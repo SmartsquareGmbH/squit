@@ -6,10 +6,8 @@ version = "1.0-SNAPSHOT"
 task clean(type: Delete) {
     group "Build"
     description "Deletes the build directory."
-    
-    doLast {
-        delete "$buildDir"
-    }
+
+    delete buildDir
 }
 
 task wrapper(type: Wrapper) {

@@ -14,7 +14,10 @@ class TimITRunnerPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         try {
-            project.tasks.create("runTimITs", TimRequestTask::class.java)
+            project.tasks.create("runTimITs", TimRequestTask::class.java) {
+                it.group = "build"
+                it.description = "Performs the requests specified in the test source directory."
+            }
         } catch (error: MissingMethodException) {
             throw GradleException("Your Gradle version is too old.")
         }

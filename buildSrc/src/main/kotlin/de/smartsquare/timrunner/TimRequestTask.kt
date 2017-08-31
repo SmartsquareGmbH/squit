@@ -41,20 +41,17 @@ open class TimRequestTask : DefaultTask() {
     @Input
     var pathSegments = "tim/"
 
-    private val api = Retrofit.Builder()
-            .baseUrl(HttpUrl.Builder()
-                    .scheme(scheme)
-                    .host(host)
-                    .port(port)
-                    .addPathSegments(pathSegments)
-                    .build())
-            .addConverterFactory(ScalarsConverterFactory.create())
-            .build()
-            .create(TimApi::class.java)
-
-    init {
-        group = "build"
-        description = "Performs the requests specified in the test source directory."
+    private val api by lazy {
+        Retrofit.Builder()
+                .baseUrl(HttpUrl.Builder()
+                        .scheme(scheme)
+                        .host(host)
+                        .port(port)
+                        .addPathSegments(pathSegments)
+                        .build())
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .build()
+                .create(TimApi::class.java)
     }
 
     /**
