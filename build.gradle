@@ -1,0 +1,17 @@
+apply plugin: 'tim-it-runner'
+
+group = "de.smartsquare"
+version = "1.0-SNAPSHOT"
+
+task clean(type: Delete) {
+    group "Build"
+    description "Deletes the build directory."
+    
+    doLast {
+        delete "$buildDir"
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.1'
+}
