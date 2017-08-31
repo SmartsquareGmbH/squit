@@ -60,7 +60,7 @@ open class TimRequestTask : DefaultTask() {
     @TaskAction
     fun run() {
         val testSrcDir = File("${project.projectDir}/src/main/test").also {
-            if (!it.exists()) throw GradleException("Test directory not found: ${it.absolutePath}")
+            if (!it.exists()) throw GradleException("Test directory not found. The path should be projectDir/src/main/test")
         }
 
         testSrcDir.listFiles(DirectoryFilter()).forEach { suiteDir ->
