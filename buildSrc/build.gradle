@@ -25,5 +25,5 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:2.3.0"
     implementation "com.squareup.retrofit2:converter-scalars:2.3.0"
 
-    implementation "dom4j:dom4j:1.6.1"
+    implementation "org.dom4j:dom4j:2.0.1"
 }

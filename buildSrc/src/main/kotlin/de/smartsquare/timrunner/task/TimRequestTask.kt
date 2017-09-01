@@ -1,9 +1,13 @@
-package de.smartsquare.timrunner
+package de.smartsquare.timrunner.task
 
+import de.smartsquare.timrunner.util.DirectoryFilter
+import de.smartsquare.timrunner.util.TimApi
 import okhttp3.HttpUrl
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
@@ -41,29 +45,24 @@ open class TimRequestTask : DefaultTask() {
     @Input
     var pathSegments = "tim/"
 
-    private val api by lazy {
-        Retrofit.Builder()
-                .baseUrl(HttpUrl.Builder()
-                        .scheme(scheme)
-                        .host(host)
-                        .port(port)
-                        .addPathSegments(pathSegments)
-                        .build())
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .build()
-                .create(TimApi::class.java)
-    }
+    /**
+     * The directory of the test sources.
+     */
+    @InputDirectory
+    var inputDirectory = File("${project.projectDir}/src/main/test")
+
+    /**
+     * The directory to save the results in.
+     */
+    @OutputDirectory
+    var outputDirectory = File("${project.buildDir}/results/raw")
 
     /**
      * Runs the task.
      */
     @TaskAction
     fun run() {
-        val testSrcDir = File("${project.projectDir}/src/main/test").also {
-            if (!it.exists()) throw GradleException("Test directory not found. The path should be projectDir/src/main/test")
-        }
-
-        testSrcDir.listFiles(DirectoryFilter()).forEach { suiteDir ->
+        inputDirectory.listFiles(DirectoryFilter()).forEach { suiteDir ->
             val propertiesFile = File(suiteDir, "config.properties").also {
                 if (!it.exists()) throw GradleException("No config.properties file for suite: ${suiteDir.name}")
             }
@@ -75,7 +74,7 @@ open class TimRequestTask : DefaultTask() {
                     if (!it.exists()) throw GradleException("No request.xml file for test: ${testDir.name}")
                 }
 
-                val soapResponse = api.request(endpoint, requestFile.readText())
+                val soapResponse = constructApi().request(endpoint, requestFile.readText())
                         .execute()
                         .let { response ->
                             if (!response.isSuccessful) {
@@ -85,7 +84,7 @@ open class TimRequestTask : DefaultTask() {
                             response.body()?.string() ?: throw GradleException("Empty response for test: ${testDir.name}")
                         }
 
-                val resultDir = File(project.buildDir, "results/${suiteDir.name}/${testDir.name}").also {
+                val resultDir = File(outputDirectory, "${suiteDir.name}/${testDir.name}").also {
                     if (!it.exists() && !it.mkdirs()) throw GradleException("Couldn't create result directory")
                 }
 
@@ -97,4 +96,15 @@ open class TimRequestTask : DefaultTask() {
             }
         }
     }
+
+    private fun constructApi() = Retrofit.Builder()
+            .baseUrl(HttpUrl.Builder()
+                    .scheme(scheme)
+                    .host(host)
+                    .port(port)
+                    .addPathSegments(pathSegments)
+                    .build())
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .build()
+            .create(TimApi::class.java)
 }

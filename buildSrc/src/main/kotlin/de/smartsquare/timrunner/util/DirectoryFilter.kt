@@ -1,4 +1,4 @@
-package de.smartsquare.timrunner
+package de.smartsquare.timrunner.util
 
 import java.io.File
 import java.io.FileFilter

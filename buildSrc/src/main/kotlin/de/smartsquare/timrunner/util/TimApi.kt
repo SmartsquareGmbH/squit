@@ -1,4 +1,4 @@
-package de.smartsquare.timrunner
+package de.smartsquare.timrunner.util
 
 import okhttp3.ResponseBody
 import retrofit2.Call
