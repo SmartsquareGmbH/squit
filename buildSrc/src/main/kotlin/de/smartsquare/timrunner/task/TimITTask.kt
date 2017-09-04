@@ -78,7 +78,7 @@ open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
                         .build()
 
                 resultList += if (diffBuilder.hasDifferences()) {
-                    TimITResult(suiteDir.name, testDir.name, diffBuilder.differences.joinToString(separator = "\n\n"))
+                    TimITResult(suiteDir.name, testDir.name, diffBuilder.differences.joinToString(separator = "\n"))
                 } else {
                     TimITResult(suiteDir.name, testDir.name)
                 }
@@ -110,9 +110,9 @@ open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
             }
 
             if (it.result.isEmpty()) {
-                testElement.addElement("failure").addText(it.result)
-            } else {
                 testElement.addElement("success")
+            } else {
+                testElement.addElement("failure").addText(it.result)
             }
         }
 
