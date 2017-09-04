@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
-               xmlns:ws="http://ws.tim.ikea.com/">
-    <soap:Header/>
-    <soap:Body>
-        <ws:applyTax>
-            <arg0>
+<S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
+    <S:Body>
+        <ns0:applyTaxResponse xmlns:ns0="http://ws.tim.ikea.com/">
+            <return>
                 <DocumentId>
                     <SystemSourceId>ICI001</SystemSourceId>
-                    <TransactionId/>
+                    <TransactionId>1005689801</TransactionId>
                 </DocumentId>
                 <AlternateDocumentId>
                     <CustomField1>CustomField1</CustomField1>
@@ -29,9 +27,10 @@
                     <LanguageCode>en</LanguageCode>
                     <LanguageCountryCode>GB</LanguageCountryCode>
                 </CommunicationLanguage>
+                <GrossPriceCalculation>Y</GrossPriceCalculation>
                 <PriceType>fixed</PriceType>
                 <CalculationDecimalPlaces>0</CalculationDecimalPlaces>
-                <PreviousInvoiceTaxCountry/>
+                <PreviousInvoiceTaxCountry>CA</PreviousInvoiceTaxCountry>
                 <TaxDecisionSet>
                     <TaxDecisionSetId/>
                     <SellerTaxIndicator>
@@ -54,8 +53,7 @@
                     <SellerTaxRegState/>
                     <BuyerTaxRegCountry/>
                     <BuyerTaxRegState/>
-                    <GrossPriceCountry/>
-
+                    <GrossPriceCountry>CA</GrossPriceCountry>
                     <TaxComment>
                         <TaxCommentType/>
                         <TaxCommentText/>
@@ -71,11 +69,10 @@
                         <ItemNo>1</ItemNo>
                         <ItemType/>
                         <UNSPSC>10200000</UNSPSC>
-                        <Classification/>
-                        <SubClassification/>
+                        <Classification>M</Classification>
+                        <SubClassification>GOODS</SubClassification>
                         <CountryItemClassification/>
                         <GrossAmount>11.30</GrossAmount>
-
                         <VariableTaxSteeringInput>
                             <ConsignorCountry/>
                             <ConsignorState/>
@@ -107,19 +104,25 @@
                             <ShippingOfCustomsClearedGoods/>
                         </VariableTaxSteeringInput>
                     </TaxInvoiceLine>
-
+                    <SellerTaxInformation>
+                        <TaxRegistration/>
+                        <TaxRepresentative/>
+                    </SellerTaxInformation>
+                    <BuyerTaxInformation>
+                        <TaxRegistration/>
+                        <TaxRepresentative/>
+                    </BuyerTaxInformation>
                 </TaxDecisionSet>
                 <TaxDate>
                     <TaxAlgorithmDate>2013-02-17</TaxAlgorithmDate>
-                    <TaxCalculationDate/>
                 </TaxDate>
                 <TaxModuleBehaviour>
                     <SkipCalculation>N</SkipCalculation>
                     <SkipDecision>N</SkipDecision>
                 </TaxModuleBehaviour>
                 <VariableTaxSteeringInput>
-                    <ConsignorCountry/>
-                    <ConsignorState/>
+                    <ConsignorCountry>CA</ConsignorCountry>
+                    <ConsignorState>CAQC</ConsignorState>
                     <ConsignorBusinessUnitCode>3110</ConsignorBusinessUnitCode>
                     <ConsignorBusinessUnitType>COM</ConsignorBusinessUnitType>
                     <ConsigneeCountry/>
@@ -130,9 +133,9 @@
                     <CarrierState/>
                     <CarrierBusinessUnitCode/>
                     <CarrierBusinessUnitType/>
-                    <ShipmentStartCountry/>
+                    <ShipmentStartCountry>CA</ShipmentStartCountry>
                     <ShipmentEndCountry/>
-                    <ShipmentStartState/>
+                    <ShipmentStartState>CAQC</ShipmentStartState>
                     <ShipmentEndState/>
                     <ServiceRenderedCountry/>
                     <ServiceRenderedState/>
@@ -160,7 +163,7 @@
                             <ZipCode/>
                             <CountryCode/>
                             <StateCode/>
-                            <CountryOfLegalRegistration/>
+                            <CountryOfLegalRegistration>CA</CountryOfLegalRegistration>
                         </PartyAddress>
                     </Party>
                     <CustomerID/>
@@ -171,19 +174,32 @@
                         <BusinessUnitType>COM</BusinessUnitType>
                         <BusinessUnitName/>
                         <PartyAddress>
-                            <AddressType/>
-                            <City/>
-                            <PostBox/>
-                            <Street/>
-                            <ZipCode/>
-                            <CountryCode/>
-                            <StateCode/>
-                            <CountryOfLegalRegistration/>
+                            <AddressType>M</AddressType>
+                            <City>BROSSARD</City>
+                            <Street>5405 PLACE de la COURONNE</Street>
+                            <ZipCode>J4Z 3R9</ZipCode>
+                            <CountryCode>CA</CountryCode>
+                            <StateCode>CAQC</StateCode>
+                            <CountryOfLegalRegistration>CA</CountryOfLegalRegistration>
                         </PartyAddress>
                     </Party>
                 </SellerParty>
                 <TermOfDelivery>DDU</TermOfDelivery>
-            </arg0>
-        </ws:applyTax>
-    </soap:Body>
-</soap:Envelope>
+                <Error>
+                    <ErrorCode>45</ErrorCode>
+                    <ErrorType>ERROR</ErrorType>
+                    <ErrorText>It was not possible to retrieve the country and state information for the
+                        VariableTaxSteeringInput.ConsigneeCountry business unit 3101 . COM from CBD.
+                    </ErrorText>
+                </Error>
+                <Error>
+                    <ErrorCode>45</ErrorCode>
+                    <ErrorType>ERROR</ErrorType>
+                    <ErrorText>It was not possible to retrieve the country and state information for the
+                        BuyerParty.Party.PartyAddress.CountryCode business unit 3101 . COM from CBD.
+                    </ErrorText>
+                </Error>
+            </return>
+        </ns0:applyTaxResponse>
+    </S:Body>
+</S:Envelope>

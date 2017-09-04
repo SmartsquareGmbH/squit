@@ -3,6 +3,7 @@ package de.smartsquare.timrunner
 import de.smartsquare.timrunner.task.TimITTask
 import de.smartsquare.timrunner.task.TimRequestTask
 import de.smartsquare.timrunner.task.TimResponseTransformerTask
+import de.smartsquare.timrunner.task.TimSourceTransformerTask
 import groovy.lang.MissingMethodException
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -18,9 +19,15 @@ class TimITRunnerPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         try {
+            project.tasks.create("transformTimSources", TimSourceTransformerTask::class.java) {
+                it.group = "build"
+                it.description = "Transforms the sources to be readable and usable for the following tasks."
+            }
+
             project.tasks.create("requestTim", TimRequestTask::class.java) {
                 it.group = "build"
                 it.description = "Performs the requests specified in the test source directory."
+                it.dependsOn("transformTimRequests")
             }
 
             project.tasks.create("transformTimResponses", TimResponseTransformerTask::class.java) {

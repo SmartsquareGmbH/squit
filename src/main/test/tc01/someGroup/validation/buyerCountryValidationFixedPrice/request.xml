@@ -28,8 +28,7 @@
                     <LanguageCode>en</LanguageCode>
                     <LanguageCountryCode>GB</LanguageCountryCode>
                 </CommunicationLanguage>
-                <GrossPriceCalculation></GrossPriceCalculation>
-                <PriceType></PriceType>
+                <PriceType>fixed</PriceType>
                 <CalculationDecimalPlaces>0</CalculationDecimalPlaces>
                 <PreviousInvoiceTaxCountry/>
                 <TaxDecisionSet>
@@ -55,7 +54,6 @@
                     <BuyerTaxRegCountry/>
                     <BuyerTaxRegState/>
                     <GrossPriceCountry/>
-
                     <TaxComment>
                         <TaxCommentType/>
                         <TaxCommentText/>
@@ -74,8 +72,7 @@
                         <Classification/>
                         <SubClassification/>
                         <CountryItemClassification/>
-                        <NetAmount>10.0</NetAmount>
-
+                        <GrossAmount>11.30</GrossAmount>
                         <VariableTaxSteeringInput>
                             <ConsignorCountry/>
                             <ConsignorState/>
@@ -107,7 +104,6 @@
                             <ShippingOfCustomsClearedGoods/>
                         </VariableTaxSteeringInput>
                     </TaxInvoiceLine>
-
                 </TaxDecisionSet>
                 <TaxDate>
                     <TaxAlgorithmDate>2013-02-17</TaxAlgorithmDate>
