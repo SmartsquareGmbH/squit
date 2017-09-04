@@ -13,26 +13,32 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
-open class TimTransformerTask : DefaultTask() {
+open class TimResponseTransformerTask : DefaultTask() {
+
+    /**
+     * The directory of the test sources.
+     */
+    @InputDirectory
+    var inputSourceDirectory = File(project.projectDir, "src/main/test")
 
     /**
      * The directory of the previously requested responses.
      */
     @InputDirectory
-    var inputDirectory = File("${project.buildDir}/results/raw")
+    var inputResponseDirectory = File(project.buildDir, "results/raw")
 
     /**
      * The directory to save the results in.
      */
     @OutputDirectory
-    var outputDirectory = File("${project.buildDir}/results/processed")
+    var outputDirectory = File(project.buildDir, "results/processed")
 
     /**
      * Runs the task.
      */
     @TaskAction
     fun run() {
-        inputDirectory.listFiles(DirectoryFilter()).forEach { suiteDir ->
+        inputResponseDirectory.listFiles(DirectoryFilter()).forEach { suiteDir ->
             suiteDir.listFiles(DirectoryFilter()).forEach { testDir ->
                 val responseFile = File(testDir, "response.xml").also {
                     if (!it.exists()) throw GradleException("Inconsistency detected for test: ${testDir.name}")
@@ -46,8 +52,15 @@ open class TimTransformerTask : DefaultTask() {
                     if (!it.exists() && !it.createNewFile()) throw GradleException("Couldn't create result file")
                 }
 
-                val document = SAXReader().read(responseFile).let {
-                    transform(it)
+                val expectedResponseFile = File(inputSourceDirectory, "${suiteDir.name}/${testDir.name}/response.xml")
+                        .also {
+                            if (!it.exists()) throw GradleException("Inconsistency detected for test: ${testDir.name}")
+                        }
+
+                val document = SAXReader().read(responseFile).let { responseDocument ->
+                    SAXReader().read(expectedResponseFile).let { expectedResponseDocument ->
+                        transform(responseDocument, expectedResponseDocument)
+                    }
                 }
 
                 XMLWriter(resultFile.bufferedWriter(), TimOutputFormat()).use {
@@ -60,7 +73,13 @@ open class TimTransformerTask : DefaultTask() {
     /**
      * TODO
      */
-    private fun transform(document: Document): Document {
-        return document
+    private fun transform(response: Document, expectedResponse: Document): Document {
+        if (response.selectNodes("Fault").isNotEmpty()) return response
+
+        expectedResponse.selectSingleNode("//TransactionId").let {
+            response.selectSingleNode("//TransactionId").text = it.text
+        }
+
+        return response
     }
 }
