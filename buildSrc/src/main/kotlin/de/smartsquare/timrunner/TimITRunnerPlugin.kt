@@ -31,7 +31,7 @@ class TimITRunnerPlugin : Plugin<Project> {
 
             project.tasks.create("runTimITs", TimITTask::class.java) {
                 it.group = "build"
-                it.description = "Runs the integration tests"
+                it.description = "Runs the integration tests."
                 it.dependsOn("transformTimResponses")
 
                 it.reports.getXml().apply {
