@@ -1,4 +1,4 @@
-package de.smartsquare.timrunner.task
+package de.smartsquare.timrunner.entity
 
 import org.gradle.api.reporting.Report
 import org.gradle.api.reporting.ReportContainer

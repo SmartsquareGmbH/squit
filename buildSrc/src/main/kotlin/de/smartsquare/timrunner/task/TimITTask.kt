@@ -1,5 +1,8 @@
 package de.smartsquare.timrunner.task
 
+import de.smartsquare.timrunner.entity.TimITReportContainer
+import de.smartsquare.timrunner.entity.TimITReportContainerImpl
+import de.smartsquare.timrunner.entity.TimITResult
 import de.smartsquare.timrunner.util.DirectoryFilter
 import de.smartsquare.timrunner.util.use
 import groovy.lang.Closure
@@ -73,8 +76,8 @@ open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
                             if (!it.exists()) throw GradleException("Inconsistency detected for test: ${testDir.name}")
                         }
 
-                val diffBuilder = DiffBuilder.compare(Input.fromFile(expectedResponseFile))
-                        .withTest(Input.fromFile(actualResponseFile))
+                val diffBuilder = DiffBuilder.compare(Input.fromFile(actualResponseFile))
+                        .withTest(Input.fromFile(expectedResponseFile))
                         .build()
 
                 resultList += if (diffBuilder.hasDifferences()) {
