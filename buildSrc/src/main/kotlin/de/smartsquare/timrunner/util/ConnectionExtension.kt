@@ -6,6 +6,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.sql.Connection
 
-inline fun Connection.executeScript(path: Path) = createStatement().use { statement ->
-    statement.execute(Files.readAllLines(path).joinToString { it.trim().trimEnd(';') })
-}
+inline fun Connection.executeScript(path: Path) = Files.readAllLines(path).joinToString().split(";")
+        .map { it.trim() }
+        .filter { it.isNotBlank() }
+        .forEach { createStatement().use { statement -> statement.execute(it) } }
