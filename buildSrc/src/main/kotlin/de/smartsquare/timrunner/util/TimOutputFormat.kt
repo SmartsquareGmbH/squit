@@ -8,9 +8,7 @@ class TimOutputFormat : OutputFormat() {
         setIndentSize(4)
 
         isNewLineAfterDeclaration = false
-//        isSuppressDeclaration = true
         isNewlines = true
         isTrimText = true
-        isPadText = true
     }
 }

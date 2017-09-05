@@ -1,20 +1,22 @@
 package de.smartsquare.timrunner.task
 
-import de.smartsquare.timrunner.util.DirectoryFilter
-import de.smartsquare.timrunner.util.TimApi
-import okhttp3.HttpUrl
+import de.smartsquare.timrunner.entity.TimProperties
+import de.smartsquare.timrunner.util.ConnectionCollection
+import de.smartsquare.timrunner.util.FilesUtils
+import de.smartsquare.timrunner.util.cut
+import de.smartsquare.timrunner.util.executeScript
+import okhttp3.*
 import oracle.jdbc.driver.OracleDriver
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import retrofit2.Retrofit
-import retrofit2.converter.scalars.ScalarsConverterFactory
-import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.sql.DriverManager
-import java.util.*
 
 /**
  * Task for running requests against the tim API.
@@ -24,117 +26,78 @@ import java.util.*
 open class TimRequestTask : DefaultTask() {
 
     /**
-     * The scheme of the API.
-     */
-    @Input
-    var scheme = "http"
-
-    /**
-     * The host of the API.
-     */
-    @Input
-    var host = "localhost"
-
-    /**
-     * The port of the API.
-     */
-    @Input
-    var port = 7001
-
-    /**
-     * Additional path segments of the API. *Must* end with a backslash.
-     */
-    @Input
-    var pathSegments = "tim/"
-
-    /**
      * The directory of the test sources.
      */
     @InputDirectory
-    var inputDirectory = File("${project.projectDir}/src/main/test")
+    var inputPath: Path = Paths.get(project.buildDir.path, "source")
 
     /**
      * The directory to save the results in.
      */
     @OutputDirectory
-    var outputDirectory = File("${project.buildDir}/results/raw")
+    var outputPath: Path = Paths.get(project.buildDir.path, "results/raw")
+
+    @Internal
+    private val okHttpClient = OkHttpClient.Builder().build()
+
+    @Internal
+    private val dbConnections = ConnectionCollection()
+
+    init {
+        DriverManager.registerDriver(OracleDriver())
+    }
 
     /**
      * Runs the task.
      */
     @TaskAction
     fun run() {
-        DriverManager.registerDriver(OracleDriver())
-        DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "timdb", "timdb").use { timdbConnection ->
-            DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "timstat", "timstat").use { timstatConnection ->
+        dbConnections.use {
+            FilesUtils.getLeafDirectories(inputPath).forEach { testDir ->
+                val propertiesPath = FilesUtils.createFileIfNotExists(testDir.resolve("config.properties"))
+                val properties = TimProperties().fillFromProperties(propertiesPath)
 
-                inputDirectory.listFiles(DirectoryFilter()).forEach { suiteDir ->
-                    val propertiesFile = File(suiteDir, "config.properties").also {
-                        if (!it.exists()) throw GradleException("No config.properties file for suite: ${suiteDir.name}")
-                    }
+                val requestPath = FilesUtils.validateExistence(testDir.resolve("request.xml"))
 
-                    val endpoint = Properties().apply { load(propertiesFile.inputStream()) }.getProperty("endpoint")
+                executeScriptIfExisting(testDir.resolve("timdb_pre.sql"), properties.timdbJdbc,
+                        properties.timdbUser, properties.timdbPassword)
+                executeScriptIfExisting(testDir.resolve("timstat_pre.sql"), properties.timstatJdbc,
+                        properties.timstatUser, properties.timstatPassword)
 
-                    suiteDir.listFiles(DirectoryFilter()).forEach { testDir ->
-                        val preSqlFile = File(testDir, "pre.sql")
-                        val postSqlFile = File(testDir, "post.sql")
-                        val requestFile = File(testDir, "request.xml").also {
-                            if (!it.exists()) throw GradleException("No request.xml file for test: ${testDir.name}")
-                        }
-
-                        if (preSqlFile.exists()) {
-                            preSqlFile.readText().split(";").filter { it.isNotBlank() }.forEach { query ->
-                                timdbConnection.createStatement().use { statement ->
-                                    statement.execute(query)
-                                }
-
-                                timdbConnection.commit()
+                val soapResponse = constructApiCall(properties.endpoint, requestPath)
+                        .execute()
+                        .let { response ->
+                            if (!response.isSuccessful) {
+                                throw GradleException("Could not request tim for test: ${testDir.fileName} " +
+                                        "(${response.message()})")
                             }
+
+                            response.body()?.string() ?: throw GradleException("Empty response for test: " +
+                                    "${testDir.fileName}")
                         }
 
-                        val soapResponse = constructApi().request(endpoint, requestFile.readText())
-                                .execute()
-                                .let { response ->
-                                    if (!response.isSuccessful) {
-                                        throw GradleException("Could not request tim for test: ${testDir.name}")
-                                    }
+                val resultDirectoryPath = Files.createDirectories(outputPath.resolve(testDir.cut(inputPath)))
+                val resultFilePath = FilesUtils.createFileIfNotExists(resultDirectoryPath.resolve("response.xml"))
 
-                                    response.body()?.string() ?: throw GradleException("Empty response for test: ${testDir.name}")
-                                }
+                Files.write(resultFilePath, soapResponse.lines())
 
-                        if (postSqlFile.exists()) {
-                            postSqlFile.readText().split(";").filter { it.isNotBlank() }.forEach { query ->
-                                timdbConnection.createStatement().use { statement ->
-                                    statement.execute(query)
-                                }
-
-                                timdbConnection.commit()
-                            }
-                        }
-
-                        val resultDir = File(outputDirectory, "${suiteDir.name}/${testDir.name}").also {
-                            if (!it.exists() && !it.mkdirs()) throw GradleException("Couldn't create result directory")
-                        }
-
-                        val resultFile = File(resultDir, "response.xml").also {
-                            if (!it.exists() && !it.createNewFile()) throw GradleException("Couldn't create result file")
-                        }
-
-                        resultFile.writeText(soapResponse)
-                    }
-                }
+                executeScriptIfExisting(testDir.resolve("timdb_post.sql"), properties.timdbJdbc,
+                        properties.timdbUser, properties.timdbPassword)
+                executeScriptIfExisting(testDir.resolve("timstat_post.sql"), properties.timstatJdbc,
+                        properties.timstatUser, properties.timstatPassword)
             }
         }
     }
 
-    private fun constructApi() = Retrofit.Builder()
-            .baseUrl(HttpUrl.Builder()
-                    .scheme(scheme)
-                    .host(host)
-                    .port(port)
-                    .addPathSegments(pathSegments)
-                    .build())
-            .addConverterFactory(ScalarsConverterFactory.create())
+    private fun constructApiCall(url: HttpUrl, requestPath: Path) = okHttpClient.newCall(Request.Builder()
+            .post(RequestBody.create(MediaType.parse("application/soap+xml"), requestPath.toFile()))
+            .url(url)
             .build()
-            .create(TimApi::class.java)
+    )
+
+    private fun executeScriptIfExisting(path: Path, jdbc: String, username: String, password: String) {
+        if (Files.exists(path)) {
+            dbConnections.createOrGet(jdbc, username, password).executeScript(path)
+        }
+    }
 }

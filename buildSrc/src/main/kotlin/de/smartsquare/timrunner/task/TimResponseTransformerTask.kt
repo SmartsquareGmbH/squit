@@ -1,17 +1,18 @@
 package de.smartsquare.timrunner.task
 
-import de.smartsquare.timrunner.util.DirectoryFilter
-import de.smartsquare.timrunner.util.TimOutputFormat
-import de.smartsquare.timrunner.util.use
+import de.smartsquare.timrunner.util.FilesUtils
+import de.smartsquare.timrunner.util.cut
+import de.smartsquare.timrunner.util.read
+import de.smartsquare.timrunner.util.write
 import org.dom4j.Document
 import org.dom4j.io.SAXReader
-import org.dom4j.io.XMLWriter
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 
 open class TimResponseTransformerTask : DefaultTask() {
 
@@ -19,65 +20,45 @@ open class TimResponseTransformerTask : DefaultTask() {
      * The directory of the test sources.
      */
     @InputDirectory
-    var inputSourceDirectory = File(project.projectDir, "src/main/test")
+    var inputSourceDirectory: Path = Paths.get(project.buildDir.path, "source")
 
     /**
      * The directory of the previously requested responses.
      */
     @InputDirectory
-    var inputResponseDirectory = File(project.buildDir, "results/raw")
+    var inputResponseDirectory: Path = Paths.get(project.buildDir.path, "results/raw")
 
     /**
      * The directory to save the results in.
      */
     @OutputDirectory
-    var outputDirectory = File(project.buildDir, "results/processed")
+    var outputDirectory: Path = Paths.get(project.buildDir.path, "results/processed")
 
     /**
      * Runs the task.
      */
     @TaskAction
     fun run() {
-        inputResponseDirectory.listFiles(DirectoryFilter()).forEach { suiteDir ->
-            suiteDir.listFiles(DirectoryFilter()).forEach { testDir ->
-                val responseFile = File(testDir, "response.xml").also {
-                    if (!it.exists()) throw GradleException("Inconsistency detected for test: ${testDir.name}")
-                }
+        FilesUtils.getLeafDirectories(inputResponseDirectory).forEach { testDir ->
+            val responsePath = FilesUtils.validateExistence(testDir.resolve("response.xml"))
+            val expectedResponsePath = FilesUtils.validateExistence(inputSourceDirectory
+                    .resolve(testDir.cut(inputResponseDirectory))
+                    .resolve("response.xml"))
 
-                val resultDir = File(outputDirectory, "${suiteDir.name}/${testDir.name}").also {
-                    if (!it.exists() && !it.mkdirs()) throw GradleException("Couldn't create result directory")
-                }
+            val resultDirectoryPath = Files.createDirectories(outputDirectory.
+                    resolve(testDir.cut(inputResponseDirectory)))
 
-                val resultFile = File(resultDir, "response.xml").also {
-                    if (!it.exists() && !it.createNewFile()) throw GradleException("Couldn't create result file")
-                }
+            val resultFilePath = FilesUtils.createFileIfNotExists(resultDirectoryPath.resolve("response.xml"))
 
-                val expectedResponseFile = File(inputSourceDirectory, "${suiteDir.name}/${testDir.name}/response.xml")
-                        .also {
-                            if (!it.exists()) throw GradleException("Inconsistency detected for test: ${testDir.name}")
-                        }
-
-                val document = SAXReader().read(responseFile).let { responseDocument ->
-                    SAXReader().read(expectedResponseFile).let { expectedResponseDocument ->
-                        transform(responseDocument, expectedResponseDocument)
-                    }
-                }
-
-                XMLWriter(resultFile.bufferedWriter(), TimOutputFormat()).use {
-                    it.write(document)
-                }
-            }
+            transform(SAXReader().read(responsePath), SAXReader().read(expectedResponsePath)).write(resultFilePath)
         }
     }
 
-    /**
-     * TODO
-     */
     private fun transform(response: Document, expectedResponse: Document): Document {
         if (response.selectNodes("Fault").isNotEmpty()) return response
 
-        expectedResponse.selectSingleNode("//TransactionId").let {
-            response.selectSingleNode("//TransactionId").text = it.text
+        expectedResponse.selectSingleNode("//TransactionId")?.let {
+            response.selectSingleNode("//TransactionId")?.text = it.text
         }
 
         return response

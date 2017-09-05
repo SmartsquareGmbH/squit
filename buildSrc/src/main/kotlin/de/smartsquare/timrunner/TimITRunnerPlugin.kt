@@ -27,7 +27,7 @@ class TimITRunnerPlugin : Plugin<Project> {
             project.tasks.create("requestTim", TimRequestTask::class.java) {
                 it.group = "build"
                 it.description = "Performs the requests specified in the test source directory."
-                it.dependsOn("transformTimRequests")
+                it.dependsOn("transformTimSources")
             }
 
             project.tasks.create("transformTimResponses", TimResponseTransformerTask::class.java) {

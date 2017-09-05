@@ -26,9 +26,7 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.4-3"
 
-    implementation "com.squareup.retrofit2:retrofit:2.3.0"
-    implementation "com.squareup.retrofit2:converter-scalars:2.3.0"
-
+    implementation "com.squareup.okhttp3:okhttp:3.9.0"
     implementation "org.dom4j:dom4j:2.0.1"
     implementation 'org.xmlunit:xmlunit-core:2.5.0'
 }
