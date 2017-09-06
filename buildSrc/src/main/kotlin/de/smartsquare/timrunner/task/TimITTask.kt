@@ -3,6 +3,7 @@ package de.smartsquare.timrunner.task
 import de.smartsquare.timrunner.entity.TimITReportContainer
 import de.smartsquare.timrunner.entity.TimITReportContainerImpl
 import de.smartsquare.timrunner.entity.TimITResult
+import de.smartsquare.timrunner.util.Constants.RESPONSE
 import de.smartsquare.timrunner.util.FilesUtils
 import de.smartsquare.timrunner.util.cut
 import de.smartsquare.timrunner.util.write
@@ -67,13 +68,14 @@ open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
         val resultList = arrayListOf<TimITResult>()
 
         FilesUtils.getLeafDirectories(inputResponseDirectory).forEach { responseDirectory ->
-            val actualResponseFile = FilesUtils.validateExistence(responseDirectory.resolve("response.xml"))
+            val actualResponseFile = FilesUtils.validateExistence(responseDirectory.resolve(RESPONSE))
             val expectedResponseFile = FilesUtils.validateExistence(inputSourceDirectory
                     .resolve(responseDirectory.cut(inputResponseDirectory))
-                    .resolve("response.xml"))
+                    .resolve(RESPONSE))
 
             val diffBuilder = DiffBuilder.compare(Input.fromStream(Files.newInputStream(actualResponseFile)))
                     .withTest(Input.fromStream(Files.newInputStream(expectedResponseFile)))
+                    .checkForSimilar()
                     .build()
 
             resultList += if (diffBuilder.hasDifferences()) {

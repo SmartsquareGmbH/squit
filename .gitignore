@@ -13,6 +13,9 @@ cmake-build-debug/
 ## File-based project format:
 *.iws
 
+## Directory-based project format:
+*.iml
+
 ## Plugin-specific files:
 
 # IntelliJ
@@ -39,3 +42,10 @@ gradle-app.setting
 
 # Cache of project
 .gradletasknamecache
+
+### Custom extensions
+# Our own extensions, specifically for this project
+
+## Everything else apart from the actual test directory:
+/src/main/
+!/src/main/test

@@ -13,18 +13,19 @@ class TimProperties {
     val timdbJdbc get() = _timdbJdbc ?: throw AssertionError("Internal representation is null.")
     val timdbUser get() = _timdbUser ?: throw AssertionError("Internal representation is null.")
     val timdbPassword get() = _timdbPassword ?: throw AssertionError("Internal representation is null.")
-    val timstatJdbc get() = _timstatJdbc ?: throw AssertionError("Internal representation is null.")
-    val timstatUser get() = _timstatUser ?: throw AssertionError("Internal representation is null.")
-    val timstatPassword get() = _timstatPassword ?: throw AssertionError("Internal representation is null.")
+    val taxbasedbJdbc get() = _taxbasedbJdbc ?: throw AssertionError("Internal representation is null.")
+    val taxbasedbUser get() = _taxbasedbUser ?: throw AssertionError("Internal representation is null.")
+    val taxbasedbPassword
+        get() = _taxbasedbPassword ?: throw AssertionError("Internal representation is null.")
 
     private var _endpoint: HttpUrl? = null
     private var _ignore: Boolean? = null
     private var _timdbJdbc: String? = null
-    private var _timstatJdbc: String? = null
+    private var _taxbasedbJdbc: String? = null
     private var _timdbUser: String? = null
     private var _timdbPassword: String? = null
-    private var _timstatUser: String? = null
-    private var _timstatPassword: String? = null
+    private var _taxbasedbUser: String? = null
+    private var _taxbasedbPassword: String? = null
 
     fun fillFromProperties(path: Path): TimProperties {
         Properties().safeLoad(path).also { properties ->
@@ -84,8 +85,8 @@ class TimProperties {
                 }
             }
 
-            if (_timstatJdbc == null) {
-                _timstatJdbc = properties.getProperty("timstat_jdbc").let {
+            if (_taxbasedbJdbc == null) {
+                _taxbasedbJdbc = properties.getProperty("taxbasedb_jdbc").let {
                     when {
                         it == null -> null
                         it.isBlank() -> throw GradleException("Invalid value for timstat_jdbc property: $it")
@@ -94,8 +95,8 @@ class TimProperties {
                 }
             }
 
-            if (_timstatUser == null) {
-                _timstatUser = properties.getProperty("timstat_user").let {
+            if (_taxbasedbUser == null) {
+                _taxbasedbUser = properties.getProperty("taxbasedb_user").let {
                     when {
                         it == null -> null
                         it.isBlank() -> throw GradleException("Invalid value for timstat_user property: $it")
@@ -104,11 +105,11 @@ class TimProperties {
                 }
             }
 
-            if (_timstatPassword == null) {
-                _timstatPassword = properties.getProperty("timstat_password").let {
+            if (_taxbasedbPassword == null) {
+                _taxbasedbPassword = properties.getProperty("taxbasedb_password").let {
                     when {
                         it == null -> null
-                        it.isBlank() -> throw GradleException("Invalid value for timstat_password property: $it")
+                        it.isBlank() -> throw GradleException("Invalid value for taxbasedb_password property: $it")
                         else -> it
                     }
                 }
@@ -129,21 +130,18 @@ class TimProperties {
 
     fun writeToProperties() = Properties().apply {
         setProperty("endpoint", endpoint.toString())
-        setProperty("ignore", ignore.toString())
         setProperty("timdb_jdbc", timdbJdbc)
         setProperty("timdb_user", timdbUser)
         setProperty("timdb_password", timdbPassword)
-        setProperty("timstat_jdbc", timstatJdbc)
-        setProperty("timstat_user", timstatUser)
-        setProperty("timstat_password", timstatPassword)
+        setProperty("taxbasedb_jdbc", taxbasedbJdbc)
+        setProperty("taxbasedb_user", taxbasedbUser)
+        setProperty("taxbasedb_password", taxbasedbPassword)
     }
 
     fun isValid() = _endpoint != null && _timdbJdbc != null && _timdbUser != null && _timdbPassword != null
-            && _timstatJdbc != null && _timstatUser != null && _timstatPassword != null
+            && _taxbasedbJdbc != null && _taxbasedbUser != null && _taxbasedbPassword != null
 
-    override fun toString(): String {
-        return "TimProperties(_endpoint=$_endpoint, _ignore=${_ignore == true}, _timdbJdbc=$_timdbJdbc, " +
-                "_timstatJdbc=$_timstatJdbc, _timdbUser=$_timdbUser, _timdbPassword=$_timdbPassword, " +
-                "_timstatUser=$_timstatUser, _timstatPassword=$_timstatPassword)"
-    }
+    override fun toString() = "TimProperties(_endpoint=$_endpoint, _ignore=$_ignore, _timdbJdbc=$_timdbJdbc, " +
+            "_taxbasedbJdbc=$_taxbasedbJdbc, _timdbUser=$_timdbUser, _timdbPassword=$_timdbPassword, " +
+            "_taxbasedbUser=$_taxbasedbUser, _taxbasedbPassword=$_taxbasedbPassword)"
 }

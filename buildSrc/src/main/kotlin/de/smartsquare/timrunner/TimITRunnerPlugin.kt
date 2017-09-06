@@ -1,9 +1,6 @@
 package de.smartsquare.timrunner
 
-import de.smartsquare.timrunner.task.TimITTask
-import de.smartsquare.timrunner.task.TimRequestTask
-import de.smartsquare.timrunner.task.TimResponseTransformerTask
-import de.smartsquare.timrunner.task.TimSourceTransformerTask
+import de.smartsquare.timrunner.task.*
 import groovy.lang.MissingMethodException
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -20,24 +17,24 @@ class TimITRunnerPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         try {
             project.tasks.create("transformTimSources", TimSourceTransformerTask::class.java) {
-                it.group = "build"
+                it.group = "Build"
                 it.description = "Transforms the sources to be readable and usable for the following tasks."
             }
 
             project.tasks.create("requestTim", TimRequestTask::class.java) {
-                it.group = "build"
+                it.group = "Build"
                 it.description = "Performs the requests specified in the test source directory."
                 it.dependsOn("transformTimSources")
             }
 
             project.tasks.create("transformTimResponses", TimResponseTransformerTask::class.java) {
-                it.group = "build"
+                it.group = "Build"
                 it.description = "Transforms the responses to be readable and usable for the comparing task."
                 it.dependsOn("requestTim")
             }
 
             project.tasks.create("runTimITs", TimITTask::class.java) {
-                it.group = "build"
+                it.group = "Build"
                 it.description = "Runs the integration tests."
                 it.dependsOn("transformTimResponses")
 
@@ -50,6 +47,11 @@ class TimITRunnerPlugin : Plugin<Project> {
                     isEnabled = false
                     destination = File(project.buildDir, "reports/timIT")
                 }
+            }
+
+            project.tasks.create("convertSupplyChainProject", TimSupplyChainConverterTask::class.java) {
+                it.group = "Build Setup"
+                it.description = "Converts a legacy supply chain project to be usable by the ${project.name}."
             }
         } catch (error: MissingMethodException) {
             throw GradleException("Your Gradle version is too old.")

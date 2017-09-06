@@ -1,5 +1,6 @@
 package de.smartsquare.timrunner.task
 
+import de.smartsquare.timrunner.util.Constants.RESPONSE
 import de.smartsquare.timrunner.util.FilesUtils
 import de.smartsquare.timrunner.util.cut
 import de.smartsquare.timrunner.util.read
@@ -40,15 +41,15 @@ open class TimResponseTransformerTask : DefaultTask() {
     @TaskAction
     fun run() {
         FilesUtils.getLeafDirectories(inputResponseDirectory).forEach { testDir ->
-            val responsePath = FilesUtils.validateExistence(testDir.resolve("response.xml"))
+            val responsePath = FilesUtils.validateExistence(testDir.resolve(RESPONSE))
             val expectedResponsePath = FilesUtils.validateExistence(inputSourceDirectory
                     .resolve(testDir.cut(inputResponseDirectory))
-                    .resolve("response.xml"))
+                    .resolve(RESPONSE))
 
             val resultDirectoryPath = Files.createDirectories(outputDirectory.
                     resolve(testDir.cut(inputResponseDirectory)))
 
-            val resultFilePath = FilesUtils.createFileIfNotExists(resultDirectoryPath.resolve("response.xml"))
+            val resultFilePath = FilesUtils.createFileIfNotExists(resultDirectoryPath.resolve(RESPONSE))
 
             transform(SAXReader().read(responsePath), SAXReader().read(expectedResponsePath)).write(resultFilePath)
         }

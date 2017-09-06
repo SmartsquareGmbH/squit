@@ -2,6 +2,7 @@
 
 package de.smartsquare.timrunner.util
 
+import org.apache.poi.ss.usermodel.Row
 import org.dom4j.Document
 import org.dom4j.io.OutputFormat
 import org.dom4j.io.SAXReader
@@ -21,8 +22,16 @@ inline fun Properties.safeStore(path: Path, comments: String? = null) = Files.ne
 }
 
 inline fun SAXReader.read(path: Path) = Files.newInputStream(path).use {
-    SAXReader().read(it)
+    read(it)
 }
 
 inline fun Document.write(path: Path, outputFormat: OutputFormat = TimOutputFormat()) = Files.newBufferedWriter(path)
         .use { XMLWriter(it, outputFormat).write(document) }
+
+inline fun Row.safeStringValueAt(position: Int): String? {
+    return try {
+        getCell(position)?.stringCellValue?.let { if (it.isBlank()) null else it }
+    } catch (ignored: Throwable) {
+        null
+    }
+}

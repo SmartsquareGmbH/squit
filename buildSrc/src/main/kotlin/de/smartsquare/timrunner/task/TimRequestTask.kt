@@ -2,13 +2,19 @@ package de.smartsquare.timrunner.task
 
 import de.smartsquare.timrunner.entity.TimProperties
 import de.smartsquare.timrunner.util.ConnectionCollection
+import de.smartsquare.timrunner.util.Constants.CONFIG
+import de.smartsquare.timrunner.util.Constants.REQUEST
+import de.smartsquare.timrunner.util.Constants.RESPONSE
+import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_POST
+import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_PRE
+import de.smartsquare.timrunner.util.Constants.TIM_DB_POST
+import de.smartsquare.timrunner.util.Constants.TIM_DB_PRE
 import de.smartsquare.timrunner.util.FilesUtils
 import de.smartsquare.timrunner.util.cut
 import de.smartsquare.timrunner.util.executeScript
 import okhttp3.*
 import oracle.jdbc.driver.OracleDriver
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
@@ -52,39 +58,39 @@ open class TimRequestTask : DefaultTask() {
      */
     @TaskAction
     fun run() {
+        outputPath.toFile().deleteRecursively()
+
         dbConnections.use {
             FilesUtils.getLeafDirectories(inputPath).forEach { testDir ->
-                val propertiesPath = FilesUtils.createFileIfNotExists(testDir.resolve("config.properties"))
-                val properties = TimProperties().fillFromProperties(propertiesPath)
+                val propertiesPath = FilesUtils.createFileIfNotExists(testDir.resolve(CONFIG))
+                val properties = TimProperties().fillFromSingleProperties(propertiesPath)
 
-                val requestPath = FilesUtils.validateExistence(testDir.resolve("request.xml"))
+                val requestPath = FilesUtils.validateExistence(testDir.resolve(REQUEST))
 
-                executeScriptIfExisting(testDir.resolve("timdb_pre.sql"), properties.timdbJdbc,
+                executeScriptIfExisting(testDir.resolve(TIM_DB_PRE), properties.timdbJdbc,
                         properties.timdbUser, properties.timdbPassword)
-                executeScriptIfExisting(testDir.resolve("timstat_pre.sql"), properties.timstatJdbc,
-                        properties.timstatUser, properties.timstatPassword)
+                executeScriptIfExisting(testDir.resolve(TAXBASE_DB_PRE), properties.taxbasedbJdbc,
+                        properties.taxbasedbUser, properties.taxbasedbPassword)
 
                 val soapResponse = constructApiCall(properties.endpoint, requestPath)
                         .execute()
                         .let { response ->
                             if (!response.isSuccessful) {
-                                throw GradleException("Could not request tim for test: ${testDir.fileName} " +
-                                        "(${response.message()})")
+                                response.message()
                             }
 
-                            response.body()?.string() ?: throw GradleException("Empty response for test: " +
-                                    "${testDir.fileName}")
+                            response.body()?.string() ?: ""
                         }
 
                 val resultDirectoryPath = Files.createDirectories(outputPath.resolve(testDir.cut(inputPath)))
-                val resultFilePath = FilesUtils.createFileIfNotExists(resultDirectoryPath.resolve("response.xml"))
+                val resultFilePath = FilesUtils.createFileIfNotExists(resultDirectoryPath.resolve(RESPONSE))
 
                 Files.write(resultFilePath, soapResponse.lines())
 
-                executeScriptIfExisting(testDir.resolve("timdb_post.sql"), properties.timdbJdbc,
+                executeScriptIfExisting(testDir.resolve(TIM_DB_POST), properties.timdbJdbc,
                         properties.timdbUser, properties.timdbPassword)
-                executeScriptIfExisting(testDir.resolve("timstat_post.sql"), properties.timstatJdbc,
-                        properties.timstatUser, properties.timstatPassword)
+                executeScriptIfExisting(testDir.resolve(TAXBASE_DB_POST), properties.taxbasedbJdbc,
+                        properties.taxbasedbUser, properties.taxbasedbPassword)
             }
         }
     }
@@ -97,7 +103,12 @@ open class TimRequestTask : DefaultTask() {
 
     private fun executeScriptIfExisting(path: Path, jdbc: String, username: String, password: String) {
         if (Files.exists(path)) {
-            dbConnections.createOrGet(jdbc, username, password).executeScript(path)
+            try {
+                dbConnections.createOrGet(jdbc, username, password).executeScript(path)
+            } catch (error: Throwable) {
+                logger.warn("Could not run database script ${path.fileName} for test ${path.parent.fileName} " +
+                        "(${error.toString().trim()})")
+            }
         }
     }
 }

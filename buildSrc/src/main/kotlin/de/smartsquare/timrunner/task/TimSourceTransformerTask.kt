@@ -2,6 +2,13 @@ package de.smartsquare.timrunner.task
 
 import de.smartsquare.timrunner.entity.TimProperties
 import de.smartsquare.timrunner.util.*
+import de.smartsquare.timrunner.util.Constants.CONFIG
+import de.smartsquare.timrunner.util.Constants.REQUEST
+import de.smartsquare.timrunner.util.Constants.RESPONSE
+import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_POST
+import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_PRE
+import de.smartsquare.timrunner.util.Constants.TIM_DB_POST
+import de.smartsquare.timrunner.util.Constants.TIM_DB_PRE
 import org.dom4j.Document
 import org.dom4j.io.SAXReader
 import org.gradle.api.DefaultTask
@@ -33,6 +40,8 @@ open class TimSourceTransformerTask : DefaultTask() {
      */
     @TaskAction
     fun run() {
+        outputDirectory.toFile().deleteRecursively()
+
         FilesUtils.getLeafDirectories(inputSourceDirectory).forEach {
             val resolvedProperties = resolveProperties(it)
 
@@ -40,25 +49,28 @@ open class TimSourceTransformerTask : DefaultTask() {
                 val (requestPath, responsePath, sqlFilePaths) = getRelevantPathsForTest(it)
                 val resultDirectory = Files.createDirectories(outputDirectory.resolve(it.cut(inputSourceDirectory)))
 
-                val resultPropertiesPath = FilesUtils.createFileIfNotExists(resultDirectory
-                        .resolve("config.properties"))
-
-                val resultRequestPath = FilesUtils.createFileIfNotExists(resultDirectory
-                        .resolve(requestPath.fileName))
-
+                val resultPropertiesPath = FilesUtils.createFileIfNotExists(resultDirectory.resolve(CONFIG))
+                val resultRequestPath = FilesUtils.createFileIfNotExists(resultDirectory.resolve(requestPath.fileName))
                 val resultResponsePath = FilesUtils.createFileIfNotExists(resultDirectory
                         .resolve(responsePath.fileName))
 
-                transformRequest(SAXReader().read(requestPath)).write(resultRequestPath)
-                transformResponse(SAXReader().read(responsePath)).write(resultResponsePath)
+                try {
+                    transformRequest(SAXReader().read(requestPath)).write(resultRequestPath)
+                } catch (error: Throwable) {
+                    throw GradleException("Could not transform file: $requestPath ($error)")
+                }
+
+                try {
+                    transformResponse(SAXReader().read(responsePath)).write(resultResponsePath)
+                } catch (error: Throwable) {
+                    throw GradleException("Could not transform file: $responsePath ($error)")
+                }
 
                 sqlFilePaths.forEach {
                     Files.copy(it, resultDirectory.resolve(it.fileName), StandardCopyOption.REPLACE_EXISTING)
                 }
 
-                resolvedProperties
-                        .writeToProperties()
-                        .safeStore(resultPropertiesPath, "Properties for the ${it.fileName} test")
+                resolvedProperties.writeToProperties().safeStore(resultPropertiesPath)
             }
         }
     }
@@ -67,8 +79,8 @@ open class TimSourceTransformerTask : DefaultTask() {
         var currentDirectory = testDirectory
         val result = TimProperties()
 
-        while (!currentDirectory.endsWith(inputSourceDirectory)) {
-            currentDirectory.resolve("config.properties").also { propertiesPath ->
+        while (!currentDirectory.endsWith(inputSourceDirectory.parent)) {
+            currentDirectory.resolve(CONFIG).also { propertiesPath ->
                 if (Files.exists(propertiesPath)) {
                     result.fillFromProperties(propertiesPath)
                 }
@@ -92,10 +104,10 @@ open class TimSourceTransformerTask : DefaultTask() {
         Files.list(path).use {
             it.sequential().forEach { path ->
                 when (path.fileName.toString()) {
-                    "request.xml" -> requestPath = path
-                    "response.xml" -> responsePath = path
-                    "timdb_pre.sql", "timdb_post.sql", "timstat_pre.sql", "timstat_post.sql" -> sqlFilePaths.add(path)
-                    "config.properties" -> Unit
+                    REQUEST -> requestPath = path
+                    RESPONSE -> responsePath = path
+                    TIM_DB_PRE, TIM_DB_POST, TAXBASE_DB_PRE, TAXBASE_DB_POST -> sqlFilePaths.add(path)
+                    CONFIG -> Unit
                     else -> logger.warn("Ignoring unknown file: ${path.fileName}")
                 }
             }
@@ -106,7 +118,7 @@ open class TimSourceTransformerTask : DefaultTask() {
                 return Triple(safeRequestFile, safeResponseFile, sqlFilePaths)
             }
 
-            throw GradleException("Missing response.xml for test: ${path.fileName}")
+            throw GradleException("Missing ${Constants.RESPONSE} for test: ${path.fileName}")
         }
 
         throw GradleException("Missing request.xml for test: ${path.fileName}")
