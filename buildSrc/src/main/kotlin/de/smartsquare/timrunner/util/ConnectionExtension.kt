@@ -7,13 +7,21 @@ import java.nio.file.Path
 import java.sql.Connection
 
 inline fun Connection.executeScript(path: Path) {
-    createStatement().use { statement ->
-        Files.readAllLines(path).joinToString("")
-                .split(";")
-                .map { it.trim() }
-                .filter { it.isNotBlank() }
-                .forEach { statement.addBatch(it) }
+    try {
+        createStatement().use { statement ->
+            Files.readAllLines(path).joinToString(" ")
+                    .split(";")
+                    .map { it.trim() }
+                    .filter { it.isNotBlank() }
+                    .forEach { statement.addBatch(it) }
 
-        statement.executeBatch()
+            statement.executeBatch()
+        }
+
+        commit()
+    } catch (error: Throwable) {
+        rollback()
+
+        throw error
     }
 }
