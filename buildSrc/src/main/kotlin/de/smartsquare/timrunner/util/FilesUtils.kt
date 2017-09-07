@@ -9,7 +9,10 @@ import java.nio.file.attribute.BasicFileAttributes
 
 object FilesUtils {
 
-    fun getLeafDirectories(current: Path) = mutableListOf<Path>().also { result ->
+    fun getChildDirectories(current: Path) = Files.newDirectoryStream(current, { Files.isDirectory(it) })
+            .use { it.toList() }
+
+    fun getLeafDirectories(current: Path): List<Path> = mutableListOf<Path>().also { result ->
         Files.walkFileTree(current, object : SimpleFileVisitor<Path>() {
             override fun preVisitDirectory(directory: Path, attributes: BasicFileAttributes): FileVisitResult {
                 if (Files.list(directory).use { it.noneMatch { current -> Files.isDirectory(current) } }) {

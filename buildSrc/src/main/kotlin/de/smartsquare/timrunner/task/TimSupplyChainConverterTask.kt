@@ -12,6 +12,7 @@ import de.smartsquare.timrunner.util.cut
 import de.smartsquare.timrunner.util.safeStore
 import de.smartsquare.timrunner.util.safeStringValueAt
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.Row
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputDirectory
@@ -45,6 +46,8 @@ open class TimSupplyChainConverterTask : DefaultTask() {
         outputDirectory.toFile().deleteRecursively()
 
         Files.newDirectoryStream(inputDirectory, { Files.isDirectory(it) }).use {
+            val orderInfo = mutableListOf<String>()
+
             it.forEach { testDirectoryPath ->
                 val xlsFile = FilesUtils.validateExistence(testDirectoryPath
                         .resolve("${testDirectoryPath.fileName}_TC.xls"))
@@ -61,9 +64,9 @@ open class TimSupplyChainConverterTask : DefaultTask() {
                 var currentThirdPath = ""
 
                 sheet.rowIterator().asSequence().drop(1).forEach { row ->
-                    currentFirstPath = row.safeStringValueAt(0)?.trim() ?: currentFirstPath
-                    currentSecondPath = row.safeStringValueAt(1)?.trim() ?: currentSecondPath
-                    currentThirdPath = row.safeStringValueAt(2)?.trim() ?: currentThirdPath
+                    currentFirstPath = row.safeStringValueAt(0)?.trim()?.replace("\n", "")?.replace("\r", "") ?: currentFirstPath
+                    currentSecondPath = row.safeStringValueAt(1)?.trim()?.replace("\n", "")?.replace("\r", "") ?: currentSecondPath
+                    currentThirdPath = row.safeStringValueAt(2)?.trim()?.replace("\n", "")?.replace("\r", "") ?: currentThirdPath
 
                     val requestName = row.safeStringValueAt(5)?.trim()
                     val responseName = row.safeStringValueAt(6)?.trim()
@@ -86,65 +89,81 @@ open class TimSupplyChainConverterTask : DefaultTask() {
                                 .resolve(currentThirdPath)
                                 .resolve(formatResponseName(requestName)))
 
-                        Files.write(resultDirectoryPath.resolve(REQUEST), Files.readAllBytes(requestFilePath)
-                                .toString(Charsets.UTF_8)
-                                .toByteArray())
+                        copyRequestAndResponse(resultDirectoryPath, requestFilePath, responseFilePath)
+                        copyDatabaseScripts(row, testDirectoryPath, resultDirectoryPath)
+                        generateProperties(resultApiDirectoryPath, currentFirstPath)
 
-                        Files.write(resultDirectoryPath.resolve(RESPONSE), Files.readAllBytes(responseFilePath)
-                                .toString(Charsets.UTF_8)
-                                .replace("ns0", "ns2")
-                                .toByteArray())
-
-                        row.safeStringValueAt(3)?.let {
-                            copyDatabaseScript(it, TIM_DB_PRE, testDirectoryPath.resolve("Input"),
-                                    resultDirectoryPath)
-                        }
-
-                        row.safeStringValueAt(4)?.let {
-                            copyDatabaseScript(it, TAXBASE_DB_PRE, testDirectoryPath.resolve("Input"),
-                                    resultDirectoryPath)
-                        }
-
-                        row.safeStringValueAt(7)?.let {
-                            copyDatabaseScript(it, TIM_DB_POST, testDirectoryPath.resolve("Output"),
-                                    resultDirectoryPath)
-                        }
-
-                        row.safeStringValueAt(8)?.let {
-                            copyDatabaseScript(it, TAXBASE_DB_POST, testDirectoryPath.resolve("Output"),
-                                    resultDirectoryPath)
-                        }
-
-                        if (Files.notExists(outputDirectory.resolve(CONFIG))) {
-                            FilesUtils.createFileIfNotExists(outputDirectory.resolve(CONFIG)).let {
-                                generateDefaultProperties().safeStore(it)
-                            }
-                        }
-
-                        if (Files.notExists(resultApiDirectoryPath.resolve(CONFIG))) {
-                            FilesUtils.createFileIfNotExists(resultApiDirectoryPath.resolve(CONFIG)).let {
-                                Properties().apply {
-                                    when {
-                                        currentFirstPath.contains("Apply Tax") -> setProperty("endpoint",
-                                                "http://localhost:7001/tim/ApplyTaxWSSoap12HttpPort?WSDL")
-                                        currentFirstPath.contains("Control Tax") -> setProperty("endpoint",
-                                                "http://localhost:7001/tim/ControlTaxWSSoapHttpPort?WSDL")
-                                        else -> {
-                                            setProperty("endpoint", "http://localhost:7001/dummy")
-                                            setProperty("ignore", "true")
-
-                                            logger.warn("Unable to determine endpoint fo suite " +
-                                                    "${resultApiDirectoryPath.cut(outputDirectory)}, ignoring.")
-                                        }
-                                    }
-                                }.safeStore(it)
-                            }
-                        }
+                        orderInfo.add(resultDirectoryPath.cut(outputDirectory).toString())
                     } else {
                         logger.warn("Skipped test $currentFirstPath/$currentSecondPath/$currentThirdPath " +
                                 "in xls file: $xlsFile")
                     }
                 }
+            }
+
+            FilesUtils.createFileIfNotExists(outputDirectory.resolve("order_info.csv")).let { orderInfoFile ->
+                Files.write(orderInfoFile, orderInfo.joinToString(";\n").toByteArray())
+            }
+        }
+    }
+
+    private fun copyRequestAndResponse(resultDirectoryPath: Path, requestFilePath: Path, responseFilePath: Path) {
+        Files.write(resultDirectoryPath.resolve(REQUEST), Files.readAllBytes(requestFilePath)
+                .toString(Charsets.UTF_8)
+                .toByteArray())
+
+        Files.write(resultDirectoryPath.resolve(RESPONSE), Files.readAllBytes(responseFilePath)
+                .toString(Charsets.UTF_8)
+                .replace("ns0", "ns2")
+                .toByteArray())
+    }
+
+    private fun copyDatabaseScripts(row: Row, testDirectoryPath: Path, resultDirectoryPath: Path) {
+        row.safeStringValueAt(3)?.let {
+            copyDatabaseScript(it, TIM_DB_PRE, testDirectoryPath.resolve("Input"),
+                    resultDirectoryPath)
+        }
+
+        row.safeStringValueAt(4)?.let {
+            copyDatabaseScript(it, TAXBASE_DB_PRE, testDirectoryPath.resolve("Input"),
+                    resultDirectoryPath)
+        }
+
+        row.safeStringValueAt(7)?.let {
+            copyDatabaseScript(it, TIM_DB_POST, testDirectoryPath.resolve("Output"),
+                    resultDirectoryPath)
+        }
+
+        row.safeStringValueAt(8)?.let {
+            copyDatabaseScript(it, TAXBASE_DB_POST, testDirectoryPath.resolve("Output"),
+                    resultDirectoryPath)
+        }
+    }
+
+    private fun generateProperties(resultApiDirectoryPath: Path, currentFirstPath: String) {
+        if (Files.notExists(outputDirectory.resolve(CONFIG))) {
+            FilesUtils.createFileIfNotExists(outputDirectory.resolve(CONFIG)).let {
+                generateDefaultProperties().safeStore(it)
+            }
+        }
+
+        if (Files.notExists(resultApiDirectoryPath.resolve(CONFIG))) {
+            FilesUtils.createFileIfNotExists(resultApiDirectoryPath.resolve(CONFIG)).let {
+                Properties().apply {
+                    when {
+                        currentFirstPath.contains("Apply Tax") -> setProperty("endpoint",
+                                "http://localhost:7001/tim/ApplyTaxWSSoap12HttpPort?WSDL")
+                        currentFirstPath.contains("Control Tax") -> setProperty("endpoint",
+                                "http://localhost:7001/tim/ControlTaxWSSoapHttpPort?WSDL")
+                        else -> {
+                            setProperty("endpoint", "http://localhost:7001/dummy")
+                            setProperty("ignore", "true")
+
+                            logger.warn("Unable to determine endpoint fo suite " +
+                                    "${resultApiDirectoryPath.cut(outputDirectory)}, ignoring.")
+                        }
+                    }
+                }.safeStore(it)
             }
         }
     }

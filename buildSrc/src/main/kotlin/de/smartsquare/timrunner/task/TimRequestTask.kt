@@ -61,38 +61,48 @@ open class TimRequestTask : DefaultTask() {
         outputPath.toFile().deleteRecursively()
 
         dbConnections.use {
-            for (testDir in FilesUtils.getLeafDirectories(inputPath)) {
-                val propertiesPath = FilesUtils.validateExistence(testDir.resolve(CONFIG))
-                val properties = TimProperties().fillFromSingleProperties(propertiesPath)
+            FilesUtils.getChildDirectories(inputPath).forEach { itSuite ->
+                itSuite.resolve("order_info.csv").toFile()
+                        .readText()
+                        .split(";")
+                        .map { inputPath.resolve(itSuite).resolve(it.trim()) }
+                        .forEach { testDirectoryPath ->
+                            val propertiesPath = FilesUtils.validateExistence(testDirectoryPath.resolve(CONFIG))
+                            val properties = TimProperties().fillFromSingleProperties(propertiesPath)
 
-                val requestPath = FilesUtils.validateExistence(testDir.resolve(REQUEST))
+                            val requestPath = FilesUtils.validateExistence(testDirectoryPath.resolve(REQUEST))
 
-                executeScriptIfExisting(testDir.resolve(TIM_DB_PRE), properties.timdbJdbc,
-                        properties.timdbUser, properties.timdbPassword)
-                executeScriptIfExisting(testDir.resolve(TAXBASE_DB_PRE), properties.taxbasedbJdbc,
-                        properties.taxbasedbUser, properties.taxbasedbPassword)
-
-                val soapResponse = constructApiCall(properties.endpoint, requestPath)
-                        .execute()
-                        .let { response ->
-                            if (!response.isSuccessful) {
-                                response.message()
-                            }
-
-                            response.body()?.string() ?: ""
+                            doRequestAndScriptExecutions(testDirectoryPath, requestPath, properties)
                         }
-
-                val resultDirectoryPath = Files.createDirectories(outputPath.resolve(testDir.cut(inputPath)))
-                val resultFilePath = FilesUtils.createFileIfNotExists(resultDirectoryPath.resolve(RESPONSE))
-
-                Files.write(resultFilePath, soapResponse.lines())
-
-                executeScriptIfExisting(testDir.resolve(TIM_DB_POST), properties.timdbJdbc,
-                        properties.timdbUser, properties.timdbPassword)
-                executeScriptIfExisting(testDir.resolve(TAXBASE_DB_POST), properties.taxbasedbJdbc,
-                        properties.taxbasedbUser, properties.taxbasedbPassword)
             }
         }
+    }
+
+    private fun doRequestAndScriptExecutions(testDirectoryPath: Path, requestPath: Path, properties: TimProperties) {
+        executeScriptIfExisting(testDirectoryPath.resolve(TIM_DB_PRE), properties.timdbJdbc,
+                properties.timdbUser, properties.timdbPassword)
+        executeScriptIfExisting(testDirectoryPath.resolve(TAXBASE_DB_PRE), properties.taxbasedbJdbc,
+                properties.taxbasedbUser, properties.taxbasedbPassword)
+
+        val soapResponse = constructApiCall(properties.endpoint, requestPath)
+                .execute()
+                .let { response ->
+                    if (!response.isSuccessful) {
+                        response.message()
+                    }
+
+                    response.body()?.string() ?: ""
+                }
+
+        val resultDirectoryPath = Files.createDirectories(outputPath.resolve(testDirectoryPath.cut(inputPath)))
+        val resultFilePath = FilesUtils.createFileIfNotExists(resultDirectoryPath.resolve(RESPONSE))
+
+        Files.write(resultFilePath, soapResponse.lines())
+
+        executeScriptIfExisting(testDirectoryPath.resolve(TIM_DB_POST), properties.timdbJdbc,
+                properties.timdbUser, properties.timdbPassword)
+        executeScriptIfExisting(testDirectoryPath.resolve(TAXBASE_DB_POST), properties.taxbasedbJdbc,
+                properties.taxbasedbUser, properties.taxbasedbPassword)
     }
 
     private fun constructApiCall(url: HttpUrl, requestPath: Path) = okHttpClient.newCall(Request.Builder()
