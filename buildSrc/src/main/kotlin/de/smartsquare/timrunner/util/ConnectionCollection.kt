@@ -12,6 +12,8 @@ class ConnectionCollection : AutoCloseable {
             connections[it].let { value ->
                 value ?: DriverManager.getConnection(it.first, it.second, it.third).also { result: Connection ->
                     connections.put(it, result)
+                }.also {
+                    it.createStatement().execute("ALTER SESSION SET NLS_LANGUAGE=ENGLISH")
                 }
             }
         }
