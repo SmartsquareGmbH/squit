@@ -6,8 +6,10 @@ import de.smartsquare.timrunner.util.cut
 import de.smartsquare.timrunner.util.read
 import de.smartsquare.timrunner.util.write
 import org.dom4j.Document
+import org.dom4j.Element
 import org.dom4j.io.SAXReader
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -51,7 +53,11 @@ open class TimResponseTransformerTask : DefaultTask() {
 
             val resultFilePath = FilesUtils.createFileIfNotExists(resultDirectoryPath.resolve(RESPONSE))
 
-            transform(SAXReader().read(responsePath), SAXReader().read(expectedResponsePath)).write(resultFilePath)
+            try {
+                transform(SAXReader().read(responsePath), SAXReader().read(expectedResponsePath)).write(resultFilePath)
+            } catch (error: Throwable) {
+                throw GradleException("Could not transform file: $responsePath ($error)")
+            }
         }
     }
 
@@ -62,6 +68,33 @@ open class TimResponseTransformerTask : DefaultTask() {
             response.selectSingleNode("//TransactionId")?.text = it.text
         }
 
+//        response.selectSingleNode("//SellerTaxTotal/TaxInvoiceSubTotal")?.let {
+//            logger.warn(it.toString())
+//
+//            sortElements(it as Element, "TaxAmount", "GrossAmount", "TaxCode")
+//        }
+//
+//        response.selectSingleNode("//BuyerTaxTotal/TaxInvoiceSubTotal")?.let {
+//            sortElements(it as Element, "TaxAmount", "GrossAmount", "TaxCode")
+//        }
+
         return response
+    }
+
+    private fun sortElements(elementToSort: Element, vararg children: String) {
+        val temporaryElements = mutableMapOf<String, Element>()
+
+        children.forEach {
+            elementToSort.element(it)?.let { elementToRemove ->
+                temporaryElements.put(it, elementToRemove)
+                elementToSort.remove(elementToRemove)
+            }
+        }
+
+        children.forEach {
+            temporaryElements.get(it)?.let { elementToAdd ->
+                elementToSort.add(elementToAdd)
+            }
+        }
     }
 }

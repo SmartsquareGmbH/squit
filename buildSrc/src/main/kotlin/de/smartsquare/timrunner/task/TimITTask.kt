@@ -56,12 +56,12 @@ open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
             }
         }
 
-        val failedTests = results.filter { it.result.isNotEmpty() }
+        val successfulTests = results.count { it.result.isEmpty() }
+        val failedTests = results.count { it.result.isNotEmpty() }
 
-        if (failedTests.isNotEmpty()) {
-            throw GradleException("There ${if (failedTests.size == 1) "was" else "were"} ${failedTests.size} " +
-                    "failing ${if (failedTests.size == 1) "test" else "tests"}.")
-        }
+        println("${results.size} tests ran.\n$successfulTests successful and $failedTests failed.")
+
+        if (failedTests > 0) throw GradleException("Failing tests.")
     }
 
     private fun runTests(): List<TimITResult> {
