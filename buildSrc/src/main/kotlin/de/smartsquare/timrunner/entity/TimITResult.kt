@@ -1,3 +1,5 @@
 package de.smartsquare.timrunner.entity
 
-class TimITResult(val suite: String, val test: String, val result: String = "")
+data class TimITResult(val context: String, val suite: String, val test: String, val result: String = "") {
+    val path get() = "$context/$suite"
+}

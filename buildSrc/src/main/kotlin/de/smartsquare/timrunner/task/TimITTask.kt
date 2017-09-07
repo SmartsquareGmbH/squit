@@ -56,7 +56,7 @@ open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
             }
         }
 
-        val failedTests = results.sortedBy { it.suite }.filter { it.result.isNotEmpty() }
+        val failedTests = results.filter { it.result.isNotEmpty() }
 
         if (failedTests.isNotEmpty()) {
             throw GradleException("There ${if (failedTests.size == 1) "was" else "were"} ${failedTests.size} " +
@@ -78,12 +78,7 @@ open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
                     .checkForSimilar()
                     .build()
 
-            resultList += if (diffBuilder.hasDifferences()) {
-                TimITResult(responseDirectory.parent.fileName.toString(), responseDirectory.fileName.toString(),
-                        diffBuilder.differences.joinToString(separator = "\n"))
-            } else {
-                TimITResult(responseDirectory.parent.fileName.toString(), responseDirectory.fileName.toString())
-            }
+            resultList += constructResult(diffBuilder.differences.joinToString(separator = "\n"), responseDirectory)
         }
 
         return resultList
@@ -96,13 +91,16 @@ open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
         val document = DocumentHelper.createDocument()
         val root = document.addElement("results")
 
-        result.sortedBy { it.suite }.forEach {
-            val suiteElement = root.addElement("suite").apply { addAttribute("name", it.suite) }
-            val testElement = suiteElement.addElement("test").apply { addAttribute("name", it.test) }
+        result.sortedBy { it.path }.groupBy { it.path }.forEach { suite, tests ->
+            val suiteElement = root.addElement("suite").apply { addAttribute("name", suite) }
 
-            when {
-                it.result.isEmpty() -> testElement.addElement("success")
-                else -> testElement.addElement("failure").addText(it.result)
+            tests.sortedBy { it.test }.forEach {
+                val testElement = suiteElement.addElement("test").apply { addAttribute("name", it.test) }
+
+                when {
+                    it.result.isEmpty() -> testElement.addElement("success")
+                    else -> testElement.addElement("failure").addText(it.result)
+                }
             }
         }
 
@@ -112,6 +110,14 @@ open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
     @Suppress("UNUSED_PARAMETER")
     private fun writeHtmlReport(result: List<TimITResult>, report: Report) {
         TODO()
+    }
+
+    private fun constructResult(differences: String, responseDirectory: Path) = if (differences.isNotBlank()) {
+        TimITResult(responseDirectory.parent.parent.cut(inputResponseDirectory).toString(),
+                responseDirectory.parent.fileName.toString(), responseDirectory.fileName.toString(), differences)
+    } else {
+        TimITResult(responseDirectory.parent.parent.cut(inputResponseDirectory).toString(),
+                responseDirectory.parent.fileName.toString(), responseDirectory.fileName.toString())
     }
 
     @Internal
