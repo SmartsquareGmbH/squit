@@ -57,13 +57,13 @@ open class TimSourceTransformerTask : DefaultTask() {
                 try {
                     transformRequest(SAXReader().read(requestPath)).write(resultRequestPath)
                 } catch (error: Throwable) {
-                    throw GradleException("Could not transform file: $requestPath ($error)")
+                    throw GradleException("Could not transform file: ${requestPath.cut(inputSourceDirectory)} ($error)")
                 }
 
                 try {
                     transformResponse(SAXReader().read(responsePath)).write(resultResponsePath)
                 } catch (error: Throwable) {
-                    throw GradleException("Could not transform file: $responsePath ($error)")
+                    throw GradleException("Could not transform file: ${responsePath.cut(inputSourceDirectory)} ($error)")
                 }
 
                 sqlFilePaths.forEach {
@@ -92,7 +92,7 @@ open class TimSourceTransformerTask : DefaultTask() {
         return when (result.isValid()) {
             true -> result
             false -> throw GradleException("No config.properties file with the required properties on the path of " +
-                    "test: ${testDirectory.fileName}")
+                    "test: ${testDirectory.cut(inputSourceDirectory)}")
         }
     }
 

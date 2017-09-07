@@ -1,5 +1,6 @@
 package de.smartsquare.timrunner.task
 
+import de.smartsquare.timrunner.util.Constants.CONFIG
 import de.smartsquare.timrunner.util.Constants.REQUEST
 import de.smartsquare.timrunner.util.Constants.RESPONSE
 import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_POST
@@ -8,6 +9,7 @@ import de.smartsquare.timrunner.util.Constants.TIM_DB_POST
 import de.smartsquare.timrunner.util.Constants.TIM_DB_PRE
 import de.smartsquare.timrunner.util.FilesUtils
 import de.smartsquare.timrunner.util.cut
+import de.smartsquare.timrunner.util.safeStore
 import de.smartsquare.timrunner.util.safeStringValueAt
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.gradle.api.DefaultTask
@@ -19,6 +21,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
+import java.util.*
 
 open class TimSupplyChainConverterTask : DefaultTask() {
 
@@ -32,7 +35,7 @@ open class TimSupplyChainConverterTask : DefaultTask() {
      * The directory to save the results in.
      */
     @OutputDirectory
-    var outputDirectory: Path = Paths.get(project.projectDir.path, "src/main/test")
+    var outputDirectory: Path = Paths.get(project.projectDir.path, "src/main/test/supply-chain")
 
     /**
      * Runs the task.
@@ -74,18 +77,23 @@ open class TimSupplyChainConverterTask : DefaultTask() {
                                 .resolve("Output")
                                 .resolve("$responseName.xml"))
 
-                        val resultDirectoryPath = Files.createDirectories(outputDirectory
+                        val resultApiDirectoryPath = Files.createDirectories(outputDirectory
                                 .resolve(testDirectoryPath.cut(inputDirectory))
-                                .resolve(currentFirstPath)
+                                .resolve(currentFirstPath))
+
+                        val resultDirectoryPath = Files.createDirectories(resultApiDirectoryPath
                                 .resolve(currentSecondPath)
                                 .resolve(currentThirdPath)
                                 .resolve(formatResponseName(requestName)))
 
-                        Files.copy(requestFilePath, resultDirectoryPath.resolve(REQUEST),
-                                StandardCopyOption.REPLACE_EXISTING)
+                        Files.write(resultDirectoryPath.resolve(REQUEST), Files.readAllBytes(requestFilePath)
+                                .toString(Charsets.UTF_8)
+                                .toByteArray())
 
-                        Files.copy(responseFilePath, resultDirectoryPath.resolve(RESPONSE),
-                                StandardCopyOption.REPLACE_EXISTING)
+                        Files.write(resultDirectoryPath.resolve(RESPONSE), Files.readAllBytes(responseFilePath)
+                                .toString(Charsets.UTF_8)
+                                .replace("ns0", "ns2")
+                                .toByteArray())
 
                         row.safeStringValueAt(3)?.let {
                             copyDatabaseScript(it, TIM_DB_PRE, testDirectoryPath.resolve("Input"),
@@ -105,6 +113,32 @@ open class TimSupplyChainConverterTask : DefaultTask() {
                         row.safeStringValueAt(8)?.let {
                             copyDatabaseScript(it, TAXBASE_DB_POST, testDirectoryPath.resolve("Output"),
                                     resultDirectoryPath)
+                        }
+
+                        if (Files.notExists(outputDirectory.resolve(CONFIG))) {
+                            FilesUtils.createFileIfNotExists(outputDirectory.resolve(CONFIG)).let {
+                                generateDefaultProperties().safeStore(it)
+                            }
+                        }
+
+                        if (Files.notExists(resultApiDirectoryPath.resolve(CONFIG))) {
+                            FilesUtils.createFileIfNotExists(resultApiDirectoryPath.resolve(CONFIG)).let {
+                                Properties().apply {
+                                    when {
+                                        currentFirstPath.contains("Apply Tax") -> setProperty("endpoint",
+                                                "http://localhost:7001/tim/ApplyTaxWSSoap12HttpPort?WSDL")
+                                        currentFirstPath.contains("Control Tax") -> setProperty("endpoint",
+                                                "http://localhost:7001/tim/ControlTaxWSSoapHttpPort?WSDL")
+                                        else -> {
+                                            setProperty("endpoint", "http://localhost:7001/dummy")
+                                            setProperty("ignore", "true")
+
+                                            logger.warn("Unable to determine endpoint fo suite " +
+                                                    "${resultApiDirectoryPath.cut(outputDirectory)}, ignoring.")
+                                        }
+                                    }
+                                }.safeStore(it)
+                            }
                         }
                     } else {
                         logger.warn("Skipped test $currentFirstPath/$currentSecondPath/$currentThirdPath " +
@@ -127,5 +161,16 @@ open class TimSupplyChainConverterTask : DefaultTask() {
                 .let { path ->
                     Files.copy(path, resultDirectoryPath.resolve(resultName), StandardCopyOption.REPLACE_EXISTING)
                 }
+    }
+
+    private fun generateDefaultProperties(): Properties {
+        return Properties().apply {
+            setProperty("timdb_jdbc", "jdbc:oracle:thin:@localhost:1521:xe")
+            setProperty("timdb_user", "timdb")
+            setProperty("timdb_password", "timdb")
+            setProperty("taxbasedb_jdbc", "jdbc:oracle:thin:@localhost:1521:xe")
+            setProperty("taxbasedb_user", "taxbase")
+            setProperty("taxbasedb_password", "taxbase")
+        }
     }
 }
