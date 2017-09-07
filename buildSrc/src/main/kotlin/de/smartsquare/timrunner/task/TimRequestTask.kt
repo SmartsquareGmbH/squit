@@ -61,8 +61,8 @@ open class TimRequestTask : DefaultTask() {
         outputPath.toFile().deleteRecursively()
 
         dbConnections.use {
-            FilesUtils.getLeafDirectories(inputPath).forEach { testDir ->
-                val propertiesPath = FilesUtils.createFileIfNotExists(testDir.resolve(CONFIG))
+            for (testDir in FilesUtils.getLeafDirectories(inputPath)) {
+                val propertiesPath = FilesUtils.validateExistence(testDir.resolve(CONFIG))
                 val properties = TimProperties().fillFromSingleProperties(propertiesPath)
 
                 val requestPath = FilesUtils.validateExistence(testDir.resolve(REQUEST))
@@ -101,14 +101,20 @@ open class TimRequestTask : DefaultTask() {
             .build()
     )
 
-    private fun executeScriptIfExisting(path: Path, jdbc: String, username: String, password: String) {
-        if (Files.exists(path)) {
+    private fun executeScriptIfExisting(path: Path, jdbc: String, username: String, password: String): Boolean {
+        return if (Files.exists(path)) {
             try {
                 dbConnections.createOrGet(jdbc, username, password).executeScript(path)
+
+                true
             } catch (error: Throwable) {
                 logger.warn("Could not run database script ${path.fileName} for test ${path.parent.fileName} " +
                         "(${error.toString().trim()})")
+
+                false
             }
+        } else {
+            true
         }
     }
 }
