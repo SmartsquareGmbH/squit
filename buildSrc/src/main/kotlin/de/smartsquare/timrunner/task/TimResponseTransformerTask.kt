@@ -9,11 +9,13 @@ import org.dom4j.Document
 import org.dom4j.io.SAXReader
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.regex.Pattern.quote
 
 open class TimResponseTransformerTask : DefaultTask() {
 
@@ -34,6 +36,12 @@ open class TimResponseTransformerTask : DefaultTask() {
      */
     @OutputDirectory
     var outputDirectory: Path = Paths.get(project.buildDir.path, "results/processed")
+
+    @Internal
+    private val transformationRegex = Regex("transaction ID ${quote("[")}(.+)${quote("]")}")
+
+    @Internal
+    private val transformationReplacementRegex = Regex("transaction ID ${quote("[")}.*${quote("]")}")
 
     /**
      * Runs the task.
@@ -62,6 +70,23 @@ open class TimResponseTransformerTask : DefaultTask() {
 
     private fun transform(response: Document, expectedResponse: Document) {
         if (response.selectNodes("Fault").isEmpty()) {
+            response.selectNodes("//ErrorText").forEachIndexed { index, responseNode ->
+                if (responseNode.text.startsWith("Technical error")) {
+                    responseNode.text = responseNode.text.substring(0, responseNode.text.indexOf("at com.")).trim()
+
+                    expectedResponse.selectNodes("//ErrorText").getOrNull(index)?.let { expectedResponseNode ->
+                        val newId = transformationRegex.find(expectedResponseNode.text)?.groupValues?.let {
+                            if (it.size == 2) it[1] else null
+                        }
+
+                        if (newId != null) {
+                            responseNode.text = responseNode.text.replace(transformationReplacementRegex,
+                                    "transaction ID [$newId]")
+                        }
+                    }
+                }
+            }
+
             expectedResponse.selectSingleNode("//TransactionId")?.let {
                 response.selectSingleNode("//TransactionId")?.text = it.text
             }

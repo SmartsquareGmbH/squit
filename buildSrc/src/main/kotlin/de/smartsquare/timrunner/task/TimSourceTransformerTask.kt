@@ -141,5 +141,11 @@ open class TimSourceTransformerTask : DefaultTask() {
                 }
             }
         }
+
+        expectedResponse.selectNodes("//ErrorText").forEach {
+            if (it.text.startsWith("Technical error")) {
+                it.text = it.text.substring(0, it.text.indexOf("at com.")).trim()
+            }
+        }
     }
 }
