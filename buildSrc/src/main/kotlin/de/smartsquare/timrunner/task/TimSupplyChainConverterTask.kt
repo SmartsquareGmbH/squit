@@ -182,8 +182,8 @@ open class TimSupplyChainConverterTask : DefaultTask() {
             setProperty("timdb_user", "timdb")
             setProperty("timdb_password", "timdb")
             setProperty("taxbasedb_jdbc", "jdbc:oracle:thin:@localhost:1521:xe")
-            setProperty("taxbasedb_user", "taxbase")
-            setProperty("taxbasedb_password", "taxbase")
+            setProperty("taxbasedb_user", "timdb")
+            setProperty("taxbasedb_password", "timdb")
         }
     }
 }
