@@ -73,8 +73,8 @@ open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
                     .resolve(responseDirectory.cut(inputResponseDirectory))
                     .resolve(RESPONSE))
 
-            val diffBuilder = DiffBuilder.compare(Input.fromStream(Files.newInputStream(actualResponseFile)))
-                    .withTest(Input.fromStream(Files.newInputStream(expectedResponseFile)))
+            val diffBuilder = DiffBuilder.compare(Input.fromStream(Files.newInputStream(expectedResponseFile)))
+                    .withTest(Input.fromStream(Files.newInputStream(actualResponseFile)))
                     .checkForSimilar()
                     .build()
 

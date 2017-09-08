@@ -97,7 +97,7 @@ open class TimRequestTask : DefaultTask() {
         val resultDirectoryPath = Files.createDirectories(outputPath.resolve(testDirectoryPath.cut(inputPath)))
         val resultFilePath = FilesUtils.createFileIfNotExists(resultDirectoryPath.resolve(RESPONSE))
 
-        Files.write(resultFilePath, soapResponse.lines())
+        Files.write(resultFilePath, soapResponse.toByteArray(Charsets.UTF_8))
 
         executeScriptIfExisting(testDirectoryPath.resolve(TIM_DB_POST), properties.timdbJdbc,
                 properties.timdbUser, properties.timdbPassword)
@@ -106,7 +106,7 @@ open class TimRequestTask : DefaultTask() {
     }
 
     private fun constructApiCall(url: HttpUrl, requestPath: Path) = okHttpClient.newCall(Request.Builder()
-            .post(RequestBody.create(MediaType.parse("application/soap+xml"), requestPath.toFile()))
+            .post(RequestBody.create(MediaType.parse("application/soap+xml; utf-8"), requestPath.toFile()))
             .url(url)
             .build()
     )

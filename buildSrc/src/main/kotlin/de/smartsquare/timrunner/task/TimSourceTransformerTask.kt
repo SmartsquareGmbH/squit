@@ -77,7 +77,6 @@ open class TimSourceTransformerTask : DefaultTask() {
 
                     resolvedProperties.writeToProperties().safeStore(resultPropertiesPath)
                 } else {
-                    logger.warn(it.toString())
                     orderInfo.remove(it.cut(testRoot).toString())
                 }
             }
