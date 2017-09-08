@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 buildscript {
     repositories {
         jcenter()
@@ -30,4 +32,10 @@ dependencies {
     implementation 'org.dom4j:dom4j:2.0.1'
     implementation 'org.xmlunit:xmlunit-core:2.5.0'
     implementation 'org.apache.poi:poi:3.17-beta1'
+}
+
+tasks.withType(KotlinCompile).all {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
