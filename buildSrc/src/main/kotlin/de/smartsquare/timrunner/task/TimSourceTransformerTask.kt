@@ -14,12 +14,15 @@ import org.dom4j.io.SAXReader
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
+import java.time.LocalDate
+import java.util.regex.Pattern.quote
 
 open class TimSourceTransformerTask : DefaultTask() {
 
@@ -34,6 +37,9 @@ open class TimSourceTransformerTask : DefaultTask() {
      */
     @OutputDirectory
     var outputDirectory: Path = Paths.get(project.buildDir.path, "source")
+
+    @Internal
+    private val transformationRegex = Regex("${quote("$")}${quote("{")}#TestSuite#TaxAlgoDate(.*?)${quote("}")}")
 
     /**
      * Runs the task.
@@ -54,17 +60,13 @@ open class TimSourceTransformerTask : DefaultTask() {
                 val resultResponsePath = FilesUtils.createFileIfNotExists(resultDirectory
                         .resolve(responsePath.fileName))
 
-                try {
-                    transformRequest(SAXReader().read(requestPath)).write(resultRequestPath)
-                } catch (error: Throwable) {
-                    throw GradleException("Could not transform file: ${requestPath.cut(inputSourceDirectory)} ($error)")
-                }
+                val request = SAXReader().read(requestPath)
+                val response = SAXReader().read(responsePath)
 
-                try {
-                    transformResponse(SAXReader().read(responsePath)).write(resultResponsePath)
-                } catch (error: Throwable) {
-                    throw GradleException("Could not transform file: ${responsePath.cut(inputSourceDirectory)} ($error)")
-                }
+                transform(request, response)
+
+                request.write(resultRequestPath)
+                response.write(resultResponsePath)
 
                 sqlFilePaths.forEach {
                     Files.copy(it, resultDirectory.resolve(it.fileName), StandardCopyOption.REPLACE_EXISTING)
@@ -124,11 +126,20 @@ open class TimSourceTransformerTask : DefaultTask() {
         throw GradleException("Missing request.xml for test: ${path.fileName}")
     }
 
-    private fun transformRequest(request: Document): Document {
-        return request
-    }
+    private fun transform(request: Document, expectedResponse: Document) {
+        request.selectSingleNode("//TaxAlgorithmDate")?.let { currentAlgorithmDateNode ->
+            expectedResponse.selectSingleNode("//TaxAlgorithmDate")?.let { expectedAlgorithmDateNode ->
+                transformationRegex.find(currentAlgorithmDateNode.text)?.let { regexResult ->
+                    val dateToSet = if (regexResult.groupValues.size == 2) {
+                        LocalDate.now().plusDays(regexResult.groupValues[1].toLongOrNull() ?: 0).toString()
+                    } else {
+                        expectedAlgorithmDateNode.text
+                    }
 
-    private fun transformResponse(response: Document): Document {
-        return response
+                    currentAlgorithmDateNode.text = dateToSet
+                    expectedAlgorithmDateNode.text = dateToSet
+                }
+            }
+        }
     }
 }

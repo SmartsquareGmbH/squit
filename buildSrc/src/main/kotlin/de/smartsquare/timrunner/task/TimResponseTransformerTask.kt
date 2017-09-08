@@ -8,7 +8,6 @@ import de.smartsquare.timrunner.util.write
 import org.dom4j.Document
 import org.dom4j.io.SAXReader
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -52,21 +51,20 @@ open class TimResponseTransformerTask : DefaultTask() {
 
             val resultFilePath = FilesUtils.createFileIfNotExists(resultDirectoryPath.resolve(RESPONSE))
 
-            try {
-                transform(SAXReader().read(responsePath), SAXReader().read(expectedResponsePath)).write(resultFilePath)
-            } catch (error: Throwable) {
-                throw GradleException("Could not transform file: $responsePath ($error)")
-            }
+            val response = SAXReader().read(responsePath)
+            val expectedResponse = SAXReader().read(expectedResponsePath)
+
+            transform(response, expectedResponse)
+
+            response.write(resultFilePath)
         }
     }
 
-    private fun transform(response: Document, expectedResponse: Document): Document {
-        if (response.selectNodes("Fault").isNotEmpty()) return response
-
-        expectedResponse.selectSingleNode("//TransactionId")?.let {
-            response.selectSingleNode("//TransactionId")?.text = it.text
+    private fun transform(response: Document, expectedResponse: Document) {
+        if (response.selectNodes("Fault").isEmpty()) {
+            expectedResponse.selectSingleNode("//TransactionId")?.let {
+                response.selectSingleNode("//TransactionId")?.text = it.text
+            }
         }
-
-        return response
     }
 }

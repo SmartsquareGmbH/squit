@@ -7,6 +7,7 @@ import org.dom4j.Document
 import org.dom4j.io.OutputFormat
 import org.dom4j.io.SAXReader
 import org.dom4j.io.XMLWriter
+import org.gradle.api.GradleException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
@@ -21,8 +22,12 @@ inline fun Properties.safeStore(path: Path, comments: String? = null) = Files.ne
     this.apply { store(it, comments) }
 }
 
-inline fun SAXReader.read(path: Path) = Files.newInputStream(path).use {
-    read(it)
+inline fun SAXReader.read(path: Path) = try {
+    Files.newInputStream(path).use {
+        read(it)
+    }
+} catch (error: Throwable) {
+    throw GradleException("Could not read xml file: $path ($error)")
 }
 
 inline fun Document.write(path: Path, outputFormat: OutputFormat = TimOutputFormat()) = Files.newBufferedWriter(path)
