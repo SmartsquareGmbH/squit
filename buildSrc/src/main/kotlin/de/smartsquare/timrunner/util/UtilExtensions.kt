@@ -28,9 +28,14 @@ inline fun SAXReader.read(path: Path) = Files.newInputStream(path).use {
 inline fun Document.write(path: Path, outputFormat: OutputFormat = TimOutputFormat()) = Files.newBufferedWriter(path)
         .use { XMLWriter(it, outputFormat).write(document) }
 
-inline fun Row.safeStringValueAt(position: Int): String? {
+inline fun Row.safeCleanedStringValueAt(position: Int): String? {
     return try {
-        getCell(position)?.stringCellValue?.let { if (it.isBlank()) null else it }
+        getCell(position)?.stringCellValue?.let {
+            when (it.isBlank()) {
+                true -> null
+                false -> it.trim().replace("\n", "").replace("\r", "")
+            }
+        }
     } catch (ignored: Throwable) {
         null
     }

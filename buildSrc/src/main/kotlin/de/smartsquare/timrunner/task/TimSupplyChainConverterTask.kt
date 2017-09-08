@@ -9,8 +9,8 @@ import de.smartsquare.timrunner.util.Constants.TIM_DB_POST
 import de.smartsquare.timrunner.util.Constants.TIM_DB_PRE
 import de.smartsquare.timrunner.util.FilesUtils
 import de.smartsquare.timrunner.util.cut
+import de.smartsquare.timrunner.util.safeCleanedStringValueAt
 import de.smartsquare.timrunner.util.safeStore
-import de.smartsquare.timrunner.util.safeStringValueAt
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Row
 import org.gradle.api.DefaultTask
@@ -45,64 +45,58 @@ open class TimSupplyChainConverterTask : DefaultTask() {
     fun run() {
         outputDirectory.toFile().deleteRecursively()
 
-        Files.newDirectoryStream(inputDirectory, { Files.isDirectory(it) }).use {
-            val orderInfo = mutableListOf<String>()
+        var currentIndex = 0
 
-            it.forEach { testDirectoryPath ->
-                val xlsFile = FilesUtils.validateExistence(testDirectoryPath
-                        .resolve("${testDirectoryPath.fileName}_TC.xls"))
+        FilesUtils.getChildDirectories(inputDirectory).forEach { testDirectoryPath ->
+            val xlsFile = FilesUtils.validateExistence(testDirectoryPath
+                    .resolve("${testDirectoryPath.fileName}_TC.xls"))
 
-                val workbook = HSSFWorkbook(Files.newInputStream(xlsFile)).also {
-                    if (it.numberOfSheets <= 0) {
-                        throw GradleException("Invalid xls file: $xlsFile (No sheets found)")
-                    }
-                }
-
-                val sheet = workbook.getSheetAt(0)
-                var currentFirstPath = ""
-                var currentSecondPath = ""
-                var currentThirdPath = ""
-
-                sheet.rowIterator().asSequence().drop(1).forEach { row ->
-                    currentFirstPath = row.safeStringValueAt(0)?.trim()?.replace("\n", "")?.replace("\r", "") ?: currentFirstPath
-                    currentSecondPath = row.safeStringValueAt(1)?.trim()?.replace("\n", "")?.replace("\r", "") ?: currentSecondPath
-                    currentThirdPath = row.safeStringValueAt(2)?.trim()?.replace("\n", "")?.replace("\r", "") ?: currentThirdPath
-
-                    val requestName = row.safeStringValueAt(5)?.trim()
-                    val responseName = row.safeStringValueAt(6)?.trim()
-
-                    if (requestName != null && responseName != null) {
-                        val requestFilePath = FilesUtils.validateExistence(testDirectoryPath
-                                .resolve("Input")
-                                .resolve("$requestName.xml"))
-
-                        val responseFilePath = FilesUtils.validateExistence(testDirectoryPath
-                                .resolve("Output")
-                                .resolve("$responseName.xml"))
-
-                        val resultApiDirectoryPath = Files.createDirectories(outputDirectory
-                                .resolve(testDirectoryPath.cut(inputDirectory))
-                                .resolve(currentFirstPath))
-
-                        val resultDirectoryPath = Files.createDirectories(resultApiDirectoryPath
-                                .resolve(currentSecondPath)
-                                .resolve(currentThirdPath)
-                                .resolve(formatResponseName(requestName)))
-
-                        copyRequestAndResponse(resultDirectoryPath, requestFilePath, responseFilePath)
-                        copyDatabaseScripts(row, testDirectoryPath, resultDirectoryPath)
-                        generateProperties(resultApiDirectoryPath, currentFirstPath)
-
-                        orderInfo.add(resultDirectoryPath.cut(outputDirectory).toString())
-                    } else {
-                        logger.warn("Skipped test $currentFirstPath/$currentSecondPath/$currentThirdPath " +
-                                "in xls file: $xlsFile")
-                    }
+            val workbook = HSSFWorkbook(Files.newInputStream(xlsFile)).also {
+                if (it.numberOfSheets <= 0) {
+                    throw GradleException("Invalid xls file: $xlsFile (No sheets found)")
                 }
             }
 
-            FilesUtils.createFileIfNotExists(outputDirectory.resolve("order_info.csv")).let { orderInfoFile ->
-                Files.write(orderInfoFile, orderInfo.joinToString(";\n").toByteArray())
+            val sheet = workbook.getSheetAt(0)
+            var currentFirstPath = ""
+            var currentSecondPath = ""
+            var currentThirdPath = ""
+
+            sheet.rowIterator().asSequence().drop(1).forEach { row ->
+                currentFirstPath = row.safeCleanedStringValueAt(0) ?: currentFirstPath
+                currentSecondPath = row.safeCleanedStringValueAt(1) ?: currentSecondPath
+                currentThirdPath = row.safeCleanedStringValueAt(2) ?: currentThirdPath
+
+                val requestName = row.safeCleanedStringValueAt(5)
+                val responseName = row.safeCleanedStringValueAt(6)
+
+                if (requestName != null && responseName != null) {
+                    val requestFilePath = FilesUtils.validateExistence(testDirectoryPath
+                            .resolve("Input")
+                            .resolve("$requestName.xml"))
+
+                    val responseFilePath = FilesUtils.validateExistence(testDirectoryPath
+                            .resolve("Output")
+                            .resolve("$responseName.xml"))
+
+                    val resultApiDirectoryPath = Files.createDirectories(outputDirectory
+                            .resolve(testDirectoryPath.cut(inputDirectory))
+                            .resolve(currentFirstPath))
+
+                    val resultDirectoryPath = Files.createDirectories(resultApiDirectoryPath
+                            .resolve(currentSecondPath)
+                            .resolve(currentThirdPath)
+                            .resolve(formatResponseName(currentIndex, requestName)))
+
+                    copyRequestAndResponse(resultDirectoryPath, requestFilePath, responseFilePath)
+                    copyDatabaseScripts(row, testDirectoryPath, resultDirectoryPath)
+                    generateProperties(resultApiDirectoryPath, currentFirstPath)
+
+                    currentIndex += 1
+                } else {
+                    logger.warn("Skipped test $currentFirstPath/$currentSecondPath/$currentThirdPath " +
+                            "in xls file: $xlsFile")
+                }
             }
         }
     }
@@ -119,22 +113,22 @@ open class TimSupplyChainConverterTask : DefaultTask() {
     }
 
     private fun copyDatabaseScripts(row: Row, testDirectoryPath: Path, resultDirectoryPath: Path) {
-        row.safeStringValueAt(3)?.let {
+        row.safeCleanedStringValueAt(3)?.let {
             copyDatabaseScript(it, TIM_DB_PRE, testDirectoryPath.resolve("Input"),
                     resultDirectoryPath)
         }
 
-        row.safeStringValueAt(4)?.let {
+        row.safeCleanedStringValueAt(4)?.let {
             copyDatabaseScript(it, TAXBASE_DB_PRE, testDirectoryPath.resolve("Input"),
                     resultDirectoryPath)
         }
 
-        row.safeStringValueAt(7)?.let {
+        row.safeCleanedStringValueAt(7)?.let {
             copyDatabaseScript(it, TIM_DB_POST, testDirectoryPath.resolve("Output"),
                     resultDirectoryPath)
         }
 
-        row.safeStringValueAt(8)?.let {
+        row.safeCleanedStringValueAt(8)?.let {
             copyDatabaseScript(it, TAXBASE_DB_POST, testDirectoryPath.resolve("Output"),
                     resultDirectoryPath)
         }
@@ -168,7 +162,7 @@ open class TimSupplyChainConverterTask : DefaultTask() {
         }
     }
 
-    private fun formatResponseName(name: String) = name
+    private fun formatResponseName(currentIndex: Int, name: String) = currentIndex.toString() + "-" + name
             .replace("request", "")
             .replace("req", "")
             .trim('_')

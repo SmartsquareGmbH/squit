@@ -61,20 +61,16 @@ open class TimRequestTask : DefaultTask() {
         outputPath.toFile().deleteRecursively()
 
         dbConnections.use {
-            FilesUtils.getChildDirectories(inputPath).forEach { itSuite ->
-                itSuite.resolve("order_info.csv").toFile()
-                        .readText()
-                        .split(";")
-                        .map { inputPath.resolve(itSuite).resolve(it.trim()) }
-                        .forEach { testDirectoryPath ->
-                            val propertiesPath = FilesUtils.validateExistence(testDirectoryPath.resolve(CONFIG))
-                            val properties = TimProperties().fillFromSingleProperties(propertiesPath)
+            FilesUtils.getLeafDirectories(inputPath)
+                    .sortedWith(Comparator { first, second -> getTestIndex(first).compareTo(getTestIndex(second)) })
+                    .forEach { testDirectoryPath ->
+                        val propertiesPath = FilesUtils.validateExistence(testDirectoryPath.resolve(CONFIG))
+                        val properties = TimProperties().fillFromSingleProperties(propertiesPath)
 
-                            val requestPath = FilesUtils.validateExistence(testDirectoryPath.resolve(REQUEST))
+                        val requestPath = FilesUtils.validateExistence(testDirectoryPath.resolve(REQUEST))
 
-                            doRequestAndScriptExecutions(testDirectoryPath, requestPath, properties)
-                        }
-            }
+                        doRequestAndScriptExecutions(testDirectoryPath, requestPath, properties)
+                    }
         }
     }
 
@@ -118,13 +114,17 @@ open class TimRequestTask : DefaultTask() {
 
                 true
             } catch (error: Throwable) {
-                logger.warn("Could not run database script ${path.fileName} for test ${path.parent.fileName} " +
-                        "(${error.toString().trim()})")
+                logger.warn("Could not run database script ${path.fileName} for test " +
+                        "${path.parent.cut(inputPath)} (${error.toString().trim()})")
 
                 false
             }
         } else {
             true
         }
+    }
+
+    private fun getTestIndex(testDirectoryPath: Path) = testDirectoryPath.fileName.toString().let {
+        it.substring(0, it.indexOf("-")).toInt()
     }
 }

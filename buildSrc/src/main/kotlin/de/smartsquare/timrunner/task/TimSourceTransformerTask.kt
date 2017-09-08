@@ -42,47 +42,36 @@ open class TimSourceTransformerTask : DefaultTask() {
     fun run() {
         outputDirectory.toFile().deleteRecursively()
 
-        FilesUtils.getChildDirectories(inputSourceDirectory).forEach { testRoot ->
-            val orderInfo = Files.readAllLines(FilesUtils.validateExistence(testRoot.resolve("order_info.csv")))
-                    .map { it.trim().trim(';') }
-                    .toMutableList()
+        FilesUtils.getLeafDirectories(inputSourceDirectory).forEach {
+            val resolvedProperties = resolveProperties(it)
 
-            FilesUtils.getLeafDirectories(inputSourceDirectory).forEach {
-                val resolvedProperties = resolveProperties(it)
+            if (!resolvedProperties.ignore) {
+                val (requestPath, responsePath, sqlFilePaths) = getRelevantPathsForTest(it)
+                val resultDirectory = Files.createDirectories(outputDirectory.resolve(it.cut(inputSourceDirectory)))
 
-                if (!resolvedProperties.ignore) {
-                    val (requestPath, responsePath, sqlFilePaths) = getRelevantPathsForTest(it)
-                    val resultDirectory = Files.createDirectories(outputDirectory.resolve(it.cut(inputSourceDirectory)))
+                val resultPropertiesPath = FilesUtils.createFileIfNotExists(resultDirectory.resolve(CONFIG))
+                val resultRequestPath = FilesUtils.createFileIfNotExists(resultDirectory.resolve(requestPath.fileName))
+                val resultResponsePath = FilesUtils.createFileIfNotExists(resultDirectory
+                        .resolve(responsePath.fileName))
 
-                    val resultPropertiesPath = FilesUtils.createFileIfNotExists(resultDirectory.resolve(CONFIG))
-                    val resultRequestPath = FilesUtils.createFileIfNotExists(resultDirectory.resolve(requestPath.fileName))
-                    val resultResponsePath = FilesUtils.createFileIfNotExists(resultDirectory
-                            .resolve(responsePath.fileName))
-
-                    try {
-                        transformRequest(SAXReader().read(requestPath)).write(resultRequestPath)
-                    } catch (error: Throwable) {
-                        throw GradleException("Could not transform file: ${requestPath.cut(inputSourceDirectory)} ($error)")
-                    }
-
-                    try {
-                        transformResponse(SAXReader().read(responsePath)).write(resultResponsePath)
-                    } catch (error: Throwable) {
-                        throw GradleException("Could not transform file: ${responsePath.cut(inputSourceDirectory)} ($error)")
-                    }
-
-                    sqlFilePaths.forEach {
-                        Files.copy(it, resultDirectory.resolve(it.fileName), StandardCopyOption.REPLACE_EXISTING)
-                    }
-
-                    resolvedProperties.writeToProperties().safeStore(resultPropertiesPath)
-                } else {
-                    orderInfo.remove(it.cut(testRoot).toString())
+                try {
+                    transformRequest(SAXReader().read(requestPath)).write(resultRequestPath)
+                } catch (error: Throwable) {
+                    throw GradleException("Could not transform file: ${requestPath.cut(inputSourceDirectory)} ($error)")
                 }
-            }
 
-            Files.write(outputDirectory.resolve(testRoot.fileName).resolve("order_info.csv"),
-                    orderInfo.joinToString(";\n").toByteArray())
+                try {
+                    transformResponse(SAXReader().read(responsePath)).write(resultResponsePath)
+                } catch (error: Throwable) {
+                    throw GradleException("Could not transform file: ${responsePath.cut(inputSourceDirectory)} ($error)")
+                }
+
+                sqlFilePaths.forEach {
+                    Files.copy(it, resultDirectory.resolve(it.fileName), StandardCopyOption.REPLACE_EXISTING)
+                }
+
+                resolvedProperties.writeToProperties().safeStore(resultPropertiesPath)
+            }
         }
     }
 
