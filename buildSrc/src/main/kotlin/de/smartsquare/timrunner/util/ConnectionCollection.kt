@@ -13,9 +13,10 @@ class ConnectionCollection : AutoCloseable {
                 value ?: DriverManager.getConnection(it.first, it.second, it.third).also { result: Connection ->
                     connections.put(it, result)
                 }.also {
-                    it.autoCommit = false
-
                     it.createStatement().execute("ALTER SESSION SET NLS_LANGUAGE=ENGLISH")
+                    it.createStatement().execute("ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.,'")
+
+                    it.autoCommit = false
                 }
             }
         }
