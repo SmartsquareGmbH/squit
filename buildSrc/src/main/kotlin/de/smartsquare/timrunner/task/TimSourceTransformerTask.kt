@@ -10,6 +10,7 @@ import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_PRE
 import de.smartsquare.timrunner.util.Constants.TIM_DB_POST
 import de.smartsquare.timrunner.util.Constants.TIM_DB_PRE
 import org.dom4j.Document
+import org.dom4j.Node
 import org.dom4j.io.SAXReader
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -139,16 +140,12 @@ open class TimSourceTransformerTask : DefaultTask() {
     private fun transform(request: Document, expectedResponse: Document) {
         request.selectSingleNode("//TaxAlgorithmDate")?.let { currentAlgorithmDateNode ->
             expectedResponse.selectSingleNode("//TaxAlgorithmDate")?.let { expectedAlgorithmDateNode ->
-                transformationRegex.find(currentAlgorithmDateNode.text)?.let { regexResult ->
-                    val dateToSet = if (regexResult.groupValues.size == 2) {
-                        LocalDate.now().plusDays(regexResult.groupValues[1].toLongOrNull() ?: 0).toString()
-                    } else {
-                        expectedAlgorithmDateNode.text
-                    }
-
-                    currentAlgorithmDateNode.text = dateToSet
-                    expectedAlgorithmDateNode.text = dateToSet
-                }
+                transformDate(currentAlgorithmDateNode, expectedAlgorithmDateNode)
+            }
+        }
+        request.selectSingleNode("//TaxCalculationDate")?.let { currentCalculationDateNode ->
+            expectedResponse.selectSingleNode("//TaxCalculationDate")?.let { expectedCalculationDateNode ->
+                transformDate(currentCalculationDateNode, expectedCalculationDateNode)
             }
         }
 
@@ -156,6 +153,19 @@ open class TimSourceTransformerTask : DefaultTask() {
             if (it.text.startsWith("Technical error")) {
                 it.text = it.text.substring(0, it.text.indexOf("at com.")).trim()
             }
+        }
+    }
+
+    private fun transformDate(currentNode: Node, expectedNode: Node) {
+        transformationRegex.find(currentNode.text)?.let { regexResult ->
+            val dateToSet = if (regexResult.groupValues.size == 2) {
+                LocalDate.now().plusDays(regexResult.groupValues[1].toLongOrNull() ?: 0).toString()
+            } else {
+                expectedNode.text
+            }
+
+            currentNode.text = dateToSet
+            expectedNode.text = dateToSet
         }
     }
 }
