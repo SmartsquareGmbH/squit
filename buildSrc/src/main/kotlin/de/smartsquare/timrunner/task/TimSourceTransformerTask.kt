@@ -48,6 +48,7 @@ open class TimSourceTransformerTask : DefaultTask() {
     fun run() {
         outputDirectory.toFile().deleteRecursively()
 
+        Files.createDirectories(outputDirectory)
         FilesUtils.getLeafDirectories(inputSourceDirectory)
                 .sortedWith(Comparator { first, second ->
                     Utils.getTestIndex(first).compareTo(Utils.getTestIndex(second))

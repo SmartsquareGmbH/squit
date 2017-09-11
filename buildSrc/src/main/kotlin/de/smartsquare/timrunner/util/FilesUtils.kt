@@ -9,13 +9,13 @@ import java.nio.file.attribute.BasicFileAttributes
 
 object FilesUtils {
 
-    fun getChildDirectories(current: Path) = Files.newDirectoryStream(current, { Files.isDirectory(it) })
+    fun getChildDirectories(path: Path) = Files.newDirectoryStream(path, { Files.isDirectory(it) })
             .use { it.toList() }
 
-    fun getLeafDirectories(current: Path): List<Path> = mutableListOf<Path>().also { result ->
-        Files.walkFileTree(current, object : SimpleFileVisitor<Path>() {
+    fun getLeafDirectories(path: Path): List<Path> = mutableListOf<Path>().also { result ->
+        Files.walkFileTree(path, object : SimpleFileVisitor<Path>() {
             override fun preVisitDirectory(directory: Path, attributes: BasicFileAttributes): FileVisitResult {
-                if (Files.list(directory).use { it.noneMatch { current -> Files.isDirectory(current) } }) {
+                if (directory != path && containsDirectories(directory)) {
                     result.add(directory)
                 }
 
@@ -32,5 +32,11 @@ object FilesUtils {
     fun validateExistence(path: Path): Path = when (Files.exists(path)) {
         true -> path
         false -> throw GradleException("Missing expected file: $path")
+    }
+
+    private fun containsDirectories(path: Path) = Files.list(path).use {
+        it.noneMatch { current ->
+            Files.isDirectory(current)
+        }
     }
 }

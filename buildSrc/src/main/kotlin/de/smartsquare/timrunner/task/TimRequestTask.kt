@@ -57,12 +57,16 @@ open class TimRequestTask : DefaultTask() {
     fun run() {
         outputPath.toFile().deleteRecursively()
 
+        Files.createDirectories(outputPath)
+
         dbConnections.use {
             FilesUtils.getLeafDirectories(inputPath)
                     .sortedWith(Comparator { first, second ->
                         Utils.getTestIndex(first).compareTo(Utils.getTestIndex(second))
                     })
-                    .forEach { testDirectoryPath ->
+                    .forEachIndexed { index, testDirectoryPath ->
+                        logger.quiet("Running test ${index + 1}")
+
                         val propertiesPath = FilesUtils.validateExistence(testDirectoryPath.resolve(CONFIG))
                         val properties = TimProperties().fillFromSingleProperties(propertiesPath)
 
