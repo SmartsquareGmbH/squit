@@ -16,6 +16,7 @@ import org.apache.poi.ss.usermodel.Row
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Files
@@ -38,6 +39,10 @@ open class TimSupplyChainConverterTask : DefaultTask() {
     @OutputDirectory
     var outputDirectory: Path = Paths.get(project.projectDir.path, "src/main/test/supply-chain")
 
+    @Internal
+    private val order = arrayOf("Validation", "Grouping", "DecideTaxTreatment&Consolidation", "Calculation",
+            "Finalization", "Smoke Tests", "Smoke Tests - New Algo")
+
     /**
      * Runs the task.
      */
@@ -47,58 +52,62 @@ open class TimSupplyChainConverterTask : DefaultTask() {
 
         var currentIndex = 0
 
-        FilesUtils.getChildDirectories(inputDirectory).forEach { testDirectoryPath ->
-            val xlsFile = FilesUtils.validateExistence(testDirectoryPath
-                    .resolve("${testDirectoryPath.fileName}_TC.xls"))
+        FilesUtils.getChildDirectories(inputDirectory)
+                .sortedWith(kotlin.Comparator { first, second ->
+                    order.indexOf(first.fileName.toString()).compareTo(order.indexOf(second.fileName.toString()))
+                })
+                .forEach { testDirectoryPath ->
+                    val xlsFile = FilesUtils.validateExistence(testDirectoryPath
+                            .resolve("${testDirectoryPath.fileName}_TC.xls"))
 
-            val workbook = HSSFWorkbook(Files.newInputStream(xlsFile)).also {
-                if (it.numberOfSheets <= 0) {
-                    throw GradleException("Invalid xls file: $xlsFile (No sheets found)")
+                    val workbook = HSSFWorkbook(Files.newInputStream(xlsFile)).also {
+                        if (it.numberOfSheets <= 0) {
+                            throw GradleException("Invalid xls file: $xlsFile (No sheets found)")
+                        }
+                    }
+
+                    val sheet = workbook.getSheetAt(0)
+                    var currentFirstPath = ""
+                    var currentSecondPath = ""
+                    var currentThirdPath = ""
+
+                    sheet.rowIterator().asSequence().drop(1).forEach { row ->
+                        currentFirstPath = row.safeCleanedStringValueAt(0) ?: currentFirstPath
+                        currentSecondPath = row.safeCleanedStringValueAt(1) ?: currentSecondPath
+                        currentThirdPath = row.safeCleanedStringValueAt(2) ?: currentThirdPath
+
+                        val requestName = row.safeCleanedStringValueAt(5)
+                        val responseName = row.safeCleanedStringValueAt(6)
+
+                        if (requestName != null && responseName != null) {
+                            val requestFilePath = FilesUtils.validateExistence(testDirectoryPath
+                                    .resolve("Input")
+                                    .resolve("$requestName.xml"))
+
+                            val responseFilePath = FilesUtils.validateExistence(testDirectoryPath
+                                    .resolve("Output")
+                                    .resolve("$responseName.xml"))
+
+                            val resultApiDirectoryPath = Files.createDirectories(outputDirectory
+                                    .resolve(testDirectoryPath.cut(inputDirectory))
+                                    .resolve(currentFirstPath))
+
+                            val resultDirectoryPath = Files.createDirectories(resultApiDirectoryPath
+                                    .resolve(currentSecondPath)
+                                    .resolve(currentThirdPath)
+                                    .resolve(formatResponseName(currentIndex, requestName)))
+
+                            copyRequestAndResponse(resultDirectoryPath, requestFilePath, responseFilePath)
+                            copyDatabaseScripts(row, testDirectoryPath, resultDirectoryPath)
+                            generateProperties(resultApiDirectoryPath, currentFirstPath)
+
+                            currentIndex += 1
+                        } else {
+                            logger.warn("Skipped test $currentFirstPath/$currentSecondPath/$currentThirdPath " +
+                                    "in xls file: $xlsFile")
+                        }
+                    }
                 }
-            }
-
-            val sheet = workbook.getSheetAt(0)
-            var currentFirstPath = ""
-            var currentSecondPath = ""
-            var currentThirdPath = ""
-
-            sheet.rowIterator().asSequence().drop(1).forEach { row ->
-                currentFirstPath = row.safeCleanedStringValueAt(0) ?: currentFirstPath
-                currentSecondPath = row.safeCleanedStringValueAt(1) ?: currentSecondPath
-                currentThirdPath = row.safeCleanedStringValueAt(2) ?: currentThirdPath
-
-                val requestName = row.safeCleanedStringValueAt(5)
-                val responseName = row.safeCleanedStringValueAt(6)
-
-                if (requestName != null && responseName != null) {
-                    val requestFilePath = FilesUtils.validateExistence(testDirectoryPath
-                            .resolve("Input")
-                            .resolve("$requestName.xml"))
-
-                    val responseFilePath = FilesUtils.validateExistence(testDirectoryPath
-                            .resolve("Output")
-                            .resolve("$responseName.xml"))
-
-                    val resultApiDirectoryPath = Files.createDirectories(outputDirectory
-                            .resolve(testDirectoryPath.cut(inputDirectory))
-                            .resolve(currentFirstPath))
-
-                    val resultDirectoryPath = Files.createDirectories(resultApiDirectoryPath
-                            .resolve(currentSecondPath)
-                            .resolve(currentThirdPath)
-                            .resolve(formatResponseName(currentIndex, requestName)))
-
-                    copyRequestAndResponse(resultDirectoryPath, requestFilePath, responseFilePath)
-                    copyDatabaseScripts(row, testDirectoryPath, resultDirectoryPath)
-                    generateProperties(resultApiDirectoryPath, currentFirstPath)
-
-                    currentIndex += 1
-                } else {
-                    logger.warn("Skipped test $currentFirstPath/$currentSecondPath/$currentThirdPath " +
-                            "in xls file: $xlsFile")
-                }
-            }
-        }
     }
 
     private fun copyRequestAndResponse(resultDirectoryPath: Path, requestFilePath: Path, responseFilePath: Path) {
