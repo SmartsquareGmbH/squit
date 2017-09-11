@@ -1,7 +1,7 @@
 package de.smartsquare.timrunner.task
 
 import de.smartsquare.timrunner.entity.TimProperties
-import de.smartsquare.timrunner.util.ConnectionCollection
+import de.smartsquare.timrunner.util.*
 import de.smartsquare.timrunner.util.Constants.CONFIG
 import de.smartsquare.timrunner.util.Constants.REQUEST
 import de.smartsquare.timrunner.util.Constants.RESPONSE
@@ -9,9 +9,6 @@ import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_POST
 import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_PRE
 import de.smartsquare.timrunner.util.Constants.TIM_DB_POST
 import de.smartsquare.timrunner.util.Constants.TIM_DB_PRE
-import de.smartsquare.timrunner.util.FilesUtils
-import de.smartsquare.timrunner.util.cut
-import de.smartsquare.timrunner.util.executeScript
 import okhttp3.*
 import oracle.jdbc.driver.OracleDriver
 import org.gradle.api.DefaultTask
@@ -62,7 +59,9 @@ open class TimRequestTask : DefaultTask() {
 
         dbConnections.use {
             FilesUtils.getLeafDirectories(inputPath)
-                    .sortedWith(Comparator { first, second -> getTestIndex(first).compareTo(getTestIndex(second)) })
+                    .sortedWith(Comparator { first, second ->
+                        Utils.getTestIndex(first).compareTo(Utils.getTestIndex(second))
+                    })
                     .forEach { testDirectoryPath ->
                         val propertiesPath = FilesUtils.validateExistence(testDirectoryPath.resolve(CONFIG))
                         val properties = TimProperties().fillFromSingleProperties(propertiesPath)
@@ -122,9 +121,5 @@ open class TimRequestTask : DefaultTask() {
         } else {
             true
         }
-    }
-
-    private fun getTestIndex(testDirectoryPath: Path) = testDirectoryPath.fileName.toString().let {
-        it.substring(0, it.indexOf("-")).toInt()
     }
 }

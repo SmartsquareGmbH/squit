@@ -48,33 +48,40 @@ open class TimSourceTransformerTask : DefaultTask() {
     fun run() {
         outputDirectory.toFile().deleteRecursively()
 
-        FilesUtils.getLeafDirectories(inputSourceDirectory).forEach {
-            val resolvedProperties = resolveProperties(it)
+        FilesUtils.getLeafDirectories(inputSourceDirectory)
+                .sortedWith(Comparator { first, second ->
+                    Utils.getTestIndex(first).compareTo(Utils.getTestIndex(second))
+                })
+                .forEach {
+                    val resolvedProperties = resolveProperties(it)
 
-            if (!resolvedProperties.ignore) {
-                val (requestPath, responsePath, sqlFilePaths) = getRelevantPathsForTest(it)
-                val resultDirectory = Files.createDirectories(outputDirectory.resolve(it.cut(inputSourceDirectory)))
+                    if (!resolvedProperties.ignore) {
+                        val (requestPath, responsePath, sqlFilePaths) = getRelevantPathsForTest(it)
+                        val resultDirectory = Files.createDirectories(outputDirectory
+                                .resolve(it.cut(inputSourceDirectory)))
 
-                val resultPropertiesPath = FilesUtils.createFileIfNotExists(resultDirectory.resolve(CONFIG))
-                val resultRequestPath = FilesUtils.createFileIfNotExists(resultDirectory.resolve(requestPath.fileName))
-                val resultResponsePath = FilesUtils.createFileIfNotExists(resultDirectory
-                        .resolve(responsePath.fileName))
+                        val resultPropertiesPath = FilesUtils.createFileIfNotExists(resultDirectory.resolve(CONFIG))
+                        val resultRequestPath = FilesUtils.createFileIfNotExists(resultDirectory
+                                .resolve(requestPath.fileName))
 
-                val request = SAXReader().read(requestPath)
-                val response = SAXReader().read(responsePath)
+                        val resultResponsePath = FilesUtils.createFileIfNotExists(resultDirectory
+                                .resolve(responsePath.fileName))
 
-                transform(request, response)
+                        val request = SAXReader().read(requestPath)
+                        val response = SAXReader().read(responsePath)
 
-                request.write(resultRequestPath)
-                response.write(resultResponsePath)
+                        transform(request, response)
 
-                sqlFilePaths.forEach {
-                    Files.copy(it, resultDirectory.resolve(it.fileName), StandardCopyOption.REPLACE_EXISTING)
+                        request.write(resultRequestPath)
+                        response.write(resultResponsePath)
+
+                        sqlFilePaths.forEach {
+                            Files.copy(it, resultDirectory.resolve(it.fileName), StandardCopyOption.REPLACE_EXISTING)
+                        }
+
+                        resolvedProperties.writeToProperties().safeStore(resultPropertiesPath)
+                    }
                 }
-
-                resolvedProperties.writeToProperties().safeStore(resultPropertiesPath)
-            }
-        }
     }
 
     private fun resolveProperties(testDirectory: Path): TimProperties {
