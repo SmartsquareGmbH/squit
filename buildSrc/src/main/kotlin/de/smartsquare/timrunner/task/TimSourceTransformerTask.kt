@@ -81,6 +81,8 @@ open class TimSourceTransformerTask : DefaultTask() {
                         }
 
                         resolvedProperties.writeToProperties().safeStore(resultPropertiesPath)
+                    } else {
+                        logger.warn("Ignoring test ${it.cut(inputSourceDirectory)}")
                     }
                 }
     }
