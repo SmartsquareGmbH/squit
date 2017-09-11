@@ -12,8 +12,8 @@ inline fun Connection.executeScript(path: Path) {
         createStatement().use { statement ->
             Files.readAllBytes(path).toString(Charsets.UTF_8)
                     .replace(Regex("--.*?\n", DOT_MATCHES_ALL), "")
-                    .replace("\n", "")
-                    .replace("\r", "")
+                    .replace("\n", " ")
+                    .replace("\r", " ")
                     .replace("\uFEFF", "")
                     .split(";")
                     .map { it.trim() }
