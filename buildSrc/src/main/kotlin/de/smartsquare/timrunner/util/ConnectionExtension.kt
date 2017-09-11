@@ -9,13 +9,14 @@ import java.sql.Connection
 inline fun Connection.executeScript(path: Path) {
     try {
         createStatement().use { statement ->
-            Files.readAllLines(path).joinToString(" ")
+            Files.readAllBytes(path).toString(Charsets.UTF_8)
+                    .replace("\n", "")
+                    .replace("\r", "")
+                    .replace("\uFEFF", "")
                     .split(";")
                     .map { it.trim() }
                     .filter { it.isNotBlank() }
-                    .forEach { statement.addBatch(it) }
-
-            statement.executeBatch()
+                    .forEach { statement.execute(it) }
         }
 
         commit()
