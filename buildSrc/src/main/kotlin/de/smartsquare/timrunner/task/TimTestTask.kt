@@ -21,7 +21,7 @@ import java.nio.file.Paths
 /**
  * Task for comparing the actual responses to the expected responses and generating a report.
  */
-open class TimITTask : DefaultTask() {
+open class TimTestTask : DefaultTask() {
 
     /**
      * The directory of the test sources.

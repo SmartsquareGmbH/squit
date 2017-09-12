@@ -15,32 +15,32 @@ class TimITRunnerPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         try {
-            project.tasks.create("transformTimSources", TimPreProcessTask::class.java) {
+            project.tasks.create("preProcessTimSources", TimPreProcessTask::class.java) {
                 it.group = "Build"
                 it.description = "Transforms the sources to be readable and usable for the following tasks."
             }
 
-            project.tasks.create("requestTim", TimRequestTask::class.java) {
+            project.tasks.create("runTimRequests", TimRequestTask::class.java) {
                 it.group = "Build"
-                it.description = "Performs the requests specified in the test source directory."
-                it.dependsOn("transformTimSources")
+                it.description = "Performs the integration tests specified in the test source directory."
+                it.dependsOn("preProcessTimSources")
             }
 
-            project.tasks.create("transformTimResponses", TimPostProcessTask::class.java) {
+            project.tasks.create("postProcessTimSources", TimPostProcessTask::class.java) {
                 it.group = "Build"
-                it.description = "Transforms the responses to be readable and usable for the comparing task."
-                it.dependsOn("requestTim")
+                it.description = "Transforms the actual responses to be readable and usable for the comparing task."
+                it.dependsOn("runTimRequests")
             }
 
-            project.tasks.create("runTimITs", TimITTask::class.java) {
+            project.tasks.create("testTim", TimTestTask::class.java) {
                 it.group = "Build"
-                it.description = "Runs the integration tests."
-                it.dependsOn("transformTimResponses")
+                it.description = "Compares the actual responses to the expected responses and generates a report."
+                it.dependsOn("postProcessTimSources")
             }
 
             project.tasks.create("convertSupplyChainProject", TimSupplyChainConverterTask::class.java) {
                 it.group = "Build Setup"
-                it.description = "Converts a legacy supply chain project to be usable by the ${project.name}."
+                it.description = "Converts a legacy supply-chain project to be usable by the ${project.name}."
                 it.outputs.upToDateWhen { false }
             }
         } catch (error: MissingMethodException) {
