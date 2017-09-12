@@ -5,7 +5,7 @@ import org.dom4j.io.OutputFormat
 class TimOutputFormat : OutputFormat() {
 
     init {
-        setIndentSize(4)
+        setIndentSize(2)
 
         isNewLineAfterDeclaration = false
         isNewlines = true
