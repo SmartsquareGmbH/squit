@@ -3,7 +3,6 @@ package de.smartsquare.timrunner.task
 import de.smartsquare.timrunner.io.FilesUtils
 import de.smartsquare.timrunner.logic.TimTransformer
 import de.smartsquare.timrunner.util.Constants.RESPONSE
-import de.smartsquare.timrunner.util.Utils
 import de.smartsquare.timrunner.util.cut
 import de.smartsquare.timrunner.util.read
 import de.smartsquare.timrunner.util.write
@@ -42,28 +41,24 @@ open class TimPostProcessTask : DefaultTask() {
      */
     @TaskAction
     fun run() {
-        FilesUtils.getLeafDirectories(inputResponseDirectory)
-                .sortedWith(Comparator { first, second ->
-                    Utils.getTestIndex(first).compareTo(Utils.getTestIndex(second))
-                })
-                .forEach { testDir ->
-                    val responsePath = FilesUtils.validateExistence(testDir.resolve(RESPONSE))
-                    val expectedResponsePath = FilesUtils.validateExistence(inputSourceDirectory
-                            .resolve(testDir.cut(inputResponseDirectory))
-                            .resolve(RESPONSE))
+        FilesUtils.getSortedLeafDirectories(inputResponseDirectory).forEach { testDir ->
+            val responsePath = FilesUtils.validateExistence(testDir.resolve(RESPONSE))
+            val expectedResponsePath = FilesUtils.validateExistence(inputSourceDirectory
+                    .resolve(testDir.cut(inputResponseDirectory))
+                    .resolve(RESPONSE))
 
-                    val resultDirectoryPath = Files.createDirectories(outputDirectory.
-                            resolve(testDir.cut(inputResponseDirectory)))
+            val resultDirectoryPath = Files.createDirectories(outputDirectory
+                    .resolve(testDir.cut(inputResponseDirectory)))
 
-                    val resultFilePath = FilesUtils.createFileIfNotExists(resultDirectoryPath.resolve(RESPONSE))
+            val resultFilePath = FilesUtils.createFileIfNotExists(resultDirectoryPath.resolve(RESPONSE))
 
-                    val response = SAXReader().read(responsePath)
-                    val expectedResponse = SAXReader().read(expectedResponsePath)
+            val response = SAXReader().read(responsePath)
+            val expectedResponse = SAXReader().read(expectedResponsePath)
 
-                    transform(response, expectedResponse)
+            transform(response, expectedResponse)
 
-                    response.write(resultFilePath)
-                }
+            response.write(resultFilePath)
+        }
     }
 
     private fun transform(response: Document, expectedResponse: Document) {

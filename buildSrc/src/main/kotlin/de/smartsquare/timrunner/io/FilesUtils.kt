@@ -1,29 +1,39 @@
 package de.smartsquare.timrunner.io
 
 import org.gradle.api.GradleException
-import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.SimpleFileVisitor
-import java.nio.file.attribute.BasicFileAttributes
 
+/**
+ * Object with io related utility methods in the style of [java.nio.file.Files].
+ */
 object FilesUtils {
 
+    /**
+     * Returns the child directories paths of the given [path].
+     */
     fun getChildDirectories(path: Path) = Files.newDirectoryStream(path, { Files.isDirectory(it) })
             .use { it.toList() }
 
-    fun getLeafDirectories(path: Path): List<Path> = mutableListOf<Path>().also { result ->
-        Files.walkFileTree(path, object : SimpleFileVisitor<Path>() {
-            override fun preVisitDirectory(directory: Path, attributes: BasicFileAttributes): FileVisitResult {
-                if (directory != path && containsDirectories(directory)) {
-                    result.add(directory)
+    /**
+     * Returns all leaf directories of the given [path], sorted by alphanumeric order.
+     */
+    fun getSortedLeafDirectories(path: Path): List<Path> = getChildDirectories(path)
+            .sortedWith(compareBy({
+                it.fileName.toString().substringBefore("-").toIntOrNull() ?: 0
+            }, {
+                it.fileName.toString().substringAfter("-")
+            }))
+            .fold(listOf(), { current, it ->
+                current + when (containsDirectories(it)) {
+                    true -> getSortedLeafDirectories(it)
+                    false -> listOf(it)
                 }
+            })
 
-                return FileVisitResult.CONTINUE
-            }
-        })
-    }
-
+    /**
+     * Deletes the given [path] recursively, if existing.
+     */
     fun deleteRecursivelyIfExisting(path: Path) = when {
         Files.exists(path) -> Files.walk(path)
                 .sorted(Comparator.reverseOrder())
@@ -31,19 +41,27 @@ object FilesUtils {
         else -> Unit
     }
 
+    /**
+     * Creates and returns the file at the given [path].
+     */
     fun createFileIfNotExists(path: Path): Path = when (Files.exists(path)) {
         true -> path
         false -> Files.createFile(path)
     }
 
+    /**
+     * Validates if a file or directory exists at the given [path] and returns it.
+     */
+    @Throws(GradleException::class)
     fun validateExistence(path: Path): Path = when (Files.exists(path)) {
         true -> path
         false -> throw GradleException("Missing expected file: $path")
     }
 
+    /**
+     * Returns if the directory at the given [path] contains at least one sub directory.
+     */
     private fun containsDirectories(path: Path) = Files.list(path).use {
-        it.noneMatch { current ->
-            Files.isDirectory(current)
-        }
+        it.anyMatch { current -> Files.isDirectory(current) }
     }
 }

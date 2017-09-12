@@ -22,7 +22,7 @@ import org.gradle.api.tasks.TaskAction
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
+import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.util.*
 
 open class TimSupplyChainConverterTask : DefaultTask() {
@@ -43,42 +43,72 @@ open class TimSupplyChainConverterTask : DefaultTask() {
     private val order = arrayOf("Validation", "Grouping", "DecideTaxTreatment&Consolidation", "Calculation",
             "Finalization", "Smoke Tests", "Smoke Tests - New Algo")
 
+    @Internal
+    private val aliases = mapOf(
+            "DecideTaxTreatment&Consolidation_TC" to "DecideTT&Consolidation_TC",
+            "Smoke Tests_TC" to "SmokeTest_TC",
+            "Smoke Tests - New Algo_TC" to "SmokeTest_TC_NewAlg"
+    )
+
     /**
      * Runs the task.
      */
     @TaskAction
     fun run() {
-        var currentIndex = 0
-
         FilesUtils.deleteRecursivelyIfExisting(outputDirectory)
         FilesUtils.getChildDirectories(inputDirectory)
                 .sortedWith(kotlin.Comparator { first, second ->
                     order.indexOf(first.fileName.toString()).compareTo(order.indexOf(second.fileName.toString()))
                 })
-                .forEach { testDirectoryPath ->
-                    val xlsFile = FilesUtils.validateExistence(testDirectoryPath
-                            .resolve("${testDirectoryPath.fileName}_TC.xls"))
+                .forEachIndexed { overallIndex, testDirectoryPath ->
+                    val xlsName = "${testDirectoryPath.fileName}_TC"
+                    val xlsPath = "${aliases.getOrElse(xlsName, { xlsName })}.xls"
+                    val xlsFilePath = FilesUtils.validateExistence(testDirectoryPath.resolve(xlsPath))
 
-                    val workbook = HSSFWorkbook(Files.newInputStream(xlsFile)).also {
+                    val workbook = HSSFWorkbook(Files.newInputStream(xlsFilePath)).also {
                         if (it.numberOfSheets <= 0) {
-                            throw GradleException("Invalid xls file: $xlsFile (No sheets found)")
+                            throw GradleException("Invalid xls file: $xlsFilePath (No sheets found)")
                         }
                     }
 
                     val sheet = workbook.getSheetAt(0)
+
                     var currentFirstPath = ""
                     var currentSecondPath = ""
                     var currentThirdPath = ""
 
-                    sheet.rowIterator().asSequence().drop(1).forEach { row ->
-                        currentFirstPath = row.safeCleanedStringValueAt(0) ?: currentFirstPath
-                        currentSecondPath = row.safeCleanedStringValueAt(1) ?: currentSecondPath
-                        currentThirdPath = row.safeCleanedStringValueAt(2) ?: currentThirdPath
+                    var currentFirstIndex = -1
+                    var currentSecondIndex = -1
+                    var currentThirdIndex = -1
 
+                    var testIndex = 0
+
+                    sheet.rowIterator().asSequence().drop(1).forEach { row ->
                         val requestName = row.safeCleanedStringValueAt(5)
                         val responseName = row.safeCleanedStringValueAt(6)
 
                         if (requestName != null && responseName != null) {
+                            row.safeCleanedStringValueAt(0)?.let {
+                                currentFirstPath = it
+                                currentFirstIndex++
+
+                                currentSecondIndex = if (row.safeCleanedStringValueAt(1) == null) 0 else -1
+                                currentThirdIndex = if (row.safeCleanedStringValueAt(2) == null) 0 else -1
+                            }
+
+                            row.safeCleanedStringValueAt(1)?.let {
+                                currentSecondPath = it
+                                currentSecondIndex++
+
+                                currentThirdIndex = if (row.safeCleanedStringValueAt(2) == null) 0 else -1
+                            }
+
+                            row.safeCleanedStringValueAt(2)?.let {
+                                currentThirdPath = it
+                                currentThirdIndex++
+                                testIndex = 0
+                            }
+
                             val requestFilePath = FilesUtils.validateExistence(testDirectoryPath
                                     .resolve("Input")
                                     .resolve("$requestName.xml"))
@@ -88,22 +118,22 @@ open class TimSupplyChainConverterTask : DefaultTask() {
                                     .resolve("$responseName.xml"))
 
                             val resultApiDirectoryPath = Files.createDirectories(outputDirectory
-                                    .resolve(testDirectoryPath.cut(inputDirectory))
-                                    .resolve(currentFirstPath))
+                                    .resolve("$overallIndex-${testDirectoryPath.cut(inputDirectory)}")
+                                    .resolve("$currentFirstIndex-$currentFirstPath"))
 
                             val resultDirectoryPath = Files.createDirectories(resultApiDirectoryPath
-                                    .resolve(currentSecondPath)
-                                    .resolve(currentThirdPath)
-                                    .resolve(formatResponseName(currentIndex, requestName)))
+                                    .resolve("$currentSecondIndex-$currentSecondPath")
+                                    .resolve("$currentThirdIndex-$currentThirdPath")
+                                    .resolve(formatResponseName(testIndex, requestName)))
 
                             copyRequestAndResponse(resultDirectoryPath, requestFilePath, responseFilePath)
                             copyDatabaseScripts(row, testDirectoryPath, resultDirectoryPath)
                             generateProperties(resultApiDirectoryPath, currentFirstPath)
 
-                            currentIndex += 1
+                            testIndex++
                         } else {
                             logger.warn("Skipped test $currentFirstPath/$currentSecondPath/$currentThirdPath " +
-                                    "in xls file: $xlsFile")
+                                    "in xls file: $xlsFilePath")
                         }
                     }
                 }
@@ -121,24 +151,15 @@ open class TimSupplyChainConverterTask : DefaultTask() {
     }
 
     private fun copyDatabaseScripts(row: Row, testDirectoryPath: Path, resultDirectoryPath: Path) {
-        row.safeCleanedStringValueAt(3)?.let {
-            copyDatabaseScript(it, TIM_DB_PRE, testDirectoryPath.resolve("Input"),
-                    resultDirectoryPath)
-        }
-
-        row.safeCleanedStringValueAt(4)?.let {
-            copyDatabaseScript(it, TAXBASE_DB_PRE, testDirectoryPath.resolve("Input"),
-                    resultDirectoryPath)
-        }
-
-        row.safeCleanedStringValueAt(7)?.let {
-            copyDatabaseScript(it, TIM_DB_POST, testDirectoryPath.resolve("Output"),
-                    resultDirectoryPath)
-        }
-
-        row.safeCleanedStringValueAt(8)?.let {
-            copyDatabaseScript(it, TAXBASE_DB_POST, testDirectoryPath.resolve("Output"),
-                    resultDirectoryPath)
+        listOf(
+                Triple(3, TIM_DB_PRE, testDirectoryPath.resolve("Input")),
+                Triple(4, TAXBASE_DB_PRE, testDirectoryPath.resolve("Input")),
+                Triple(7, TIM_DB_POST, testDirectoryPath.resolve("Output")),
+                Triple(8, TAXBASE_DB_POST, testDirectoryPath.resolve("Output"))
+        ).forEach { (index, name, resolvedTestDirectoryPath) ->
+            row.safeCleanedStringValueAt(index)?.let {
+                copyDatabaseScript(it, name, resolvedTestDirectoryPath, resultDirectoryPath)
+            }
         }
     }
 
@@ -179,9 +200,7 @@ open class TimSupplyChainConverterTask : DefaultTask() {
                                    resultDirectoryPath: Path) {
         FilesUtils.validateExistence(testDirectoryPath
                 .resolve("$sourceName.sql"))
-                .let { path ->
-                    Files.copy(path, resultDirectoryPath.resolve(resultName), StandardCopyOption.REPLACE_EXISTING)
-                }
+                .let { path -> Files.copy(path, resultDirectoryPath.resolve(resultName), REPLACE_EXISTING) }
     }
 
     private fun generateDefaultProperties(): Properties {

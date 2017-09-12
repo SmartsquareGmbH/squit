@@ -5,7 +5,6 @@ import de.smartsquare.timrunner.entity.TimITReportContainerImpl
 import de.smartsquare.timrunner.entity.TimITResult
 import de.smartsquare.timrunner.io.FilesUtils
 import de.smartsquare.timrunner.util.Constants.RESPONSE
-import de.smartsquare.timrunner.util.Utils
 import de.smartsquare.timrunner.util.cut
 import de.smartsquare.timrunner.util.write
 import groovy.lang.Closure
@@ -68,24 +67,20 @@ open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
     private fun runTests(): List<TimITResult> {
         val resultList = arrayListOf<TimITResult>()
 
-        FilesUtils.getLeafDirectories(inputResponseDirectory)
-                .sortedWith(Comparator { first, second ->
-                    Utils.getTestIndex(first).compareTo(Utils.getTestIndex(second))
-                })
-                .forEach { responseDirectory ->
-                    val actualResponseFile = FilesUtils.validateExistence(responseDirectory.resolve(RESPONSE))
-                    val expectedResponseFile = FilesUtils.validateExistence(inputSourceDirectory
-                            .resolve(responseDirectory.cut(inputResponseDirectory))
-                            .resolve(RESPONSE))
+        FilesUtils.getSortedLeafDirectories(inputResponseDirectory).forEach { responseDirectory ->
+            val actualResponseFile = FilesUtils.validateExistence(responseDirectory.resolve(RESPONSE))
+            val expectedResponseFile = FilesUtils.validateExistence(inputSourceDirectory
+                    .resolve(responseDirectory.cut(inputResponseDirectory))
+                    .resolve(RESPONSE))
 
-                    val diffBuilder = DiffBuilder.compare(Input.fromStream(Files.newInputStream(expectedResponseFile)))
-                            .withTest(Input.fromStream(Files.newInputStream(actualResponseFile)))
-                            .checkForSimilar()
-                            .build()
+            val diffBuilder = DiffBuilder.compare(Input.fromStream(Files.newInputStream(actualResponseFile)))
+                    .withTest(Input.fromStream(Files.newInputStream(expectedResponseFile)))
+                    .checkForSimilar()
+                    .build()
 
-                    resultList += constructResult(diffBuilder.differences.joinToString(separator = "\n"),
-                            responseDirectory)
-                }
+            resultList += constructResult(diffBuilder.differences.joinToString(separator = "\n"),
+                    responseDirectory)
+        }
 
         return resultList
     }

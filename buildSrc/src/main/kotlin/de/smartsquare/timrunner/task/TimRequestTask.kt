@@ -11,7 +11,6 @@ import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_POST
 import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_PRE
 import de.smartsquare.timrunner.util.Constants.TIM_DB_POST
 import de.smartsquare.timrunner.util.Constants.TIM_DB_PRE
-import de.smartsquare.timrunner.util.Utils
 import de.smartsquare.timrunner.util.cut
 import okhttp3.*
 import oracle.jdbc.driver.OracleDriver
@@ -63,20 +62,16 @@ open class TimRequestTask : DefaultTask() {
         Files.createDirectories(outputPath)
 
         dbConnections.use {
-            FilesUtils.getLeafDirectories(inputPath)
-                    .sortedWith(Comparator { first, second ->
-                        Utils.getTestIndex(first).compareTo(Utils.getTestIndex(second))
-                    })
-                    .forEachIndexed { index, testDirectoryPath ->
-                        logger.quiet("Running test ${index + 1}")
+            FilesUtils.getSortedLeafDirectories(inputPath).forEachIndexed { index, testDirectoryPath ->
+                logger.quiet("Running test $index")
 
-                        val propertiesPath = FilesUtils.validateExistence(testDirectoryPath.resolve(CONFIG))
-                        val properties = TimProperties().fillFromSingleProperties(propertiesPath)
+                val propertiesPath = FilesUtils.validateExistence(testDirectoryPath.resolve(CONFIG))
+                val properties = TimProperties().fillFromSingleProperties(propertiesPath)
 
-                        val requestPath = FilesUtils.validateExistence(testDirectoryPath.resolve(REQUEST))
+                val requestPath = FilesUtils.validateExistence(testDirectoryPath.resolve(REQUEST))
 
-                        doRequestAndScriptExecutions(testDirectoryPath, requestPath, properties)
-                    }
+                doRequestAndScriptExecutions(testDirectoryPath, requestPath, properties)
+            }
         }
     }
 
