@@ -22,19 +22,19 @@ open class TimPostProcessTask : DefaultTask() {
      * The directory of the test sources.
      */
     @InputDirectory
-    var sourcesPath: Path = Paths.get(project.buildDir.path, "source")
+    var processedSourcesPath: Path = Paths.get(project.buildDir.path, "sources")
 
     /**
      * The directory of the previously requested responses.
      */
     @InputDirectory
-    var actualResponsesPath: Path = Paths.get(project.buildDir.path, "results/raw")
+    var actualResponsesPath: Path = Paths.get(project.buildDir.path, "responses", "raw")
 
     /**
      * The directory to save the results in.
      */
     @OutputDirectory
-    var processedActualResponsesPath: Path = Paths.get(project.buildDir.path, "results/processed")
+    var processedActualResponsesPath: Path = Paths.get(project.buildDir.path, "responses", "processed")
 
     /**
      * Runs the task.
@@ -43,7 +43,7 @@ open class TimPostProcessTask : DefaultTask() {
     fun run() {
         FilesUtils.getSortedLeafDirectories(actualResponsesPath).forEach { testDir ->
             val actualResponsePath = FilesUtils.validateExistence(testDir.resolve(RESPONSE))
-            val expectedResponsePath = FilesUtils.validateExistence(sourcesPath
+            val expectedResponsePath = FilesUtils.validateExistence(processedSourcesPath
                     .resolve(testDir.cut(actualResponsesPath))
                     .resolve(RESPONSE))
 

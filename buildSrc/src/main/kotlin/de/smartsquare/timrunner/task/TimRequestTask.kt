@@ -40,13 +40,13 @@ open class TimRequestTask : DefaultTask() {
      * The directory of the test sources.
      */
     @InputDirectory
-    var sourcesPath: Path = Paths.get(project.buildDir.path, "source")
+    var processedSourcesPath: Path = Paths.get(project.buildDir.path, "sources")
 
     /**
      * The directory to save the results in.
      */
     @OutputDirectory
-    var actualResponsesPath: Path = Paths.get(project.buildDir.path, "results", "raw")
+    var actualResponsesPath: Path = Paths.get(project.buildDir.path, "responses", "raw")
 
     @Internal
     private val okHttpClient = OkHttpClient.Builder().build()
@@ -67,7 +67,7 @@ open class TimRequestTask : DefaultTask() {
         Files.createDirectories(actualResponsesPath)
 
         dbConnections.use {
-            FilesUtils.getSortedLeafDirectories(sourcesPath).forEachIndexed { index, testDirectoryPath ->
+            FilesUtils.getSortedLeafDirectories(processedSourcesPath).forEachIndexed { index, testDirectoryPath ->
                 logger.quiet("Running test $index")
 
                 val propertiesPath = FilesUtils.validateExistence(testDirectoryPath.resolve(CONFIG))
@@ -96,7 +96,9 @@ open class TimRequestTask : DefaultTask() {
                     response.body()?.string() ?: ""
                 }
 
-        val resultResponsePath = Files.createDirectories(actualResponsesPath.resolve(testDirectoryPath.cut(sourcesPath)))
+        val resultResponsePath = Files.createDirectories(actualResponsesPath
+                .resolve(testDirectoryPath.cut(processedSourcesPath)))
+
         val resultResponseFilePath = FilesUtils.createFileIfNotExists(resultResponsePath.resolve(RESPONSE))
 
         Files.write(resultResponseFilePath, soapResponse.toByteArray(Charsets.UTF_8))
@@ -121,7 +123,7 @@ open class TimRequestTask : DefaultTask() {
                 true
             } catch (error: Throwable) {
                 logger.warn("Could not run database script ${path.fileName} for test " +
-                        "${path.parent.cut(sourcesPath)} (${error.toString().trim()})")
+                        "${path.parent.cut(processedSourcesPath)} (${error.toString().trim()})")
 
                 false
             }

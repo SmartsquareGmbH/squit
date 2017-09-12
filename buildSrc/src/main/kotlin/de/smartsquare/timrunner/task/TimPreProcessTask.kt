@@ -41,7 +41,7 @@ open class TimPreProcessTask : DefaultTask() {
      * The directory to save the results in.
      */
     @OutputDirectory
-    var processedSourcesPath: Path = Paths.get(project.buildDir.path, "source")
+    var processedSourcesPath: Path = Paths.get(project.buildDir.path, "sources")
 
     /**
      * Runs the task.

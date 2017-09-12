@@ -27,16 +27,16 @@ open class TimTestTask : DefaultTask() {
      * The directory of the test sources.
      */
     @InputDirectory
-    var sourcesPath: Path = Paths.get(project.buildDir.path, "source")
+    var processedSourcesPath: Path = Paths.get(project.buildDir.path, "sources")
 
     /**
      * The directory of the previously requested responses.
      */
     @InputDirectory
-    var actualResponsesPath: Path = Paths.get(project.buildDir.path, "results/processed")
+    var actualResponsesPath: Path = Paths.get(project.buildDir.path, "responses", "processed")
 
     @OutputFile
-    var xmlReportFilePath: Path = Paths.get(project.buildDir.path, "reports/main.xml")
+    var xmlReportFilePath: Path = Paths.get(project.buildDir.path, "reports", "main.xml")
 
     /**
      * Runs the task.
@@ -60,7 +60,7 @@ open class TimTestTask : DefaultTask() {
 
         FilesUtils.getSortedLeafDirectories(actualResponsesPath).forEach { actualResponsePath ->
             val actualResponseFilePath = FilesUtils.validateExistence(actualResponsePath.resolve(RESPONSE))
-            val expectedResponseFilePath = FilesUtils.validateExistence(sourcesPath
+            val expectedResponseFilePath = FilesUtils.validateExistence(processedSourcesPath
                     .resolve(actualResponsePath.cut(actualResponsesPath))
                     .resolve(RESPONSE))
 
