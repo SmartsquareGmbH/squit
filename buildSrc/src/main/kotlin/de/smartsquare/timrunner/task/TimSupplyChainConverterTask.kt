@@ -117,10 +117,7 @@ open class TimSupplyChainConverterTask : DefaultTask() {
 
         Files.write(resultDirectoryPath.resolve(RESPONSE), Files.readAllBytes(responseFilePath)
                 .toString(Charsets.UTF_8)
-                .replace("ns0", "ws")
-                .replace("ns1", "ws")
-                .replace("ns2", "ws")
-                .replace("ns3", "ws")
+                .replace("ns0", "ns2")
                 .toByteArray())
     }
 
