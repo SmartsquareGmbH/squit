@@ -8,29 +8,18 @@ import java.util.*
 
 class TimProperties {
 
-    val endpoint get() = _endpoint ?: throw AssertionError("Internal representation is null.")
-    val ignore get() = _ignore == true
-    val timdbJdbc get() = _timdbJdbc ?: throw AssertionError("Internal representation is null.")
-    val timdbUser get() = _timdbUser ?: throw AssertionError("Internal representation is null.")
-    val timdbPassword get() = _timdbPassword ?: throw AssertionError("Internal representation is null.")
-    val taxbasedbJdbc get() = _taxbasedbJdbc ?: throw AssertionError("Internal representation is null.")
-    val taxbasedbUser get() = _taxbasedbUser ?: throw AssertionError("Internal representation is null.")
-    val taxbasedbPassword
-        get() = _taxbasedbPassword ?: throw AssertionError("Internal representation is null.")
+    val endpoint get() = internalEndpoint ?: throw AssertionError("Internal representation is null.")
+    val ignore get() = internalIgnore == true
+    val databaseConfigurations get() = internalDatabaseConfigurations.values
 
-    private var _endpoint: HttpUrl? = null
-    private var _ignore: Boolean? = null
-    private var _timdbJdbc: String? = null
-    private var _taxbasedbJdbc: String? = null
-    private var _timdbUser: String? = null
-    private var _timdbPassword: String? = null
-    private var _taxbasedbUser: String? = null
-    private var _taxbasedbPassword: String? = null
+    private var internalEndpoint: HttpUrl? = null
+    private var internalIgnore: Boolean? = null
+    private val internalDatabaseConfigurations = mutableMapOf<String, TimDatabaseConfiguration>()
 
     fun fillFromProperties(path: Path): TimProperties {
         Properties().safeLoad(path).also { properties ->
-            if (_endpoint == null) {
-                _endpoint = properties.getProperty("endpoint").let {
+            if (internalEndpoint == null) {
+                internalEndpoint = properties.getProperty("endpoint").let {
                     when {
                         it == null -> null
                         it.isBlank() -> throw GradleException("Invalid value for endpoint property: $it")
@@ -44,8 +33,8 @@ class TimProperties {
                 }
             }
 
-            if (_ignore == null) {
-                _ignore = properties.getProperty("ignore").let {
+            if (internalIgnore == null) {
+                internalIgnore = properties.getProperty("ignore").let {
                     when (it) {
                         "true" -> true
                         "false" -> false
@@ -55,65 +44,46 @@ class TimProperties {
                 }
             }
 
-            if (_timdbJdbc == null) {
-                _timdbJdbc = properties.getProperty("timdb_jdbc").let {
-                    when {
-                        it == null -> null
-                        it.isBlank() -> throw GradleException("Invalid value for timdb_jdbc property: $it")
-                        else -> it
-                    }
-                }
-            }
+            properties
+                    .map { it.key.toString() }
+                    .filter { it.startsWith("db_") }
+                    .map { it.substringAfter("_").substringBeforeLast("_") }
+                    .distinct()
+                    .forEach { databaseName ->
+                        if (!internalDatabaseConfigurations.containsKey(databaseName)) {
+                            val jdbc = properties.getProperty("db_${databaseName}_jdbc")?.let {
+                                when {
+                                    it.isBlank() -> throw GradleException("Invalid value for property " +
+                                            "db_${databaseName}_jdbc: $it")
+                                    else -> it
+                                }
+                            }
 
-            if (_timdbUser == null) {
-                _timdbUser = properties.getProperty("timdb_user").let {
-                    when {
-                        it == null -> null
-                        it.isBlank() -> throw GradleException("Invalid value for timdb_user property: $it")
-                        else -> it
-                    }
-                }
-            }
+                            val username = properties.getProperty("db_${databaseName}_username")?.let {
+                                when {
+                                    it.isBlank() -> throw GradleException("Invalid value for property " +
+                                            "db_${databaseName}_username: $it")
+                                    else -> it
+                                }
+                            }
 
-            if (_timdbPassword == null) {
-                _timdbPassword = properties.getProperty("timdb_password").let {
-                    when {
-                        it == null -> null
-                        it.isBlank() -> throw GradleException("Invalid value for timdb_password property: $it")
-                        else -> it
-                    }
-                }
-            }
+                            val password = properties.getProperty("db_${databaseName}_password")?.let {
+                                when {
+                                    it.isBlank() -> throw GradleException("Invalid value for property " +
+                                            "db_${databaseName}_password: $it")
+                                    else -> it
+                                }
+                            }
 
-            if (_taxbasedbJdbc == null) {
-                _taxbasedbJdbc = properties.getProperty("taxbasedb_jdbc").let {
-                    when {
-                        it == null -> null
-                        it.isBlank() -> throw GradleException("Invalid value for timstat_jdbc property: $it")
-                        else -> it
-                    }
-                }
-            }
+                            if (jdbc == null || username == null || password == null) {
+                                throw GradleException("A jdbc, username and password property is required in the same" +
+                                        "properties file if a db property is declared.")
+                            }
 
-            if (_taxbasedbUser == null) {
-                _taxbasedbUser = properties.getProperty("taxbasedb_user").let {
-                    when {
-                        it == null -> null
-                        it.isBlank() -> throw GradleException("Invalid value for timstat_user property: $it")
-                        else -> it
+                            internalDatabaseConfigurations.put(databaseName,
+                                    TimDatabaseConfiguration(databaseName, jdbc, username, password))
+                        }
                     }
-                }
-            }
-
-            if (_taxbasedbPassword == null) {
-                _taxbasedbPassword = properties.getProperty("taxbasedb_password").let {
-                    when {
-                        it == null -> null
-                        it.isBlank() -> throw GradleException("Invalid value for taxbasedb_password property: $it")
-                        else -> it
-                    }
-                }
-            }
         }
 
         return this
@@ -130,18 +100,14 @@ class TimProperties {
 
     fun writeToProperties() = Properties().apply {
         setProperty("endpoint", endpoint.toString())
-        setProperty("timdb_jdbc", timdbJdbc)
-        setProperty("timdb_user", timdbUser)
-        setProperty("timdb_password", timdbPassword)
-        setProperty("taxbasedb_jdbc", taxbasedbJdbc)
-        setProperty("taxbasedb_user", taxbasedbUser)
-        setProperty("taxbasedb_password", taxbasedbPassword)
+        setProperty("ignore", ignore.toString())
+
+        internalDatabaseConfigurations.forEach { databaseName, configuration ->
+            setProperty("db_${databaseName}_jdbc", configuration.jdbcAddress)
+            setProperty("db_${databaseName}_username", configuration.username)
+            setProperty("db_${databaseName}_password", configuration.password)
+        }
     }
 
-    fun isValid() = _endpoint != null && _timdbJdbc != null && _timdbUser != null && _timdbPassword != null
-            && _taxbasedbJdbc != null && _taxbasedbUser != null && _taxbasedbPassword != null
-
-    override fun toString() = "TimProperties(_endpoint=$_endpoint, _ignore=$_ignore, _timdbJdbc=$_timdbJdbc, " +
-            "_taxbasedbJdbc=$_taxbasedbJdbc, _timdbUser=$_timdbUser, _timdbPassword=$_timdbPassword, " +
-            "_taxbasedbUser=$_taxbasedbUser, _taxbasedbPassword=$_taxbasedbPassword)"
+    fun isValid() = internalEndpoint != null
 }

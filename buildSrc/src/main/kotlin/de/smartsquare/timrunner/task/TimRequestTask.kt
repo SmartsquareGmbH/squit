@@ -7,10 +7,6 @@ import de.smartsquare.timrunner.io.FilesUtils
 import de.smartsquare.timrunner.util.Constants.CONFIG
 import de.smartsquare.timrunner.util.Constants.REQUEST
 import de.smartsquare.timrunner.util.Constants.RESPONSE
-import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_POST
-import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_PRE
-import de.smartsquare.timrunner.util.Constants.TIM_DB_POST
-import de.smartsquare.timrunner.util.Constants.TIM_DB_PRE
 import de.smartsquare.timrunner.util.cut
 import okhttp3.*
 import oracle.jdbc.driver.OracleDriver
@@ -81,10 +77,10 @@ open class TimRequestTask : DefaultTask() {
     }
 
     private fun doRequestAndScriptExecutions(testDirectoryPath: Path, requestPath: Path, properties: TimProperties) {
-        executeScriptIfExisting(testDirectoryPath.resolve(TIM_DB_PRE), properties.timdbJdbc,
-                properties.timdbUser, properties.timdbPassword)
-        executeScriptIfExisting(testDirectoryPath.resolve(TAXBASE_DB_PRE), properties.taxbasedbJdbc,
-                properties.taxbasedbUser, properties.taxbasedbPassword)
+        properties.databaseConfigurations.forEach {
+            executeScriptIfExisting(testDirectoryPath.resolve("${it.name}_pre.sql"), it.jdbcAddress,
+                    it.username, it.password)
+        }
 
         val soapResponse: String = constructApiCall(properties.endpoint, requestPath)
                 .execute()
@@ -103,10 +99,10 @@ open class TimRequestTask : DefaultTask() {
 
         Files.write(resultResponseFilePath, soapResponse.toByteArray(Charsets.UTF_8))
 
-        executeScriptIfExisting(testDirectoryPath.resolve(TIM_DB_POST), properties.timdbJdbc,
-                properties.timdbUser, properties.timdbPassword)
-        executeScriptIfExisting(testDirectoryPath.resolve(TAXBASE_DB_POST), properties.taxbasedbJdbc,
-                properties.taxbasedbUser, properties.taxbasedbPassword)
+        properties.databaseConfigurations.forEach {
+            executeScriptIfExisting(testDirectoryPath.resolve("${it.name}_post.sql"), it.jdbcAddress,
+                    it.username, it.password)
+        }
     }
 
     private fun constructApiCall(url: HttpUrl, requestPath: Path) = okHttpClient.newCall(Request.Builder()

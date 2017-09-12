@@ -6,10 +6,6 @@ import de.smartsquare.timrunner.logic.TimTransformer
 import de.smartsquare.timrunner.util.Constants.CONFIG
 import de.smartsquare.timrunner.util.Constants.REQUEST
 import de.smartsquare.timrunner.util.Constants.RESPONSE
-import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_POST
-import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_PRE
-import de.smartsquare.timrunner.util.Constants.TIM_DB_POST
-import de.smartsquare.timrunner.util.Constants.TIM_DB_PRE
 import de.smartsquare.timrunner.util.cut
 import de.smartsquare.timrunner.util.read
 import de.smartsquare.timrunner.util.safeStore
@@ -55,7 +51,7 @@ open class TimPreProcessTask : DefaultTask() {
             val resolvedProperties = resolveProperties(it)
 
             if (!resolvedProperties.ignore) {
-                val (requestPath, responsePath, sqlFilePaths) = getRelevantPathsForTest(it)
+                val (requestPath, responsePath, sqlFilePaths) = getRelevantPathsForTest(it, resolvedProperties)
                 val processedResultPath = Files.createDirectories(processedSourcesPath.resolve(it.cut(sourcesPath)))
 
                 val processedPropertiesPath = FilesUtils.createFileIfNotExists(processedResultPath.resolve(CONFIG))
@@ -103,7 +99,7 @@ open class TimPreProcessTask : DefaultTask() {
 
         return when (result.isValid()) {
             true -> result
-            false -> throw GradleException("No config.properties file with the required properties on the path of " +
+            false -> throw GradleException("No $CONFIG file with the required properties on the path of " +
                     "test: ${testPath.cut(sourcesPath)}") // TODO: Better error
         }
     }
@@ -113,7 +109,7 @@ open class TimPreProcessTask : DefaultTask() {
      *
      * Relevant are the request and response, the config and the sql scripts.
      */
-    private fun getRelevantPathsForTest(testPath: Path): Triple<Path, Path, List<Path>> {
+    private fun getRelevantPathsForTest(testPath: Path, properties: TimProperties): Triple<Path, Path, List<Path>> {
         var requestPath: Path? = null
         var responsePath: Path? = null
         val sqlFilePaths = mutableListOf<Path>()
@@ -123,8 +119,9 @@ open class TimPreProcessTask : DefaultTask() {
                 when (path.fileName.toString()) {
                     REQUEST -> requestPath = path
                     RESPONSE -> responsePath = path
-                    TIM_DB_PRE, TIM_DB_POST, TAXBASE_DB_PRE, TAXBASE_DB_POST -> sqlFilePaths.add(path)
                     CONFIG -> Unit
+                    in properties.databaseConfigurations.map { "${it.name}_pre.sql" } -> sqlFilePaths.add(path)
+                    in properties.databaseConfigurations.map { "${it.name}_post.sql" } -> sqlFilePaths.add(path)
                     else -> logger.warn("Ignoring unknown file: ${path.fileName}")
                 }
             }
@@ -135,7 +132,7 @@ open class TimPreProcessTask : DefaultTask() {
                 return Triple(safeRequestFile, safeResponseFile, sqlFilePaths)
             }
 
-            throw GradleException("Missing ${RESPONSE} for test: ${testPath.fileName}")
+            throw GradleException("Missing $RESPONSE for test: ${testPath.fileName}")
         }
 
         throw GradleException("Missing request.xml for test: ${testPath.fileName}")

@@ -4,10 +4,6 @@ import de.smartsquare.timrunner.io.FilesUtils
 import de.smartsquare.timrunner.util.Constants.CONFIG
 import de.smartsquare.timrunner.util.Constants.REQUEST
 import de.smartsquare.timrunner.util.Constants.RESPONSE
-import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_POST
-import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_PRE
-import de.smartsquare.timrunner.util.Constants.TIM_DB_POST
-import de.smartsquare.timrunner.util.Constants.TIM_DB_PRE
 import de.smartsquare.timrunner.util.cut
 import de.smartsquare.timrunner.util.safeCleanedStringValueAt
 import de.smartsquare.timrunner.util.safeStore
@@ -157,10 +153,10 @@ open class TimSupplyChainConverterTask : DefaultTask() {
 
     private fun copyDatabaseScripts(row: Row, testDirectoryPath: Path, resultDirectoryPath: Path) {
         listOf(
-                Triple(3, TIM_DB_PRE, testDirectoryPath.resolve("Input")),
-                Triple(4, TAXBASE_DB_PRE, testDirectoryPath.resolve("Input")),
-                Triple(7, TIM_DB_POST, testDirectoryPath.resolve("Output")),
-                Triple(8, TAXBASE_DB_POST, testDirectoryPath.resolve("Output"))
+                Triple(3, "tim_pre.sql", testDirectoryPath.resolve("Input")),
+                Triple(4, "taxbase_pre.sql", testDirectoryPath.resolve("Input")),
+                Triple(7, "tim_post.sql", testDirectoryPath.resolve("Output")),
+                Triple(8, "taxbase_post.sql", testDirectoryPath.resolve("Output"))
         ).forEach { (index, name, resolvedTestDirectoryPath) ->
             row.safeCleanedStringValueAt(index)?.let {
                 copyDatabaseScript(it, name, resolvedTestDirectoryPath, resultDirectoryPath)
@@ -210,12 +206,12 @@ open class TimSupplyChainConverterTask : DefaultTask() {
 
     private fun generateDefaultProperties(): Properties {
         return Properties().apply {
-            setProperty("timdb_jdbc", "jdbc:oracle:thin:@localhost:1521:xe")
-            setProperty("timdb_user", "timdb")
-            setProperty("timdb_password", "timdb")
-            setProperty("taxbasedb_jdbc", "jdbc:oracle:thin:@localhost:1521:xe")
-            setProperty("taxbasedb_user", "timdb")
-            setProperty("taxbasedb_password", "timdb")
+            setProperty("db_tim_jdbc", "jdbc:oracle:thin:@localhost:1521:xe")
+            setProperty("db_tim_username", "timdb")
+            setProperty("db_tim_password", "timdb")
+            setProperty("db_taxbase_jdbc", "jdbc:oracle:thin:@localhost:1521:xe")
+            setProperty("db_taxbase_username", "timdb")
+            setProperty("db_taxbase_password", "timdb")
         }
     }
 }
