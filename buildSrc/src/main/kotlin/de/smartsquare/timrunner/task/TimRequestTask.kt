@@ -25,23 +25,28 @@ import java.nio.file.Paths
 import java.sql.DriverManager
 
 /**
- * Task for running requests against the tim API.
+ * Task for running requests against the TIM API. Also capable of running existing sql scripts before and after the
+ * request.
  *
  * @author Ruben Gees
  */
 open class TimRequestTask : DefaultTask() {
 
+    private companion object {
+        private val MEDIA_TYPE = MediaType.parse("application/soap+xml; utf-8")
+    }
+
     /**
      * The directory of the test sources.
      */
     @InputDirectory
-    var inputPath: Path = Paths.get(project.buildDir.path, "source")
+    var sourcesPath: Path = Paths.get(project.buildDir.path, "source")
 
     /**
      * The directory to save the results in.
      */
     @OutputDirectory
-    var outputPath: Path = Paths.get(project.buildDir.path, "results/raw")
+    var actualResponsesPath: Path = Paths.get(project.buildDir.path, "results", "raw")
 
     @Internal
     private val okHttpClient = OkHttpClient.Builder().build()
@@ -58,11 +63,11 @@ open class TimRequestTask : DefaultTask() {
      */
     @TaskAction
     fun run() {
-        FilesUtils.deleteRecursivelyIfExisting(outputPath)
-        Files.createDirectories(outputPath)
+        FilesUtils.deleteRecursivelyIfExisting(actualResponsesPath)
+        Files.createDirectories(actualResponsesPath)
 
         dbConnections.use {
-            FilesUtils.getSortedLeafDirectories(inputPath).forEachIndexed { index, testDirectoryPath ->
+            FilesUtils.getSortedLeafDirectories(sourcesPath).forEachIndexed { index, testDirectoryPath ->
                 logger.quiet("Running test $index")
 
                 val propertiesPath = FilesUtils.validateExistence(testDirectoryPath.resolve(CONFIG))
@@ -81,7 +86,7 @@ open class TimRequestTask : DefaultTask() {
         executeScriptIfExisting(testDirectoryPath.resolve(TAXBASE_DB_PRE), properties.taxbasedbJdbc,
                 properties.taxbasedbUser, properties.taxbasedbPassword)
 
-        val soapResponse = constructApiCall(properties.endpoint, requestPath)
+        val soapResponse: String = constructApiCall(properties.endpoint, requestPath)
                 .execute()
                 .let { response ->
                     if (!response.isSuccessful) {
@@ -91,10 +96,10 @@ open class TimRequestTask : DefaultTask() {
                     response.body()?.string() ?: ""
                 }
 
-        val resultDirectoryPath = Files.createDirectories(outputPath.resolve(testDirectoryPath.cut(inputPath)))
-        val resultFilePath = FilesUtils.createFileIfNotExists(resultDirectoryPath.resolve(RESPONSE))
+        val resultResponsePath = Files.createDirectories(actualResponsesPath.resolve(testDirectoryPath.cut(sourcesPath)))
+        val resultResponseFilePath = FilesUtils.createFileIfNotExists(resultResponsePath.resolve(RESPONSE))
 
-        Files.write(resultFilePath, soapResponse.toByteArray(Charsets.UTF_8))
+        Files.write(resultResponseFilePath, soapResponse.toByteArray(Charsets.UTF_8))
 
         executeScriptIfExisting(testDirectoryPath.resolve(TIM_DB_POST), properties.timdbJdbc,
                 properties.timdbUser, properties.timdbPassword)
@@ -103,7 +108,7 @@ open class TimRequestTask : DefaultTask() {
     }
 
     private fun constructApiCall(url: HttpUrl, requestPath: Path) = okHttpClient.newCall(Request.Builder()
-            .post(RequestBody.create(MediaType.parse("application/soap+xml; utf-8"), Files.readAllBytes(requestPath)))
+            .post(RequestBody.create(MEDIA_TYPE, Files.readAllBytes(requestPath)))
             .url(url)
             .build()
     )
@@ -116,7 +121,7 @@ open class TimRequestTask : DefaultTask() {
                 true
             } catch (error: Throwable) {
                 logger.warn("Could not run database script ${path.fileName} for test " +
-                        "${path.parent.cut(inputPath)} (${error.toString().trim()})")
+                        "${path.parent.cut(sourcesPath)} (${error.toString().trim()})")
 
                 false
             }

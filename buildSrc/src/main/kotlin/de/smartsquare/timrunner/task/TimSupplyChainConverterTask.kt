@@ -25,6 +25,11 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.util.*
 
+/**
+ * Task for converting a legacy SOAP UI project to a format readable by the tim-it-runner.
+ *
+ * This task is very specific and should only be used for the supply-chain tests.
+ */
 open class TimSupplyChainConverterTask : DefaultTask() {
 
     /**

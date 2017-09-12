@@ -22,54 +22,55 @@ open class TimPostProcessTask : DefaultTask() {
      * The directory of the test sources.
      */
     @InputDirectory
-    var inputSourceDirectory: Path = Paths.get(project.buildDir.path, "source")
+    var sourcesPath: Path = Paths.get(project.buildDir.path, "source")
 
     /**
      * The directory of the previously requested responses.
      */
     @InputDirectory
-    var inputResponseDirectory: Path = Paths.get(project.buildDir.path, "results/raw")
+    var actualResponsesPath: Path = Paths.get(project.buildDir.path, "results/raw")
 
     /**
      * The directory to save the results in.
      */
     @OutputDirectory
-    var outputDirectory: Path = Paths.get(project.buildDir.path, "results/processed")
+    var processedActualResponsesPath: Path = Paths.get(project.buildDir.path, "results/processed")
 
     /**
      * Runs the task.
      */
     @TaskAction
     fun run() {
-        FilesUtils.getSortedLeafDirectories(inputResponseDirectory).forEach { testDir ->
-            val responsePath = FilesUtils.validateExistence(testDir.resolve(RESPONSE))
-            val expectedResponsePath = FilesUtils.validateExistence(inputSourceDirectory
-                    .resolve(testDir.cut(inputResponseDirectory))
+        FilesUtils.getSortedLeafDirectories(actualResponsesPath).forEach { testDir ->
+            val actualResponsePath = FilesUtils.validateExistence(testDir.resolve(RESPONSE))
+            val expectedResponsePath = FilesUtils.validateExistence(sourcesPath
+                    .resolve(testDir.cut(actualResponsesPath))
                     .resolve(RESPONSE))
 
-            val resultDirectoryPath = Files.createDirectories(outputDirectory
-                    .resolve(testDir.cut(inputResponseDirectory)))
+            val resultProcessedActualResponsePath = Files.createDirectories(processedActualResponsesPath
+                    .resolve(testDir.cut(actualResponsesPath)))
 
-            val resultFilePath = FilesUtils.createFileIfNotExists(resultDirectoryPath.resolve(RESPONSE))
+            val resultProcessedActualResponseFilePath = FilesUtils
+                    .createFileIfNotExists(resultProcessedActualResponsePath.resolve(RESPONSE))
 
-            val response = SAXReader().read(responsePath)
+            val actualResponse = SAXReader().read(actualResponsePath)
             val expectedResponse = SAXReader().read(expectedResponsePath)
 
-            transform(response, expectedResponse)
+            transform(actualResponse, expectedResponse)
 
-            response.write(resultFilePath)
+            actualResponse.write(resultProcessedActualResponseFilePath)
         }
     }
 
-    private fun transform(response: Document, expectedResponse: Document) {
-        if (response.selectNodes("//Fault").isEmpty()) {
-            TimTransformer.stripStackTraces(response)
-            TimTransformer.replaceErrorTransactionIdFromExpectedResponse(response, expectedResponse)
+    private fun transform(actualResponse: Document, expectedResponse: Document) {
+        if (actualResponse.selectNodes("//Fault").isEmpty()) {
+            TimTransformer.stripStackTraces(actualResponse)
+            TimTransformer.replaceErrorTransactionIdFromExpectedResponse(actualResponse, expectedResponse)
 
-            TimTransformer.sortTaxInvoiceSubTotals(response, "SellerTaxTotal")
-            TimTransformer.sortTaxInvoiceSubTotals(response, "BuyerTaxTotal")
+            TimTransformer.sortTaxInvoiceSubTotals(actualResponse, "SellerTaxTotal")
+            TimTransformer.sortTaxInvoiceSubTotals(actualResponse, "BuyerTaxTotal")
 
-            TimTransformer.replaceTransactionIdFromExpectedResponse(response, expectedResponse)
+            TimTransformer.replaceTransactionIdFromExpectedResponse(actualResponse, expectedResponse)
         }
     }
 }

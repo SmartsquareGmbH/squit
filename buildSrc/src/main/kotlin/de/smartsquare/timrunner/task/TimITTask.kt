@@ -25,23 +25,29 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
+/**
+ * Task for comparing the actual responses to the expected responses and generating a report.
+ */
 open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
 
     /**
      * The directory of the test sources.
      */
     @InputDirectory
-    var inputSourceDirectory: Path = Paths.get(project.buildDir.path, "source")
+    var sourcesPath: Path = Paths.get(project.buildDir.path, "source")
 
     /**
      * The directory of the previously requested responses.
      */
     @InputDirectory
-    var inputResponseDirectory: Path = Paths.get(project.buildDir.path, "results/processed")
+    var actualResponsesPath: Path = Paths.get(project.buildDir.path, "results/processed")
 
     @get:Internal
     private val internalReports by lazy { TimITReportContainerImpl(this) }
 
+    /**
+     * Runs the task.
+     */
     @TaskAction
     fun run() {
         val results = runTests()
@@ -67,19 +73,18 @@ open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
     private fun runTests(): List<TimITResult> {
         val resultList = arrayListOf<TimITResult>()
 
-        FilesUtils.getSortedLeafDirectories(inputResponseDirectory).forEach { responseDirectory ->
-            val actualResponseFile = FilesUtils.validateExistence(responseDirectory.resolve(RESPONSE))
-            val expectedResponseFile = FilesUtils.validateExistence(inputSourceDirectory
-                    .resolve(responseDirectory.cut(inputResponseDirectory))
+        FilesUtils.getSortedLeafDirectories(actualResponsesPath).forEach { actualResponsePath ->
+            val actualResponseFilePath = FilesUtils.validateExistence(actualResponsePath.resolve(RESPONSE))
+            val expectedResponseFilePath = FilesUtils.validateExistence(sourcesPath
+                    .resolve(actualResponsePath.cut(actualResponsesPath))
                     .resolve(RESPONSE))
 
-            val diffBuilder = DiffBuilder.compare(Input.fromStream(Files.newInputStream(actualResponseFile)))
-                    .withTest(Input.fromStream(Files.newInputStream(expectedResponseFile)))
+            val diffBuilder = DiffBuilder.compare(Input.fromStream(Files.newInputStream(actualResponseFilePath)))
+                    .withTest(Input.fromStream(Files.newInputStream(expectedResponseFilePath)))
                     .checkForSimilar()
                     .build()
 
-            resultList += constructResult(diffBuilder.differences.joinToString(separator = "\n"),
-                    responseDirectory)
+            resultList += constructResult(diffBuilder.differences.joinToString("\n"), actualResponsePath)
         }
 
         return resultList
@@ -113,12 +118,12 @@ open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
         TODO()
     }
 
-    private fun constructResult(differences: String, responseDirectory: Path) = if (differences.isNotBlank()) {
-        TimITResult(responseDirectory.parent.parent.cut(inputResponseDirectory).toString(),
-                responseDirectory.parent.fileName.toString(), responseDirectory.fileName.toString(), differences)
-    } else {
-        TimITResult(responseDirectory.parent.parent.cut(inputResponseDirectory).toString(),
-                responseDirectory.parent.fileName.toString(), responseDirectory.fileName.toString())
+    private fun constructResult(differences: String, expectedResponsePath: Path) = when (differences.isNotBlank()) {
+        true -> TimITResult(expectedResponsePath.parent.parent.cut(actualResponsesPath).toString(),
+                expectedResponsePath.parent.fileName.toString(), expectedResponsePath.fileName.toString(), differences)
+
+        false -> TimITResult(expectedResponsePath.parent.parent.cut(actualResponsesPath).toString(),
+                expectedResponsePath.parent.fileName.toString(), expectedResponsePath.fileName.toString())
     }
 
     @Internal
