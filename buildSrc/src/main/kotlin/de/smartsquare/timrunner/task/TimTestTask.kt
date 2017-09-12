@@ -66,6 +66,7 @@ open class TimTestTask : DefaultTask() {
 
             val diffBuilder = DiffBuilder.compare(Input.fromStream(Files.newInputStream(actualResponseFilePath)))
                     .withTest(Input.fromStream(Files.newInputStream(expectedResponseFilePath)))
+                    .ignoreWhitespace()
                     .checkForSimilar()
                     .build()
 
