@@ -1,23 +1,16 @@
 package de.smartsquare.timrunner.task
 
-import de.smartsquare.timrunner.entity.TimITReportContainer
-import de.smartsquare.timrunner.entity.TimITReportContainerImpl
 import de.smartsquare.timrunner.entity.TimITResult
 import de.smartsquare.timrunner.io.FilesUtils
 import de.smartsquare.timrunner.util.Constants.RESPONSE
 import de.smartsquare.timrunner.util.cut
 import de.smartsquare.timrunner.util.write
-import groovy.lang.Closure
 import org.dom4j.DocumentHelper
 import org.dom4j.io.OutputFormat
-import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.internal.ClosureBackedAction
-import org.gradle.api.reporting.Report
-import org.gradle.api.reporting.Reporting
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.xmlunit.builder.DiffBuilder
 import org.xmlunit.builder.Input
@@ -28,7 +21,7 @@ import java.nio.file.Paths
 /**
  * Task for comparing the actual responses to the expected responses and generating a report.
  */
-open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
+open class TimITTask : DefaultTask() {
 
     /**
      * The directory of the test sources.
@@ -42,8 +35,8 @@ open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
     @InputDirectory
     var actualResponsesPath: Path = Paths.get(project.buildDir.path, "results/processed")
 
-    @get:Internal
-    private val internalReports by lazy { TimITReportContainerImpl(this) }
+    @OutputFile
+    var xmlReportFilePath: Path = Paths.get(project.buildDir.path, "reports/main.xml")
 
     /**
      * Runs the task.
@@ -52,15 +45,7 @@ open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
     fun run() {
         val results = runTests()
 
-        internalReports.forEach {
-            if (it.isEnabled) {
-                when (it.name) {
-                    "xml" -> writeXmlReport(results, it)
-                    "html" -> writeHtmlReport(results, it)
-                    else -> throw GradleException("Unknown report type: ${it.name}")
-                }
-            }
-        }
+        writeXmlReport(results)
 
         val successfulTests = results.count { it.result.isEmpty() }
         val failedTests = results.count { it.result.isNotEmpty() }
@@ -90,9 +75,10 @@ open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
         return resultList
     }
 
-    private fun writeXmlReport(result: List<TimITResult>, report: Report) {
-        val destinationDirectory = Files.createDirectories(report.destination.toPath())
-        val reportFile = FilesUtils.createFileIfNotExists(destinationDirectory.resolve("main.xml"))
+    private fun writeXmlReport(result: List<TimITResult>) {
+        Files.createDirectories(xmlReportFilePath.parent)
+
+        val reportFilePath = FilesUtils.createFileIfNotExists(xmlReportFilePath)
 
         val document = DocumentHelper.createDocument()
         val root = document.addElement("results")
@@ -110,12 +96,7 @@ open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
             }
         }
 
-        document.write(reportFile, OutputFormat.createPrettyPrint())
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    private fun writeHtmlReport(result: List<TimITResult>, report: Report) {
-        TODO()
+        document.write(reportFilePath, OutputFormat.createPrettyPrint())
     }
 
     private fun constructResult(differences: String, expectedResponsePath: Path) = when (differences.isNotBlank()) {
@@ -124,14 +105,5 @@ open class TimITTask : DefaultTask(), Reporting<TimITReportContainer> {
 
         false -> TimITResult(expectedResponsePath.parent.parent.cut(actualResponsesPath).toString(),
                 expectedResponsePath.parent.fileName.toString(), expectedResponsePath.fileName.toString())
-    }
-
-    @Internal
-    override fun getReports() = internalReports
-
-    override fun reports(closure: Closure<*>) = reports(ClosureBackedAction<TimITReportContainer>(closure))
-
-    override fun reports(configureAction: Action<in TimITReportContainer>) = internalReports.apply {
-        configureAction.execute(this)
     }
 }

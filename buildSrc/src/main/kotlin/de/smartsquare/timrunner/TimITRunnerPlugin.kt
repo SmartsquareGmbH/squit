@@ -5,7 +5,6 @@ import groovy.lang.MissingMethodException
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import java.io.File
 
 /**
  * The main plugin class.
@@ -37,16 +36,6 @@ class TimITRunnerPlugin : Plugin<Project> {
                 it.group = "Build"
                 it.description = "Runs the integration tests."
                 it.dependsOn("transformTimResponses")
-
-                it.reports.getXml().apply {
-                    isEnabled = true
-                    destination = File(project.buildDir, "reports/timIT")
-                }
-
-                it.reports.getHtml().apply {
-                    isEnabled = false
-                    destination = File(project.buildDir, "reports/timIT")
-                }
             }
 
             project.tasks.create("convertSupplyChainProject", TimSupplyChainConverterTask::class.java) {
