@@ -10,20 +10,16 @@ import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_PRE
 import de.smartsquare.timrunner.util.Constants.TIM_DB_POST
 import de.smartsquare.timrunner.util.Constants.TIM_DB_PRE
 import org.dom4j.Document
-import org.dom4j.Node
 import org.dom4j.io.SAXReader
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
-import java.time.LocalDate
-import java.util.regex.Pattern.quote
 
 open class TimSourceTransformerTask : DefaultTask() {
 
@@ -38,9 +34,6 @@ open class TimSourceTransformerTask : DefaultTask() {
      */
     @OutputDirectory
     var outputDirectory: Path = Paths.get(project.buildDir.path, "source")
-
-    @Internal
-    private val transformationRegex = Regex("${quote("$")}${quote("{")}#TestSuite#TaxAlgoDate(.*?)${quote("}")}")
 
     /**
      * Runs the task.
@@ -69,8 +62,8 @@ open class TimSourceTransformerTask : DefaultTask() {
                         val resultResponsePath = FilesUtils.createFileIfNotExists(resultDirectory
                                 .resolve(responsePath.fileName))
 
-                        val request = SAXReader().read(requestPath)
-                        val response = SAXReader().read(responsePath)
+                        val request: Document = SAXReader().read(requestPath)
+                        val response: Document = SAXReader().read(responsePath)
 
                         transform(request, response)
 
@@ -138,34 +131,12 @@ open class TimSourceTransformerTask : DefaultTask() {
     }
 
     private fun transform(request: Document, expectedResponse: Document) {
-        request.selectSingleNode("//TaxAlgorithmDate")?.let { currentAlgorithmDateNode ->
-            expectedResponse.selectSingleNode("//TaxAlgorithmDate")?.let { expectedAlgorithmDateNode ->
-                transformDate(currentAlgorithmDateNode, expectedAlgorithmDateNode)
-            }
-        }
-        request.selectSingleNode("//TaxCalculationDate")?.let { currentCalculationDateNode ->
-            expectedResponse.selectSingleNode("//TaxCalculationDate")?.let { expectedCalculationDateNode ->
-                transformDate(currentCalculationDateNode, expectedCalculationDateNode)
-            }
-        }
+        TimTransformer.replaceDateFromExpectedResponse(request, expectedResponse, "TaxAlgorithmDate")
+        TimTransformer.replaceDateFromExpectedResponse(request, expectedResponse, "TaxCalculationDate")
 
-        expectedResponse.selectNodes("//ErrorText").forEach {
-            if (it.text.startsWith("Technical error")) {
-                it.text = it.text.substring(0, it.text.indexOf("at com.")).trim()
-            }
-        }
-    }
+        TimTransformer.sortTaxInvoiceSubTotals(expectedResponse, "SellerTaxTotal")
+        TimTransformer.sortTaxInvoiceSubTotals(expectedResponse, "BuyerTaxTotal")
 
-    private fun transformDate(currentNode: Node, expectedNode: Node) {
-        transformationRegex.find(currentNode.text)?.let { regexResult ->
-            val dateToSet = if (regexResult.groupValues.size == 2) {
-                LocalDate.now().plusDays(regexResult.groupValues[1].toLongOrNull() ?: 0).toString()
-            } else {
-                expectedNode.text
-            }
-
-            currentNode.text = dateToSet
-            expectedNode.text = dateToSet
-        }
+        TimTransformer.stripStackTraces(expectedResponse)
     }
 }
