@@ -11,8 +11,9 @@ import org.gradle.api.GradleException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
+import kotlin.text.RegexOption.DOT_MATCHES_ALL
 
-inline fun Path.cut(other: Path) = this.subtract(other).reduce { current, path -> current.resolve(path) }
+inline fun Path.cut(other: Path): Path = this.subtract(other).reduce { current, path -> current.resolve(path) }
 
 inline fun Properties.safeLoad(path: Path) = Files.newBufferedReader(path).use {
     this.apply { load(it) }
@@ -22,7 +23,7 @@ inline fun Properties.safeStore(path: Path, comments: String? = null) = Files.ne
     this.apply { store(it, comments) }
 }
 
-inline fun SAXReader.read(path: Path) = try {
+inline fun SAXReader.read(path: Path): Document = try {
     Files.newInputStream(path).use {
         read(it)
     }
@@ -38,10 +39,17 @@ inline fun Row.safeCleanedStringValueAt(position: Int): String? {
         getCell(position)?.stringCellValue?.let {
             when (it.isBlank()) {
                 true -> null
-                false -> it.trim().replace("\n", "").replace("\r", "")
+                false -> it.clean()
             }
         }
     } catch (ignored: Throwable) {
         null
     }
 }
+
+inline fun String.clean() = this
+        .replace(Regex("--.*?\n", DOT_MATCHES_ALL), "")
+        .replace("\n", " ")
+        .replace("\r", " ")
+        .replace("\uFEFF", "")
+        .trim()

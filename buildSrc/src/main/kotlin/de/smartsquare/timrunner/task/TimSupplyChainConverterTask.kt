@@ -1,5 +1,6 @@
 package de.smartsquare.timrunner.task
 
+import de.smartsquare.timrunner.io.FilesUtils
 import de.smartsquare.timrunner.util.Constants.CONFIG
 import de.smartsquare.timrunner.util.Constants.REQUEST
 import de.smartsquare.timrunner.util.Constants.RESPONSE
@@ -7,7 +8,6 @@ import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_POST
 import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_PRE
 import de.smartsquare.timrunner.util.Constants.TIM_DB_POST
 import de.smartsquare.timrunner.util.Constants.TIM_DB_PRE
-import de.smartsquare.timrunner.util.FilesUtils
 import de.smartsquare.timrunner.util.cut
 import de.smartsquare.timrunner.util.safeCleanedStringValueAt
 import de.smartsquare.timrunner.util.safeStore

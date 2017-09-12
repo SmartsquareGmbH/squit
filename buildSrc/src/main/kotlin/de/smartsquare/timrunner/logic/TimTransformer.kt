@@ -1,4 +1,4 @@
-package de.smartsquare.timrunner.util
+package de.smartsquare.timrunner.logic
 
 import org.dom4j.Document
 import org.dom4j.Element
@@ -65,7 +65,7 @@ object TimTransformer {
      * of the [document] based on the TaxAmount, GrossAmount and TaxCode in that order.
      */
     fun sortTaxInvoiceSubTotals(document: Document, elementName: String) {
-        document.selectSingleNode("//$elementName")?.let { elementNode ->
+        document.selectNodes("//$elementName").forEach { elementNode ->
             if (elementNode is Element) {
                 val elements = elementNode.elements()
                 val itemsToRemove = elements

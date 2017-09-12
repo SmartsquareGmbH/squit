@@ -1,6 +1,8 @@
 package de.smartsquare.timrunner.task
 
 import de.smartsquare.timrunner.entity.TimProperties
+import de.smartsquare.timrunner.io.FilesUtils
+import de.smartsquare.timrunner.logic.TimTransformer
 import de.smartsquare.timrunner.util.*
 import de.smartsquare.timrunner.util.Constants.CONFIG
 import de.smartsquare.timrunner.util.Constants.REQUEST
@@ -21,7 +23,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 
-open class TimSourceTransformerTask : DefaultTask() {
+open class TimPreProcessTask : DefaultTask() {
 
     /**
      * The directory of the test sources.

@@ -1,22 +1,18 @@
 @file:Suppress("NOTHING_TO_INLINE")
 
-package de.smartsquare.timrunner.util
+package de.smartsquare.timrunner.db
 
+import de.smartsquare.timrunner.util.clean
 import java.nio.file.Files
 import java.nio.file.Path
 import java.sql.Connection
-import kotlin.text.RegexOption.DOT_MATCHES_ALL
 
 inline fun Connection.executeScript(path: Path) {
     try {
         createStatement().use { statement ->
             Files.readAllBytes(path).toString(Charsets.UTF_8)
-                    .replace(Regex("--.*?\n", DOT_MATCHES_ALL), "")
-                    .replace("\n", " ")
-                    .replace("\r", " ")
-                    .replace("\uFEFF", "")
                     .split(";")
-                    .map { it.trim() }
+                    .map { it.clean() }
                     .filter { it.isNotBlank() }
                     .forEach { statement.execute(it) }
         }

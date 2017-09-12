@@ -3,8 +3,8 @@ package de.smartsquare.timrunner.task
 import de.smartsquare.timrunner.entity.TimITReportContainer
 import de.smartsquare.timrunner.entity.TimITReportContainerImpl
 import de.smartsquare.timrunner.entity.TimITResult
+import de.smartsquare.timrunner.io.FilesUtils
 import de.smartsquare.timrunner.util.Constants.RESPONSE
-import de.smartsquare.timrunner.util.FilesUtils
 import de.smartsquare.timrunner.util.Utils
 import de.smartsquare.timrunner.util.cut
 import de.smartsquare.timrunner.util.write

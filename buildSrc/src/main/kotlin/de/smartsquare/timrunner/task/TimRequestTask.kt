@@ -1,7 +1,9 @@
 package de.smartsquare.timrunner.task
 
+import de.smartsquare.timrunner.db.ConnectionCollection
+import de.smartsquare.timrunner.db.executeScript
 import de.smartsquare.timrunner.entity.TimProperties
-import de.smartsquare.timrunner.util.*
+import de.smartsquare.timrunner.io.FilesUtils
 import de.smartsquare.timrunner.util.Constants.CONFIG
 import de.smartsquare.timrunner.util.Constants.REQUEST
 import de.smartsquare.timrunner.util.Constants.RESPONSE
@@ -9,6 +11,8 @@ import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_POST
 import de.smartsquare.timrunner.util.Constants.TAXBASE_DB_PRE
 import de.smartsquare.timrunner.util.Constants.TIM_DB_POST
 import de.smartsquare.timrunner.util.Constants.TIM_DB_PRE
+import de.smartsquare.timrunner.util.Utils
+import de.smartsquare.timrunner.util.cut
 import okhttp3.*
 import oracle.jdbc.driver.OracleDriver
 import org.gradle.api.DefaultTask

@@ -1,4 +1,4 @@
-package de.smartsquare.timrunner.util
+package de.smartsquare.timrunner.io
 
 import org.gradle.api.GradleException
 import java.nio.file.FileVisitResult

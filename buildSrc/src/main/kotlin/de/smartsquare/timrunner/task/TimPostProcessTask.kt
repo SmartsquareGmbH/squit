@@ -1,7 +1,12 @@
 package de.smartsquare.timrunner.task
 
-import de.smartsquare.timrunner.util.*
+import de.smartsquare.timrunner.io.FilesUtils
+import de.smartsquare.timrunner.logic.TimTransformer
 import de.smartsquare.timrunner.util.Constants.RESPONSE
+import de.smartsquare.timrunner.util.Utils
+import de.smartsquare.timrunner.util.cut
+import de.smartsquare.timrunner.util.read
+import de.smartsquare.timrunner.util.write
 import org.dom4j.Document
 import org.dom4j.io.SAXReader
 import org.gradle.api.DefaultTask
@@ -12,7 +17,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
-open class TimResponseTransformerTask : DefaultTask() {
+open class TimPostProcessTask : DefaultTask() {
 
     /**
      * The directory of the test sources.

@@ -1,4 +1,4 @@
-package de.smartsquare.timrunner.util
+package de.smartsquare.timrunner.db
 
 import java.sql.Connection
 import java.sql.DriverManager

@@ -16,7 +16,7 @@ class TimITRunnerPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         try {
-            project.tasks.create("transformTimSources", TimSourceTransformerTask::class.java) {
+            project.tasks.create("transformTimSources", TimPreProcessTask::class.java) {
                 it.group = "Build"
                 it.description = "Transforms the sources to be readable and usable for the following tasks."
             }
@@ -27,7 +27,7 @@ class TimITRunnerPlugin : Plugin<Project> {
                 it.dependsOn("transformTimSources")
             }
 
-            project.tasks.create("transformTimResponses", TimResponseTransformerTask::class.java) {
+            project.tasks.create("transformTimResponses", TimPostProcessTask::class.java) {
                 it.group = "Build"
                 it.description = "Transforms the responses to be readable and usable for the comparing task."
                 it.dependsOn("requestTim")
