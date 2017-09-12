@@ -48,10 +48,9 @@ open class TimSupplyChainConverterTask : DefaultTask() {
      */
     @TaskAction
     fun run() {
-        outputDirectory.toFile().deleteRecursively()
-
         var currentIndex = 0
 
+        FilesUtils.deleteRecursivelyIfExisting(outputDirectory)
         FilesUtils.getChildDirectories(inputDirectory)
                 .sortedWith(kotlin.Comparator { first, second ->
                     order.indexOf(first.fileName.toString()).compareTo(order.indexOf(second.fileName.toString()))

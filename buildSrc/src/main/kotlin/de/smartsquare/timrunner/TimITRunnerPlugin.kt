@@ -52,6 +52,7 @@ class TimITRunnerPlugin : Plugin<Project> {
             project.tasks.create("convertSupplyChainProject", TimSupplyChainConverterTask::class.java) {
                 it.group = "Build Setup"
                 it.description = "Converts a legacy supply chain project to be usable by the ${project.name}."
+                it.outputs.upToDateWhen { false }
             }
         } catch (error: MissingMethodException) {
             throw GradleException("Your Gradle version is too old.")

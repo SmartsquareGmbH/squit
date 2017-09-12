@@ -24,6 +24,13 @@ object FilesUtils {
         })
     }
 
+    fun deleteRecursivelyIfExisting(path: Path) = when {
+        Files.exists(path) -> Files.walk(path)
+                .sorted(Comparator.reverseOrder())
+                .forEach { Files.delete(it) }
+        else -> Unit
+    }
+
     fun createFileIfNotExists(path: Path): Path = when (Files.exists(path)) {
         true -> path
         false -> Files.createFile(path)

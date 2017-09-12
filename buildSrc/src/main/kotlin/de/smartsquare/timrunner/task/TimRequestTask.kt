@@ -59,8 +59,7 @@ open class TimRequestTask : DefaultTask() {
      */
     @TaskAction
     fun run() {
-        outputPath.toFile().deleteRecursively()
-
+        FilesUtils.deleteRecursivelyIfExisting(outputPath)
         Files.createDirectories(outputPath)
 
         dbConnections.use {
@@ -109,7 +108,7 @@ open class TimRequestTask : DefaultTask() {
     }
 
     private fun constructApiCall(url: HttpUrl, requestPath: Path) = okHttpClient.newCall(Request.Builder()
-            .post(RequestBody.create(MediaType.parse("application/soap+xml; utf-8"), requestPath.toFile()))
+            .post(RequestBody.create(MediaType.parse("application/soap+xml; utf-8"), Files.readAllBytes(requestPath)))
             .url(url)
             .build()
     )

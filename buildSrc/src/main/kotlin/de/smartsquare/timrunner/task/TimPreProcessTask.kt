@@ -42,9 +42,9 @@ open class TimPreProcessTask : DefaultTask() {
      */
     @TaskAction
     fun run() {
-        outputDirectory.toFile().deleteRecursively()
-
+        FilesUtils.deleteRecursivelyIfExisting(outputDirectory)
         Files.createDirectories(outputDirectory)
+
         FilesUtils.getLeafDirectories(inputSourceDirectory)
                 .sortedWith(Comparator { first, second ->
                     Utils.getTestIndex(first).compareTo(Utils.getTestIndex(second))
