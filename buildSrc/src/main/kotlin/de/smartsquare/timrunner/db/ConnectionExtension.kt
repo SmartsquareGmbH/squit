@@ -7,6 +7,9 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.sql.Connection
 
+/**
+ * Executes the sql script at the given [path]. The contained statements are split by ";" and cleaned.
+ */
 inline fun Connection.executeScript(path: Path) {
     try {
         createStatement().use { statement ->
