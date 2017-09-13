@@ -1,0 +1,1 @@
+update PA_MATCHING_LEVEL_T set option_no='Y', OPTION_DEVIATION_DECIMAL='N' where seq_no_ml IN ('5000147','5000149','5000155','5000157','5000171');

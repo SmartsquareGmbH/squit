@@ -1,0 +1,8 @@
+Insert into CBD_GA_TAX_PARAM_T (SEQ_NO_GTP,GA_TYPE,GA_CODE,TAX_TYPE,VALUE,VALID_FROM,VALID_TO,IDRS_IMPORT_DATE,DELETE_DATE) 
+values (555555555,'CTY','FR','POSTP','Y',to_date('01-SEP-04','DD-MON-RR'),to_date('16-SEP-15','DD-MON-RR'),to_date('18-SEP-15','DD-MON-RR'),null);
+Update CBD_GA_TAX_PARAM_T
+set VALUE = 'Y'
+where GA_CODE = 'FR' and TAX_TYPE = 'POSTP' and SEQ_NO_GTP = '317';
+Update CBD_GA_TAX_PARAM_T
+set VALUE = 'N'
+where GA_CODE = 'FR' and TAX_TYPE = 'POSTP' and SEQ_NO_GTP = '2894';

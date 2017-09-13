@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
+   <S:Body>
+      <ns2:getTaxRegistrationResponse xmlns:ns2="http://taxreg.basedata.ws.tim.ikea.com/">
+         <return>
+            <SourceSystemId>ICI001</SourceSystemId>
+            <BusinessUnit>
+               <BusinessUnitCode>5100</BusinessUnitCode>
+               <BusinessUnitType>COM</BusinessUnitType>
+            </BusinessUnit>
+            <GeographicalArea>
+               <GeographicalAreaCode>CH</GeographicalAreaCode>
+               <GeographicalAreaType>CTY</GeographicalAreaType>
+            </GeographicalArea>
+            <TaxRegistrationNumber>
+               <TaxRegistrationNumber>CHE 116267532MWST</TaxRegistrationNumber>
+               <TaxRegistrationType>DV</TaxRegistrationType>
+            </TaxRegistrationNumber>
+            <Date>2014-06-01</Date>
+         </return>
+      </ns2:getTaxRegistrationResponse>
+   </S:Body>
+</S:Envelope>

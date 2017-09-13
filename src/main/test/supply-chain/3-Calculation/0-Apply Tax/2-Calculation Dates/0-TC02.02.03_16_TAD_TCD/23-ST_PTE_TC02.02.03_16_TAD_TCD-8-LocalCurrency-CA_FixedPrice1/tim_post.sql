@@ -1,0 +1,14 @@
+update pa_system_config_t set pa_system_config_t.consolidation_treatment='error' where pa_system_config_t.seq_no_paramsrc=( select PA_SYSTEM_CONFIG_T.seq_no_paramsrc from PARAM_T,PARAM_SOURCE_SYSTEM_T,PA_SYSTEM_CONFIG_T,TIM_SOURCE_SYSTEM_T where PARAM_T.seq_no_param=PARAM_SOURCE_SYSTEM_T.seq_no_param and PARAM_T.name='SystemConfiguration' and TIM_SOURCE_SYSTEM_T.seq_no_srcsys=PARAM_SOURCE_SYSTEM_T.seq_no_srcsys and TIM_SOURCE_SYSTEM_T.ID='ICI001' and PA_SYSTEM_CONFIG_T.seq_no_paramsrc=PARAM_SOURCE_SYSTEM_T.seq_no_paramsrc and PARAM_SOURCE_SYSTEM_T.valid_to is null and PARAM_SOURCE_SYSTEM_T.delete_date is null);
+delete from PA_TAX_COMMENT_ML_T where SEQ_NO_TCML between 5000000 and 6000000;
+delete from PA_TAX_COMMENT_T where SEQ_NO_TC between 5000000 and 6000000;
+update IC_UNSPSC_T set valid_to=null where seq_no_unsp=1021;
+update IC_UNSPSC_T set valid_from=to_date('01-SEP-11','DD-MON-RR') where seq_no_unsp=1021;
+delete from IC_ITEM_CLASS_T where SEQ_NO_IC between 5000000 and 6000000;
+delete from IC_TAX_CODE_T where SEQ_NO_ITC between 5000000 and 6000000;
+delete from IC_UNSPSC_T where SEQ_NO_UNSP between 5000000 and 6000000;
+update TIM_SOURCE_SYSTEM_T set valid_from= to_date('01-JAN-13','DD-MON-RR');
+update CBD_GEOGRAPHICAL_AREA_T set valid_to=null where seq_no_ga=48732;
+-- delete from CBD_GA_TAXTYPES_T where SEQ_NO_GTT between 5000000 and 6000000;
+update cbd_ga_taxtypes_t set valid_to=null where seq_no_gtt in (2880,2710,2711);
+update cbd_ga_taxtypes_t set valid_to=null where seq_no_gtt=2889;
+delete CBD_GEOGRAPHICAL_AREA_T where seq_no_ga between 5000000 and 6000000;

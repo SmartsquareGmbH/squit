@@ -46,9 +46,8 @@ gradle-app.setting
 ### Custom extensions
 # Our own extensions, specifically for this project
 
-## Everything else apart from the actual test directory:
-/src/main/
-!/src/main/test
+## Legacy project folder
+/legacy
 
 ## Oxygen project files
 *.xpr

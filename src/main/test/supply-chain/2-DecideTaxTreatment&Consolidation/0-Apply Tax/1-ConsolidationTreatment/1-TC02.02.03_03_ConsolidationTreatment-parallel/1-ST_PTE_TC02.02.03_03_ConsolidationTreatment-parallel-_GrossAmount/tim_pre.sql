@@ -1,0 +1,2 @@
+update PA_TAX_CALC_RULE_T set SEQ_NO_CR='1001' where SEQ_NO_TI=1067 and SEQ_NO_TT='5001';
+update PA_TAX_CALC_RULE_T set SEQ_NO_CR='1001' where SEQ_NO_TI=1068 and SEQ_NO_TT='5001';
