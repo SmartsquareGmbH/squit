@@ -148,6 +148,8 @@ open class TimPreProcessTask : DefaultTask() {
         TimTransformer.sortTaxInvoiceSubTotals(expectedResponse, "SellerTaxTotal")
         TimTransformer.sortTaxInvoiceSubTotals(expectedResponse, "BuyerTaxTotal")
 
+        TimTransformer.sortErrors(expectedResponse)
+
         TimTransformer.stripStackTraces(expectedResponse)
     }
 }

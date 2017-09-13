@@ -65,28 +65,24 @@ object TimTransformer {
      * of the [document] based on the TaxAmount, GrossAmount and TaxCode in that order.
      */
     fun sortTaxInvoiceSubTotals(document: Document, elementName: String) {
-        document.selectNodes("//$elementName").forEach { elementNode ->
-            if (elementNode is Element) {
-                val elements = elementNode.elements()
-                val itemsToRemove = elements
-                        .mapIndexed { index, it -> index to it }
-                        .filter { it.second.name == "TaxInvoiceSubTotal" }
+        sortElements(document, elementName, "TaxInvoiceSubTotal", compareBy({
+            it.second.selectSingleNode("TaxAmount")?.text?.toFloatOrNull() ?: -1f
+        }, {
+            it.second.selectSingleNode("GrossAmount")?.text?.toFloatOrNull() ?: -1f
+        }, {
+            it.second.selectSingleNode("TaxCode")?.text?.toFloatOrNull() ?: -1f
+        }))
+    }
 
-                itemsToRemove.asReversed().forEach {
-                    elements.removeAt(it.first)
-                }
-
-                itemsToRemove
-                        .sortedWith(compareBy({
-                            it.second.selectSingleNode("TaxAmount")?.text?.toFloatOrNull() ?: -1f
-                        }, {
-                            it.second.selectSingleNode("GrossAmount")?.text?.toFloatOrNull() ?: -1f
-                        }, {
-                            it.second.selectSingleNode("TaxCode")?.text?.toFloatOrNull() ?: -1f
-                        }))
-                        .forEach { elements.add(it.second) }
-            }
-        }
+    /**
+     * Sorts the Error children of the given [document], based on the ErrorCode and the ErrorText in that order.
+     */
+    fun sortErrors(document: Document) {
+        sortElements(document, "return", "Error", compareBy({
+            it.second.selectSingleNode("ErrorCode")?.text?.toIntOrNull() ?: -1
+        }, {
+            it.second.selectSingleNode("ErrorText")?.text ?: ""
+        }))
     }
 
     /**
@@ -100,6 +96,30 @@ object TimTransformer {
                 if (stacktraceIndex >= 0) {
                     it.text = it.text.substring(0, stacktraceIndex).trim()
                 }
+            }
+        }
+    }
+
+    /**
+     * Helper function for sorting elements (named [subElementName]) of a given [elementName], based on the given
+     * [comparator] in the given [document].
+     */
+    private fun sortElements(document: Document, elementName: String, subElementName: String,
+                             comparator: Comparator<Pair<Int, Element>>) {
+        document.selectNodes("//$elementName").forEach { elementNode ->
+            if (elementNode is Element) {
+                val elements = elementNode.elements()
+                val itemsToRemove = elements
+                        .mapIndexed { index, it -> index to it }
+                        .filter { it.second.name == subElementName }
+
+                itemsToRemove.asReversed().forEach {
+                    elements.removeAt(it.first)
+                }
+
+                itemsToRemove
+                        .sortedWith(comparator)
+                        .forEach { elements.add(it.second) }
             }
         }
     }

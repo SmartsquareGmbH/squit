@@ -70,6 +70,8 @@ open class TimPostProcessTask : DefaultTask() {
             TimTransformer.sortTaxInvoiceSubTotals(actualResponse, "SellerTaxTotal")
             TimTransformer.sortTaxInvoiceSubTotals(actualResponse, "BuyerTaxTotal")
 
+            TimTransformer.sortErrors(actualResponse)
+
             TimTransformer.replaceTransactionIdFromExpectedResponse(actualResponse, expectedResponse)
         }
     }
