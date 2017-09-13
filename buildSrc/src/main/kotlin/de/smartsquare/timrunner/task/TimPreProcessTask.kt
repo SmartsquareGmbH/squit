@@ -25,6 +25,8 @@ import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
 /**
  * Task for pre-processing the available sources like requests, responses, sql scripts and properties.
+ *
+ * @author Ruben Gees
  */
 open class TimPreProcessTask : DefaultTask() {
 

@@ -7,6 +7,8 @@ import java.sql.DriverManager
  * Data structure for holding [java.sql.Connection] objects with auto close capabilities.
  *
  * The connections are hold in a HashMap with a key of the jdbc address, the username and the password.
+ *
+ * @author Ruben Gees
  */
 class ConnectionCollection : AutoCloseable {
 

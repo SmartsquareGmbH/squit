@@ -7,6 +7,8 @@ import java.nio.file.Path
 
 /**
  * Object with io related utility methods in the style of [java.nio.file.Files].
+ *
+ * @author Ruben Gees
  */
 object FilesUtils {
 

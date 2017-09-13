@@ -17,6 +17,11 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
+/**
+ * Task for post-processing the responses from tim.
+ *
+ * @author Ruben Gees
+ */
 open class TimPostProcessTask : DefaultTask() {
 
     /**

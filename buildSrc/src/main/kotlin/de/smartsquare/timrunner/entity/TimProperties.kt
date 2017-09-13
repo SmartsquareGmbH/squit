@@ -8,6 +8,8 @@ import java.util.*
 
 /**
  * Class for reading, holding and writing tim related properties.
+ *
+ * @author Ruben Gees
  */
 class TimProperties {
 

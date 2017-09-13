@@ -8,6 +8,8 @@ import java.util.regex.Pattern
 
 /**
  * Object with utility methods for transforming the requests and responses.
+ *
+ * @author Ruben Gees
  */
 object TimTransformer {
 

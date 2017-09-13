@@ -11,6 +11,8 @@ import java.nio.file.Path
  * @property testDirectoryPath The path of the directory, the test files are contained in.
  * @property result The result of the test. An empty String means the test was successful, otherwise it contains the#
  *                  XMLUnit diff.
+ *
+ * @author Ruben Gees
  */
 data class TimITResult(val contextPath: Path, val suitePath: Path, val testDirectoryPath: Path,
                        val result: String = "") {

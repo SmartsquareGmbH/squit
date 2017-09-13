@@ -2,6 +2,8 @@ package de.smartsquare.timrunner.util
 
 /**
  * Object which acts as a collection of various constants.
+ *
+ * @author Ruben Gees
  */
 object Constants {
 

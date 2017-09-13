@@ -9,6 +9,8 @@ import java.sql.Connection
 
 /**
  * Executes the sql script at the given [path]. The contained statements are split by ";" and cleaned.
+ *
+ * @author Ruben Gees
  */
 inline fun Connection.executeScript(path: Path) {
     try {

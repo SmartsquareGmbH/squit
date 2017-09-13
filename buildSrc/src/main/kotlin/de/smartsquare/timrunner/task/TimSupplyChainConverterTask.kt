@@ -25,6 +25,8 @@ import java.util.*
  * Task for converting a legacy SOAP UI project to a format readable by the tim-it-runner.
  *
  * This task is very specific and should only be used for the supply-chain tests.
+ *
+ * @author Ruben Gees
  */
 open class TimSupplyChainConverterTask : DefaultTask() {
 
