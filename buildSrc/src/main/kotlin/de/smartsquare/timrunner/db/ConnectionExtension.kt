@@ -13,7 +13,7 @@ import java.sql.Connection
 inline fun Connection.executeScript(path: Path) {
     try {
         createStatement().use { statement ->
-            Files.readAllBytes(path).toString(Charsets.UTF_8)
+            Files.readAllBytes(path).toString(Charsets.UTF_8).clean()
                     .split(";")
                     .map { it.clean() }
                     .filter { it.isNotBlank() }
