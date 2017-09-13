@@ -1,7 +1,9 @@
 package de.smartsquare.timrunner.task
 
 import de.smartsquare.timrunner.entity.TimITResult
+import de.smartsquare.timrunner.entity.TimProperties
 import de.smartsquare.timrunner.io.FilesUtils
+import de.smartsquare.timrunner.util.Constants.CONFIG
 import de.smartsquare.timrunner.util.Constants.RESPONSE
 import de.smartsquare.timrunner.util.cut
 import de.smartsquare.timrunner.util.write
@@ -59,18 +61,27 @@ open class TimTestTask : DefaultTask() {
         val resultList = arrayListOf<TimITResult>()
 
         FilesUtils.getSortedLeafDirectories(actualResponsesPath).forEach { actualResponsePath ->
-            val actualResponseFilePath = FilesUtils.validateExistence(actualResponsePath.resolve(RESPONSE))
-            val expectedResponseFilePath = FilesUtils.validateExistence(processedSourcesPath
-                    .resolve(actualResponsePath.cut(actualResponsesPath))
-                    .resolve(RESPONSE))
+            val propertiesPath = FilesUtils.validateExistence(processedSourcesPath
+                    .resolve(actualResponsePath.cut(actualResponsesPath)).resolve(CONFIG))
 
-            val diffBuilder = DiffBuilder.compare(Input.fromStream(Files.newInputStream(actualResponseFilePath)))
-                    .withTest(Input.fromStream(Files.newInputStream(expectedResponseFilePath)))
-                    .ignoreWhitespace()
-                    .checkForSimilar()
-                    .build()
+            val properties = TimProperties().fillFromSingleProperties(propertiesPath)
 
-            resultList += constructResult(diffBuilder.differences.joinToString("\n"), actualResponsePath)
+            if (!properties.ignoreForReport) {
+                val actualResponseFilePath = FilesUtils.validateExistence(actualResponsePath.resolve(RESPONSE))
+                val expectedResponseFilePath = FilesUtils.validateExistence(processedSourcesPath
+                        .resolve(actualResponsePath.cut(actualResponsesPath))
+                        .resolve(RESPONSE))
+
+                val diffBuilder = DiffBuilder.compare(Input.fromStream(Files.newInputStream(actualResponseFilePath)))
+                        .withTest(Input.fromStream(Files.newInputStream(expectedResponseFilePath)))
+                        .ignoreWhitespace()
+                        .checkForSimilar()
+                        .build()
+
+                resultList += constructResult(diffBuilder.differences.joinToString("\n"), actualResponsePath)
+            } else {
+                logger.warn("Ignoring test for report: ${actualResponsePath.cut(actualResponsesPath)}")
+            }
         }
 
         return resultList

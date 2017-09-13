@@ -10,10 +10,12 @@ class TimProperties {
 
     val endpoint get() = internalEndpoint ?: throw AssertionError("Internal representation is null.")
     val ignore get() = internalIgnore == true
+    val ignoreForReport get() = internalIgnoreForReport == true
     val databaseConfigurations get() = internalDatabaseConfigurations.values
 
     private var internalEndpoint: HttpUrl? = null
     private var internalIgnore: Boolean? = null
+    private var internalIgnoreForReport: Boolean? = null
     private val internalDatabaseConfigurations = mutableMapOf<String, TimDatabaseConfiguration>()
 
     fun fillFromProperties(path: Path): TimProperties {
@@ -40,6 +42,17 @@ class TimProperties {
                         "false" -> false
                         null -> null
                         else -> throw GradleException("Invalid value for ignore property: $it")
+                    }
+                }
+            }
+
+            if (internalIgnoreForReport == null) {
+                internalIgnoreForReport = properties.getProperty("ignoreForReport").let {
+                    when (it) {
+                        "true" -> true
+                        "false" -> false
+                        null -> null
+                        else -> throw GradleException("Invalid value for ignoreForReport property: $it")
                     }
                 }
             }
@@ -101,11 +114,12 @@ class TimProperties {
     fun writeToProperties() = Properties().apply {
         setProperty("endpoint", endpoint.toString())
         setProperty("ignore", ignore.toString())
+        setProperty("ignoreForReport", ignoreForReport.toString())
 
-        internalDatabaseConfigurations.forEach { databaseName, configuration ->
-            setProperty("db_${databaseName}_jdbc", configuration.jdbcAddress)
-            setProperty("db_${databaseName}_username", configuration.username)
-            setProperty("db_${databaseName}_password", configuration.password)
+        internalDatabaseConfigurations.forEach { databaseName, (_, jdbcAddress, username, password) ->
+            setProperty("db_${databaseName}_jdbc", jdbcAddress)
+            setProperty("db_${databaseName}_username", username)
+            setProperty("db_${databaseName}_password", password)
         }
     }
 
