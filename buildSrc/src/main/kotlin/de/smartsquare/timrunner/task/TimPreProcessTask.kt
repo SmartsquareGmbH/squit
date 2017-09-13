@@ -4,8 +4,9 @@ import de.smartsquare.timrunner.entity.TimProperties
 import de.smartsquare.timrunner.io.FilesUtils
 import de.smartsquare.timrunner.logic.TimTransformer
 import de.smartsquare.timrunner.util.Constants.CONFIG
+import de.smartsquare.timrunner.util.Constants.EXPECTED_RESPONSE
 import de.smartsquare.timrunner.util.Constants.REQUEST
-import de.smartsquare.timrunner.util.Constants.RESPONSE
+import de.smartsquare.timrunner.util.Constants.SOURCE_RESPONSE
 import de.smartsquare.timrunner.util.cut
 import de.smartsquare.timrunner.util.read
 import de.smartsquare.timrunner.util.safeStore
@@ -57,9 +58,9 @@ open class TimPreProcessTask : DefaultTask() {
                 val processedPropertiesPath = FilesUtils.createFileIfNotExists(processedResultPath.resolve(CONFIG))
 
                 val processedRequestPath = FilesUtils.createFileIfNotExists(processedResultPath
-                        .resolve(requestPath.fileName))
+                        .resolve(REQUEST))
                 val processedResponsePath = FilesUtils.createFileIfNotExists(processedResultPath
-                        .resolve(responsePath.fileName))
+                        .resolve(EXPECTED_RESPONSE))
 
                 val request = SAXReader().read(requestPath)
                 val response = SAXReader().read(responsePath)
@@ -118,7 +119,7 @@ open class TimPreProcessTask : DefaultTask() {
             it.sequential().forEach { path ->
                 when (path.fileName.toString()) {
                     REQUEST -> requestPath = path
-                    RESPONSE -> responsePath = path
+                    SOURCE_RESPONSE -> responsePath = path
                     CONFIG -> Unit
                     in properties.databaseConfigurations.map { "${it.name}_pre.sql" } -> sqlFilePaths.add(path)
                     in properties.databaseConfigurations.map { "${it.name}_post.sql" } -> sqlFilePaths.add(path)
@@ -132,7 +133,7 @@ open class TimPreProcessTask : DefaultTask() {
                 return Triple(safeRequestFile, safeResponseFile, sqlFilePaths)
             }
 
-            throw GradleException("Missing $RESPONSE for test: ${testPath.fileName}")
+            throw GradleException("Missing $SOURCE_RESPONSE for test: ${testPath.fileName}")
         }
 
         throw GradleException("Missing request.xml for test: ${testPath.fileName}")

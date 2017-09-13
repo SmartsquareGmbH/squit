@@ -2,7 +2,8 @@ package de.smartsquare.timrunner.task
 
 import de.smartsquare.timrunner.io.FilesUtils
 import de.smartsquare.timrunner.logic.TimTransformer
-import de.smartsquare.timrunner.util.Constants.RESPONSE
+import de.smartsquare.timrunner.util.Constants.ACTUAL_RESPONSE
+import de.smartsquare.timrunner.util.Constants.EXPECTED_RESPONSE
 import de.smartsquare.timrunner.util.cut
 import de.smartsquare.timrunner.util.read
 import de.smartsquare.timrunner.util.write
@@ -42,16 +43,16 @@ open class TimPostProcessTask : DefaultTask() {
     @TaskAction
     fun run() {
         FilesUtils.getSortedLeafDirectories(actualResponsesPath).forEach { testDir ->
-            val actualResponsePath = FilesUtils.validateExistence(testDir.resolve(RESPONSE))
+            val actualResponsePath = FilesUtils.validateExistence(testDir.resolve(ACTUAL_RESPONSE))
             val expectedResponsePath = FilesUtils.validateExistence(processedSourcesPath
                     .resolve(testDir.cut(actualResponsesPath))
-                    .resolve(RESPONSE))
+                    .resolve(EXPECTED_RESPONSE))
 
             val resultProcessedActualResponsePath = Files.createDirectories(processedActualResponsesPath
                     .resolve(testDir.cut(actualResponsesPath)))
 
             val resultProcessedActualResponseFilePath = FilesUtils
-                    .createFileIfNotExists(resultProcessedActualResponsePath.resolve(RESPONSE))
+                    .createFileIfNotExists(resultProcessedActualResponsePath.resolve(ACTUAL_RESPONSE))
 
             val actualResponse = SAXReader().read(actualResponsePath)
             val expectedResponse = SAXReader().read(expectedResponsePath)

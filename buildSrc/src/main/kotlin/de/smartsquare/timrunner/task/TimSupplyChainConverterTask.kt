@@ -2,8 +2,8 @@ package de.smartsquare.timrunner.task
 
 import de.smartsquare.timrunner.io.FilesUtils
 import de.smartsquare.timrunner.util.Constants.CONFIG
+import de.smartsquare.timrunner.util.Constants.EXPECTED_RESPONSE
 import de.smartsquare.timrunner.util.Constants.REQUEST
-import de.smartsquare.timrunner.util.Constants.RESPONSE
 import de.smartsquare.timrunner.util.cut
 import de.smartsquare.timrunner.util.safeCleanedStringValueAt
 import de.smartsquare.timrunner.util.safeStore
@@ -145,7 +145,7 @@ open class TimSupplyChainConverterTask : DefaultTask() {
                 .toString(Charsets.UTF_8)
                 .toByteArray())
 
-        Files.write(resultDirectoryPath.resolve(RESPONSE), Files.readAllBytes(responseFilePath)
+        Files.write(resultDirectoryPath.resolve(EXPECTED_RESPONSE), Files.readAllBytes(responseFilePath)
                 .toString(Charsets.UTF_8)
                 .replace("ns0", "ns2")
                 .toByteArray())

@@ -4,9 +4,9 @@ import de.smartsquare.timrunner.db.ConnectionCollection
 import de.smartsquare.timrunner.db.executeScript
 import de.smartsquare.timrunner.entity.TimProperties
 import de.smartsquare.timrunner.io.FilesUtils
+import de.smartsquare.timrunner.util.Constants.ACTUAL_RESPONSE
 import de.smartsquare.timrunner.util.Constants.CONFIG
 import de.smartsquare.timrunner.util.Constants.REQUEST
-import de.smartsquare.timrunner.util.Constants.RESPONSE
 import de.smartsquare.timrunner.util.cut
 import okhttp3.*
 import oracle.jdbc.driver.OracleDriver
@@ -95,7 +95,7 @@ open class TimRequestTask : DefaultTask() {
         val resultResponsePath = Files.createDirectories(actualResponsesPath
                 .resolve(testDirectoryPath.cut(processedSourcesPath)))
 
-        val resultResponseFilePath = FilesUtils.createFileIfNotExists(resultResponsePath.resolve(RESPONSE))
+        val resultResponseFilePath = FilesUtils.createFileIfNotExists(resultResponsePath.resolve(ACTUAL_RESPONSE))
 
         Files.write(resultResponseFilePath, soapResponse.toByteArray(Charsets.UTF_8))
 

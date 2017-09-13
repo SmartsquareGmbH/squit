@@ -3,8 +3,9 @@ package de.smartsquare.timrunner.task
 import de.smartsquare.timrunner.entity.TimITResult
 import de.smartsquare.timrunner.entity.TimProperties
 import de.smartsquare.timrunner.io.FilesUtils
+import de.smartsquare.timrunner.util.Constants.ACTUAL_RESPONSE
 import de.smartsquare.timrunner.util.Constants.CONFIG
-import de.smartsquare.timrunner.util.Constants.RESPONSE
+import de.smartsquare.timrunner.util.Constants.EXPECTED_RESPONSE
 import de.smartsquare.timrunner.util.cut
 import de.smartsquare.timrunner.util.write
 import org.dom4j.DocumentHelper
@@ -67,10 +68,10 @@ open class TimTestTask : DefaultTask() {
             val properties = TimProperties().fillFromSingleProperties(propertiesPath)
 
             if (!properties.ignoreForReport) {
-                val actualResponseFilePath = FilesUtils.validateExistence(actualResponsePath.resolve(RESPONSE))
+                val actualResponseFilePath = FilesUtils.validateExistence(actualResponsePath.resolve(ACTUAL_RESPONSE))
                 val expectedResponseFilePath = FilesUtils.validateExistence(processedSourcesPath
                         .resolve(actualResponsePath.cut(actualResponsesPath))
-                        .resolve(RESPONSE))
+                        .resolve(EXPECTED_RESPONSE))
 
                 val diffBuilder = DiffBuilder.compare(Input.fromStream(Files.newInputStream(actualResponseFilePath)))
                         .withTest(Input.fromStream(Files.newInputStream(expectedResponseFilePath)))
