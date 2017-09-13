@@ -1,8 +1,9 @@
 endpoint=http://localhost:7001/tim/ApplyTaxWSSoap12HttpPort?WSDL
-timdb_jdbc=jdbc:oracle:thin:@localhost:1521:xe
-timdb_user=timdb
-timdb_password=timdb
-taxbasedb_jdbc=jdbc:oracle:thin:@localhost:1521:xe
-taxbasedb_user=taxbase
-taxbasedb_password=taxbase
+db_tim_jdbc=jdbc:oracle:thin:@localhost:1521:xe
+db_tim_username=timdb
+db_tim_password=timdb
+db_taxbase_jdbc=jdbc:oracle:thin:@localhost:1521:xe
+db_taxbase_username=taxbase
+db_taxbase_password=taxbase
 ignore=false
+ignoreForReport=false
