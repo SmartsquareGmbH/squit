@@ -134,7 +134,7 @@ open class TimSupplyChainConverterTask : DefaultTask() {
                             testIndex++
                         } else {
                             logger.warn("Skipped test $currentFirstPath/$currentSecondPath/$currentThirdPath " +
-                                    "in xls file: $xlsFilePath")
+                                    "in xls file $xlsFilePath")
                         }
                     }
                 }

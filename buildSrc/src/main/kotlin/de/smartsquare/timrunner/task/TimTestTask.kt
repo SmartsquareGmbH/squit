@@ -81,7 +81,7 @@ open class TimTestTask : DefaultTask() {
 
                 resultList += constructResult(diffBuilder.differences.joinToString("\n"), actualResponsePath)
             } else {
-                logger.warn("Ignoring test for report: ${actualResponsePath.cut(actualResponsesPath)}")
+                logger.warn("Ignoring test for report ${actualResponsePath.cut(actualResponsesPath)}")
             }
         }
 

@@ -123,7 +123,7 @@ open class TimPreProcessTask : DefaultTask() {
                     CONFIG -> Unit
                     in properties.databaseConfigurations.map { "${it.name}_pre.sql" } -> sqlFilePaths.add(path)
                     in properties.databaseConfigurations.map { "${it.name}_post.sql" } -> sqlFilePaths.add(path)
-                    else -> logger.warn("Ignoring unknown file: ${path.fileName}")
+                    else -> logger.warn("Ignoring unknown file ${path.fileName}")
                 }
             }
         }

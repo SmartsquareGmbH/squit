@@ -90,3 +90,11 @@ inline fun String.clean() = this
         .replace("\r", " ")
         .replace("\uFEFF", "") // This is a weird unicode blank character, present in some sql files.
         .trim()
+
+/**
+ * Prints the given [message] to the standard output stream and flushes it afterwards.
+ */
+inline fun printAndFlush(message: Any?) {
+    System.out.print(message)
+    System.out.flush()
+}

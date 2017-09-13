@@ -8,6 +8,7 @@ import de.smartsquare.timrunner.util.Constants.ACTUAL_RESPONSE
 import de.smartsquare.timrunner.util.Constants.CONFIG
 import de.smartsquare.timrunner.util.Constants.REQUEST
 import de.smartsquare.timrunner.util.cut
+import de.smartsquare.timrunner.util.printAndFlush
 import okhttp3.*
 import oracle.jdbc.driver.OracleDriver
 import org.gradle.api.DefaultTask
@@ -64,7 +65,9 @@ open class TimRequestTask : DefaultTask() {
 
         dbConnections.use {
             FilesUtils.getSortedLeafDirectories(processedSourcesPath).forEachIndexed { index, testDirectoryPath ->
-                logger.quiet("Running test $index")
+                if (logger.isLifecycleEnabled) {
+                    printAndFlush("\rRunning test $index")
+                }
 
                 val propertiesPath = FilesUtils.validateExistence(testDirectoryPath.resolve(CONFIG))
                 val properties = TimProperties().fillFromSingleProperties(propertiesPath)
@@ -74,6 +77,8 @@ open class TimRequestTask : DefaultTask() {
                 doRequestAndScriptExecutions(testDirectoryPath, requestPath, properties)
             }
         }
+
+        println()
     }
 
     private fun doRequestAndScriptExecutions(testDirectoryPath: Path, requestPath: Path, properties: TimProperties) {
@@ -118,6 +123,11 @@ open class TimRequestTask : DefaultTask() {
 
                 true
             } catch (error: Throwable) {
+                if (logger.isLifecycleEnabled) {
+                    // Switch to next line from progress.
+                    println()
+                }
+
                 logger.warn("Could not run database script ${path.fileName} for test " +
                         "${path.parent.cut(processedSourcesPath)} (${error.toString().trim()})")
 
