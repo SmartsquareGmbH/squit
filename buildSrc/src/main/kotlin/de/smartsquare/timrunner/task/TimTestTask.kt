@@ -55,8 +55,8 @@ open class TimTestTask : DefaultTask() {
         writeXmlReport(results)
         copyFailures(results)
 
-        val successfulTests = results.count { it.result.isEmpty() }
-        val failedTests = results.count { it.result.isNotEmpty() }
+        val successfulTests = results.count { it.isSuccess }
+        val failedTests = results.count { !it.isSuccess }
 
         println("${results.size} tests ran.\n$successfulTests successful and $failedTests failed.")
 
@@ -102,14 +102,18 @@ open class TimTestTask : DefaultTask() {
         val root = document.addElement("results")
 
         result.groupBy { it.path }.forEach { suite, tests ->
-            val suiteElement = root.addElement("suite").apply { addAttribute("name", suite) }
+            val suiteElement = root.addElement("suite").apply {
+                addAttribute("name", suite.toString())
+            }
 
             tests.forEach {
-                val testElement = suiteElement.addElement("test").apply { addAttribute("name", it.test) }
+                val testElement = suiteElement.addElement("test").apply {
+                    addAttribute("name", it.test.toString())
+                }
 
-                when {
-                    it.result.isEmpty() -> testElement.addElement("success")
-                    else -> testElement.addElement("failure").addText(it.result)
+                when (it.isSuccess) {
+                    true -> testElement.addElement("success")
+                    false -> testElement.addElement("failure").addText(it.result)
                 }
             }
         }
@@ -119,8 +123,9 @@ open class TimTestTask : DefaultTask() {
 
     private fun copyFailures(result: List<TimITResult>) {
         FilesUtils.deleteRecursivelyIfExisting(failureResultDirectory)
+        Files.createDirectories(failureResultDirectory)
 
-        result.forEach {
+        result.filterNot { it.isSuccess }.forEach {
             val resultDirectoryPath = Files.createDirectories(failureResultDirectory.resolve(it.fullPath))
 
             val testProcessedSourcesPath = FilesUtils.validateExistence(processedSourcesPath.resolve(it.fullPath))
@@ -132,10 +137,10 @@ open class TimTestTask : DefaultTask() {
     }
 
     private fun constructResult(differences: String, expectedResponsePath: Path) = when (differences.isNotBlank()) {
-        true -> TimITResult(expectedResponsePath.parent.parent.cut(actualResponsesPath).toString(),
-                expectedResponsePath.parent.fileName.toString(), expectedResponsePath.fileName.toString(), differences)
+        true -> TimITResult(expectedResponsePath.parent.parent.cut(actualResponsesPath),
+                expectedResponsePath.parent.fileName, expectedResponsePath.fileName, differences)
 
-        false -> TimITResult(expectedResponsePath.parent.parent.cut(actualResponsesPath).toString(),
-                expectedResponsePath.parent.fileName.toString(), expectedResponsePath.fileName.toString())
+        false -> TimITResult(expectedResponsePath.parent.parent.cut(actualResponsesPath),
+                expectedResponsePath.parent.fileName, expectedResponsePath.fileName)
     }
 }

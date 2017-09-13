@@ -32,13 +32,13 @@ open class TimSupplyChainConverterTask : DefaultTask() {
      * The directory of the sources to convert.
      */
     @InputDirectory
-    var inputDirectory: Path = Paths.get(project.projectDir.path, "src/main/supply-chain")
+    var inputDirectory: Path = Paths.get(project.projectDir.path, "src", "main", "supply-chain")
 
     /**
      * The directory to save the results in.
      */
     @OutputDirectory
-    var outputDirectory: Path = Paths.get(project.projectDir.path, "src/main/test/supply-chain")
+    var outputDirectory: Path = Paths.get(project.projectDir.path, "src", "main", "test", "supply-chain")
 
     @Internal
     private val order = arrayOf("Validation", "Grouping", "DecideTaxTreatment&Consolidation", "Calculation",

@@ -32,7 +32,7 @@ open class TimPreProcessTask : DefaultTask() {
      * The directory of the test sources.
      */
     @InputDirectory
-    var sourcesPath: Path = Paths.get(project.projectDir.path, "src/main/test")
+    var sourcesPath: Path = Paths.get(project.projectDir.path, "src", "main", "test")
 
     /**
      * The directory to save the results in.
