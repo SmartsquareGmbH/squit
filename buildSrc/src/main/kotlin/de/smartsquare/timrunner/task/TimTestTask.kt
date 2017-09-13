@@ -39,9 +39,15 @@ open class TimTestTask : DefaultTask() {
     @InputDirectory
     var actualResponsesPath: Path = Paths.get(project.buildDir.path, "responses", "processed")
 
+    /**
+     * The directory to generate the xml report file into.
+     */
     @OutputFile
     var xmlReportFilePath: Path = Paths.get(project.buildDir.path, "reports", "main.xml")
 
+    /**
+     * The directory to copy failed tests into.
+     */
     @OutputDirectory
     var failureResultDirectory: Path = Paths.get(project.buildDir.path, "reports", "failures")
 
@@ -108,7 +114,7 @@ open class TimTestTask : DefaultTask() {
 
             tests.forEach {
                 val testElement = suiteElement.addElement("test").apply {
-                    addAttribute("name", it.test.toString())
+                    addAttribute("name", it.testDirectoryPath.toString())
                 }
 
                 when (it.isSuccess) {

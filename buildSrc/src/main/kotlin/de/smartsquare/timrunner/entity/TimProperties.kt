@@ -6,11 +6,29 @@ import org.gradle.api.GradleException
 import java.nio.file.Path
 import java.util.*
 
+/**
+ * Class for reading, holding and writing tim related properties.
+ */
 class TimProperties {
 
+    /**
+     * The endpoint.
+     */
     val endpoint get() = internalEndpoint ?: throw AssertionError("Internal representation is null.")
+
+    /**
+     * If the test should be ignored.
+     */
     val ignore get() = internalIgnore == true
+
+    /**
+     * If the test should run, but not show up in the report.
+     */
     val ignoreForReport get() = internalIgnoreForReport == true
+
+    /**
+     * List of [TimDatabaseConfiguration] objects to use.
+     */
     val databaseConfigurations get() = internalDatabaseConfigurations.values
 
     private var internalEndpoint: HttpUrl? = null
@@ -18,6 +36,14 @@ class TimProperties {
     private var internalIgnoreForReport: Boolean? = null
     private val internalDatabaseConfigurations = mutableMapOf<String, TimDatabaseConfiguration>()
 
+    /**
+     * Fills this instance with the properties found at the given [path].
+     *
+     * The properties file is a usual [Properties] file and the values are required to be not blank.
+     * This method is intended to be used multiple times for example in a recursive directory tree to gradually add all
+     * required properties.
+     */
+    @Throws(GradleException::class)
     fun fillFromProperties(path: Path): TimProperties {
         Properties().safeLoad(path).also { properties ->
             if (internalEndpoint == null) {
@@ -102,6 +128,11 @@ class TimProperties {
         return this
     }
 
+    /**
+     * Fills this instance with the properties found at the given [path], but requires the file to contain all needed
+     * properties.
+     */
+    @Throws(GradleException::class)
     fun fillFromSingleProperties(path: Path): TimProperties {
         fillFromProperties(path)
 
@@ -111,6 +142,9 @@ class TimProperties {
         }
     }
 
+    /**
+     * Converts this to an instance of [Properties].
+     */
     fun writeToProperties() = Properties().apply {
         setProperty("endpoint", endpoint.toString())
         setProperty("ignore", ignore.toString())
@@ -123,5 +157,8 @@ class TimProperties {
         }
     }
 
+    /**
+     * Returns if this contains all required properties.
+     */
     fun isValid() = internalEndpoint != null
 }
