@@ -49,3 +49,6 @@ gradle-app.setting
 ## Everything else apart from the actual test directory:
 /src/main/
 !/src/main/test
+
+## Oxygen project files
+*.xpr
