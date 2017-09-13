@@ -13,6 +13,7 @@ import org.dom4j.io.OutputFormat
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.xmlunit.builder.DiffBuilder
@@ -41,6 +42,9 @@ open class TimTestTask : DefaultTask() {
     @OutputFile
     var xmlReportFilePath: Path = Paths.get(project.buildDir.path, "reports", "main.xml")
 
+    @OutputDirectory
+    var failureResultDirectory: Path = Paths.get(project.buildDir.path, "reports", "failures")
+
     /**
      * Runs the task.
      */
@@ -49,6 +53,7 @@ open class TimTestTask : DefaultTask() {
         val results = runTests()
 
         writeXmlReport(results)
+        copyFailures(results)
 
         val successfulTests = results.count { it.result.isEmpty() }
         val failedTests = results.count { it.result.isNotEmpty() }
@@ -110,6 +115,20 @@ open class TimTestTask : DefaultTask() {
         }
 
         document.write(reportFilePath, OutputFormat.createPrettyPrint())
+    }
+
+    private fun copyFailures(result: List<TimITResult>) {
+        FilesUtils.deleteRecursivelyIfExisting(failureResultDirectory)
+
+        result.forEach {
+            val resultDirectoryPath = Files.createDirectories(failureResultDirectory.resolve(it.fullPath))
+
+            val testProcessedSourcesPath = FilesUtils.validateExistence(processedSourcesPath.resolve(it.fullPath))
+            val testActualResponsesPath = FilesUtils.validateExistence(actualResponsesPath.resolve(it.fullPath))
+
+            FilesUtils.copyFilesFromDirectory(testProcessedSourcesPath, resultDirectoryPath)
+            FilesUtils.copyFilesFromDirectory(testActualResponsesPath, resultDirectoryPath)
+        }
     }
 
     private fun constructResult(differences: String, expectedResponsePath: Path) = when (differences.isNotBlank()) {

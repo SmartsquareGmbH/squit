@@ -1,5 +1,6 @@
 package de.smartsquare.timrunner.io
 
+import de.smartsquare.timrunner.util.cut
 import org.gradle.api.GradleException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -39,6 +40,17 @@ object FilesUtils {
                 .sorted(Comparator.reverseOrder())
                 .forEach { Files.delete(it) }
         else -> Unit
+    }
+
+    /**
+     * Copies all files from the given [source] directory to the given [dest] directory.
+     *
+     * This is not recursive.
+     */
+    fun copyFilesFromDirectory(source: Path, dest: Path) {
+        Files.newDirectoryStream(source, { Files.isRegularFile(it) }).use { files ->
+            files.forEach { file -> Files.copy(file, dest.resolve(file.cut(source))) }
+        }
     }
 
     /**
