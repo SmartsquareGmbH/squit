@@ -138,9 +138,11 @@ open class TimTestTask : DefaultTask() {
 
             val testProcessedSourcesPath = FilesUtils.validateExistence(processedSourcesPath.resolve(it.fullPath))
             val testActualResponsesPath = FilesUtils.validateExistence(actualResponsesPath.resolve(it.fullPath))
+            val testDifferenceFile = Files.createFile(resultDirectoryPath.resolve("diff.txt"))
 
             FilesUtils.copyFilesFromDirectory(testProcessedSourcesPath, resultDirectoryPath)
             FilesUtils.copyFilesFromDirectory(testActualResponsesPath, resultDirectoryPath)
+            Files.write(testDifferenceFile, it.result.toByteArray())
         }
     }
 
