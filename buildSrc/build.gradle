@@ -29,7 +29,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.9.0'
     implementation 'org.dom4j:dom4j:2.0.1'
     implementation 'org.xmlunit:xmlunit-core:2.5.0'
-    implementation 'org.apache.poi:poi:3.17-beta1'
+    implementation 'org.apache.poi:poi:3.17'
     implementation 'nu.studer:java-ordered-properties:1.0.1'
 
     testImplementation 'junit:junit:4.12'
