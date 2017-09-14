@@ -1,6 +1,10 @@
 package de.smartsquare.timrunner.entity
 
+import de.smartsquare.timrunner.util.Constants.CONFIG
+import de.smartsquare.timrunner.util.Utils
+import de.smartsquare.timrunner.util.getTemplateProperty
 import de.smartsquare.timrunner.util.safeLoad
+import nu.studer.java.util.OrderedProperties
 import okhttp3.HttpUrl
 import org.gradle.api.GradleException
 import java.nio.file.Path
@@ -12,6 +16,12 @@ import java.util.*
  * @author Ruben Gees
  */
 class TimProperties {
+
+    private companion object {
+        private const val ENDPOINT_PROPERTY = "endpoint"
+        private const val IGNORE_PROPERTY = "ignore"
+        private const val IGNORE_FOR_REPORT_PROPERTY = "ignoreForReport"
+    }
 
     /**
      * The endpoint.
@@ -46,85 +56,22 @@ class TimProperties {
      * required properties.
      */
     @Throws(GradleException::class)
-    fun fillFromProperties(path: Path): TimProperties {
-        Properties().safeLoad(path).also { properties ->
+    fun fillFromProperties(path: Path, projectProperties: Map<String, *>? = null): TimProperties {
+        Utils.newProperties().safeLoad(path).also { properties ->
             if (internalEndpoint == null) {
-                internalEndpoint = properties.getProperty("endpoint").let {
-                    when {
-                        it == null -> null
-                        it.isBlank() -> throw GradleException("Invalid value for endpoint property: $it")
-                        else -> HttpUrl.parse(it).let {
-                            when (it) {
-                                null -> throw GradleException("Invalid value for endpoint property: $it")
-                                else -> it
-                            }
-                        }
-                    }
-                }
+                internalEndpoint = readAndValidateHttpUrlProperty(ENDPOINT_PROPERTY, properties, projectProperties)
             }
 
             if (internalIgnore == null) {
-                internalIgnore = properties.getProperty("ignore").let {
-                    when (it) {
-                        "true" -> true
-                        "false" -> false
-                        null -> null
-                        else -> throw GradleException("Invalid value for ignore property: $it")
-                    }
-                }
+                internalIgnore = readAndValidateBooleanProperty(IGNORE_PROPERTY, properties, projectProperties)
             }
 
             if (internalIgnoreForReport == null) {
-                internalIgnoreForReport = properties.getProperty("ignoreForReport").let {
-                    when (it) {
-                        "true" -> true
-                        "false" -> false
-                        null -> null
-                        else -> throw GradleException("Invalid value for ignoreForReport property: $it")
-                    }
-                }
+                internalIgnoreForReport = readAndValidateBooleanProperty(IGNORE_FOR_REPORT_PROPERTY, properties,
+                        projectProperties)
             }
 
-            properties
-                    .map { it.key.toString() }
-                    .filter { it.startsWith("db_") }
-                    .map { it.substringAfter("_").substringBeforeLast("_") }
-                    .distinct()
-                    .forEach { databaseName ->
-                        if (!internalDatabaseConfigurations.containsKey(databaseName)) {
-                            val jdbc = properties.getProperty("db_${databaseName}_jdbc")?.let {
-                                when {
-                                    it.isBlank() -> throw GradleException("Invalid value for property " +
-                                            "db_${databaseName}_jdbc: $it")
-                                    else -> it
-                                }
-                            }
-
-                            val username = properties.getProperty("db_${databaseName}_username")?.let {
-                                when {
-                                    it.isBlank() -> throw GradleException("Invalid value for property " +
-                                            "db_${databaseName}_username: $it")
-                                    else -> it
-                                }
-                            }
-
-                            val password = properties.getProperty("db_${databaseName}_password")?.let {
-                                when {
-                                    it.isBlank() -> throw GradleException("Invalid value for property " +
-                                            "db_${databaseName}_password: $it")
-                                    else -> it
-                                }
-                            }
-
-                            if (jdbc == null || username == null || password == null) {
-                                throw GradleException("A jdbc, username and password property is required in the same" +
-                                        "properties file if a db property is declared.")
-                            }
-
-                            internalDatabaseConfigurations.put(databaseName,
-                                    TimDatabaseConfiguration(databaseName, jdbc, username, password))
-                        }
-                    }
+            readDatabaseConfigurations(properties, projectProperties)
         }
 
         return this
@@ -136,21 +83,39 @@ class TimProperties {
      */
     @Throws(GradleException::class)
     fun fillFromSingleProperties(path: Path): TimProperties {
-        fillFromProperties(path)
+        return this.apply {
+            fillFromProperties(path)
 
-        return when (isValid()) {
-            true -> this
-            false -> throw IllegalArgumentException("Invalid properties at path: $path")
+            validateAndGetErrorMessage().let {
+                when (it) {
+                    null -> this
+                    else -> throw GradleException("Invalid $CONFIG at path: $path ($it)")
+                }
+            }
+        }
+    }
+
+    /**
+     * Merges this with another [TimProperties] instance. Properties which already exist in this instance are not
+     * changed.
+     */
+    fun mergeWith(other: TimProperties) {
+        if (internalEndpoint == null) internalEndpoint = other.internalEndpoint
+        if (internalIgnore == null) internalIgnore = other.internalIgnore
+        if (internalIgnoreForReport == null) internalIgnoreForReport = other.internalIgnoreForReport
+
+        other.internalDatabaseConfigurations.forEach { (key, value) ->
+            internalDatabaseConfigurations.putIfAbsent(key, value)
         }
     }
 
     /**
      * Converts this to an instance of [Properties].
      */
-    fun writeToProperties() = Properties().apply {
-        setProperty("endpoint", endpoint.toString())
-        setProperty("ignore", ignore.toString())
-        setProperty("ignoreForReport", ignoreForReport.toString())
+    fun writeToProperties() = Utils.newProperties().apply {
+        setProperty(ENDPOINT_PROPERTY, endpoint.toString())
+        setProperty(IGNORE_PROPERTY, ignore.toString())
+        setProperty(IGNORE_FOR_REPORT_PROPERTY, ignoreForReport.toString())
 
         internalDatabaseConfigurations.forEach { databaseName, (_, jdbcAddress, username, password) ->
             setProperty("db_${databaseName}_jdbc", jdbcAddress)
@@ -160,7 +125,77 @@ class TimProperties {
     }
 
     /**
-     * Returns if this contains all required properties.
+     * Validates if this instance contains all needed properties and returns a [String] with an error message if not.
      */
-    fun isValid() = internalEndpoint != null
+    fun validateAndGetErrorMessage(): String? {
+        return when (internalEndpoint != null) {
+            true -> null
+            false -> "endpoint property is missing"
+        }
+    }
+
+    private fun readDatabaseConfigurations(properties: OrderedProperties, projectProperties: Map<String, *>?) {
+        properties
+                .entrySet()
+                .map { it.key.toString() }
+                .filter { it.startsWith("db_") }
+                .map { it.substringAfter("_").substringBeforeLast("_") }
+                .distinct()
+                .forEach { databaseName ->
+                    if (!internalDatabaseConfigurations.containsKey(databaseName)) {
+                        val jdbc = readAndValidateStringProperty("db_${databaseName}_jdbc", properties,
+                                projectProperties)
+
+                        val username = readAndValidateStringProperty("db_${databaseName}_username", properties,
+                                projectProperties)
+
+                        val password = readAndValidateStringProperty("db_${databaseName}_password", properties,
+                                projectProperties)
+
+                        if (jdbc == null || username == null || password == null) {
+                            throw GradleException("A jdbc, username and password property is required in the same" +
+                                    "properties file if a db property is declared.")
+                        }
+
+                        internalDatabaseConfigurations.put(databaseName,
+                                TimDatabaseConfiguration(databaseName, jdbc, username, password))
+                    }
+                }
+    }
+
+    private fun readAndValidateHttpUrlProperty(name: String, properties: OrderedProperties,
+                                               projectProperties: Map<String, *>? = null): HttpUrl? {
+        return properties.getTemplateProperty(name, projectProperties)?.let {
+            when {
+                it.isBlank() -> throw GradleException("Invalid value for $name property: $it")
+                else -> HttpUrl.parse(it).let {
+                    when (it) {
+                        null -> throw GradleException("Invalid value for $name property: $it")
+                        else -> it
+                    }
+                }
+            }
+        }
+    }
+
+    private fun readAndValidateBooleanProperty(name: String, properties: OrderedProperties,
+                                               projectProperties: Map<String, *>? = null): Boolean? {
+        return properties.getTemplateProperty(name, projectProperties)?.let {
+            when {
+                it.equals("true", ignoreCase = true) -> true
+                it.equals("false", ignoreCase = true) -> false
+                else -> throw GradleException("Invalid value for $name property: $it")
+            }
+        }
+    }
+
+    private fun readAndValidateStringProperty(name: String, properties: OrderedProperties,
+                                              projectProperties: Map<String, *>? = null): String? {
+        return properties.getTemplateProperty(name, projectProperties)?.let {
+            when {
+                it.isBlank() -> throw GradleException("Invalid value for $name property: $it")
+                else -> it
+            }
+        }
+    }
 }

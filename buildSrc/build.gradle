@@ -30,6 +30,7 @@ dependencies {
     implementation 'org.dom4j:dom4j:2.0.1'
     implementation 'org.xmlunit:xmlunit-core:2.5.0'
     implementation 'org.apache.poi:poi:3.17-beta1'
+    implementation 'nu.studer:java-ordered-properties:1.0.1'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.amshove.kluent:kluent-android:1.29'

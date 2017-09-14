@@ -16,6 +16,7 @@ import org.dom4j.io.SAXReader
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Files
@@ -41,6 +42,9 @@ open class TimPreProcessTask : DefaultTask() {
      */
     @OutputDirectory
     var processedSourcesPath: Path = Paths.get(project.buildDir.path, "sources")
+
+    @Internal
+    val propertyCache = mutableMapOf<Path, TimProperties>()
 
     /**
      * Runs the task.
@@ -93,17 +97,23 @@ open class TimPreProcessTask : DefaultTask() {
         while (!currentDirectoryPath.endsWith(sourcesPath.parent)) {
             currentDirectoryPath.resolve(CONFIG).also { propertiesPath ->
                 if (Files.exists(propertiesPath)) {
-                    result.fillFromProperties(propertiesPath)
+                    val newProperties = propertyCache.getOrPut(propertiesPath, {
+                        TimProperties().fillFromProperties(propertiesPath, project.properties)
+                    })
+
+                    result.mergeWith(newProperties)
                 }
             }
 
             currentDirectoryPath = currentDirectoryPath.parent
         }
 
-        return when (result.isValid()) {
-            true -> result
-            false -> throw GradleException("No $CONFIG file with the required properties on the path of " +
-                    "test: ${testPath.cut(sourcesPath)}") // TODO: Better error
+        return result.validateAndGetErrorMessage().let {
+            when (it) {
+                null -> result
+                else -> throw GradleException("Invalid $CONFIG file on path of test: " +
+                        "${testPath.cut(sourcesPath)} ($it)")
+            }
         }
     }
 

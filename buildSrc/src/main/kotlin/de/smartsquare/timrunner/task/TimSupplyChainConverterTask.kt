@@ -4,9 +4,11 @@ import de.smartsquare.timrunner.io.FilesUtils
 import de.smartsquare.timrunner.util.Constants.CONFIG
 import de.smartsquare.timrunner.util.Constants.EXPECTED_RESPONSE
 import de.smartsquare.timrunner.util.Constants.REQUEST
+import de.smartsquare.timrunner.util.Utils
 import de.smartsquare.timrunner.util.cut
 import de.smartsquare.timrunner.util.safeCleanedStringValueAt
 import de.smartsquare.timrunner.util.safeStore
+import nu.studer.java.util.OrderedProperties
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Row
 import org.gradle.api.DefaultTask
@@ -19,7 +21,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
-import java.util.*
 
 /**
  * Task for converting a legacy SOAP UI project to a format readable by the tim-it-runner.
@@ -175,7 +176,7 @@ open class TimSupplyChainConverterTask : DefaultTask() {
 
         if (Files.notExists(resultApiDirectoryPath.resolve(CONFIG))) {
             FilesUtils.createFileIfNotExists(resultApiDirectoryPath.resolve(CONFIG)).let {
-                Properties().apply {
+                Utils.newProperties().apply {
                     when {
                         currentFirstPath.contains("Apply Tax") -> setProperty("endpoint",
                                 "http://localhost:7001/tim/ApplyTaxWSSoap12HttpPort?WSDL")
@@ -206,8 +207,8 @@ open class TimSupplyChainConverterTask : DefaultTask() {
                 .let { path -> Files.copy(path, resultDirectoryPath.resolve(resultName), REPLACE_EXISTING) }
     }
 
-    private fun generateDefaultProperties(): Properties {
-        return Properties().apply {
+    private fun generateDefaultProperties(): OrderedProperties {
+        return Utils.newProperties().apply {
             setProperty("db_tim_jdbc", "jdbc:oracle:thin:@localhost:1521:xe")
             setProperty("db_tim_username", "timdb")
             setProperty("db_tim_password", "timdb")

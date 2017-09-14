@@ -2,6 +2,9 @@
 
 package de.smartsquare.timrunner.util
 
+import groovy.lang.MissingPropertyException
+import groovy.text.SimpleTemplateEngine
+import nu.studer.java.util.OrderedProperties
 import org.apache.poi.ss.usermodel.Row
 import org.dom4j.Document
 import org.dom4j.io.OutputFormat
@@ -10,7 +13,6 @@ import org.dom4j.io.XMLWriter
 import org.gradle.api.GradleException
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.*
 import kotlin.text.RegexOption.DOT_MATCHES_ALL
 
 /**
@@ -26,7 +28,7 @@ inline fun Path.cut(other: Path): Path = this.subtract(other).reduce { current, 
  *
  * Safe means in this context that the file is correctly closed.
  */
-inline fun Properties.safeLoad(path: Path) = Files.newBufferedReader(path).use {
+inline fun OrderedProperties.safeLoad(path: Path) = Files.newBufferedReader(path).use {
     this.apply { load(it) }
 }
 
@@ -35,8 +37,26 @@ inline fun Properties.safeLoad(path: Path) = Files.newBufferedReader(path).use {
  *
  * Safe means in this context that the file is correctly closed.
  */
-inline fun Properties.safeStore(path: Path, comments: String? = null) = Files.newBufferedWriter(path).use {
+inline fun OrderedProperties.safeStore(path: Path, comments: String? = null) = Files.newBufferedWriter(path).use {
     this.apply { store(it, comments) }
+}
+
+/**
+ * Returns the property with the given [key] after applying the given [templateProperties] if present on any present
+ * templates in the property [String].
+ */
+inline fun OrderedProperties.getTemplateProperty(key: String, templateProperties: Map<String, *>? = null): String? {
+    return getProperty(key)?.let {
+        when (templateProperties != null) {
+            true -> try {
+                SimpleTemplateEngine().createTemplate(it).make(templateProperties).toString()
+            } catch (error: MissingPropertyException) {
+                throw GradleException("Missing property \"${error.property}\" for template, did you forget " +
+                        "to pass it with -P?")
+            }
+            false -> it
+        }
+    }
 }
 
 /**
