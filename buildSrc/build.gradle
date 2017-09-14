@@ -17,8 +17,6 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.15.0'
 }
 
-apply plugin: "kotlin"
-
 repositories {
     jcenter()
 }
@@ -32,6 +30,9 @@ dependencies {
     implementation 'org.dom4j:dom4j:2.0.1'
     implementation 'org.xmlunit:xmlunit-core:2.5.0'
     implementation 'org.apache.poi:poi:3.17-beta1'
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.amshove.kluent:kluent-android:1.29'
 }
 
 tasks.withType(KotlinCompile).all {
