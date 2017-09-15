@@ -1,1 +1,0 @@
-update PA_TAX_CALC_RULE_T set SEQ_NO_CR='1001' where SEQ_NO_TI='1051' and SEQ_NO_TT='5001';

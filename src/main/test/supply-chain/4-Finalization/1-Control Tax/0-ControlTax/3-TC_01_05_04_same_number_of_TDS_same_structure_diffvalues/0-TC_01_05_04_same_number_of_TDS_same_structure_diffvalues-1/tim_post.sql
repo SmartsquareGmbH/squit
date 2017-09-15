@@ -1,1 +1,0 @@
-﻿update pa_system_config_t set consolidation_treatment='error' where seq_no_paramsrc = (select seq_no_paramsrc from param_source_system_t where seq_no_param=(select seq_no_param from param_t where name='SystemConfiguration') and seq_no_srcsys = (select seq_no_srcsys from tim_source_system_t where id='COMPASS001'));

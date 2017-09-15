@@ -1,1 +1,1 @@
-rootProject.name = 'tim-it-runner'
+include 'library', 'plugin'

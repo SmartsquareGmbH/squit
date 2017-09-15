@@ -1,13 +1,32 @@
-apply plugin: 'tim-it-runner'
+plugins {
+    id 'com.github.ben-manes.versions' version '0.15.0'
+}
 
-group = "de.smartsquare"
-version = "1.0-SNAPSHOT"
+allprojects {
+    group = 'de.smartsquare'
+    version = '1.0-SNAPSHOT'
+}
+
+subprojects {
+    buildscript {
+        repositories {
+            jcenter()
+        }
+    }
+
+    repositories {
+        jcenter()
+    }
+
+    tasks.matching { it.name.matches('compile.*Kotlin') }.all {
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
+    }
+}
 
 task clean(type: Delete) {
-    group "Build"
-    description "Deletes the build directory."
-
-    delete buildDir
+    delete rootProject.buildDir
 }
 
 task wrapper(type: Wrapper) {

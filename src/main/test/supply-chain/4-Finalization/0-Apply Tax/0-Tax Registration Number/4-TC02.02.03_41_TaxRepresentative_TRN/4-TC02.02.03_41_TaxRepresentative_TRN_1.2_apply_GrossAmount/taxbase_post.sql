@@ -1,2 +1,0 @@
-delete from CBD_TAX_REPRESENTATIVE_T where SEQ_NO_TREP between 50000000 and 60000000;
-delete from CBD_TAX_REG_NUMBERS_T where SEQ_NO_TREG between 5000000 and 6000000;

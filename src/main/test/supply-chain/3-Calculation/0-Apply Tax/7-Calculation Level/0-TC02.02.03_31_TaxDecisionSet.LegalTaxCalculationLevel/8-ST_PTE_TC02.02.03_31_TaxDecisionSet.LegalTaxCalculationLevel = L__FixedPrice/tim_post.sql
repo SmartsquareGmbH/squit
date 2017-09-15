@@ -1,1 +1,0 @@
-delete from PA_TAXCALC_INDICATOR_T where SEQ_NO_TCI between 5000000 and 60000000;
