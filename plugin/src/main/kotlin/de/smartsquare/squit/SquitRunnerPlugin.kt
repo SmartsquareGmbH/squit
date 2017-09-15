@@ -41,12 +41,6 @@ class SquitRunnerPlugin : Plugin<Project> {
                 it.dependsOn("squitPostProgress")
             }
 
-            project.tasks.create("convertSupplyChainProject", TimSupplyChainConverterTask::class.java) {
-                it.group = "Build Setup"
-                it.description = "Converts a legacy supply-chain project to be usable by the ${project.name}."
-                it.outputs.upToDateWhen { false }
-            }
-
             project.extensions.add("squit", SquitPluginExtension::class.java)
         } catch (error: MissingMethodException) {
             throw GradleException("Your Gradle version is too old.")
