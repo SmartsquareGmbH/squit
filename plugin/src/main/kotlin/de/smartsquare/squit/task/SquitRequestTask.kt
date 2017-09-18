@@ -30,10 +30,6 @@ import java.sql.DriverManager
  */
 open class SquitRequestTask : DefaultTask() {
 
-    private companion object {
-        private val MEDIA_TYPE = MediaType.parse("application/soap+xml; utf-8")
-    }
-
     /**
      * The directory of the test sources.
      */
@@ -90,7 +86,7 @@ open class SquitRequestTask : DefaultTask() {
                     it.username, it.password)
         }
 
-        val soapResponse: String = constructApiCall(properties.endpoint, requestPath)
+        val soapResponse: String = constructApiCall(properties.endpoint, requestPath, properties.mediaType)
                 .execute()
                 .let { response ->
                     if (!response.isSuccessful) {
@@ -113,11 +109,12 @@ open class SquitRequestTask : DefaultTask() {
         }
     }
 
-    private fun constructApiCall(url: HttpUrl, requestPath: Path) = okHttpClient.newCall(Request.Builder()
-            .post(RequestBody.create(MEDIA_TYPE, Files.readAllBytes(requestPath)))
-            .url(url)
-            .build()
-    )
+    private fun constructApiCall(url: HttpUrl, requestPath: Path, mediaType: MediaType) = okHttpClient
+            .newCall(Request.Builder()
+                    .post(RequestBody.create(mediaType, Files.readAllBytes(requestPath)))
+                    .url(url)
+                    .build()
+            )
 
     private fun executeScriptIfExisting(path: Path, jdbc: String, username: String, password: String): Boolean {
         return if (Files.exists(path)) {

@@ -6,6 +6,7 @@ import de.smartsquare.squit.util.getTemplateProperty
 import de.smartsquare.squit.util.safeLoad
 import nu.studer.java.util.OrderedProperties
 import okhttp3.HttpUrl
+import okhttp3.MediaType
 import org.gradle.api.GradleException
 import java.nio.file.Path
 import java.util.*
@@ -19,6 +20,7 @@ class SquitProperties {
 
     private companion object {
         private const val ENDPOINT_PROPERTY = "endpoint"
+        private const val MEDIA_TYPE_PROPERTY = "mediaType"
         private const val IGNORE_PROPERTY = "ignore"
         private const val IGNORE_FOR_REPORT_PROPERTY = "ignoreForReport"
     }
@@ -27,6 +29,11 @@ class SquitProperties {
      * The endpoint.
      */
     val endpoint get() = internalEndpoint ?: throw AssertionError("Internal representation is null.")
+
+    /**
+     * The media type.
+     */
+    val mediaType get() = internalMediaType ?: throw AssertionError("Internal representation is null.")
 
     /**
      * If the test should be ignored.
@@ -44,6 +51,7 @@ class SquitProperties {
     val databaseConfigurations get() = internalDatabaseConfigurations.values
 
     private var internalEndpoint: HttpUrl? = null
+    private var internalMediaType: MediaType? = null
     private var internalIgnore: Boolean? = null
     private var internalIgnoreForReport: Boolean? = null
     private val internalDatabaseConfigurations = mutableMapOf<String, SquitDatabaseConfiguration>()
@@ -60,6 +68,10 @@ class SquitProperties {
         Utils.newProperties().safeLoad(path).also { properties ->
             if (internalEndpoint == null) {
                 internalEndpoint = readAndValidateHttpUrlProperty(ENDPOINT_PROPERTY, properties, projectProperties)
+            }
+
+            if (internalMediaType == null) {
+                internalMediaType = readAndValidateMediaTypeProperty(MEDIA_TYPE_PROPERTY, properties, projectProperties)
             }
 
             if (internalIgnore == null) {
@@ -101,6 +113,7 @@ class SquitProperties {
      */
     fun mergeWith(other: SquitProperties) {
         if (internalEndpoint == null) internalEndpoint = other.internalEndpoint
+        if (internalMediaType == null) internalMediaType = other.internalMediaType
         if (internalIgnore == null) internalIgnore = other.internalIgnore
         if (internalIgnoreForReport == null) internalIgnoreForReport = other.internalIgnoreForReport
 
@@ -114,6 +127,7 @@ class SquitProperties {
      */
     fun writeToProperties() = Utils.newProperties().apply {
         setProperty(ENDPOINT_PROPERTY, endpoint.toString())
+        setProperty(MEDIA_TYPE_PROPERTY, mediaType.toString())
         setProperty(IGNORE_PROPERTY, ignore.toString())
         setProperty(IGNORE_FOR_REPORT_PROPERTY, ignoreForReport.toString())
 
@@ -127,11 +141,10 @@ class SquitProperties {
     /**
      * Validates if this instance contains all needed properties and returns a [String] with an error message if not.
      */
-    fun validateAndGetErrorMessage(): String? {
-        return when (internalEndpoint != null) {
-            true -> null
-            false -> "endpoint property is missing"
-        }
+    fun validateAndGetErrorMessage() = when {
+        internalEndpoint == null -> "endpoint property is missing"
+        internalMediaType == null -> "mediaType property is missing"
+        else -> null
     }
 
     private fun readDatabaseConfigurations(properties: OrderedProperties, projectProperties: Map<String, *>?) {
@@ -165,14 +178,11 @@ class SquitProperties {
 
     private fun readAndValidateHttpUrlProperty(name: String, properties: OrderedProperties,
                                                projectProperties: Map<String, *>? = null): HttpUrl? {
-        return properties.getTemplateProperty(name, projectProperties)?.let {
-            when {
-                it.isBlank() -> throw GradleException("Invalid value for $name property: $it")
-                else -> HttpUrl.parse(it).let {
-                    when (it) {
-                        null -> throw GradleException("Invalid value for $name property: $it")
-                        else -> it
-                    }
+        return properties.getTemplateProperty(name, projectProperties)?.let { property ->
+            HttpUrl.parse(property).let { parsedProperty ->
+                when (parsedProperty) {
+                    null -> throw GradleException("Invalid value for $name property: $property")
+                    else -> parsedProperty
                 }
             }
         }
@@ -180,21 +190,33 @@ class SquitProperties {
 
     private fun readAndValidateBooleanProperty(name: String, properties: OrderedProperties,
                                                projectProperties: Map<String, *>? = null): Boolean? {
-        return properties.getTemplateProperty(name, projectProperties)?.let {
+        return properties.getTemplateProperty(name, projectProperties)?.let { property ->
             when {
-                it.equals("true", ignoreCase = true) -> true
-                it.equals("false", ignoreCase = true) -> false
-                else -> throw GradleException("Invalid value for $name property: $it")
+                property.equals("true", ignoreCase = true) -> true
+                property.equals("false", ignoreCase = true) -> false
+                else -> throw GradleException("Invalid value for $name property: $property")
             }
         }
     }
 
     private fun readAndValidateStringProperty(name: String, properties: OrderedProperties,
                                               projectProperties: Map<String, *>? = null): String? {
-        return properties.getTemplateProperty(name, projectProperties)?.let {
+        return properties.getTemplateProperty(name, projectProperties)?.let { property ->
             when {
-                it.isBlank() -> throw GradleException("Invalid value for $name property: $it")
-                else -> it
+                property.isBlank() -> throw GradleException("Invalid value for $name property: $property")
+                else -> property
+            }
+        }
+    }
+
+    private fun readAndValidateMediaTypeProperty(name: String, properties: OrderedProperties,
+                                                 projectProperties: Map<String, *>? = null): MediaType? {
+        return properties.getTemplateProperty(name, projectProperties)?.let { property ->
+            MediaType.parse(property).let { parsedProperty ->
+                when (parsedProperty) {
+                    null -> throw GradleException("Invalid value for $name property: $property")
+                    else -> parsedProperty
+                }
             }
         }
     }
