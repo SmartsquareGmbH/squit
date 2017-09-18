@@ -13,7 +13,7 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.4-3'
 
     implementation 'com.squareup.okhttp3:okhttp:3.9.0'
-    implementation 'org.dom4j:dom4j:2.0.1'
+    implementation 'org.dom4j:dom4j:2.1.0'
     implementation 'org.xmlunit:xmlunit-core:2.5.0'
     implementation 'nu.studer:java-ordered-properties:1.0.1'
 
@@ -25,6 +25,19 @@ task sourceJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
 
+task javadocJar(type: Jar, dependsOn: dokka) {
+    from javadoc.destinationDir
+}
+
+dokka {
+    jdkVersion = 8
+    outputDirectory = javadoc.destinationDir
+
+    externalDocumentationLink {
+        url = new URL("https://dom4j.github.io/javadoc/2.1.0/")
+    }
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -34,6 +47,10 @@ publishing {
 
             artifact sourceJar {
                 classifier 'sources'
+            }
+
+            artifact javadocJar {
+                classifier "javadoc"
             }
         }
     }

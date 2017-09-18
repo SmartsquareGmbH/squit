@@ -19,7 +19,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 /**
- * Task for post-processing the responses from tim.
+ * Task for post-processing the responses.
  *
  * @author Ruben Gees
  */

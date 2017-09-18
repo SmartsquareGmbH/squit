@@ -16,6 +16,19 @@ task sourceJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
 
+task javadocJar(type: Jar, dependsOn: dokka) {
+    from javadoc.destinationDir
+}
+
+dokka {
+    jdkVersion = 8
+    outputDirectory = javadoc.destinationDir
+
+    externalDocumentationLink {
+        url = new URL("https://dom4j.github.io/javadoc/2.1.0/")
+    }
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -25,6 +38,10 @@ publishing {
 
             artifact sourceJar {
                 classifier 'sources'
+            }
+
+            artifact javadocJar {
+                classifier "javadoc"
             }
         }
     }

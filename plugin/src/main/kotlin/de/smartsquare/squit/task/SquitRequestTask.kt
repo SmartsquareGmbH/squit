@@ -23,7 +23,7 @@ import java.sql.Driver
 import java.sql.DriverManager
 
 /**
- * Task for running requests against the TIM API. Also capable of running existing sql scripts before and after the
+ * Task for running requests against the given api. Also capable of running existing sql scripts before and after the
  * request.
  *
  * @author Ruben Gees

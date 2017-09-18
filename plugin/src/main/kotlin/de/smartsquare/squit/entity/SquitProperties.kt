@@ -11,7 +11,7 @@ import java.nio.file.Path
 import java.util.*
 
 /**
- * Class for reading, holding and writing tim related properties.
+ * Class for reading, holding and writing properties.
  *
  * @author Ruben Gees
  */
