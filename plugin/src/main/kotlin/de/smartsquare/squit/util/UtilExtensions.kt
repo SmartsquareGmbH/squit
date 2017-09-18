@@ -5,7 +5,6 @@ package de.smartsquare.squit.util
 import groovy.lang.MissingPropertyException
 import groovy.text.SimpleTemplateEngine
 import nu.studer.java.util.OrderedProperties
-import org.apache.poi.ss.usermodel.Row
 import org.dom4j.Document
 import org.dom4j.io.OutputFormat
 import org.dom4j.io.SAXReader
@@ -81,23 +80,6 @@ inline fun SAXReader.read(path: Path): Document = try {
 inline fun Document.write(path: Path, outputFormat: OutputFormat = OutputFormat.createPrettyPrint()) {
     Files.newBufferedWriter(path).use {
         XMLWriter(it, outputFormat).write(document)
-    }
-}
-
-/**
- * Retrieves and returns the [String] of this [Row] at the given [position]. The result is cleaned (by [clean]) and
- * errors converted to a null value prior to returning.
- */
-inline fun Row.safeCleanedStringValueAt(position: Int): String? {
-    return try {
-        getCell(position)?.stringCellValue?.let {
-            when (it.isBlank()) {
-                true -> null
-                false -> it.clean()
-            }
-        }
-    } catch (ignored: Throwable) {
-        null
     }
 }
 
