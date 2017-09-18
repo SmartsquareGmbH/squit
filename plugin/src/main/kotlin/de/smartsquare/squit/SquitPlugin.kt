@@ -29,7 +29,7 @@ class SquitPlugin : Plugin<Project> {
                 it.dependsOn("squitPreProcess")
             }
 
-            project.tasks.create("squitPostProgress", SquitPostProcessTask::class.java) {
+            project.tasks.create("squitPostProcess", SquitPostProcessTask::class.java) {
                 it.group = "Build"
                 it.description = "Transforms the actual responses to be readable and usable for the comparing task."
                 it.dependsOn("squitRunRequests")
@@ -38,7 +38,7 @@ class SquitPlugin : Plugin<Project> {
             project.tasks.create("squitTest", SquitTestTask::class.java) {
                 it.group = "Build"
                 it.description = "Compares the actual responses to the expected responses and generates a report."
-                it.dependsOn("squitPostProgress")
+                it.dependsOn("squitPostProcess")
             }
 
             project.extensions.add("squit", SquitPluginExtension::class.java)
