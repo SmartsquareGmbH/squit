@@ -14,7 +14,7 @@ import org.gradle.api.Project
  *
  * @author Ruben Gees
  */
-class SquitRunnerPlugin : Plugin<Project> {
+class SquitPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         try {
