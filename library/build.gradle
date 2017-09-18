@@ -30,6 +30,17 @@ dokka {
 }
 
 publishing {
+    repositories {
+        maven {
+            credentials {
+                username "${if(project.hasProperty("nexusUser")) project.property("nexusUser") else 'dummy'}"
+                password "${if(project.hasProperty("nexusPassword")) project.property("nexusPassword") else 'dummy'}"
+            }
+
+            url "https://nexus.smartsquare.de/content/repositories/snapshots/"
+        }
+    }
+
     publications {
         mavenJava(MavenPublication) {
             artifactId 'squit-library'
