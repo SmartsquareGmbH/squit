@@ -11,6 +11,7 @@ import de.smartsquare.squit.util.write
 import org.dom4j.io.SAXReader
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Files
@@ -42,6 +43,19 @@ open class SquitPostProcessTask : DefaultTask() {
     @OutputDirectory
     var processedActualResponsesPath: Path = Paths.get(project.buildDir.path, "responses", "processed")
 
+    @get:Internal
+    private val processor by lazy {
+        project.extensions.getByType(SquitPluginExtension::class.java).postProcessClass.let {
+            if (it.isNotBlank()) {
+                logger.info("Using $it for post processing.")
+
+                Class.forName(it).newInstance() as SquitPostProcessor
+            } else {
+                null
+            }
+        }
+    }
+
     /**
      * Runs the task.
      */
@@ -62,13 +76,7 @@ open class SquitPostProcessTask : DefaultTask() {
             val actualResponse = SAXReader().read(actualResponsePath)
             val expectedResponse = SAXReader().read(expectedResponsePath)
 
-            project.extensions.getByType(SquitPluginExtension::class.java).postProcessClass.let {
-                if (it.isNotBlank()) {
-                    val postProcessor = Class.forName(it).newInstance() as SquitPostProcessor
-
-                    postProcessor.process(actualResponse, expectedResponse)
-                }
-            }
+            processor?.process(actualResponse, expectedResponse)
 
             actualResponse.write(resultProcessedActualResponseFilePath)
         }

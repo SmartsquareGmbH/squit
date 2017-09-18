@@ -44,7 +44,20 @@ open class SquitPreProcessTask : DefaultTask() {
     var processedSourcesPath: Path = Paths.get(project.buildDir.path, "sources")
 
     @Internal
-    val propertyCache = mutableMapOf<Path, SquitProperties>()
+    private val propertyCache = mutableMapOf<Path, SquitProperties>()
+
+    @get:Internal
+    private val processor by lazy {
+        project.extensions.getByType(SquitPluginExtension::class.java)?.preProcessClass?.let {
+            if (it.isNotBlank()) {
+                logger.info("Using $it for pre processing.")
+
+                Class.forName(it).newInstance() as SquitPreProcessor
+            } else {
+                null
+            }
+        }
+    }
 
     /**
      * Runs the task.
@@ -71,13 +84,7 @@ open class SquitPreProcessTask : DefaultTask() {
                 val request = SAXReader().read(requestPath)
                 val response = SAXReader().read(responsePath)
 
-                project.extensions.getByType(SquitPluginExtension::class.java).preProcessClass.let {
-                    if (it.isNotBlank()) {
-                        val preProcessor = Class.forName(it).newInstance() as SquitPreProcessor
-
-                        preProcessor.process(request, response)
-                    }
-                }
+                processor?.process(request, response)
 
                 request.write(processedRequestPath)
                 response.write(processedResponsePath)
