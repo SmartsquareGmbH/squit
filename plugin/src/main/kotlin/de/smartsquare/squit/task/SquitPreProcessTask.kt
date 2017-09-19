@@ -161,7 +161,7 @@ open class SquitPreProcessTask : DefaultTask() {
             throw GradleException("Missing $SOURCE_RESPONSE for test: ${testPath.fileName}")
         }
 
-        throw GradleException("Missing request.xml for test: ${testPath.fileName}")
+        throw GradleException("Missing $REQUEST for test: ${testPath.fileName}")
     }
 
     private fun shouldRunTest(properties: SquitProperties): Boolean {
