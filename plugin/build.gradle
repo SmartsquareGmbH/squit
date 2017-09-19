@@ -5,6 +5,8 @@ plugins {
     id 'java-gradle-plugin'
     id 'java-library'
     id 'maven-publish'
+
+    id "io.gitlab.arturbosch.detekt" version "1.0.0.RC4-3"
 }
 
 dependencies {
@@ -27,6 +29,15 @@ task sourceJar(type: Jar, dependsOn: classes) {
 
 task javadocJar(type: Jar, dependsOn: dokka) {
     from javadoc.destinationDir
+}
+
+detekt {
+    version = "1.0.0.RC4-3"
+
+    profile("main") {
+        config = "${rootProject.projectDir}/config/detekt/detekt.yml"
+        output = "$buildDir/reports/detekt"
+    }
 }
 
 dokka {

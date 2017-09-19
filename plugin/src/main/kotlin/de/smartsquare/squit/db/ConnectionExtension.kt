@@ -6,12 +6,14 @@ import de.smartsquare.squit.util.clean
 import java.nio.file.Files
 import java.nio.file.Path
 import java.sql.Connection
+import java.sql.SQLException
 
 /**
  * Executes the sql script at the given [path]. The contained statements are split by ";" and cleaned.
  *
  * @author Ruben Gees
  */
+@Suppress("RethrowCaughtException")
 inline fun Connection.executeScript(path: Path) {
     try {
         createStatement().use { statement ->
@@ -23,7 +25,7 @@ inline fun Connection.executeScript(path: Path) {
         }
 
         commit()
-    } catch (error: Throwable) {
+    } catch (error: SQLException) {
         rollback()
 
         throw error

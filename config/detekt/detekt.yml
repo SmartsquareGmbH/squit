@@ -1,0 +1,7 @@
+potential-bugs:
+  UnsafeCast:
+    active: false
+
+build:
+  warningThreshold: 0
+  failThreshold: 0

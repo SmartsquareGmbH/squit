@@ -10,6 +10,7 @@ import org.dom4j.io.OutputFormat
 import org.dom4j.io.SAXReader
 import org.dom4j.io.XMLWriter
 import org.gradle.api.GradleException
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.text.RegexOption.DOT_MATCHES_ALL
@@ -51,7 +52,7 @@ inline fun OrderedProperties.getTemplateProperty(key: String, templateProperties
                 SimpleTemplateEngine().createTemplate(it).make(templateProperties).toString()
             } catch (error: MissingPropertyException) {
                 throw GradleException("Missing property \"${error.property}\" for template, did you forget " +
-                        "to pass it with -P?")
+                        "to pass it with -P?", error)
             }
             false -> it
         }
@@ -67,7 +68,7 @@ inline fun SAXReader.read(path: Path): Document = try {
     Files.newInputStream(path).use {
         read(it)
     }
-} catch (error: Throwable) {
+} catch (error: IOException) {
     throw GradleException("Could not read xml file: $path ($error)")
 }
 

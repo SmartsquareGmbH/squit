@@ -16,25 +16,48 @@ import java.util.Properties
  *
  * @author Ruben Gees
  */
+@Suppress("all")
 class SquitProperties {
 
     companion object {
+
+        /**
+         * The endpoint property.
+         */
         const val ENDPOINT_PROPERTY = "endpoint"
+
+        /**
+         * The mediaType property.
+         */
         const val MEDIA_TYPE_PROPERTY = "mediaType"
+
+        /**
+         * The ignore property.
+         */
         const val IGNORE_PROPERTY = "ignore"
+
+        /**
+         * The ignoreForReport property.
+         */
         const val IGNORE_FOR_REPORT_PROPERTY = "ignoreForReport"
+
+        /**
+         * The tags property.
+         */
         const val TAGS_PROPERTY = "tags"
+
+        private const val NULL_ERROR = "Internal representation is null."
     }
 
     /**
      * The endpoint.
      */
-    val endpoint get() = internalEndpoint ?: throw AssertionError("Internal representation is null.")
+    val endpoint get() = internalEndpoint ?: throw AssertionError(NULL_ERROR)
 
     /**
      * The media type.
      */
-    val mediaType get() = internalMediaType ?: throw AssertionError("Internal representation is null.")
+    val mediaType get() = internalMediaType ?: throw AssertionError(NULL_ERROR)
 
     /**
      * If the test should be ignored.
@@ -194,7 +217,7 @@ class SquitProperties {
         return properties.getTemplateProperty(name, projectProperties)?.let { property ->
             HttpUrl.parse(property).let { parsedProperty ->
                 when (parsedProperty) {
-                    null -> throw GradleException("Invalid value for $name property: $property")
+                    null -> throwInvalidPropertyError(name, property)
                     else -> parsedProperty
                 }
             }
@@ -207,7 +230,7 @@ class SquitProperties {
             when {
                 property.equals("true", ignoreCase = true) -> true
                 property.equals("false", ignoreCase = true) -> false
-                else -> throw GradleException("Invalid value for $name property: $property")
+                else -> throwInvalidPropertyError(name, property)
             }
         }
     }
@@ -216,7 +239,7 @@ class SquitProperties {
                                               projectProperties: Map<String, *>? = null): String? {
         return properties.getTemplateProperty(name, projectProperties)?.let { property ->
             when {
-                property.isBlank() -> throw GradleException("Invalid value for $name property: $property")
+                property.isBlank() -> throwInvalidPropertyError(name, property)
                 else -> property
             }
         }
@@ -227,7 +250,7 @@ class SquitProperties {
         return properties.getTemplateProperty(name, projectProperties)?.let { property ->
             MediaType.parse(property).let { parsedProperty ->
                 when (parsedProperty) {
-                    null -> throw GradleException("Invalid value for $name property: $property")
+                    null -> throwInvalidPropertyError(name, property)
                     else -> parsedProperty
                 }
             }
@@ -237,9 +260,13 @@ class SquitProperties {
     private fun readAndValidateStringListProperty(name: String, properties: OrderedProperties): List<String> {
         return properties.getProperty(name)?.let { property ->
             when {
-                property.isBlank() -> throw GradleException("Invalid value for $name property: $property")
+                property.isBlank() -> throwInvalidPropertyError(name, property)
                 else -> property.split(",").map { it.trim() }.filter { it.isNotBlank() }
             }
         } ?: emptyList()
+    }
+
+    private fun throwInvalidPropertyError(name: String, property: String): Nothing {
+        throw GradleException("Invalid value for $name property: $property")
     }
 }

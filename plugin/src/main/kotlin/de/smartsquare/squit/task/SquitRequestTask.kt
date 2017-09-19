@@ -7,7 +7,11 @@ import de.smartsquare.squit.entity.SquitProperties
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.util.Constants.ACTUAL_RESPONSE
 import de.smartsquare.squit.util.Constants.CONFIG
+import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
 import de.smartsquare.squit.util.Constants.REQUEST
+import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
+import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
+import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.cut
 import de.smartsquare.squit.util.printAndFlush
 import okhttp3.HttpUrl
@@ -26,6 +30,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.sql.Driver
 import java.sql.DriverManager
+import java.sql.SQLException
 import kotlin.properties.Delegates
 
 /**
@@ -36,9 +41,9 @@ import kotlin.properties.Delegates
  */
 open class SquitRequestTask : DefaultTask() {
 
-    @get:Internal
-    internal var extension by Delegates.notNull<SquitExtension>()
-
+    /**
+     * The class name of the jdbc [Driver] to use.
+     */
     @Suppress("MemberVisibilityCanPrivate")
     @get:Input
     val jdbcDriverClassName by lazy {
@@ -58,14 +63,19 @@ open class SquitRequestTask : DefaultTask() {
      */
     @Suppress("MemberVisibilityCanPrivate")
     @get:InputDirectory
-    val processedSourcesPath: Path = Paths.get(project.buildDir.path, "squit", "sources")
+    val processedSourcesPath: Path = Paths.get(project.buildDir.path,
+            SQUIT_DIRECTORY, SOURCES_DIRECTORY)
 
     /**
      * The directory to save the results in.
      */
     @Suppress("MemberVisibilityCanPrivate")
     @get:OutputDirectory
-    val actualResponsesPath: Path = Paths.get(project.buildDir.path, "squit", "responses", "raw")
+    val actualResponsesPath: Path = Paths.get(project.buildDir.path,
+            SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)
+
+    @get:Internal
+    internal var extension by Delegates.notNull<SquitExtension>()
 
     @get:Internal
     private val okHttpClient = OkHttpClient.Builder().build()
@@ -151,7 +161,7 @@ open class SquitRequestTask : DefaultTask() {
                 dbConnections.createOrGet(jdbc, username, password).executeScript(path)
 
                 true
-            } catch (error: Throwable) {
+            } catch (error: SQLException) {
                 if (logger.isLifecycleEnabled) {
                     // Switch to next line from progress.
                     println()

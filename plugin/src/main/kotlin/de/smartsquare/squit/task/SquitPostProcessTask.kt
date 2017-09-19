@@ -5,6 +5,11 @@ import de.smartsquare.squit.SquitPostProcessor
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.util.Constants.ACTUAL_RESPONSE
 import de.smartsquare.squit.util.Constants.EXPECTED_RESPONSE
+import de.smartsquare.squit.util.Constants.PROCESSED_DIRECTORY
+import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
+import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
+import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
+import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.cut
 import de.smartsquare.squit.util.read
 import de.smartsquare.squit.util.write
@@ -27,9 +32,9 @@ import kotlin.properties.Delegates
  */
 open class SquitPostProcessTask : DefaultTask() {
 
-    @get:Internal
-    internal var extension by Delegates.notNull<SquitExtension>()
-
+    /**
+     * The class name of the [SquitPostProcessor] to use.
+     */
     @Suppress("MemberVisibilityCanPrivate")
     @get:Input
     val postProcessClassName by lazy { extension.postProcessClass }
@@ -39,21 +44,27 @@ open class SquitPostProcessTask : DefaultTask() {
      */
     @Suppress("MemberVisibilityCanPrivate")
     @InputDirectory
-    val processedSourcesPath: Path = Paths.get(project.buildDir.path, "squit", "sources")
+    val processedSourcesPath: Path = Paths.get(project.buildDir.path,
+            SQUIT_DIRECTORY, SOURCES_DIRECTORY)
 
     /**
      * The directory of the previously requested responses.
      */
     @Suppress("MemberVisibilityCanPrivate")
     @InputDirectory
-    val actualResponsesPath: Path = Paths.get(project.buildDir.path, "squit", "responses", "raw")
+    val actualResponsesPath: Path = Paths.get(project.buildDir.path,
+            SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)
 
     /**
      * The directory to save the results in.
      */
     @Suppress("MemberVisibilityCanPrivate")
     @OutputDirectory
-    val processedActualResponsesPath: Path = Paths.get(project.buildDir.path, "squit", "responses", "processed")
+    val processedActualResponsesPath: Path = Paths.get(project.buildDir.path,
+            SQUIT_DIRECTORY, RESPONSES_DIRECTORY, PROCESSED_DIRECTORY)
+
+    @get:Internal
+    internal var extension by Delegates.notNull<SquitExtension>()
 
     @get:Internal
     private val processor by lazy {
@@ -88,18 +99,18 @@ open class SquitPostProcessTask : DefaultTask() {
                     .resolve(testDir.cut(actualResponsesPath))
                     .resolve(EXPECTED_RESPONSE))
 
-            val resultProcessedActualResponsePath = Files.createDirectories(processedActualResponsesPath
+            val resultActualResponsePath = Files.createDirectories(processedActualResponsesPath
                     .resolve(testDir.cut(actualResponsesPath)))
 
-            val resultProcessedActualResponseFilePath = FilesUtils
-                    .createFileIfNotExists(resultProcessedActualResponsePath.resolve(ACTUAL_RESPONSE))
+            val resultActualResponseFilePath = FilesUtils.createFileIfNotExists(resultActualResponsePath
+                    .resolve(ACTUAL_RESPONSE))
 
             val actualResponse = SAXReader().read(actualResponsePath)
             val expectedResponse = SAXReader().read(expectedResponsePath)
 
             processor?.process(actualResponse, expectedResponse)
 
-            actualResponse.write(resultProcessedActualResponseFilePath)
+            actualResponse.write(resultActualResponseFilePath)
         }
     }
 }

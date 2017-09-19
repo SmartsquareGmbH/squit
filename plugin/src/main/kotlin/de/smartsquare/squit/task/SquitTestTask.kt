@@ -7,6 +7,10 @@ import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.util.Constants.ACTUAL_RESPONSE
 import de.smartsquare.squit.util.Constants.CONFIG
 import de.smartsquare.squit.util.Constants.EXPECTED_RESPONSE
+import de.smartsquare.squit.util.Constants.PROCESSED_DIRECTORY
+import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
+import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
+import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.cut
 import de.smartsquare.squit.util.write
 import org.dom4j.DocumentHelper
@@ -32,22 +36,21 @@ import kotlin.properties.Delegates
  */
 open class SquitTestTask : DefaultTask() {
 
-    @get:Internal
-    internal var extension by Delegates.notNull<SquitExtension>()
-
     /**
      * The directory of the test sources.
      */
     @Suppress("MemberVisibilityCanPrivate")
     @get:InputDirectory
-    val processedSourcesPath: Path = Paths.get(project.buildDir.path, "squit", "sources")
+    val processedSourcesPath: Path = Paths.get(project.buildDir.path,
+            SQUIT_DIRECTORY, SOURCES_DIRECTORY)
 
     /**
      * The directory of the previously requested responses.
      */
     @Suppress("MemberVisibilityCanPrivate")
     @get:InputDirectory
-    val actualResponsesPath: Path = Paths.get(project.buildDir.path, "squit", "responses", "processed")
+    val actualResponsesPath: Path = Paths.get(project.buildDir.path,
+            SQUIT_DIRECTORY, RESPONSES_DIRECTORY, PROCESSED_DIRECTORY)
 
     /**
      * The directory to generate the xml report file into.
@@ -68,6 +71,9 @@ open class SquitTestTask : DefaultTask() {
         extension.reportsPath?.resolve("failures")
                 ?: throw IllegalArgumentException("reportPath cannot be null")
     }
+
+    @get:Internal
+    internal var extension by Delegates.notNull<SquitExtension>()
 
     init {
         group = "Build"

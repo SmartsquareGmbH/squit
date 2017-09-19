@@ -7,7 +7,9 @@ import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.util.Constants.CONFIG
 import de.smartsquare.squit.util.Constants.EXPECTED_RESPONSE
 import de.smartsquare.squit.util.Constants.REQUEST
+import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCE_RESPONSE
+import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.cut
 import de.smartsquare.squit.util.read
 import de.smartsquare.squit.util.safeStore
@@ -31,11 +33,12 @@ import kotlin.properties.Delegates
  *
  * @author Ruben Gees
  */
+@Suppress("LargeClass")
 open class SquitPreProcessTask : DefaultTask() {
 
-    @get:Internal
-    internal var extension by Delegates.notNull<SquitExtension>()
-
+    /**
+     * The class name of the [SquitPreProcessor] to use.
+     */
     @Suppress("MemberVisibilityCanPrivate")
     @get:Input
     val preProcessClassName by lazy { extension.preProcessClass }
@@ -64,10 +67,11 @@ open class SquitPreProcessTask : DefaultTask() {
      */
     @Suppress("MemberVisibilityCanPrivate")
     @get:OutputDirectory
-    val processedSourcesPath: Path = Paths.get(project.buildDir.path, "squit", "sources")
+    val processedSourcesPath: Path = Paths.get(project.buildDir.path,
+            SQUIT_DIRECTORY, SOURCES_DIRECTORY)
 
     @get:Internal
-    private val propertyCache = mutableMapOf<Path, SquitProperties>()
+    internal var extension by Delegates.notNull<SquitExtension>()
 
     @get:Internal
     private val processor by lazy {
@@ -81,6 +85,9 @@ open class SquitPreProcessTask : DefaultTask() {
             }
         }
     }
+
+    @get:Internal
+    private val propertyCache = mutableMapOf<Path, SquitProperties>()
 
     init {
         group = "Build"
@@ -127,11 +134,6 @@ open class SquitPreProcessTask : DefaultTask() {
         }
     }
 
-    /**
-     * Recursively resolves properties starting at the bottommost directory. Already found attributes are not overridden
-     * by later found ones which allows for setting attributes for many tests, while also being able to tweak for
-     * individual ones.
-     */
     private fun resolveProperties(testPath: Path): SquitProperties {
         var currentDirectoryPath = testPath
         val result = SquitProperties()
@@ -159,11 +161,6 @@ open class SquitPreProcessTask : DefaultTask() {
         }
     }
 
-    /**
-     * Finds and returns the relevant paths of the test located at the given [testPath].
-     *
-     * Relevant are the request and response, the config and the sql scripts.
-     */
     private fun getRelevantPathsForTest(testPath: Path, properties: SquitProperties): Triple<Path, Path, List<Path>> {
         var requestPath: Path? = null
         var responsePath: Path? = null

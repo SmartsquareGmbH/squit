@@ -66,16 +66,10 @@ object FilesUtils {
         false -> throw GradleException("Missing expected file: $path")
     }
 
-    /**
-     * Returns if the directory at the given [path] contains at least one sub directory.
-     */
     private fun containsDirectories(path: Path) = Files.list(path).use {
         it.anyMatch { current -> Files.isDirectory(current) }
     }
 
-    /**
-     * Returns the child directories paths of the given [path].
-     */
     private fun getChildDirectories(path: Path) = Files.newDirectoryStream(path, { Files.isDirectory(it) })
             .use { it.toList() }
 }
