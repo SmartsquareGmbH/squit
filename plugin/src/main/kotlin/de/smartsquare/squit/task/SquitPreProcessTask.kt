@@ -70,7 +70,7 @@ open class SquitPreProcessTask : DefaultTask() {
         FilesUtils.getSortedLeafDirectories(sourcesPath).forEach {
             val resolvedProperties = resolveProperties(it)
 
-            if (!resolvedProperties.ignore) {
+            if (shouldRunTest(resolvedProperties)) {
                 val (requestPath, responsePath, sqlFilePaths) = getRelevantPathsForTest(it, resolvedProperties)
                 val processedResultPath = Files.createDirectories(processedSourcesPath.resolve(it.cut(sourcesPath)))
 
@@ -163,4 +163,15 @@ open class SquitPreProcessTask : DefaultTask() {
 
         throw GradleException("Missing request.xml for test: ${testPath.fileName}")
     }
+
+    private fun shouldRunTest(properties: SquitProperties): Boolean {
+        val tags = getTags()
+
+        return !properties.ignore && (tags.isEmpty() || tags.any { it in properties.tags })
+    }
+
+    private fun getTags() = when (project.hasProperty(SquitProperties.TAGS_PROPERTY)) {
+        true -> project.property(SquitProperties.TAGS_PROPERTY) as String?
+        false -> null
+    }?.split(",")?.map { it.trim() }?.filter { it.isNotBlank() } ?: emptyList()
 }

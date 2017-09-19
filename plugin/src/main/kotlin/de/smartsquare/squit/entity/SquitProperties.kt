@@ -18,11 +18,12 @@ import java.util.*
  */
 class SquitProperties {
 
-    private companion object {
-        private const val ENDPOINT_PROPERTY = "endpoint"
-        private const val MEDIA_TYPE_PROPERTY = "mediaType"
-        private const val IGNORE_PROPERTY = "ignore"
-        private const val IGNORE_FOR_REPORT_PROPERTY = "ignoreForReport"
+    companion object {
+        const val ENDPOINT_PROPERTY = "endpoint"
+        const val MEDIA_TYPE_PROPERTY = "mediaType"
+        const val IGNORE_PROPERTY = "ignore"
+        const val IGNORE_FOR_REPORT_PROPERTY = "ignoreForReport"
+        const val TAGS_PROPERTY = "tags"
     }
 
     /**
@@ -46,6 +47,11 @@ class SquitProperties {
     val ignoreForReport get() = internalIgnoreForReport == true
 
     /**
+     * Tags to select the tests to run.
+     */
+    val tags get() = internalTags
+
+    /**
      * List of [SquitDatabaseConfiguration] objects to use.
      */
     val databaseConfigurations get() = internalDatabaseConfigurations.values
@@ -54,6 +60,7 @@ class SquitProperties {
     private var internalMediaType: MediaType? = null
     private var internalIgnore: Boolean? = null
     private var internalIgnoreForReport: Boolean? = null
+    private var internalTags: List<String> = emptyList()
     private val internalDatabaseConfigurations = mutableMapOf<String, SquitDatabaseConfiguration>()
 
     /**
@@ -82,6 +89,8 @@ class SquitProperties {
                 internalIgnoreForReport = readAndValidateBooleanProperty(IGNORE_FOR_REPORT_PROPERTY, properties,
                         projectProperties)
             }
+
+            internalTags += readAndValidateStringListProperty(TAGS_PROPERTY, properties)
 
             readDatabaseConfigurations(properties, projectProperties)
         }
@@ -117,6 +126,8 @@ class SquitProperties {
         if (internalIgnore == null) internalIgnore = other.internalIgnore
         if (internalIgnoreForReport == null) internalIgnoreForReport = other.internalIgnoreForReport
 
+        internalTags += other.internalTags
+
         other.internalDatabaseConfigurations.forEach { (key, value) ->
             internalDatabaseConfigurations.putIfAbsent(key, value)
         }
@@ -130,6 +141,8 @@ class SquitProperties {
         setProperty(MEDIA_TYPE_PROPERTY, mediaType.toString())
         setProperty(IGNORE_PROPERTY, ignore.toString())
         setProperty(IGNORE_FOR_REPORT_PROPERTY, ignoreForReport.toString())
+
+        if (tags.isNotEmpty()) setProperty(TAGS_PROPERTY, tags.joinToString(","))
 
         internalDatabaseConfigurations.forEach { databaseName, (_, jdbcAddress, username, password) ->
             setProperty("db_${databaseName}_jdbc", jdbcAddress)
@@ -219,5 +232,14 @@ class SquitProperties {
                 }
             }
         }
+    }
+
+    private fun readAndValidateStringListProperty(name: String, properties: OrderedProperties): List<String> {
+        return properties.getProperty(name)?.let { property ->
+            when {
+                property.isBlank() -> throw GradleException("Invalid value for $name property: $property")
+                else -> property.split(",").map { it.trim() }.filter { it.isNotBlank() }
+            }
+        } ?: emptyList()
     }
 }
