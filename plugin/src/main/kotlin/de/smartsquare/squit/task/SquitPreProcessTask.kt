@@ -41,7 +41,7 @@ open class SquitPreProcessTask : DefaultTask() {
      */
     @Suppress("MemberVisibilityCanPrivate")
     @get:Input
-    val preProcessClassName by lazy { extension.preProcessClass }
+    val preProcessClassName by lazy { extension.preProcessorClass }
 
     /**
      * The tags to filter by.

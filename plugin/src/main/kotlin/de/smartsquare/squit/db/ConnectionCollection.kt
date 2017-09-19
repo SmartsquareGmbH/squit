@@ -1,5 +1,6 @@
 package de.smartsquare.squit.db
 
+import de.smartsquare.squit.SquitDatabaseInitializer
 import java.sql.Connection
 import java.sql.DriverManager
 
@@ -18,16 +19,16 @@ class ConnectionCollection : AutoCloseable {
      * Creates a new [java.sql.Connection] or returns an existing one, based on the passed [jdbc] address, [username]
      * and [password].
      *
-     * Upon creation, required session parameters are set.
+     * Upon creation, the [initializer] is invoked, if present.
      */
-    fun createOrGet(jdbc: String, username: String, password: String): Connection {
+    fun createOrGet(jdbc: String, username: String, password: String,
+                    initializer: SquitDatabaseInitializer? = null): Connection {
         return Triple(jdbc, username, password).let {
             connections[it].let { value ->
                 value ?: DriverManager.getConnection(it.first, it.second, it.third).also { result: Connection ->
                     connections.put(it, result)
                 }.also {
-                    it.createStatement().execute("ALTER SESSION SET NLS_LANGUAGE=ENGLISH")
-                    it.createStatement().execute("ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.,'")
+                    initializer?.initialize(it)
 
                     it.autoCommit = false
                 }

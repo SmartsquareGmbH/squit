@@ -15,14 +15,22 @@ open class SquitExtension(project: Project) {
     var jdbcDriver: String? = ""
 
     /**
-     * The class for pre processing. If specified, it is expected to be on the classpath.
+     * The class for pre processing. If specified, it is expected to be on the classpath and a subclass
+     * of [SquitPreProcessor].
      */
-    var preProcessClass: String? = ""
+    var preProcessorClass: String? = ""
 
     /**
-     * The class for post processing. If specified, it is expected to be on the classpath.
+     * The class for post processing. If specified, it is expected to be on the classpath and a subclass
+     * of [SquitPostProcessor].
      */
-    var postProcessClass: String? = ""
+    var postProcessorClass: String? = ""
+
+    /**
+     * The class for database initialization. If specified, it is expected to be on the classpath and a subclass
+     * of [SquitDatabaseInitializer].
+     */
+    var databaseInitializerClass: String? = null
 
     /**
      * The path the sources lie in. Defaults to src/test.

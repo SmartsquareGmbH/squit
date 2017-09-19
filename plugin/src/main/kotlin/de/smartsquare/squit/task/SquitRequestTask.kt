@@ -1,5 +1,6 @@
 package de.smartsquare.squit.task
 
+import de.smartsquare.squit.SquitDatabaseInitializer
 import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.db.ConnectionCollection
 import de.smartsquare.squit.db.executeScript
@@ -59,6 +60,13 @@ open class SquitRequestTask : DefaultTask() {
     }
 
     /**
+     * The class name of the [de.smartsquare.squit.SquitDatabaseInitializer] to use.
+     */
+    @Suppress("MemberVisibilityCanPrivate")
+    @get:Input
+    val databaseInitializerClassName by lazy { extension.databaseInitializerClass }
+
+    /**
      * The directory of the test sources.
      */
     @Suppress("MemberVisibilityCanPrivate")
@@ -76,6 +84,19 @@ open class SquitRequestTask : DefaultTask() {
 
     @get:Internal
     internal var extension by Delegates.notNull<SquitExtension>()
+
+    @get:Internal
+    private val databaseInitializer by lazy {
+        databaseInitializerClassName?.let {
+            if (it.isNotBlank()) {
+                logger.info("Using $it for database initialization")
+
+                Class.forName(it).newInstance() as SquitDatabaseInitializer
+            } else {
+                null
+            }
+        }
+    }
 
     @get:Internal
     private val okHttpClient = OkHttpClient.Builder().build()
@@ -158,7 +179,7 @@ open class SquitRequestTask : DefaultTask() {
     private fun executeScriptIfExisting(path: Path, jdbc: String, username: String, password: String): Boolean {
         return if (Files.exists(path)) {
             try {
-                dbConnections.createOrGet(jdbc, username, password).executeScript(path)
+                dbConnections.createOrGet(jdbc, username, password, databaseInitializer).executeScript(path)
 
                 true
             } catch (error: SQLException) {

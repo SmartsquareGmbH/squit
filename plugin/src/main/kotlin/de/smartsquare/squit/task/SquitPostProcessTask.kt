@@ -37,7 +37,7 @@ open class SquitPostProcessTask : DefaultTask() {
      */
     @Suppress("MemberVisibilityCanPrivate")
     @get:Input
-    val postProcessClassName by lazy { extension.postProcessClass }
+    val postProcessClassName by lazy { extension.postProcessorClass }
 
     /**
      * The directory of the test sources.
