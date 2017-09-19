@@ -13,12 +13,6 @@ import java.nio.file.Path
 object FilesUtils {
 
     /**
-     * Returns the child directories paths of the given [path].
-     */
-    fun getChildDirectories(path: Path) = Files.newDirectoryStream(path, { Files.isDirectory(it) })
-            .use { it.toList() }
-
-    /**
      * Returns all leaf directories of the given [path], sorted by alphanumeric order.
      */
     fun getSortedLeafDirectories(path: Path): List<Path> = getChildDirectories(path)
@@ -78,4 +72,10 @@ object FilesUtils {
     private fun containsDirectories(path: Path) = Files.list(path).use {
         it.anyMatch { current -> Files.isDirectory(current) }
     }
+
+    /**
+     * Returns the child directories paths of the given [path].
+     */
+    private fun getChildDirectories(path: Path) = Files.newDirectoryStream(path, { Files.isDirectory(it) })
+            .use { it.toList() }
 }

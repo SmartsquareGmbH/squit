@@ -1,6 +1,6 @@
 package de.smartsquare.squit.task
 
-import de.smartsquare.squit.SquitPluginExtension
+import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.db.ConnectionCollection
 import de.smartsquare.squit.db.executeScript
 import de.smartsquare.squit.entity.SquitProperties
@@ -10,8 +10,13 @@ import de.smartsquare.squit.util.Constants.CONFIG
 import de.smartsquare.squit.util.Constants.REQUEST
 import de.smartsquare.squit.util.cut
 import de.smartsquare.squit.util.printAndFlush
-import okhttp3.*
+import okhttp3.HttpUrl
+import okhttp3.MediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
@@ -21,6 +26,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.sql.Driver
 import java.sql.DriverManager
+import kotlin.properties.Delegates
 
 /**
  * Task for running requests against the given api. Also capable of running existing sql scripts before and after the
@@ -30,33 +36,56 @@ import java.sql.DriverManager
  */
 open class SquitRequestTask : DefaultTask() {
 
+    @get:Internal
+    internal var extension by Delegates.notNull<SquitExtension>()
+
+    @Suppress("MemberVisibilityCanPrivate")
+    @get:Input
+    val jdbcDriverClassName by lazy {
+        extension.jdbcDriver?.let {
+            if (it.isNotBlank()) {
+                logger.info("Using $it for jdbc connections.")
+
+                it
+            } else {
+                null
+            }
+        }
+    }
+
     /**
      * The directory of the test sources.
      */
-    @InputDirectory
-    var processedSourcesPath: Path = Paths.get(project.buildDir.path, "sources")
+    @Suppress("MemberVisibilityCanPrivate")
+    @get:InputDirectory
+    val processedSourcesPath: Path = Paths.get(project.buildDir.path, "squit", "sources")
 
     /**
      * The directory to save the results in.
      */
-    @OutputDirectory
-    var actualResponsesPath: Path = Paths.get(project.buildDir.path, "responses", "raw")
+    @Suppress("MemberVisibilityCanPrivate")
+    @get:OutputDirectory
+    val actualResponsesPath: Path = Paths.get(project.buildDir.path, "squit", "responses", "raw")
 
-    @Internal
+    @get:Internal
     private val okHttpClient = OkHttpClient.Builder().build()
 
-    @Internal
+    @get:Internal
     private val dbConnections = ConnectionCollection()
+
+    init {
+        group = "Build"
+        description = "Performs the integration tests specified in the test source directory."
+    }
 
     /**
      * Runs the task.
      */
+    @Suppress("unused")
     @TaskAction
     fun run() {
-        project.extensions.getByType(SquitPluginExtension::class.java).jdbcDriver.let {
-            if (it.isNotBlank()) {
-                DriverManager.registerDriver(Class.forName(it).newInstance() as Driver)
-            }
+        jdbcDriverClassName?.let {
+            DriverManager.registerDriver(Class.forName(it).newInstance() as Driver)
         }
 
         FilesUtils.deleteRecursivelyIfExisting(actualResponsesPath)

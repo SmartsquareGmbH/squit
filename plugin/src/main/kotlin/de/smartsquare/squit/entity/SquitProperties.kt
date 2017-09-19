@@ -9,7 +9,7 @@ import okhttp3.HttpUrl
 import okhttp3.MediaType
 import org.gradle.api.GradleException
 import java.nio.file.Path
-import java.util.*
+import java.util.Properties
 
 /**
  * Class for reading, holding and writing properties.

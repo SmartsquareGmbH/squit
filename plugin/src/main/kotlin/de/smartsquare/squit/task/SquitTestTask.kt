@@ -1,5 +1,6 @@
 package de.smartsquare.squit.task
 
+import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.entity.SquitProperties
 import de.smartsquare.squit.entity.SquitResult
 import de.smartsquare.squit.io.FilesUtils
@@ -13,6 +14,7 @@ import org.dom4j.io.OutputFormat
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -21,6 +23,7 @@ import org.xmlunit.builder.Input
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.properties.Delegates
 
 /**
  * Task for comparing the actual responses to the expected responses and generating a report.
@@ -29,33 +32,52 @@ import java.nio.file.Paths
  */
 open class SquitTestTask : DefaultTask() {
 
+    @get:Internal
+    internal var extension by Delegates.notNull<SquitExtension>()
+
     /**
      * The directory of the test sources.
      */
-    @InputDirectory
-    var processedSourcesPath: Path = Paths.get(project.buildDir.path, "sources")
+    @Suppress("MemberVisibilityCanPrivate")
+    @get:InputDirectory
+    val processedSourcesPath: Path = Paths.get(project.buildDir.path, "squit", "sources")
 
     /**
      * The directory of the previously requested responses.
      */
-    @InputDirectory
-    var actualResponsesPath: Path = Paths.get(project.buildDir.path, "responses", "processed")
+    @Suppress("MemberVisibilityCanPrivate")
+    @get:InputDirectory
+    val actualResponsesPath: Path = Paths.get(project.buildDir.path, "squit", "responses", "processed")
 
     /**
      * The directory to generate the xml report file into.
      */
-    @OutputFile
-    var xmlReportFilePath: Path = Paths.get(project.buildDir.path, "reports", "main.xml")
+    @Suppress("MemberVisibilityCanPrivate")
+    @get:OutputFile
+    val xmlReportFilePath by lazy {
+        extension.reportsPath?.resolve("main.xml")
+                ?: throw IllegalArgumentException("reportPath cannot be null")
+    }
 
     /**
      * The directory to copy failed tests into.
      */
-    @OutputDirectory
-    var failureResultDirectory: Path = Paths.get(project.buildDir.path, "reports", "failures")
+    @Suppress("MemberVisibilityCanPrivate")
+    @get:OutputDirectory
+    val failureResultDirectory by lazy {
+        extension.reportsPath?.resolve("failures")
+                ?: throw IllegalArgumentException("reportPath cannot be null")
+    }
+
+    init {
+        group = "Build"
+        description = "Compares the actual responses to the expected responses and generates a report."
+    }
 
     /**
      * Runs the task.
      */
+    @Suppress("unused")
     @TaskAction
     fun run() {
         val results = runTests()

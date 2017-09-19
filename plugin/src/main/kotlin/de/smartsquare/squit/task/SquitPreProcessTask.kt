@@ -1,6 +1,6 @@
 package de.smartsquare.squit.task
 
-import de.smartsquare.squit.SquitPluginExtension
+import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.SquitPreProcessor
 import de.smartsquare.squit.entity.SquitProperties
 import de.smartsquare.squit.io.FilesUtils
@@ -15,6 +15,7 @@ import de.smartsquare.squit.util.write
 import org.dom4j.io.SAXReader
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
@@ -23,6 +24,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
+import kotlin.properties.Delegates
 
 /**
  * Task for pre-processing the available sources like requests, responses, sql scripts and properties.
@@ -31,24 +33,45 @@ import java.nio.file.StandardCopyOption.REPLACE_EXISTING
  */
 open class SquitPreProcessTask : DefaultTask() {
 
+    @get:Internal
+    internal var extension by Delegates.notNull<SquitExtension>()
+
+    @Suppress("MemberVisibilityCanPrivate")
+    @get:Input
+    val preProcessClassName by lazy { extension.preProcessClass }
+
+    /**
+     * The tags to filter by.
+     */
+    @Suppress("MemberVisibilityCanPrivate")
+    @get:Input
+    val tags = when (project.hasProperty(SquitProperties.TAGS_PROPERTY)) {
+        true -> project.property(SquitProperties.TAGS_PROPERTY) as String?
+        false -> null
+    }?.split(",")?.map { it.trim() }?.filter { it.isNotBlank() } ?: emptyList()
+
     /**
      * The directory of the test sources.
      */
-    @InputDirectory
-    var sourcesPath: Path = Paths.get(project.projectDir.path, "src", "main", "test")
+    @Suppress("MemberVisibilityCanPrivate")
+    @get:InputDirectory
+    val sourcesPath by lazy {
+        extension.sourcesPath ?: throw IllegalArgumentException("sourcesPath cannot be null")
+    }
 
     /**
      * The directory to save the results in.
      */
-    @OutputDirectory
-    var processedSourcesPath: Path = Paths.get(project.buildDir.path, "sources")
+    @Suppress("MemberVisibilityCanPrivate")
+    @get:OutputDirectory
+    val processedSourcesPath: Path = Paths.get(project.buildDir.path, "squit", "sources")
 
-    @Internal
+    @get:Internal
     private val propertyCache = mutableMapOf<Path, SquitProperties>()
 
     @get:Internal
     private val processor by lazy {
-        project.extensions.getByType(SquitPluginExtension::class.java)?.preProcessClass?.let {
+        preProcessClassName?.let {
             if (it.isNotBlank()) {
                 logger.info("Using $it for pre processing.")
 
@@ -59,9 +82,15 @@ open class SquitPreProcessTask : DefaultTask() {
         }
     }
 
+    init {
+        group = "Build"
+        description = "Transforms the sources to be readable and usable for the following tasks."
+    }
+
     /**
      * Runs the task.
      */
+    @Suppress("unused")
     @TaskAction
     fun run() {
         FilesUtils.deleteRecursivelyIfExisting(processedSourcesPath)
@@ -165,13 +194,6 @@ open class SquitPreProcessTask : DefaultTask() {
     }
 
     private fun shouldRunTest(properties: SquitProperties): Boolean {
-        val tags = getTags()
-
         return !properties.ignore && (tags.isEmpty() || tags.any { it in properties.tags })
     }
-
-    private fun getTags() = when (project.hasProperty(SquitProperties.TAGS_PROPERTY)) {
-        true -> project.property(SquitProperties.TAGS_PROPERTY) as String?
-        false -> null
-    }?.split(",")?.map { it.trim() }?.filter { it.isNotBlank() } ?: emptyList()
 }

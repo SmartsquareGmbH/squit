@@ -14,7 +14,7 @@ import java.nio.file.Path
  *
  * @author Ruben Gees
  */
-data class SquitResult(val contextPath: Path, val suitePath: Path, val testDirectoryPath: Path,
+data class SquitResult(private val contextPath: Path, private val suitePath: Path, val testDirectoryPath: Path,
                        val result: String = "") {
 
     /**

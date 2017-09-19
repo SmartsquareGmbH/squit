@@ -14,34 +14,34 @@ import org.gradle.api.Project
  *
  * @author Ruben Gees
  */
+@Suppress("unused")
 class SquitPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         try {
+            val extension = project.extensions.create("squit", SquitExtension::class.java, project)
+
             project.tasks.create("squitPreProcess", SquitPreProcessTask::class.java) {
-                it.group = "Build"
-                it.description = "Transforms the sources to be readable and usable for the following tasks."
+                it.extension = extension
             }
 
             project.tasks.create("squitRunRequests", SquitRequestTask::class.java) {
-                it.group = "Build"
-                it.description = "Performs the integration tests specified in the test source directory."
+                it.extension = extension
+
                 it.dependsOn("squitPreProcess")
             }
 
             project.tasks.create("squitPostProcess", SquitPostProcessTask::class.java) {
-                it.group = "Build"
-                it.description = "Transforms the actual responses to be readable and usable for the comparing task."
+                it.extension = extension
+
                 it.dependsOn("squitRunRequests")
             }
 
             project.tasks.create("squitTest", SquitTestTask::class.java) {
-                it.group = "Build"
-                it.description = "Compares the actual responses to the expected responses and generates a report."
+                it.extension = extension
+
                 it.dependsOn("squitPostProcess")
             }
-
-            project.extensions.add("squit", SquitPluginExtension::class.java)
         } catch (error: MissingMethodException) {
             throw GradleException("Your Gradle version is too old.")
         }
