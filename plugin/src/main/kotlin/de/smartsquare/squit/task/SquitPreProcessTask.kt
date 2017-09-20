@@ -148,7 +148,7 @@ open class SquitPreProcessTask : DefaultTask() {
                         ?.apply {
                             binding = Binding(mapOf(
                                     "request" to request,
-                                    "response" to response
+                                    "expectedResponse" to response
                             ))
                         }
                         ?.run()
