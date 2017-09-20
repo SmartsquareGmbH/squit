@@ -13,11 +13,16 @@ import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.cut
 import de.smartsquare.squit.util.read
 import de.smartsquare.squit.util.write
+import groovy.lang.Binding
+import groovy.lang.GroovyShell
 import org.dom4j.io.SAXReader
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Files
@@ -37,7 +42,15 @@ open class SquitPostProcessTask : DefaultTask() {
      */
     @Suppress("MemberVisibilityCanPrivate")
     @get:Input
-    val postProcessClassName by lazy { extension.postProcessorClass }
+    val postProcessorClassName by lazy { extension.postProcessorClass }
+
+    /**
+     * The path of a groovy script to use for post processing.
+     */
+    @Suppress("MemberVisibilityCanPrivate")
+    @get:InputFile
+    @get:Optional
+    val postProcessorScriptPath by lazy { extension.postProcessorScriptPath }
 
     /**
      * The directory of the test sources.
@@ -68,13 +81,24 @@ open class SquitPostProcessTask : DefaultTask() {
 
     @get:Internal
     private val processor by lazy {
-        postProcessClassName?.let {
+        postProcessorClassName?.let {
             if (it.isNotBlank()) {
                 logger.info("Using $it for post processing.")
 
                 Class.forName(it).newInstance() as SquitPostProcessor
             } else {
                 null
+            }
+        }
+    }
+
+    @get:Internal
+    private val processorScript by lazy {
+        postProcessorScriptPath?.let {
+            if (!Files.exists(it)) {
+                throw GradleException("Could not find pre processor script: $it")
+            } else {
+                GroovyShell().parse(Files.newBufferedReader(it))
             }
         }
     }
@@ -109,6 +133,14 @@ open class SquitPostProcessTask : DefaultTask() {
             val expectedResponse = SAXReader().read(expectedResponsePath)
 
             processor?.process(actualResponse, expectedResponse)
+            processorScript
+                    ?.apply {
+                        binding = Binding(mapOf(
+                                "actualResponse" to actualResponse,
+                                "expectedResponse" to expectedResponse
+                        ))
+                    }
+                    ?.run()
 
             actualResponse.write(resultActualResponseFilePath)
         }

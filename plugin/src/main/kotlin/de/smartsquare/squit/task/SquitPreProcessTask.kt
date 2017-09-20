@@ -14,12 +14,16 @@ import de.smartsquare.squit.util.cut
 import de.smartsquare.squit.util.read
 import de.smartsquare.squit.util.safeStore
 import de.smartsquare.squit.util.write
+import groovy.lang.Binding
+import groovy.lang.GroovyShell
 import org.dom4j.io.SAXReader
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Files
@@ -41,7 +45,15 @@ open class SquitPreProcessTask : DefaultTask() {
      */
     @Suppress("MemberVisibilityCanPrivate")
     @get:Input
-    val preProcessClassName by lazy { extension.preProcessorClass }
+    val preProcessorClassName by lazy { extension.preProcessorClass }
+
+    /**
+     * The path of a groovy script to use for pre processing.
+     */
+    @Suppress("MemberVisibilityCanPrivate")
+    @get:InputFile
+    @get:Optional
+    val preProcessorScriptPath by lazy { extension.preProcessorScriptPath }
 
     /**
      * The tags to filter by.
@@ -75,13 +87,24 @@ open class SquitPreProcessTask : DefaultTask() {
 
     @get:Internal
     private val processor by lazy {
-        preProcessClassName?.let {
+        preProcessorClassName?.let {
             if (it.isNotBlank()) {
                 logger.info("Using $it for pre processing.")
 
                 Class.forName(it).newInstance() as SquitPreProcessor
             } else {
                 null
+            }
+        }
+    }
+
+    @get:Internal
+    private val processorScript by lazy {
+        preProcessorScriptPath?.let {
+            if (!Files.exists(it)) {
+                throw GradleException("Could not find pre processor script: $it")
+            } else {
+                GroovyShell().parse(Files.newBufferedReader(it))
             }
         }
     }
@@ -121,6 +144,14 @@ open class SquitPreProcessTask : DefaultTask() {
                 val response = SAXReader().read(responsePath)
 
                 processor?.process(request, response)
+                processorScript
+                        ?.apply {
+                            binding = Binding(mapOf(
+                                    "request" to request,
+                                    "response" to response
+                            ))
+                        }
+                        ?.run()
 
                 request.write(processedRequestPath)
                 response.write(processedResponsePath)

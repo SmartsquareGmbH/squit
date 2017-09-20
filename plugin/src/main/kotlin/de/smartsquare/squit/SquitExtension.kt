@@ -21,10 +21,20 @@ open class SquitExtension(project: Project) {
     var preProcessorClass: String? = ""
 
     /**
+     * The path of a groovy script to use for pre processing.
+     */
+    var preProcessorScriptPath: Path? = null
+
+    /**
      * The class for post processing. If specified, it is expected to be on the classpath and a subclass
      * of [SquitPostProcessor].
      */
     var postProcessorClass: String? = ""
+
+    /**
+     * The path of a groovy script to use for post processing.
+     */
+    var postProcessorScriptPath: Path? = null
 
     /**
      * The class for database initialization. If specified, it is expected to be on the classpath and a subclass
