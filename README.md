@@ -3,6 +3,27 @@
 `Squit` is a `Gradle` plugin for automated testing of `Xml` and/or `Soap` based apis.<br>
 It features high customizability and speed.
 
+## Table of Contents
+
+- [Squit](#squit)
+
+  - [Integration](#integration)
+  - [Project structure](#project-structure)
+  - [Usage](#usage)
+
+    - [Configuration](#configuration)
+
+      - [Templating](#templating)
+
+    - [Database modifications](#database-modifications)
+    - [Pre- and Post-processing](#pre--and-post-processing)
+
+      - [Groovy processing](#groovy-processing)
+      - [Interface processing](#interface-processing)
+
+    - [Tagging](#tagging)
+    - [Squit Dsl](#squit-dsl)
+
 ## Integration
 
 Add the plugin to your `buildscript`:
