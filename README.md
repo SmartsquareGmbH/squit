@@ -25,18 +25,6 @@ and apply it:
 apply plugin: 'squit'
 ```
 
-## Usage
-
-The plugin is composed of various `Gradle` tasks. For daily usage, only the `squitTest` is relevant.<br>
-The following table lists all tasks and their purpose:
-
-Task name          | Description
------------------- | -------------------------------------------------------------------------------------------------------------------
-`squitPreProcess`  | Pre processes the test sources in a configurable manner.
-`squitRunRequests` | Runs the actual requests against your backend.
-`squitPostProcess` | Post processes the responses in a configurable manner.
-`squitTest`        | Compares the expected and actual response and fails the build if differences were found. Also generates the report.
-
 ## Project structure
 
 Projects are structured in arbitarilly deep folders. The plugin expects the root to be in the `src/test` folder.
@@ -84,7 +72,19 @@ As the example shows, `test1` also contains a `config.properties` file. This one
 
 > It is not **required** to have a `config.properties` file there, often it is enough to have one for all your tests in the root folder.
 
-## Configuration
+## Usage
+
+The plugin is composed of various `Gradle` tasks. For daily usage, only the `squitTest` is relevant.<br>
+The following table lists all tasks and their purpose:
+
+Task name          | Description
+------------------ | -------------------------------------------------------------------------------------------------------------------
+`squitPreProcess`  | Pre processes the test sources in a configurable manner.
+`squitRunRequests` | Runs the actual requests against your backend.
+`squitPostProcess` | Post processes the responses in a configurable manner.
+`squitTest`        | Compares the expected and actual response and fails the build if differences were found. Also generates the report.
+
+### Configuration
 
 The plugin features a variaty of configuration possibilities. As aforementioned, these are collected in `config.properties` files. As of the current version, these are the supported ones:
 
@@ -100,7 +100,23 @@ db_$name_password | The password for database scripts to use                    
 
 > The parameters `endpoint` and `mediaType` are required and the build will fail if at least one is missing for a test.
 
-## Database modifications
+#### Templating
+
+It may be useful to have a placeholder in a `config.properties` file and fill it at runtime, for example when the port of an endpoint is dynamic or when running in a CI environment.
+
+`Squit` features a simple templating engine, borrowed from [Groovy](http://docs.groovy-lang.org/next/html/documentation/template-engines.html). An example for such a template would look like this:
+
+```properties
+endpoint=http://localhost:$port/someEndpoint
+```
+
+`port` could then be replaced when invoking `Squit` like this:
+
+```bash
+./gradlew squitTest -Pport=1234
+```
+
+### Database modifications
 
 As part of your tests, you may want to modify your database into a specific state. `Squit` allows you to do so with ordinary `sql` scripts which can be run before and after a test.
 
@@ -138,13 +154,13 @@ buildscript {
 
 The `sql` files are added per test. They are required to be named after the configuration you added in the `config.properties` file, ending with either `_pre.sql` or `_post.sql`. The example from before would be `mydb_pre.sql` and `mydb_post.sql`.
 
-## Pre- and Post-processing
+### Pre- and Post-processing
 
 `Squit` allows you to pre- and post-process the requests and actual responses. This max be required for incremental ids you have no control over, dates or other things.
 
 There are currently two ways to do so: Using `Groovy` scripts or implementing a specific `interface`.
 
-### Groovy processing
+#### Groovy processing
 
 `Groovy` processing is the more easy, but less flexible option.
 
@@ -172,7 +188,7 @@ request.selectNodes("//Date").each {
 
 > The passed objects for the post-processor are called `actualResponse` and `expectedResponse`. Again, `expectedResponse` is only for reference.
 
-### Interface processing
+#### Interface processing
 
 Implementing the `Squit` interfaces is harder to set up, but much more flexible than the scripting approach.
 
@@ -205,7 +221,26 @@ public class MyPreProcessor implements SquitPreProcessor {
 
 > Other interfaces as of the current version are the `SquitPostProcessor` and the `SquitDatabaseInitializer`.
 
-## Squit Dsl
+### Tagging
+
+Tags allow to run only a subset of your tests to save time and resources if needed.
+
+Tags need to be defined in corresponding `config.properties` files before usage. An example could look like this:
+
+```properties
+tags=fast,mysuite
+```
+
+All tests covered by this `config.properties` file would then be tagged as `fast` and `mysuite`.<br>
+To run only tests with the tag `fast`, you would invoke `Squit` like so:
+
+```bash
+./gradlew squitTest -Ptags=fast
+```
+
+> You can also specify more tags by separating with a `,`.
+
+### Squit Dsl
 
 Here is a complete example of the `Squit` dsl:
 
