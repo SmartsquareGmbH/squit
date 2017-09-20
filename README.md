@@ -8,19 +8,14 @@ It features high customizability and speed.
 - [Integration](#integration)
 - [Project structure](#project-structure)
 - [Usage](#usage)
-
-  - [Configuration](#configuration)
-
-    - [Templating](#templating)
-
-  - [Database modifications](#database-modifications)
-  - [Pre- and Post-processing](#pre--and-post-processing)
-
-    - [Groovy processing](#groovy-processing)
-    - [Interface processing](#interface-processing)
-
-  - [Tagging](#tagging)
-  - [Squit Dsl](#squit-dsl)
+  * [Configuration](#configuration)
+    + [Templating](#templating)
+  * [Database modifications](#database-modifications)
+  * [Pre- and Post-processing](#pre--and-post-processing)
+    + [Groovy processing](#groovy-processing)
+    + [Interface processing](#interface-processing)
+  * [Tagging](#tagging)
+  * [Squit Dsl](#squit-dsl)
 
 ## Integration
 
