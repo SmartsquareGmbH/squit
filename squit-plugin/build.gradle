@@ -54,6 +54,7 @@ dependencies {
     }
 
     testImplementation gradleTestKit()
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     testImplementation "org.jetbrains.spek:spek-api:$spekVersion"
     testImplementation "org.jetbrains.spek:spek-subject-extension:$spekVersion"
     testImplementation "org.junit.platform:junit-platform-runner:$junitPlatformVersion"
