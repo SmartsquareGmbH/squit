@@ -1,6 +1,6 @@
 # Squit
 
-`Squit` is a `Gradle` plugin for automated testing of `XML` and/or `SOAP` based apis.<br>
+`Squit` is a `Gradle` plugin for automated testing of `Xml` and/or `Soap` based apis.<br>
 It features high customizability and speed.
 
 ## Table of Contents
@@ -19,16 +19,17 @@ It features high customizability and speed.
 
 ## Integration
 
-Add the plugin to your `buildscript`:
+Add the [plugin](https://plugins.gradle.org/plugin/de.smartsquare.squit) to your `buildscript`:
 
 ```groovy
 buildscript {
     repositories {
-        mavenLocal()
+        maven { url "https://plugins.gradle.org/m2/" }
+        jcenter()
     }
 
     dependencies {
-        classpath "de.smartsquare:squit-plugin:1.0.0"
+        classpath "gradle.plugin.de.smartsquare:squit-plugin:1.0.2"
     }
 }
 ```
@@ -36,7 +37,7 @@ buildscript {
 and apply it:
 
 ```groovy
-apply plugin: 'squit'
+apply plugin: "de.smartsquare.squit"
 ```
 
 ## Project structure
@@ -218,8 +219,12 @@ To do so, you need to set up a [buildSrc](https://docs.gradle.org/current/usergu
 Create the `buildSrc` folder and set up a normal project in your preferred JVM language. After that, you add the `Squit` library to your dependencies:
 
 ```groovy
+repositories {
+    jcenter()
+}
+
 dependencies {
-    compile 'de.smartsquare:squit-library:1.0.0'
+    compile 'de.smartsquare:squit-library:1.0.2'
 }
 ```
 
