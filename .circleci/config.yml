@@ -1,0 +1,25 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/code
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - checkout
+      - restore_cache:
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "plugin/build.gradle" }}-{{ checksum  "library/build.gradle" }}
+      - run:
+          name: Run Build
+          command: ./gradlew build --console=plain
+      - store_test_results:
+          path: plugin/build/test-results/junit-platform
+      - store_artifacts:
+          path: plugin/build/reports
+          destination: reports
+      - run:
+          name: Upload Coverage
+          command: bash <(curl -s https://codecov.io/bash)
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "plugin/build.gradle" }}-{{ checksum  "library/build.gradle" }}

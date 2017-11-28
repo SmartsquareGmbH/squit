@@ -3,6 +3,7 @@ ext {
     squitVersion = '1.0.0'
 
     gradlePublishVersion = '0.9.9'
+    bintrayPublishVersion = '1.7.3'
 
     kotlinVersion = '1.1.61'
     dokkaVersion = '0.9.15'
