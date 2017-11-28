@@ -34,7 +34,7 @@ configurations {
 }
 
 dependencies {
-    implementation project(':library')
+    implementation project(':squit-library')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlinVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-html-jvm:$kotlinHtmlVersion"
@@ -45,12 +45,12 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
     implementation "nu.studer:java-ordered-properties:$orderedPropertiesVersion"
     implementation("com.github.wumpz:diffutils:$diffUtilsVersion") {
-        exclude group: 'org.eclipse.jgit'
+        exclude group: 'org.eclipse.jgit', module: '*'
     }
 
     implementation "org.webjars:bootstrap:$bootstrapVersion"
     implementation("org.webjars.npm:diff2html:$diff2htmlVersion") {
-        exclude group: 'org.webjars.npm'
+        exclude group: 'org.webjars.npm', module: '*'
     }
 
     testImplementation gradleTestKit()

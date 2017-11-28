@@ -1,1 +1,1 @@
-include 'library', 'plugin'
+include 'squit-plugin', 'squit-library'
