@@ -2,6 +2,8 @@ buildscript {
     apply from: '../gradle/versions.gradle'
 
     dependencies {
+        classpath "com.gradle.publish:plugin-publish-plugin:$gradlePublishVersion"
+
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokkaVersion"
 
@@ -11,6 +13,8 @@ buildscript {
         classpath "gradle.plugin.com.palantir.ideatestfix:gradle-idea-test-fix:$gradleTestIdeaFixVersion"
     }
 }
+
+apply plugin: 'com.gradle.plugin-publish'
 
 apply plugin: 'java-gradle-plugin'
 apply plugin: 'java-library'
@@ -45,7 +49,7 @@ dependencies {
     }
 
     implementation "org.webjars:bootstrap:$bootstrapVersion"
-    implementation("org.webjars.npm:diff2html:2.3.2") {
+    implementation("org.webjars.npm:diff2html:$diff2htmlVersion") {
         exclude group: 'org.webjars.npm'
     }
 
@@ -135,10 +139,24 @@ dokka {
     }
 }
 
+pluginBundle {
+    website = 'https://github.com/SmartsquareGmbH/squit'
+    vcsUrl = 'https://github.com/SmartsquareGmbH/squit'
+    description = 'Gradle plugin for testing Xml/Soap based apis.'
+    tags = ['testing', 'soap', 'xml', 'automation']
+
+    plugins {
+        squit {
+            id = 'de.smartsquare.squit'
+            displayName = 'Squit'
+        }
+    }
+}
+
 gradlePlugin {
     plugins {
         squit {
-            id = "squit"
+            id = "de.smartsquare.squit"
             implementationClass = "de.smartsquare.squit.SquitPlugin"
         }
     }

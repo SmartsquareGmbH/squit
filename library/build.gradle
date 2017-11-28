@@ -2,12 +2,16 @@ buildscript {
     apply from: '../gradle/versions.gradle'
 
     dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokkaVersion"
 
         classpath "gradle.plugin.io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detektVersion"
     }
 }
+
+apply plugin: 'com.jfrog.bintray'
 
 apply plugin: 'java-library'
 apply plugin: 'maven-publish'
@@ -45,6 +49,26 @@ dokka {
     externalDocumentationLink {
         url = new URL("https://dom4j.github.io/javadoc/$dom4jVersion/")
     }
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    publications = ['mavenJava']
+    pkg {
+        repo = 'squit'
+        name = 'squit-library'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/SmartsquareGmbH/squit'
+        labels = ['testing', 'soap', 'xml', 'automation']
+        publicDownloadNumbers = true
+        version {
+            name = squitVersion
+            desc = 'Gradle plugin for testing Xml/Soap based apis.'
+            vcsTag = squitVersion
+        }
+    }
+
 }
 
 publishing {

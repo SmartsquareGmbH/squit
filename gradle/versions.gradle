@@ -2,6 +2,8 @@ ext {
     gradleVersion = '4.3.1'
     squitVersion = '1.0.0'
 
+    gradlePublishVersion = '0.9.9'
+
     kotlinVersion = '1.1.61'
     dokkaVersion = '0.9.15'
 
@@ -13,12 +15,12 @@ ext {
     gsonVersion ='2.8.2'
     dom4jVersion = '2.1.0'
     xmlUnitVersion = '2.5.1'
-    xmlUnitVersion = '2.5.1'
     okhttpVersion = '3.9.1'
     kotlinHtmlVersion = '0.6.8'
     orderedPropertiesVersion = '1.0.1'
     diffUtilsVersion = '2.2'
     bootstrapVersion = '3.3.7-1'
+    diff2htmlVersion = '2.3.2'
 
     detektVersion = '1.0.0.RC5-4'
     ktlintVersion = '0.12.1'
