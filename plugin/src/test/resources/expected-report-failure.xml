@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<testsuites>
+  <testsuite name="project">
+    <testcase name="call1">
+      <failure>Expected element tag name 'cool' but was 'not_cool' - comparing &lt;cool...&gt; at /cool[1] to &lt;not_cool...&gt; at /not_cool[1] (DIFFERENT)</failure>
+    </testcase>
+    <testcase name="call2"/>
+  </testsuite>
+</testsuites>

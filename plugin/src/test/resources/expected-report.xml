@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<testsuites>
+  <testsuite name="project">
+    <testcase name="call1"/>
+    <testcase name="call2"/>
+  </testsuite>
+</testsuites>

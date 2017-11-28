@@ -1,0 +1,30 @@
+ext {
+    gradleVersion = '4.3.1'
+    squitVersion = '1.0.0'
+
+    kotlinVersion = '1.1.61'
+    dokkaVersion = '0.9.15'
+
+    jacocoVersion = '0.7.9'
+    jacocoTestkitVersion = '1.0.3'
+    gradleVersionsVersion = '0.17.0'
+    gradleTestIdeaFixVersion = '0.1.0'
+
+    gsonVersion ='2.8.2'
+    dom4jVersion = '2.1.0'
+    xmlUnitVersion = '2.5.1'
+    xmlUnitVersion = '2.5.1'
+    okhttpVersion = '3.9.1'
+    kotlinHtmlVersion = '0.6.8'
+    orderedPropertiesVersion = '1.0.1'
+    diffUtilsVersion = '2.2'
+    bootstrapVersion = '3.3.7-1'
+
+    detektVersion = '1.0.0.RC5-4'
+    ktlintVersion = '0.12.1'
+
+    junitPlatformVersion = '1.0.2'
+    spekVersion = '1.1.5'
+    kluentVersion = '1.30'
+    h2Version = '1.4.196'
+}

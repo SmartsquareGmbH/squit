@@ -1,0 +1,170 @@
+buildscript {
+    apply from: '../gradle/versions.gradle'
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokkaVersion"
+
+        classpath "org.junit.platform:junit-platform-gradle-plugin:$junitPlatformVersion"
+        classpath "gradle.plugin.io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detektVersion"
+        classpath "gradle.plugin.pl.droidsonroids.gradle.jacoco:jacoco-testkit-plugin:$jacocoTestkitVersion"
+        classpath "gradle.plugin.com.palantir.ideatestfix:gradle-idea-test-fix:$gradleTestIdeaFixVersion"
+    }
+}
+
+apply plugin: 'java-gradle-plugin'
+apply plugin: 'java-library'
+apply plugin: 'maven-publish'
+apply plugin: 'jacoco'
+
+apply plugin: 'org.junit.platform.gradle.plugin'
+apply plugin: 'kotlin'
+apply plugin: 'org.jetbrains.dokka'
+
+apply plugin: 'io.gitlab.arturbosch.detekt'
+apply plugin: 'com.palantir.idea-test-fix'
+apply plugin: 'pl.droidsonroids.jacoco.testkit'
+
+configurations {
+    ktlint
+}
+
+dependencies {
+    implementation project(':library')
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlinVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-html-jvm:$kotlinHtmlVersion"
+
+    implementation "org.dom4j:dom4j:$dom4jVersion"
+    implementation "com.google.code.gson:gson:$gsonVersion"
+    implementation "org.xmlunit:xmlunit-core:$xmlUnitVersion"
+    implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
+    implementation "nu.studer:java-ordered-properties:$orderedPropertiesVersion"
+    implementation("com.github.wumpz:diffutils:$diffUtilsVersion") {
+        exclude group: 'org.eclipse.jgit'
+    }
+
+    implementation "org.webjars:bootstrap:$bootstrapVersion"
+    implementation("org.webjars.npm:diff2html:2.3.2") {
+        exclude group: 'org.webjars.npm'
+    }
+
+    testImplementation gradleTestKit()
+    testImplementation "org.jetbrains.spek:spek-api:$spekVersion"
+    testImplementation "org.jetbrains.spek:spek-subject-extension:$spekVersion"
+    testImplementation "org.junit.platform:junit-platform-runner:$junitPlatformVersion"
+    testImplementation "org.amshove.kluent:kluent:$kluentVersion"
+    testImplementation "com.squareup.okhttp3:mockwebserver:$okhttpVersion"
+    testImplementation "com.h2database:h2:$h2Version"
+
+    testRuntime "org.jetbrains.spek:spek-junit-platform-engine:$spekVersion"
+
+    ktlint "com.github.shyiko:ktlint:$ktlintVersion"
+}
+
+task ktlintCheck(type: Exec) {
+    group 'Verification'
+    description 'Analyze your kotlin code with ktlint.'
+
+    commandLine 'java', '-cp', configurations.ktlint.join(System.getProperty('path.separator')),
+            'com.github.shyiko.ktlint.Main', '--reporter=checkstyle', 'src/**/*.kt'
+
+    ignoreExitValue = true
+
+    doFirst {
+        File outputFile = new File(buildDir, 'reports/ktlint/ktlint-checkstyle.xml')
+
+        outputFile.parentFile.mkdirs()
+        outputFile.createNewFile()
+
+        standardOutput = new FileOutputStream(outputFile)
+    }
+
+    doLast {
+        standardOutput.close()
+
+        if (execResult.exitValue != 0) {
+            throw new GradleException("ktlint finished with non-zero exit value ${execResult.exitValue}")
+        }
+    }
+}
+
+task sourceJar(type: Jar, dependsOn: classes) {
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: dokka) {
+    from javadoc.destinationDir
+}
+
+jacoco {
+    toolVersion = jacocoVersion
+    applyTo junitPlatformTest
+}
+
+junitPlatform {
+    filters {
+        engines {
+            include 'spek'
+        }
+    }
+}
+
+junitPlatformTest {
+    jacoco {
+        destinationFile = file("$buildDir/jacoco/test.exec")
+    }
+}
+
+detekt {
+    version = detektVersion
+
+    profile("main") {
+        input = "$projectDir/src/main/kotlin"
+        config = "${rootProject.projectDir}/config/detekt/detekt.yml"
+        output = "$buildDir/reports/detekt"
+    }
+}
+
+dokka {
+    jdkVersion = 8
+    outputDirectory = javadoc.destinationDir
+
+    externalDocumentationLink {
+        url = new URL("https://dom4j.github.io/javadoc/$dom4jVersion/")
+    }
+}
+
+gradlePlugin {
+    plugins {
+        squit {
+            id = "squit"
+            implementationClass = "de.smartsquare.squit.SquitPlugin"
+        }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId 'squit-plugin'
+
+            from components.java
+
+            artifact sourceJar {
+                classifier 'sources'
+            }
+
+            artifact javadocJar {
+                classifier "javadoc"
+            }
+        }
+    }
+}
+
+junitPlatformTest { finalizedBy jacocoTestReport }
+
+gradle.projectsEvaluated {
+    check.dependsOn detektCheck
+    check.dependsOn ktlintCheck
+}

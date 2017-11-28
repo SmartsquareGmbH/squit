@@ -1,0 +1,7 @@
+plugins {
+    id 'squit'
+}
+
+task clean(type: Delete) {
+    delete project.buildDir
+}

@@ -1,0 +1,15 @@
+#result-tree {
+    margin-bottom: 20px;
+}
+
+.list-group {
+    margin-bottom: 0;
+}
+
+.badge-success {
+    background-color: #4CAF50;
+}
+
+.badge-failure {
+    background-color: #F44336;
+}

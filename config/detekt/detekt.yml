@@ -1,0 +1,13 @@
+failFast: true
+
+potential-bugs:
+  UnsafeCast:
+    active: false
+
+style:
+  FunctionMaxLength:
+    active: false
+  VariableMinLength:
+    minimumVariableNameLength: 2
+  VariableMaxLength:
+    active: false
