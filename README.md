@@ -42,7 +42,7 @@ apply plugin: "de.smartsquare.squit"
 
 ## Project structure
 
-Projects are structured in arbitrarily deep folders. The plugin expects the root to be in the `src/test` folder.
+Projects are structured in arbitrarily deep folders. The plugin expects the root to be in the `src/test` folder per default.
 
 A single test is represented by one leaf folder. That folder **must** contain:
 
@@ -65,7 +65,7 @@ A simple example looks like this:
 ```
 - src
 --- test
------ my_tests
+----- my_suite
 ------- test1 (folder)
 --------- request.xml
 --------- response.xml
@@ -76,15 +76,19 @@ A simple example looks like this:
 ------- config.properties
 ```
 
-This shows a valid project structure for `Squit`. `my_tests` contains all our tests (in this case only two: `test1` and `test2`). `my_test` also contains a `config.properties` file, which could look like this:
+This shows a valid project structure for `Squit`. `my_suite` contains all our tests (in this case only two: `test1` and `test2`).
+
+> You *can* have more directories beneath `my_suite` (e.g. `another_suite`) and as aforementioned can also nest more deeply.<br>
+
+`my_suite` also contains a `config.properties` file, which could look like this:
 
 ```properties
 endpoint=http://localhost:1234/endpoint
 mediaType=application/xml
 ```
 
-`Squit` would then use `http://localhost:1234/endpoint` as the endpoint to call when running all tests in `my_tests`.<br>
-As the example shows, `test1` also contains a `config.properties` file. This one could be used to override the `endpoint` property of the `config.proeprties` file in the `my_tests` folder.
+`Squit` would then use `http://localhost:1234/endpoint` as the endpoint to call when running all tests in `my_suite`.<br>
+As the example shows, `test1` also contains a `config.properties` file. This one could be used to override the `endpoint` property of the `config.properties` file in the `my_suite` folder.
 
 > It is not **required** to have a `config.properties` file there, often it is enough to have one for all your tests in the root folder.
 
