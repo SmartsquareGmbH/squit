@@ -58,19 +58,17 @@ open class SquitTestTask : DefaultTask() {
      */
     @Suppress("MemberVisibilityCanPrivate")
     @get:OutputFile
-    val xmlReportFilePath by lazy {
-        extension.reportsPath?.resolve("xml")?.resolve("main.xml")
-                ?: throw IllegalArgumentException("reportPath cannot be null")
+    val xmlReportFilePath: Path by lazy {
+        extension.reportsPath.resolve("xml").resolve("main.xml")
     }
 
     /**
      * The directory to generate the xml report file into.
      */
     @Suppress("MemberVisibilityCanPrivate")
-    @get:OutputFile
-    val htmlReportFilePath by lazy {
-        extension.reportsPath?.resolve("html")?.resolve("main.html")
-                ?: throw IllegalArgumentException("reportPath cannot be null")
+    @get:OutputDirectory
+    val htmlReportDirectoryPath: Path by lazy {
+        extension.reportsPath.resolve("html")
     }
 
     /**
@@ -79,8 +77,7 @@ open class SquitTestTask : DefaultTask() {
     @Suppress("MemberVisibilityCanPrivate")
     @get:OutputDirectory
     val failureResultDirectory by lazy {
-        extension.reportsPath?.resolve("failures")
-                ?: throw IllegalArgumentException("reportPath cannot be null")
+        extension.reportsPath.resolve("failures") ?: throw IllegalArgumentException("reportPath cannot be null")
     }
 
     @get:Internal
@@ -99,6 +96,9 @@ open class SquitTestTask : DefaultTask() {
     @Suppress("unused")
     @TaskAction
     fun run() {
+        FilesUtils.deleteRecursivelyIfExisting(extension.reportsPath)
+        Files.createDirectories(processedSourcesPath)
+
         val results = runTests()
 
         writeXmlReport(results)
@@ -154,9 +154,9 @@ open class SquitTestTask : DefaultTask() {
     }
 
     private fun writeHtmlReport(result: List<SquitResult>) {
-        Files.createDirectories(htmlReportFilePath.parent)
+        Files.createDirectories(htmlReportDirectoryPath)
 
-        val reportFilePath = FilesUtils.createFileIfNotExists(htmlReportFilePath)
+        val reportFilePath = FilesUtils.createFileIfNotExists(htmlReportDirectoryPath)
 
         HtmlReportWriter.writeReport(result, reportFilePath)
     }

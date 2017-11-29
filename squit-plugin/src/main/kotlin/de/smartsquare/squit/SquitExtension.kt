@@ -19,12 +19,12 @@ open class SquitExtension(project: Project) {
     /**
      * The path the sources lie in. Defaults to src/test.
      */
-    var sourcesPath: Path? = Paths.get(project.projectDir.path, "src", "test")
+    var sourcesPath: Path = Paths.get(project.projectDir.path, "src", "test")
 
     /**
      * The path to save reports and possible failures in.
      */
-    var reportsPath: Path? = Paths.get(project.buildDir.path, "squit", "reports")
+    var reportsPath: Path = Paths.get(project.buildDir.path, "squit", "reports")
 
     /**
      * The timeout in seconds to use for requests.

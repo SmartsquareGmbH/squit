@@ -45,9 +45,9 @@ object HtmlReportWriter {
     private val emptyDiffHeader = listOf("--- $DIFF_FILE_NAME", "+++ $DIFF_FILE_NAME", "@@ -1 +1 @@")
 
     /**
-     * Generates and writes the Squit html report, given the [results] list and [reportFilePath].
+     * Generates and writes the Squit html report, given the [results] list and [reportDirectoryPath].
      */
-    fun writeReport(results: List<SquitResult>, reportFilePath: Path) {
+    fun writeReport(results: List<SquitResult>, reportDirectoryPath: Path) {
         val document = createHTMLDocument().html {
             squitHead()
             squitBody(results)
@@ -60,13 +60,12 @@ object HtmlReportWriter {
                 squitDetailBody()
             }
 
-            val detailPath = reportFilePath.parent.resolve("detail").resolve(result.id.toString())
+            val detailPath = reportDirectoryPath.resolve("detail").resolve(result.id.toString())
             val detailHtmlPath = detailPath.resolve("detail.html")
             val detailCssPath = detailPath.resolve("detail.css")
             val detailJsPath = detailPath.resolve("detail.js")
 
             Files.createDirectories(detailPath)
-            Files.createFile(detailHtmlPath)
 
             detailDocument.write(detailHtmlPath)
 
@@ -79,10 +78,10 @@ object HtmlReportWriter {
         }
 
         resources.forEach { (name, target) ->
-            FilesUtils.copyResource(name, reportFilePath.parent.resolve(target))
+            FilesUtils.copyResource(name, reportDirectoryPath.resolve(target))
         }
 
-        document.write(reportFilePath)
+        document.write(reportDirectoryPath.resolve("main.html"))
     }
 
     private fun generateDiff(result: SquitResult): List<String> {

@@ -53,9 +53,7 @@ open class SquitPreProcessTask : DefaultTask() {
      */
     @Suppress("MemberVisibilityCanPrivate")
     @get:InputDirectory
-    val sourcesPath by lazy {
-        extension.sourcesPath ?: throw IllegalArgumentException("sourcesPath cannot be null")
-    }
+    val sourcesPath by lazy { extension.sourcesPath }
 
     /**
      * The directory to save the results in.
