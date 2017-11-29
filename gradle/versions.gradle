@@ -24,7 +24,7 @@ ext {
     diff2htmlVersion = '2.3.2'
 
     detektVersion = '1.0.0.RC5-4'
-    ktlintVersion = '0.12.1'
+    ktlintVersion = '0.13.0'
 
     junitPlatformVersion = '1.0.2'
     spekVersion = '1.1.5'
