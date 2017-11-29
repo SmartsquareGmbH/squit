@@ -1,10 +1,12 @@
 package de.smartsquare.squit.report
 
 import kotlinx.html.HTML
+import kotlinx.html.a
 import kotlinx.html.body
 import kotlinx.html.div
 import kotlinx.html.id
 import kotlinx.html.script
+import kotlinx.html.span
 
 /**
  * Extension function for generating the html body of a Squit detail page.
@@ -12,9 +14,28 @@ import kotlinx.html.script
 fun HTML.squitDetailBody() {
     body {
         div(classes = "container") {
+            div(classes = "row top-row") {
+                div(classes = "col-lg-12") {
+                    a(href = "../../main.html", classes = "btn btn-primary") {
+                        attributes += "role" to "button"
+
+                        span(classes = "glyphicon glyphicon-arrow-left start-icon") {}
+
+                        +"Back"
+                    }
+
+                    a(classes = "btn btn-primary pull-right") {
+                        attributes += "role" to "button"
+                        id = "output-toggle"
+
+                        +"Show side by side"
+                    }
+                }
+            }
+
             div(classes = "row") {
                 div(classes = "col-lg-12") {
-                    id = "diffview"
+                    id = "diff-view"
                 }
             }
         }

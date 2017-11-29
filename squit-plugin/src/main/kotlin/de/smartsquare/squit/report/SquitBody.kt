@@ -12,7 +12,6 @@ import kotlinx.html.code
 import kotlinx.html.div
 import kotlinx.html.h1
 import kotlinx.html.h4
-import kotlinx.html.i
 import kotlinx.html.id
 import kotlinx.html.script
 import kotlinx.html.span
@@ -143,9 +142,7 @@ fun DIV.squitContainerItem(resultTree: SquitResultTree, level: Int) {
         attributes.put("style", "padding-left: ${12 * level}px")
         attributes.put("data-toggle", "collapse")
 
-        i(classes = "glyphicon glyphicon-chevron-right") {
-            attributes.put("style", "margin-right: 8px")
-        }
+        span(classes = "glyphicon glyphicon-chevron-right start-icon") {}
 
         +resultTree.name
 

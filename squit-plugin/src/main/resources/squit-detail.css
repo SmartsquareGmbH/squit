@@ -1,4 +1,16 @@
-#diffview {
+#diff-view {
     margin-top: 20px;
     margin-bottom: 5px;
+}
+
+.top-row {
+    margin-top: 20px;
+}
+
+.start-icon {
+    padding-right: 8px;
+}
+
+.d2h-file-side-diff {
+    margin-bottom: 15px;
 }
