@@ -49,6 +49,8 @@ dependencies {
     }
 
     implementation "org.webjars:bootstrap:$bootstrapVersion"
+    implementation "org.webjars:font-awesome:$fontAwesomeVersion"
+    implementation "org.webjars.bower:awesome-bootstrap-checkbox:$awesomeBootstrapCheckboxVersion"
     implementation("org.webjars.npm:diff2html:$diff2htmlVersion") {
         exclude group: 'org.webjars.npm', module: '*'
     }

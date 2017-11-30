@@ -6,13 +6,18 @@ import de.smartsquare.squit.entity.SquitResult
 import de.smartsquare.squit.entity.SquitResultTree
 import kotlinx.html.DIV
 import kotlinx.html.HTML
+import kotlinx.html.InputType
 import kotlinx.html.a
 import kotlinx.html.body
 import kotlinx.html.code
 import kotlinx.html.div
+import kotlinx.html.form
 import kotlinx.html.h1
 import kotlinx.html.h4
 import kotlinx.html.id
+import kotlinx.html.input
+import kotlinx.html.label
+import kotlinx.html.role
 import kotlinx.html.script
 import kotlinx.html.span
 import kotlinx.html.table
@@ -90,6 +95,26 @@ inline fun HTML.squitBody(results: List<SquitResult>) {
             }
 
             div(classes = "row") {
+                div(classes = "col-lg-12") {
+                    form {
+                        role = "form"
+
+                        div(classes = "checkbox checkbox-primary") {
+                            input(type = InputType.checkBox, classes = "styled") {
+                                id = "failed-only"
+                            }
+
+                            label {
+                                attributes += "for" to "failed-only"
+
+                                +"Show only failed tests"
+                            }
+                        }
+                    }
+                }
+            }
+
+            div(classes = "row") {
                 id = "result-tree"
 
                 div(classes = "col-lg-12") {
@@ -122,6 +147,7 @@ inline fun DIV.squitItemContainers(resultTrees: List<SquitResultTree>, level: In
  */
 fun DIV.squitLeafItem(resultTree: SquitResultTree, level: Int) {
     a(href = "detail/${resultTree.id}/detail.html", classes = "list-group-item") {
+        attributes.put("data-success", if (resultTree.isSuccess) "true" else "false")
         attributes.put("style", "padding-left: ${12 * level + 8}px")
 
         +resultTree.name
@@ -139,10 +165,11 @@ fun DIV.squitContainerItem(resultTree: SquitResultTree, level: Int) {
     val currentId = IdHolder.currentId++
 
     a(href = "#$currentId", classes = "list-group-item") {
+        attributes.put("data-success", if (resultTree.isSuccess) "true" else "false")
         attributes.put("style", "padding-left: ${12 * level}px")
         attributes.put("data-toggle", "collapse")
 
-        span(classes = "glyphicon glyphicon-chevron-right start-icon") {}
+        span(classes = "fa fa-chevron-right fa-fw start-icon") {}
 
         +resultTree.name
 

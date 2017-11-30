@@ -18,6 +18,7 @@ inline fun HTML.squitDetailHead() {
         meta(name = "viewport", content = "width=device-width, initial-scale=1.0")
 
         link(rel = "stylesheet", href = "../../css/bootstrap.css")
+        link(rel = "stylesheet", href = "../../css/font-awesome.css")
         link(rel = "stylesheet", href = "../../css/diff2html.css")
         link(rel = "stylesheet", href = "detail.css")
 

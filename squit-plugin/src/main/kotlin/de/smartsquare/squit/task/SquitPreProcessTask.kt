@@ -48,6 +48,9 @@ open class SquitPreProcessTask : DefaultTask() {
         false -> null
     }?.split(",")?.map { it.trim() }?.filter { it.isNotBlank() } ?: emptyList()
 
+    @get:Input
+    val shouldUnignore by lazy { project.properties.containsKey("unignore") }
+
     /**
      * The directory of the test sources.
      */
@@ -226,8 +229,6 @@ open class SquitPreProcessTask : DefaultTask() {
         return result.toList()
     }
 
-    private fun isTestIgnored(properties: SquitProperties) = properties.exclude
-            && !project.properties.containsKey("unignore")
-
+    private fun isTestIgnored(properties: SquitProperties) = properties.exclude && !shouldUnignore
     private fun isTestCoveredByTags(properties: SquitProperties) = tags.isEmpty() || tags.any { it in properties.tags }
 }

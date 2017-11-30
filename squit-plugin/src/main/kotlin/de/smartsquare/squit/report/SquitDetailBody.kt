@@ -19,7 +19,7 @@ fun HTML.squitDetailBody() {
                     a(href = "../../main.html", classes = "btn btn-primary") {
                         attributes += "role" to "button"
 
-                        span(classes = "glyphicon glyphicon-arrow-left start-icon") {}
+                        span(classes = "fa fa-arrow-left fa-fw start-icon") {}
 
                         +"Back"
                     }
