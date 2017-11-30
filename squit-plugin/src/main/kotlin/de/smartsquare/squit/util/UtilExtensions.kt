@@ -17,7 +17,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.text.RegexOption.DOT_MATCHES_ALL
 import org.dom4j.Document as XmlDocument
-import org.w3c.dom.Document as HtmlDocument
 
 /**
  * Removes pieces of a path, based on another path. This is useful for getting the sub directories of a path, with the
