@@ -48,7 +48,7 @@ inline fun HTML.squitBody(results: List<SquitResult>) {
     body {
         div(classes = "container") {
             div(classes = "row") {
-                div(classes = "col-lg-12") {
+                div(classes = "col-xs-12") {
                     h1 { +"Squit Results" }
                     h4 {
                         +when {
@@ -62,7 +62,7 @@ inline fun HTML.squitBody(results: List<SquitResult>) {
             }
 
             div(classes = "row") {
-                div(classes = "col-lg-12") {
+                div(classes = "col-xs-12") {
                     div(classes = "responsive-table") {
                         table(classes = "table table-striped table-bordered") {
                             tbody {
@@ -95,7 +95,7 @@ inline fun HTML.squitBody(results: List<SquitResult>) {
             }
 
             div(classes = "row") {
-                div(classes = "col-lg-12") {
+                div(classes = "col-xs-6") {
                     form {
                         role = "form"
 
@@ -112,12 +112,28 @@ inline fun HTML.squitBody(results: List<SquitResult>) {
                         }
                     }
                 }
+
+                div(classes = "col-xs-6") {
+                    a(classes = "btn btn-primary pull-right") {
+                        attributes += "role" to "button"
+                        id = "collapse-all"
+
+                        +"Collapse all"
+                    }
+
+                    a(classes = "btn btn-primary pull-right start-item") {
+                        attributes += "role" to "button"
+                        id = "expand-all"
+
+                        +"Expand all"
+                    }
+                }
             }
 
             div(classes = "row") {
                 id = "result-tree"
 
-                div(classes = "col-lg-12") {
+                div(classes = "col-xs-12") {
                     squitItemContainers(SquitResultTree.fromList(results), 1)
                 }
             }
@@ -169,7 +185,7 @@ fun DIV.squitContainerItem(resultTree: SquitResultTree, level: Int) {
         attributes.put("style", "padding-left: ${12 * level}px")
         attributes.put("data-toggle", "collapse")
 
-        span(classes = "fa fa-chevron-right fa-fw start-icon") {}
+        span(classes = "fa fa-chevron-right fa-fw start-item") {}
 
         +resultTree.name
 

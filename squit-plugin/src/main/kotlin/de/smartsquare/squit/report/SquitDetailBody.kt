@@ -15,11 +15,11 @@ fun HTML.squitDetailBody() {
     body {
         div(classes = "container") {
             div(classes = "row top-row") {
-                div(classes = "col-lg-12") {
+                div(classes = "col-xs-12") {
                     a(href = "../../main.html", classes = "btn btn-primary") {
                         attributes += "role" to "button"
 
-                        span(classes = "fa fa-arrow-left fa-fw start-icon") {}
+                        span(classes = "fa fa-arrow-left fa-fw start-item") {}
 
                         +"Back"
                     }
@@ -34,7 +34,7 @@ fun HTML.squitDetailBody() {
             }
 
             div(classes = "row") {
-                div(classes = "col-lg-12") {
+                div(classes = "col-xs-12") {
                     id = "diff-view"
                 }
             }
