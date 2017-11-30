@@ -1,16 +1,33 @@
 $(document).ready(function () {
     var failedOnlyCheckbox = $('#failed-only');
-    var items = $('.list-group-item');
+    var collapsibleItems = $(".collapse");
+    var containerItems = $('.list-group-item');
 
-    items.on('click', function () {
-        $('.fa', this)
-            .toggleClass('fa-chevron-right')
-            .toggleClass('fa-chevron-down');
+    collapsibleItems
+        .on('show.bs.collapse shown.bs.collapse', function (e) {
+            if (this === e.target) {
+                $(this).prev('.list-group-item').find('.fa:first')
+                    .removeClass('fa-chevron-right')
+                    .addClass('fa-chevron-down');
+            }
+        })
+        .on('hide.bs.collapse hidden.bs.collapse', function (e) {
+            if (this === e.target) {
+                $(this).prev('.list-group-item').find('.fa:first')
+                    .removeClass('fa-chevron-down')
+                    .addClass('fa-chevron-right');
+            }
+        });
+
+    containerItems.on('click', function () {
+        $(this).next('.list-group').find('.list-group').each(function () {
+            $(this).collapse('hide');
+        })
     });
 
     failedOnlyCheckbox.change(function () {
         if (this.checked) {
-            items.each(function () {
+            containerItems.each(function () {
                 if ($(this).attr('data-success') !== 'true') {
                     $(this).css("display", "block");
                 } else {
@@ -18,7 +35,7 @@ $(document).ready(function () {
                 }
             });
         } else {
-            items.each(function () {
+            containerItems.each(function () {
                 $(this).css("display", "block");
             });
         }
