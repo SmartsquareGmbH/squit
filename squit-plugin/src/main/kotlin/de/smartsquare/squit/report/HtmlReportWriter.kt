@@ -4,9 +4,8 @@ import com.github.difflib.DiffUtils
 import com.github.difflib.UnifiedDiffUtils
 import de.smartsquare.squit.entity.SquitResult
 import de.smartsquare.squit.io.FilesUtils
-import de.smartsquare.squit.util.write
-import kotlinx.html.dom.createHTMLDocument
 import kotlinx.html.html
+import kotlinx.html.stream.appendHTML
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
@@ -52,14 +51,14 @@ object HtmlReportWriter {
      * Generates and writes the Squit html report, given the [results] list and [reportDirectoryPath].
      */
     fun writeReport(results: List<SquitResult>, reportDirectoryPath: Path) {
-        val document = createHTMLDocument().html {
+        val document = StringBuilder("<!DOCTYPE html>").appendHTML().html {
             squitHead()
             squitBody(results)
         }
 
         results.forEach { result ->
             val unifiedDiffForJs = generateDiff(result).joinToString("\\n\\\n").replace("'", "\\'")
-            val detailDocument = createHTMLDocument().html {
+            val detailDocument = StringBuilder("<!DOCTYPE html>").appendHTML().html {
                 squitDetailHead()
                 squitDetailBody()
             }
@@ -70,8 +69,7 @@ object HtmlReportWriter {
             val detailJsPath = detailPath.resolve("detail.js")
 
             Files.createDirectories(detailPath)
-
-            detailDocument.write(detailHtmlPath)
+            Files.write(detailHtmlPath, detailDocument.toString().toByteArray())
 
             FilesUtils.copyResource("squit-detail.css", detailCssPath)
             FilesUtils.copyResource("squit-detail.js", detailJsPath, {
@@ -85,7 +83,7 @@ object HtmlReportWriter {
             FilesUtils.copyResource(name, reportDirectoryPath.resolve(target))
         }
 
-        document.write(reportDirectoryPath.resolve("main.html"))
+        Files.write(reportDirectoryPath.resolve("main.html"), document.toString().toByteArray())
     }
 
     private fun generateDiff(result: SquitResult): List<String> {

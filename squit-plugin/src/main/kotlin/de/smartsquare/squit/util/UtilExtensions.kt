@@ -11,14 +11,10 @@ import org.dom4j.io.OutputFormat
 import org.dom4j.io.SAXReader
 import org.dom4j.io.XMLWriter
 import org.gradle.api.GradleException
-import java.io.FileWriter
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.stream.StreamResult
 import kotlin.text.RegexOption.DOT_MATCHES_ALL
 import org.dom4j.Document as XmlDocument
 import org.w3c.dom.Document as HtmlDocument
@@ -114,18 +110,6 @@ inline fun XmlDocument.write(path: Path, outputFormat: OutputFormat = SquitOutpu
     Files.newBufferedWriter(path).use {
         XMLWriter(it, outputFormat).write(document)
     }
-}
-
-/**
- * Writes this [org.w3c.dom.Document] to the given [path].
- *
- * This is a safe operation, as such the file is correctly closed.
- */
-inline fun HtmlDocument.write(path: Path) = FileWriter(path.toFile()).use { fileWriter ->
-    TransformerFactory
-            .newInstance()
-            .newTransformer()
-            .transform(DOMSource(this), StreamResult(fileWriter))
 }
 
 /**
