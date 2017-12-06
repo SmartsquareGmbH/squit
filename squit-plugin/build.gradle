@@ -37,13 +37,13 @@ dependencies {
     implementation project(':squit-library')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-html-jvm:$kotlinHtmlVersion"
 
     implementation "org.dom4j:dom4j:$dom4jVersion"
-    implementation "com.google.code.gson:gson:$gsonVersion"
     implementation "org.xmlunit:xmlunit-core:$xmlUnitVersion"
     implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
-    implementation "nu.studer:java-ordered-properties:$orderedPropertiesVersion"
+    compile 'io.github.config4k:config4k:0.3.0'
     implementation("com.github.wumpz:diffutils:$diffUtilsVersion") {
         exclude group: 'org.eclipse.jgit', module: '*'
     }

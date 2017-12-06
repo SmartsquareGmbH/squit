@@ -1,9 +1,8 @@
 package de.smartsquare.squit.entity
 
-import com.google.gson.Gson
 import de.smartsquare.squit.util.Constants
 import de.smartsquare.squit.util.Constants.META
-import de.smartsquare.squit.util.fromSafeJson
+import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -57,7 +56,9 @@ data class SquitResult(
     /**
      * Additional information associated with this result.
      */
-    val metaInfo: SquitMetaInfo by lazy { Gson().fromSafeJson(metaInfoPath, SquitMetaInfo::class.java) }
+    val metaInfo: SquitMetaInfo by lazy {
+        SquitMetaInfo.fromJson(Files.readAllBytes(metaInfoPath).toString(Charset.defaultCharset()))
+    }
 
     /**
      * [List] of lines of the expected response.

@@ -1,6 +1,5 @@
 package de.smartsquare.squit.task
 
-import com.google.gson.Gson
 import de.smartsquare.squit.TestUtils
 import de.smartsquare.squit.entity.SquitMetaInfo
 import de.smartsquare.squit.withJaCoCo
@@ -22,6 +21,7 @@ import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import org.jetbrains.spek.subject.SubjectSpek
 import java.io.File
+import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 import java.sql.DriverManager
@@ -99,7 +99,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             }
 
             it("should write a valid meta.json file") {
-                val (date, duration) = Gson().fromJson(Files.newBufferedReader(call1Meta), SquitMetaInfo::class.java)
+                val (date, duration) = SquitMetaInfo.fromJson(Files.readAllBytes(call1Meta)
+                        .toString(Charset.defaultCharset()))
 
                 date shouldBeBefore LocalDateTime.now()
                 date shouldBeAfter LocalDateTime.now().minusMinutes(5)

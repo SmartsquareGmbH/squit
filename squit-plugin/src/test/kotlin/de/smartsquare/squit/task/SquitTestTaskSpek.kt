@@ -140,7 +140,7 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
 
             it("should generate a \"failures\" directory with all relevant files") {
                 Files.exists(call1FailuresDirectory.resolve("actual_response.xml")) shouldBe true
-                Files.exists(call1FailuresDirectory.resolve("config.properties")) shouldBe true
+                Files.exists(call1FailuresDirectory.resolve("test.conf")) shouldBe true
                 Files.exists(call1FailuresDirectory.resolve("diff.txt")) shouldBe true
                 Files.exists(call1FailuresDirectory.resolve("expected_response.xml")) shouldBe true
                 Files.exists(call1FailuresDirectory.resolve("request.xml")) shouldBe true

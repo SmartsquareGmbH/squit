@@ -2,11 +2,7 @@
 
 package de.smartsquare.squit.util
 
-import com.google.gson.Gson
 import de.smartsquare.squit.entity.SquitOutputFormat
-import groovy.lang.MissingPropertyException
-import groovy.text.SimpleTemplateEngine
-import nu.studer.java.util.OrderedProperties
 import org.dom4j.io.OutputFormat
 import org.dom4j.io.SAXReader
 import org.dom4j.io.XMLWriter
@@ -38,52 +34,6 @@ inline fun Path.cut(other: Path): Path {
                 isSame
             }
             .fold(Paths.get(""), { acc, path -> acc.resolve(path) })
-}
-
-/**
- * Safely loads the properties for this from the given [path].
- *
- * Safe means in this context that the file is correctly closed.
- */
-inline fun OrderedProperties.safeLoad(path: Path) = Files.newBufferedReader(path).use {
-    this.apply { load(it) }
-}
-
-/**
- * Safely stores this properties at the given [path].
- *
- * Safe means in this context that the file is correctly closed.
- */
-inline fun OrderedProperties.safeStore(path: Path, comments: String? = null) = Files.newBufferedWriter(path).use {
-    this.apply { store(it, comments) }
-}
-
-/**
- * Returns the property with the given [key] after applying the given [templateProperties] if present on any present
- * templates in the property [String].
- */
-@Suppress("ExpressionBodySyntax")
-inline fun OrderedProperties.getTemplateProperty(key: String, templateProperties: Map<String, *>? = null): String? {
-    return getProperty(key)?.let {
-        when (templateProperties != null) {
-            true -> try {
-                SimpleTemplateEngine().createTemplate(it).make(templateProperties).toString()
-            } catch (error: MissingPropertyException) {
-                throw GradleException("Missing property \"${error.property}\" for template, did you forget " +
-                        "to pass it with -P?", error)
-            }
-            false -> it
-        }
-    }
-}
-
-/**
- * Savely reads the json file ate the given [path] and returns an instance of the given [klass].
- *
- * Safe means in this context that the file is correctly closed.
- */
-inline fun <T> Gson.fromSafeJson(path: Path, klass: Class<T>): T = Files.newBufferedReader(path).use {
-    fromJson(it, klass)
 }
 
 /**

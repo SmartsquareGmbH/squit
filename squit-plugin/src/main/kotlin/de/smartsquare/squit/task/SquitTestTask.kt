@@ -1,7 +1,8 @@
 package de.smartsquare.squit.task
 
+import com.typesafe.config.Config
+import com.typesafe.config.ConfigFactory
 import de.smartsquare.squit.SquitExtension
-import de.smartsquare.squit.entity.SquitProperties
 import de.smartsquare.squit.entity.SquitResult
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.report.HtmlReportWriter
@@ -14,6 +15,7 @@ import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.cut
+import de.smartsquare.squit.util.shouldIgnore
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputDirectory
@@ -117,12 +119,12 @@ open class SquitTestTask : DefaultTask() {
         val resultList = arrayListOf<SquitResult>()
 
         FilesUtils.getSortedLeafDirectories(processedResponsesPath).forEach { actualResponsePath ->
-            val propertiesPath = FilesUtils.validateExistence(processedSourcesPath
+            val configPath = FilesUtils.validateExistence(processedSourcesPath
                     .resolve(actualResponsePath.cut(processedResponsesPath)).resolve(CONFIG))
 
-            val properties = SquitProperties().fillFromSingleProperties(propertiesPath)
+            val config = ConfigFactory.parseFile(configPath.toFile())
 
-            if (shouldReportTest(properties)) {
+            if (shouldReportTest(config)) {
                 val actualResponseFilePath = FilesUtils.validateExistence(actualResponsePath.resolve(ACTUAL_RESPONSE))
                 val expectedResponseFilePath = FilesUtils.validateExistence(processedSourcesPath
                         .resolve(actualResponsePath.cut(processedResponsesPath))
@@ -191,6 +193,7 @@ open class SquitTestTask : DefaultTask() {
         }
     }
 
-    private fun shouldReportTest(properties: SquitProperties) = !properties.ignore
-            || project.properties.containsKey("unignore") || project.properties.containsKey("unignoreForReport")
+    private fun shouldReportTest(config: Config) = !config.shouldIgnore
+            || project.properties.containsKey("unignore")
+            || project.properties.containsKey("unignoreForReport")
 }

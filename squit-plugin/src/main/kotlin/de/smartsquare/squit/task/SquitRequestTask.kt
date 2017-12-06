@@ -1,11 +1,11 @@
 package de.smartsquare.squit.task
 
-import com.google.gson.Gson
+import com.typesafe.config.Config
+import com.typesafe.config.ConfigFactory
 import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.db.ConnectionCollection
 import de.smartsquare.squit.db.executeScript
 import de.smartsquare.squit.entity.SquitMetaInfo
-import de.smartsquare.squit.entity.SquitProperties
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.util.Constants.ACTUAL_RESPONSE
 import de.smartsquare.squit.util.Constants.CONFIG
@@ -16,7 +16,10 @@ import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.cut
+import de.smartsquare.squit.util.databaseConfigurations
+import de.smartsquare.squit.util.endpoint
 import de.smartsquare.squit.util.lifecycleOnSameLine
+import de.smartsquare.squit.util.mediaType
 import de.smartsquare.squit.util.newLineIfNeeded
 import okhttp3.HttpUrl
 import okhttp3.MediaType
@@ -117,19 +120,19 @@ open class SquitRequestTask : DefaultTask() {
             FilesUtils.getSortedLeafDirectories(processedSourcesPath).forEachIndexed { index, testDirectoryPath ->
                 logger.lifecycleOnSameLine("Running test $index", project.gradle.startParameter.consoleOutput)
 
-                val propertiesPath = FilesUtils.validateExistence(testDirectoryPath.resolve(CONFIG))
-                val properties = SquitProperties().fillFromSingleProperties(propertiesPath)
+                val configPath = FilesUtils.validateExistence(testDirectoryPath.resolve(CONFIG))
+                val config = ConfigFactory.parseFile(configPath.toFile())
 
                 val requestPath = FilesUtils.validateExistence(testDirectoryPath.resolve(REQUEST))
 
-                doRequestAndScriptExecutions(testDirectoryPath, requestPath, properties)
+                doRequestAndScriptExecutions(testDirectoryPath, requestPath, config)
             }
         }
 
         logger.newLineIfNeeded()
     }
 
-    private fun doRequestAndScriptExecutions(testDirectoryPath: Path, requestPath: Path, properties: SquitProperties) {
+    private fun doRequestAndScriptExecutions(testDirectoryPath: Path, requestPath: Path, config: Config) {
         val resultResponsePath = Files.createDirectories(actualResponsesPath
                 .resolve(testDirectoryPath.cut(processedSourcesPath)))
 
@@ -138,13 +141,12 @@ open class SquitRequestTask : DefaultTask() {
 
         val startTime = System.currentTimeMillis()
 
-        properties.databaseConfigurations.forEach {
-            executeScriptIfExisting(testDirectoryPath.resolve("${it.name}_pre.sql"), it.jdbcAddress,
-                    it.username, it.password)
+        config.databaseConfigurations.forEach { (name, jdbcAddress, username, password) ->
+            executeScriptIfExisting(testDirectoryPath.resolve("${name}_pre.sql"), jdbcAddress, username, password)
         }
 
         try {
-            val soapResponse = constructApiCall(properties.endpoint, requestPath, properties.mediaType)
+            val soapResponse = constructApiCall(config.endpoint, requestPath, config.mediaType)
                     .execute()
                     .body()
                     ?.string() ?: ""
@@ -156,15 +158,14 @@ open class SquitRequestTask : DefaultTask() {
                     "(${error.toString().trim()})")
         }
 
-        properties.databaseConfigurations.forEach {
-            executeScriptIfExisting(testDirectoryPath.resolve("${it.name}_post.sql"), it.jdbcAddress,
-                    it.username, it.password)
+        config.databaseConfigurations.forEach { (name, jdbcAddress, username, password) ->
+            executeScriptIfExisting(testDirectoryPath.resolve("${name}_post.sql"), jdbcAddress, username, password)
         }
 
         val endTime = System.currentTimeMillis()
         val metaInfo = SquitMetaInfo(LocalDateTime.now(), endTime - startTime)
 
-        Files.write(metaFilePath, Gson().toJson(metaInfo).toByteArray())
+        Files.write(metaFilePath, metaInfo.toJson().toByteArray())
     }
 
     private fun constructApiCall(url: HttpUrl, requestPath: Path, mediaType: MediaType) = okHttpClient

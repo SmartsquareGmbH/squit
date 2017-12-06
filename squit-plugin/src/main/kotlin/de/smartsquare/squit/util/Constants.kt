@@ -10,7 +10,7 @@ object Constants {
     /**
      * Filename of the config.
      */
-    const val CONFIG = "config.properties"
+    const val CONFIG = "test.conf"
 
     /**
      * Filename of the request.
