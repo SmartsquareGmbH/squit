@@ -43,7 +43,7 @@ dependencies {
     implementation "org.dom4j:dom4j:$dom4jVersion"
     implementation "org.xmlunit:xmlunit-core:$xmlUnitVersion"
     implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
-    compile 'io.github.config4k:config4k:0.3.0'
+    implementation "com.typesafe:config:$typesafeConfigVersion"
     implementation("com.github.wumpz:diffutils:$diffUtilsVersion") {
         exclude group: 'org.eclipse.jgit', module: '*'
     }

@@ -86,7 +86,6 @@ open class SquitRequestTask : DefaultTask() {
     @get:Internal
     internal var extension by Delegates.notNull<SquitExtension>()
 
-    @get:Internal
     private val okHttpClient by lazy {
         OkHttpClient.Builder()
                 .connectTimeout(extension.timeout, TimeUnit.SECONDS)
@@ -95,7 +94,6 @@ open class SquitRequestTask : DefaultTask() {
                 .build()
     }
 
-    @get:Internal
     private val dbConnections = ConnectionCollection()
 
     init {

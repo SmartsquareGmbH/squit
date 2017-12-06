@@ -58,10 +58,16 @@ open class SquitPreProcessTask : DefaultTask() {
         false -> null
     }?.split(",")?.map { it.trim() }?.filter { it.isNotBlank() } ?: emptyList()
 
+    /**
+     * If all excluded or ignored tests should be run nevertheless.
+     */
     @Suppress("MemberVisibilityCanPrivate")
     @get:Input
     val shouldUnignore by lazy { project.properties.containsKey("unignore") }
 
+    /**
+     * The properties of the project parsed into a [Config] object.
+     */
     @Suppress("MemberVisibilityCanPrivate")
     @get:Input
     val projectConfig: Config by lazy {
@@ -89,7 +95,6 @@ open class SquitPreProcessTask : DefaultTask() {
     @get:Internal
     internal var extension by Delegates.notNull<SquitExtension>()
 
-    @get:Internal
     private val leafDirectoriesWithProperties by lazy {
         FilesUtils.getSortedLeafDirectories(sourcesPath)
                 .map { it to resolveConfig(it) }
@@ -106,10 +111,7 @@ open class SquitPreProcessTask : DefaultTask() {
                 }
     }
 
-    @get:Internal
     private val configCache = mutableMapOf<Path, Config>()
-
-    @get:Internal
     private val pathCache = mutableMapOf<Path, List<Path>>()
 
     init {
