@@ -51,13 +51,13 @@ A single test is represented by one leaf folder. That folder **must** contain:
 
 Further it **can** contain:
 
-- A `config.properties` file.
+- A `test.conf` file.
 - `db_$name_pre.sql` files.
 - `db_$name_post.sql` files.
 
 The `request.xml` file contains whatever payload you want to send to your backend. The `response.xml` file contains the expected response.
 
-A `config.properties` file is required at least once on the path of your test. That means that it is resolved recursively, starting at the leaf, e.g. your test folder. The `config.properties` can and must contain various properties, which are discussed in the `Configuration` section. These properties are then merged if not existing while going up the folder tree.<br>
+A `test.conf` file is required at least once on the path of your test. That means that it is resolved recursively, starting at the leaf, e.g. your test folder. The `test.conf` can and must contain various properties, which are discussed in the `Configuration` section. These properties are then merged if not existing while going up the folder tree.<br>
 This allows for convenient definition of properties for multiple tests, with the ability to override properties in special cases.
 
 A simple example looks like this:
@@ -69,28 +69,27 @@ A simple example looks like this:
 ------- test1 (folder)
 --------- request.xml
 --------- response.xml
---------- config.properties
+--------- test.conf
 ------- test2 (folder)
 --------- request.xml
 --------- response.xml
-------- config.properties
+------- test.conf
 ```
 
 This shows a valid project structure for `Squit`. `my_suite` contains all our tests (in this case only two: `test1` and `test2`).
 
 > You *can* have more directories beneath `my_suite` (e.g. `another_suite`) and as aforementioned can also nest more deeply.<br>
 
-`my_suite` also contains a `config.properties` file, which could look like this:
+`my_suite` also contains a `test.conf` file, which could look like this:
 
 ```properties
-endpoint=http://localhost:1234/endpoint
-mediaType=application/xml
+endpoint = "http://localhost:1234/endpoint"
 ```
 
 `Squit` would then use `http://localhost:1234/endpoint` as the endpoint to call when running all tests in `my_suite`.<br>
-As the example shows, `test1` also contains a `config.properties` file. This one could be used to override the `endpoint` property of the `config.properties` file in the `my_suite` folder.
+As the example shows, `test1` also contains a `test.conf` file. This one could be used to override the `endpoint` property of the `test.conf` file in the `my_suite` folder.
 
-> It is not **required** to have a `config.properties` file there, often it is enough to have one for all your tests in the root folder.
+> It is not **required** to have a `test.conf` file there, often it is enough to have one for all your tests in the root folder.
 
 ## Usage
 
@@ -106,32 +105,32 @@ Task name          | Description
 
 ### Configuration
 
-The plugin features a variety of configuration possibilities. As aforementioned, these are collected in `config.properties` files. As of the current version, these are the supported ones:
+The plugin features a variety of configuration possibilities. As aforementioned, these are collected in `test.conf` files.
+`test.conf` files are in the [hocon](https://github.com/lightbend/config/blob/master/HOCON.md) format and support all of its features.
+As of the current version, these are the supported properties:
 
-Name                 | Description                                                                                                                                                       | Example
--------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------
-endpoint             | The endpoint of your backend to call.                                                                                                                             | `endpoint=http://localhost:1234/api`
-mediaType            | The media type of your content to send.                                                                                                                           | `mediaType=application/soap+xml`
-exclude              | Excludes or un-excludes the test or test group.                                                                                                                   | `exclude=true`
-ignore               | Ignores or un-ignores the test or test group. This means that the test is run, but does not show up in anything generated at the end of the build.                | `ignore=true`
-db_$name_jdbc        | The jdbc connection for database scripts to use                                                                                                                   | `db_myoracledb_jdbc=jdbc:oracle:thin:@localhost:1521:xe`
-db_$name_username    | The username for database scripts to use                                                                                                                          | `db_myoracledb_username=someuser`
-db_$name_password    | The password for database scripts to use                                                                                                                          | `db_myoracledb_password=somepassword`
-preProcessors        | A comma separated list of pre processor classes to use                                                                                                            | `com.example.ExamplePreProcessor`
-postProcessors       | A comma separated list of post processor classes to use                                                                                                           | `com.example.ExamplePostProcessor`
-preProcessorScripts  | A comma separated list of paths to groovy pre processor scripts to use                                                                                            | `./scripts/pre_processor.groovy`
-postProcessorScripts | A comma separated list of paths to groovy post processor scripts to use                                                                                           | `./scripts/post_processor.groovy`
+Name                   | Description                                                                                                                                        | Example
+---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------
+endpoint               | The endpoint of your backend to call.                                                                                                              | `endpoint = "http://localhost:1234/api"`
+mediaType              | The media type of your content to send.                                                                                                            | `mediaType = "application/soap+xml"`
+exclude                | Excludes or un-excludes the test or test group.                                                                                                    | `exclude = true`
+ignore                 | Ignores or un-ignores the test or test group. This means that the test is run, but does not show up in anything generated at the end of the build. | `ignore = true`
+databaseConfigurations | An array of database configurations to use for pre- and post scripts. See below for details.                                                       | `databaseConfigurations = [ { / *content */ } ]`
+preProcessors          | An array of pre processor classes to use                                                                                                           | `preProcessors = ["com.example.ExamplePreProcessor"]`
+postProcessors         | An array of post processor classes to use                                                                                                          | `postProcessors = ["com.example.ExamplePostProcessor"]`
+preProcessorScripts    | An array of paths to groovy pre processor scripts to use                                                                                           | `preProcessorScripts = [./scripts/pre_processor.groovy]`
+postProcessorScripts   | An array of paths to groovy post processor scripts to use                                                                                          | `postProcessorScripts = [./scripts/post_processor.groovy]`
 
-> The parameters `endpoint` and `mediaType` are required and the build will fail if at least one is missing for a test.
+> The parameter `endpoint` is required and the build will fail if it is missing for a test.
 
 #### Templating
 
-It may be useful to have a placeholder in a `config.properties` file and fill it at runtime, for example when the port of an endpoint is dynamic or when running in a CI environment.
+It may be useful to have a placeholder in a `test.conf` file and fill it at runtime, for example when the port of an endpoint is dynamic or when running in a CI environment.
 
 `Squit` features a simple templating engine, borrowed from [Groovy](http://docs.groovy-lang.org/next/html/documentation/template-engines.html). An example for such a template would look like this:
 
 ```properties
-endpoint=http://localhost:$port/someEndpoint
+endpoint = "http://localhost:"${port}"/someEndpoint"
 ```
 
 `port` could then be replaced when invoking `Squit` like this:
@@ -144,16 +143,17 @@ endpoint=http://localhost:$port/someEndpoint
 
 As part of your tests, you may want to modify your database into a specific state. `Squit` allows you to do so with ordinary `sql` scripts which can be run before and after a test.
 
-To do so, you have to add a database configuration to your `config.properties` file(s) and specify the jdbc driver to use.
+To do so, you have to add a database configuration to your `test.conf` file(s) and specify the jdbc driver to use.
 
 A simple example would look like this:
 
-```properties
-# config.properties
+```
+# test.conf
 
-db_mydb_jdbc=jdbc:oracle:thin:@localhost:1521:xe
-db_mydb_username=someusername
-db_mydb_password=somepassword
+databaseConfigurations = [
+  {name = "mydb", jdbc = "jdbc:oracle:thin:@localhost:1521:xe", username = "someusername", password = "thepassword"}
+  // More are possible
+]
 ```
 
 ```groovy
@@ -176,7 +176,7 @@ buildscript {
 }
 ```
 
-The `sql` files are added per test. They are required to be named after the configuration you added in the `config.properties` file, ending with either `_pre.sql` or `_post.sql`. The example from before would be `mydb_pre.sql` and `mydb_post.sql`.
+The `sql` files are added per test. They are required to be named after the configuration you added in the `test.conf` file, ending with either `_pre.sql` or `_post.sql`. The example from before would be `mydb_pre.sql` and `mydb_post.sql`.
 
 You can also add a `sql` script in a higher level of your project structure to merge it into existing scripts. `_pre.sql` scripts are prepended and `_post.sql` scrips are appended.<br>
 
@@ -194,10 +194,10 @@ There are currently two ways to do so: Using `Groovy` scripts or implementing a 
 
 You add a `.groovy` script somewhere in your project and supply `Squit` with the path:
 
-```properties
-# config.properties
+```
+# test.conf
 
-preProcessorScripts=./some/path/pre_process.groovy
+preProcessorScripts = [./some/path/pre_process.groovy]
 ```
 
 As for the pre process step, the script gets passed `request` and `expectedResponse` objects, which are [Dom4J Documents](https://dom4j.github.io/).
@@ -251,25 +251,25 @@ public class MyPreProcessor implements SquitPreProcessor {
 
 > The other interface as of the current version is the `SquitPostProcessor`.
 
-The last step is to add the class to your `config.properties`, similar to the approach with `groovy` scripts:
+The last step is to add the class to your `test.conf`, similar to the approach with `groovy` scripts:
 
-```properties
-# config.properties
+```
+# test.conf
 
-preProcessors=com.example.ExamplePreProcessor
+preProcessors = ["com.example.ExamplePreProcessor"]
 ```
 
 ### Tagging
 
 Tags allow to run only a subset of your tests to save time and resources if needed.
 
-You can specify tags in corresponding `config.properties` files. An example could look like this:
+You can specify tags in corresponding `test.conf` files. An example could look like this:
 
-```properties
-tags=fast,mysuite
+```
+tags = ["fast", "mysuite"]
 ```
 
-All tests covered by this `config.properties` file would then be tagged as `fast` and `mysuite`.<br>
+All tests covered by this `test.conf` file would then be tagged as `fast` and `mysuite`.<br>
 To run only tests with the tag `fast`, you would invoke `Squit` like so:
 
 ```bash
