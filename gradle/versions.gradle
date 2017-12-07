@@ -1,6 +1,6 @@
 ext {
     gradleVersion = '4.4'
-    squitVersion = '1.1.0'
+    squitVersion = '1.1.1-SNAPSHOT'
 
     gradlePublishVersion = '0.9.9'
     bintrayPublishVersion = '1.8.0'

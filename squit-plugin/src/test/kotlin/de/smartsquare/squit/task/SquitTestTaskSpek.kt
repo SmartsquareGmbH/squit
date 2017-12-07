@@ -6,9 +6,10 @@ import de.smartsquare.squit.withTestClasspath
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
+import org.amshove.kluent.shouldBeDir
 import org.amshove.kluent.shouldBeEmpty
+import org.amshove.kluent.shouldBeFile
 import org.amshove.kluent.shouldContain
-import org.amshove.kluent.shouldEqualTo
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.spek.api.dsl.given
@@ -30,9 +31,6 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
 
     var server by Delegates.notNull<MockWebServer>()
 
-    val expectedReportPath = Paths.get(this.javaClass.classLoader.getResource("expected-report.xml").toURI())
-    val expectedFailureReportPath = Paths.get(this.javaClass.classLoader.getResource("expected-report-failure.xml").toURI())
-
     val call4Directory = subject
             .resolve("build")
             .resolve("squit")
@@ -41,17 +39,20 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             .resolve("project")
             .resolve("call4")
 
-    val actualReportPath = subject
+    val reportsDirectory = subject
             .resolve("build")
             .resolve("squit")
             .resolve("reports")
+
+    val xmlReportPath = reportsDirectory
             .resolve("xml")
             .resolve("main.xml")
 
-    val failuresDirectory = subject
-            .resolve("build")
-            .resolve("squit")
-            .resolve("reports")
+    val htmlReportPath = reportsDirectory
+            .resolve("html")
+            .resolve("main.html")
+
+    val failuresDirectory = reportsDirectory
             .resolve("failures")
 
     val call1FailuresDirectory = failuresDirectory
@@ -96,11 +97,19 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
                 result.output shouldContain "2 tests ran."
             }
 
-            it("should generate a correct report") {
-                val expectedReport = Files.readAllBytes(expectedReportPath).toString(Charsets.UTF_8)
-                val actualReport = Files.readAllBytes(actualReportPath).toString(Charsets.UTF_8)
+            it("should generate a xml report") {
+                xmlReportPath.toFile().shouldBeFile()
+            }
 
-                actualReport shouldEqualTo expectedReport
+            it("should generate a html report with the correct directory structure") {
+                htmlReportPath.toFile().shouldBeFile()
+
+                htmlReportPath.parent.resolve("css").toFile().shouldBeDir()
+                htmlReportPath.parent.resolve("detail").toFile().shouldBeDir()
+                htmlReportPath.parent.resolve("fonts").toFile().shouldBeDir()
+                htmlReportPath.parent.resolve("js").toFile().shouldBeDir()
+
+                htmlReportPath.parent.resolve("detail").resolve("0").resolve("detail.html").toFile().shouldBeFile()
             }
 
             it("should run, but not report tests which are ignored for report") {
@@ -129,13 +138,6 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
 
             it("should print the amount of successful and failed tests") {
                 result.output shouldContain "1 successful and 1 failed."
-            }
-
-            it("should generate a correct report") {
-                val expectedReport = Files.readAllBytes(expectedFailureReportPath).toString(Charsets.UTF_8)
-                val actualReport = Files.readAllBytes(actualReportPath).toString(Charsets.UTF_8)
-
-                actualReport shouldEqualTo expectedReport
             }
 
             it("should generate a \"failures\" directory with all relevant files") {
