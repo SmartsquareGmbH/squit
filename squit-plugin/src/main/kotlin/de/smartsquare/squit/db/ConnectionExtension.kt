@@ -1,8 +1,6 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package de.smartsquare.squit.db
 
-import de.smartsquare.squit.util.clean
+import de.smartsquare.squit.util.cleanSqlString
 import java.nio.file.Files
 import java.nio.file.Path
 import java.sql.Connection
@@ -14,12 +12,12 @@ import java.sql.SQLException
  * @author Ruben Gees
  */
 @Suppress("RethrowCaughtException")
-inline fun Connection.executeScript(path: Path) {
+fun Connection.executeScript(path: Path) {
     try {
         createStatement().use { statement ->
-            Files.readAllBytes(path).toString(Charsets.UTF_8).clean()
+            Files.readAllBytes(path).toString(Charsets.UTF_8).cleanSqlString()
                     .split(";")
-                    .map { it.clean() }
+                    .map { it.cleanSqlString() }
                     .filter { it.isNotBlank() }
                     .forEach { statement.execute(it) }
         }

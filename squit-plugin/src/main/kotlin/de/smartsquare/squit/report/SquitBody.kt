@@ -1,4 +1,4 @@
-@file:Suppress("NOTHING_TO_INLINE", "StringLiteralDuplication")
+@file:Suppress("StringLiteralDuplication")
 
 package de.smartsquare.squit.report
 
@@ -36,7 +36,7 @@ private object IdHolder {
 /**
  * Extension function for generating the html body of the Squit report with the given [results].
  */
-inline fun HTML.squitBody(results: List<SquitResult>) {
+fun HTML.squitBody(results: List<SquitResult>) {
     val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 
     val totalFailedTests = results.count { !it.isSuccess }
@@ -148,7 +148,7 @@ inline fun HTML.squitBody(results: List<SquitResult>) {
 /**
  * Helper extension function for generating a list of item containers with the given [resultTrees].
  */
-inline fun DIV.squitItemContainers(resultTrees: List<SquitResultTree>, level: Int) {
+fun DIV.squitItemContainers(resultTrees: List<SquitResultTree>, level: Int) {
     resultTrees.forEach {
         if (it.children.isEmpty()) {
             squitLeafItem(it, level)
@@ -201,11 +201,8 @@ fun DIV.squitContainerItem(resultTree: SquitResultTree, level: Int) {
     }
 }
 
-/**
- * Converts a duration in milliseconds into a human friendly [String].
- */
 @Suppress("ComplexMethod")
-fun durationToString(duration: Long): String {
+private fun durationToString(duration: Long): String {
     var timeDuration = Duration.of(duration, ChronoUnit.MILLIS)
     var result = ""
 

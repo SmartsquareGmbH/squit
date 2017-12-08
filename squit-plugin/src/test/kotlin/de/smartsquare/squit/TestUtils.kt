@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package de.smartsquare.squit
 
 import org.gradle.testkit.runner.GradleRunner
@@ -8,7 +6,6 @@ import java.io.File
 import java.net.URLClassLoader
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 /**
  * Utility class for methods which cannot be a extension function.
@@ -24,15 +21,10 @@ object TestUtils {
 }
 
 /**
- * Helper method which returns the [Path] of a resource, found by the specified [name].
- */
-inline fun Any.getResource(name: String): Path = Paths.get(this.javaClass.classLoader.getResource(name).toURI())
-
-/**
  * Helper method for adding the testImplementation classpath to the gradle test-kit runner.
  */
 @Suppress("ExpressionBodySyntax")
-inline fun GradleRunner.withTestClasspath(): GradleRunner {
+fun GradleRunner.withTestClasspath(): GradleRunner {
     val classpath = mutableSetOf<File>()
 
     classpath.addAll(PluginUnderTestMetadataReading.readImplementationClasspath())
@@ -44,7 +36,7 @@ inline fun GradleRunner.withTestClasspath(): GradleRunner {
 /**
  * Helper method for using the gradle test-kit with jacoco.
  */
-inline fun GradleRunner.withJaCoCo(): GradleRunner {
+fun GradleRunner.withJaCoCo(): GradleRunner {
     javaClass.classLoader
             .getResourceAsStream("testkit-gradle.properties")
             .copyTo(File(projectDir, "gradle.properties").outputStream())

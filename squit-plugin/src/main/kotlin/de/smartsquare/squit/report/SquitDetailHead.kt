@@ -1,4 +1,4 @@
-@file:Suppress("NOTHING_TO_INLINE", "StringLiteralDuplication")
+@file:Suppress("StringLiteralDuplication")
 
 package de.smartsquare.squit.report
 
@@ -11,7 +11,7 @@ import kotlinx.html.title
 /**
  * Extension function for generating the head of a Squit detail result page.
  */
-inline fun HTML.squitDetailHead() {
+fun HTML.squitDetailHead() {
     head {
         meta(charset = "utf-8")
         meta(content = "ie=edge") { attributes.put("http-equiv", "x-ua-compatible") }

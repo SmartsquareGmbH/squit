@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package de.smartsquare.squit.util
 
 import com.typesafe.config.Config
@@ -96,7 +94,7 @@ val Config.databaseConfigurations
 /**
  * Merges the given [tag] into the existing List of tags or creates a new one with it.
  */
-fun Config.mergeTag(tag: String) = withValue(TAGS, ConfigValueFactory.fromIterable(listOf(tag).plus(this.tags)))
+fun Config.mergeTag(tag: String): Config = withValue(TAGS, ConfigValueFactory.fromIterable(this.tags.plus(tag)))
 
 /**
  * Validates all properties of this instance and throws if a problem is detected.
@@ -122,25 +120,25 @@ fun Config.validate() = this.apply {
 /**
  * Writes this config to the given [path] and applies the given [options] when rendering.
  */
-inline fun Config.writeTo(
+fun Config.writeTo(
         path: Path,
         options: ConfigRenderOptions = ConfigRenderOptions.defaults()
                 .setComments(false)
                 .setOriginComments(false)
                 .setJson(false)
-) = Files.write(path, root().render(options).toByteArray())
+): Path = Files.write(path, root().render(options).toByteArray())
 
-private inline fun Config.getSafeBoolean(path: String, fallback: Boolean = false) = when (hasPath(path)) {
+private fun Config.getSafeBoolean(path: String, fallback: Boolean = false) = when (hasPath(path)) {
     true -> getBoolean(path)
     false -> fallback
 }
 
-private inline fun Config.getSafeString(path: String, fallback: String = "") = when (hasPath(path)) {
+private fun Config.getSafeString(path: String, fallback: String = "") = when (hasPath(path)) {
     true -> getString(path)
     false -> fallback
 }
 
-private inline fun Config.getSafeStringList(
+private fun Config.getSafeStringList(
         path: String,
         fallback: List<String> = emptyList()
 ): List<String> = when (hasPath(path)) {
@@ -148,12 +146,12 @@ private inline fun Config.getSafeStringList(
     false -> fallback
 }
 
-private inline fun Config.getSafeConfigList(path: String, fallback: List<Config> = emptyList()) = when (hasPath(path)) {
+private fun Config.getSafeConfigList(path: String, fallback: List<Config> = emptyList()) = when (hasPath(path)) {
     true -> getConfigList(path)
     false -> fallback
 }
 
-private inline fun Config.getSafePathList(path: String, fallback: List<Path> = emptyList()) = when (hasPath(path)) {
+private fun Config.getSafePathList(path: String, fallback: List<Path> = emptyList()) = when (hasPath(path)) {
     true -> getStringList(path).map { Paths.get(it) }
     false -> fallback
 }

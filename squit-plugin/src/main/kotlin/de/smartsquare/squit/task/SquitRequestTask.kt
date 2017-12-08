@@ -173,22 +173,24 @@ open class SquitRequestTask : DefaultTask() {
                     .build()
             )
 
-    @Suppress("ExpressionBodySyntax")
-    private fun executeScriptIfExisting(path: Path, jdbc: String, username: String, password: String): Boolean {
-        return if (Files.exists(path)) {
-            try {
-                dbConnections.createOrGet(jdbc, username, password).executeScript(path)
+    private fun executeScriptIfExisting(
+            path: Path,
+            jdbc: String,
+            username: String,
+            password: String
+    ) = if (Files.exists(path)) {
+        try {
+            dbConnections.createOrGet(jdbc, username, password).executeScript(path)
 
-                true
-            } catch (error: SQLException) {
-                logger.newLineIfNeeded()
-                logger.warn("Could not run database script ${path.fileName} for test " +
-                        "${path.parent.cut(processedSourcesPath)} (${error.toString().trim()})")
-
-                false
-            }
-        } else {
             true
+        } catch (error: SQLException) {
+            logger.newLineIfNeeded()
+            logger.warn("Could not run database script ${path.fileName} for test " +
+                    "${path.parent.cut(processedSourcesPath)} (${error.toString().trim()})")
+
+            false
         }
+    } else {
+        true
     }
 }

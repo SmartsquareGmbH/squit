@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package de.smartsquare.squit.util
 
 import de.smartsquare.squit.entity.SquitOutputFormat
@@ -20,7 +18,7 @@ import org.dom4j.Document as XmlDocument
  *
  * Given this is /a/b/c/d/e and [other] is /a/b/c, /d/e would be returned.
  */
-inline fun Path.cut(other: Path): Path {
+fun Path.cut(other: Path): Path {
     var mutableOther = other.toList()
 
     return this.toMutableList()
@@ -41,7 +39,7 @@ inline fun Path.cut(other: Path): Path {
  *
  * This is a safe operation, as such the file is correctly closed.
  */
-inline fun SAXReader.read(path: Path): XmlDocument = try {
+fun SAXReader.read(path: Path): XmlDocument = try {
     Files.newInputStream(path).use {
         read(it)
     }
@@ -55,7 +53,7 @@ inline fun SAXReader.read(path: Path): XmlDocument = try {
  *
  * This is a safe operation, as such the file is correctly closed.
  */
-inline fun XmlDocument.write(path: Path, outputFormat: OutputFormat = SquitOutputFormat) {
+fun XmlDocument.write(path: Path, outputFormat: OutputFormat = SquitOutputFormat) {
     Files.newBufferedWriter(path).use {
         XMLWriter(it, outputFormat).write(document)
     }
@@ -64,7 +62,7 @@ inline fun XmlDocument.write(path: Path, outputFormat: OutputFormat = SquitOutpu
 /**
  * Cleans this [String] by removing sql comments, newlines and blanks, followed by trimming ([trim]).
  */
-inline fun String.clean() = this
+fun String.cleanSqlString() = this
         .replace(Regex("--.*?\n", DOT_MATCHES_ALL), "")
         .replace("\n", " ")
         .replace("\r", " ")
@@ -74,7 +72,7 @@ inline fun String.clean() = this
 /**
  * Prints the given [message] to the standard output stream and flushes it afterwards.
  */
-inline fun printAndFlush(message: Any?) {
+fun printAndFlush(message: Any?) {
     System.out.print(message)
     System.out.flush()
 }
