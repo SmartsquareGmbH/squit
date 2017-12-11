@@ -116,7 +116,8 @@ open class SquitRequestTask : DefaultTask() {
 
         dbConnections.use {
             FilesUtils.getSortedLeafDirectories(processedSourcesPath).forEachIndexed { index, testDirectoryPath ->
-                logger.lifecycleOnSameLine("Running test $index", project.gradle.startParameter.consoleOutput)
+                logger.lifecycleOnSameLine("Running test ${index + 1}",
+                        project.gradle.startParameter.consoleOutput)
 
                 val configPath = FilesUtils.validateExistence(testDirectoryPath.resolve(CONFIG))
                 val config = ConfigFactory.parseFile(configPath.toFile())
