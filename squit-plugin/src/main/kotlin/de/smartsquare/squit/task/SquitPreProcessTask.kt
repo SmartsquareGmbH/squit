@@ -63,7 +63,7 @@ open class SquitPreProcessTask : DefaultTask() {
      */
     @Suppress("MemberVisibilityCanPrivate")
     @get:Input
-    val shouldUnignore by lazy { project.properties.containsKey("unignore") }
+    val shouldUnexclude by lazy { project.properties.containsKey("unexclude") }
 
     /**
      * The properties of the project parsed into a [Config] object.
@@ -245,6 +245,6 @@ open class SquitPreProcessTask : DefaultTask() {
         return result.toList()
     }
 
-    private fun isTestExcluded(config: Config) = config.shouldExclude && !shouldUnignore
+    private fun isTestExcluded(config: Config) = config.shouldExclude && !shouldUnexclude
     private fun isTestCoveredByTags(config: Config) = tags.isEmpty() || tags.any { it in config.tags }
 }

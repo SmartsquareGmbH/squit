@@ -194,6 +194,6 @@ open class SquitTestTask : DefaultTask() {
     }
 
     private fun shouldReportTest(config: Config) = !config.shouldIgnore
+            || project.properties.containsKey("unexclude")
             || project.properties.containsKey("unignore")
-            || project.properties.containsKey("unignoreForReport")
 }

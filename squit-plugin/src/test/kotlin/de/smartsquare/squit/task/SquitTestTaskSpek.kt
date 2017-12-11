@@ -59,6 +59,10 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             .resolve("project")
             .resolve("call1")
 
+    val call3FailuresDirectory = failuresDirectory
+            .resolve("project")
+            .resolve("call3")
+
     val call4FailuresDirectory = failuresDirectory
             .resolve("project")
             .resolve("call4")
@@ -156,8 +160,7 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<nice/>"))
             server.enqueue(MockResponse().setBody("<relevant/>"))
 
-            val arguments = listOf("clean", "squitTest", "-Pendpoint=${server.url("/")}", "-Punignore",
-                    "-Ptags=call1,call2,call4")
+            val arguments = listOf("clean", "squitTest", "-Pendpoint=${server.url("/")}", "-Punignore")
 
             val result = GradleRunner.create()
                     .withProjectDir(subject.toFile())
@@ -174,14 +177,19 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             it("should also report the ignored test") {
                 Files.exists(call4FailuresDirectory) shouldBe true
             }
+
+            it("should not report the excluded test") {
+                Files.exists(call3FailuresDirectory) shouldBe false
+            }
         }
 
-        on("running the test task with the unignoreForReport flag") {
+        on("running the test task with the unexclude flag") {
             server.enqueue(MockResponse().setBody("<cool/>"))
             server.enqueue(MockResponse().setBody("<nice/>"))
             server.enqueue(MockResponse().setBody("<relevant/>"))
+            server.enqueue(MockResponse().setBody("<relevant/>"))
 
-            val arguments = listOf("clean", "squitTest", "-Pendpoint=${server.url("/")}", "-PunignoreForReport")
+            val arguments = listOf("clean", "squitTest", "-Pendpoint=${server.url("/")}", "-Punexclude")
 
             val result = GradleRunner.create()
                     .withProjectDir(subject.toFile())
@@ -196,6 +204,10 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             }
 
             it("should also report the ignored test") {
+                Files.exists(call3FailuresDirectory) shouldBe true
+            }
+
+            it("should also report the excluded test") {
                 Files.exists(call4FailuresDirectory) shouldBe true
             }
         }

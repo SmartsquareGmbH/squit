@@ -111,7 +111,7 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
             }
 
             it("should also pre-process the ignored test") {
-                Files.exists(buildPath.resolve("sources").resolve("project").resolve("call3")) shouldBe true
+                Files.exists(buildPath.resolve("sources").resolve("project").resolve("call4")) shouldBe true
             }
         }
     }
