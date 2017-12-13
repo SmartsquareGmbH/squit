@@ -27,6 +27,7 @@ subprojects {
 
     repositories {
         jcenter()
+        mavenCentral()
     }
 
     tasks.matching { it.name.matches('compile.*Kotlin') }.all {

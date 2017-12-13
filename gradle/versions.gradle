@@ -30,6 +30,6 @@ ext {
 
     junitPlatformVersion = '1.0.2'
     spekVersion = '1.1.5'
-    kluentVersion = '1.30'
+    kluentVersion = '1.32'
     h2Version = '1.4.196'
 }
