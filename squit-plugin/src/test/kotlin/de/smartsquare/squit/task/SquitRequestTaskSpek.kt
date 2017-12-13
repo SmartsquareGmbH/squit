@@ -36,6 +36,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
     subject { File(this.javaClass.classLoader.getResource("test-project").toURI()).toPath() }
 
     val subjectInvalid = File(this.javaClass.classLoader.getResource("invalid-test-project-2").toURI()).toPath()
+    val subjectGet = File(this.javaClass.classLoader.getResource("test-project-get").toURI()).toPath()
+    val subjectOptions = File(this.javaClass.classLoader.getResource("test-project-options").toURI()).toPath()
 
     var server by Delegates.notNull<MockWebServer>()
 
@@ -210,6 +212,82 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             it("should print an appropriate warning") {
                 result.output shouldContain "Could not run database script test_pre.sql for test project/call1"
+            }
+        }
+    }
+
+    given("a test project with method GET set") {
+        beforeEachTest {
+            server = MockWebServer()
+        }
+
+        afterEachTest {
+            server.shutdown()
+        }
+
+        on("running the request task") {
+            server.enqueue(MockResponse().setBody("<cool/>"))
+
+            val arguments = listOf("clean", "squitRunRequests", "-Pendpoint=${server.url("/")}")
+
+            val result = GradleRunner.create()
+                    .withProjectDir(subjectGet.toFile())
+                    .withArguments(arguments)
+                    .withTestClasspath()
+                    .forwardOutput()
+                    .withJaCoCo()
+                    .build()
+
+            it("should be able to complete without errors") {
+                result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
+            }
+
+            it("should make correct requests") {
+                server.takeRequest().let {
+                    it.method shouldEqualTo "GET"
+                    it.headers.get("Content-Type") shouldBe null
+                }
+            }
+        }
+    }
+
+    given("a test project with method OPTIONS set") {
+        beforeEachTest {
+            server = MockWebServer()
+        }
+
+        afterEachTest {
+            server.shutdown()
+        }
+
+        on("running the request task") {
+            server.enqueue(MockResponse().setBody("<cool/>"))
+            server.enqueue(MockResponse().setBody("<nice/>"))
+
+            val arguments = listOf("clean", "squitRunRequests", "-Pendpoint=${server.url("/")}")
+
+            val result = GradleRunner.create()
+                    .withProjectDir(subjectOptions.toFile())
+                    .withArguments(arguments)
+                    .withTestClasspath()
+                    .forwardOutput()
+                    .withJaCoCo()
+                    .build()
+
+            it("should be able to complete without errors") {
+                result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
+            }
+
+            it("should make correct requests") {
+                server.takeRequest().let {
+                    it.method shouldEqualTo "OPTIONS"
+                    it.headers.get("Content-Type") shouldEqual "application/xml"
+                }
+
+                server.takeRequest().let {
+                    it.method shouldEqualTo "OPTIONS"
+                    it.headers.get("Content-Type") shouldBe null
+                }
             }
         }
     }

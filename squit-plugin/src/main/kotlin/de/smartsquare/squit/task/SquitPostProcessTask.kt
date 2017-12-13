@@ -93,8 +93,7 @@ open class SquitPostProcessTask : DefaultTask() {
             val resultActualResponsePath = Files.createDirectories(processedActualResponsesPath
                     .resolve(testDir.cut(actualResponsesPath)))
 
-            val resultActualResponseFilePath = FilesUtils.createFileIfNotExists(resultActualResponsePath
-                    .resolve(ACTUAL_RESPONSE))
+            val resultActualResponseFilePath = resultActualResponsePath.resolve(ACTUAL_RESPONSE)
 
             val actualResponse = SAXReader().read(actualResponsePath)
             val expectedResponse = SAXReader().read(expectedResponsePath)

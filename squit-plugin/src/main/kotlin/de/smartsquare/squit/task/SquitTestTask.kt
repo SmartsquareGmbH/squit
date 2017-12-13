@@ -150,17 +150,13 @@ open class SquitTestTask : DefaultTask() {
     private fun writeXmlReport(result: List<SquitResult>) {
         Files.createDirectories(xmlReportFilePath.parent)
 
-        val reportFilePath = FilesUtils.createFileIfNotExists(xmlReportFilePath)
-
-        XmlReportWriter.writeReport(result, reportFilePath)
+        XmlReportWriter.writeReport(result, xmlReportFilePath)
     }
 
     private fun writeHtmlReport(result: List<SquitResult>) {
         Files.createDirectories(htmlReportDirectoryPath)
 
-        val reportFilePath = FilesUtils.createFileIfNotExists(htmlReportDirectoryPath)
-
-        HtmlReportWriter.writeReport(result, reportFilePath)
+        HtmlReportWriter.writeReport(result, htmlReportDirectoryPath)
     }
 
     private fun copyFailures(result: List<SquitResult>) {

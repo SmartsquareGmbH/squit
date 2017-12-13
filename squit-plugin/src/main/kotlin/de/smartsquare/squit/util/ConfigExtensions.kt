@@ -14,6 +14,8 @@ import java.nio.file.Paths
 private const val ENDPOINT = "endpoint"
 private const val MEDIA_TYPE = "mediaType"
 private const val MEDIA_TYPE_FALLBACK = "application/xml"
+private const val METHOD = "method"
+private const val METHOD_FALLBACK = "POST"
 private const val EXCLUDE = "exclude"
 private const val IGNORE = "ignore"
 private const val PRE_PROCESSORS = "preProcessors"
@@ -42,6 +44,12 @@ val Config.mediaType
     get() = getSafeString(MEDIA_TYPE, MEDIA_TYPE_FALLBACK).let { mediaType ->
         MediaType.parse(mediaType) ?: throw IllegalStateException("Invalid $MEDIA_TYPE: $mediaType")
     }
+
+/**
+ * The method to use for the request. This also decides if a request.xml is required or not. If none is given,
+ * POST is used as fallback.
+ */
+val Config.method: String get() = getSafeString(METHOD, METHOD_FALLBACK)
 
 /**
  * If the test should be excluded. Exclusion means that the test is not run at all.

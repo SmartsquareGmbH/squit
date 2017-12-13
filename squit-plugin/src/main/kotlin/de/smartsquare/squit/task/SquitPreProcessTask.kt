@@ -16,6 +16,7 @@ import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.cut
 import de.smartsquare.squit.util.databaseConfigurations
 import de.smartsquare.squit.util.mergeTag
+import de.smartsquare.squit.util.method
 import de.smartsquare.squit.util.preProcessorScripts
 import de.smartsquare.squit.util.preProcessors
 import de.smartsquare.squit.util.read
@@ -26,6 +27,8 @@ import de.smartsquare.squit.util.write
 import de.smartsquare.squit.util.writeTo
 import groovy.lang.Binding
 import groovy.lang.GroovyShell
+import okhttp3.internal.http.HttpMethod
+import org.dom4j.Document
 import org.dom4j.io.SAXReader
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -129,34 +132,22 @@ open class SquitPreProcessTask : DefaultTask() {
         Files.createDirectories(processedSourcesPath)
 
         leafDirectoriesWithProperties.forEach { (testPath, resolvedConfig) ->
-            val requestPath = FilesUtils.validateExistence(testPath.resolve(REQUEST))
+            val requestPath = resolveRequestPath(resolvedConfig, testPath)
+
             val responsePath = FilesUtils.validateExistence(testPath.resolve(SOURCE_RESPONSE))
             val resolvedSqlScripts = resolveSqlScripts(testPath, resolvedConfig)
 
             val processedResultPath = Files.createDirectories(processedSourcesPath.resolve(testPath.cut(sourcesPath)))
-            val processedConfigPath = FilesUtils.createFileIfNotExists(processedResultPath.resolve(CONFIG))
-            val processedRequestPath = FilesUtils.createFileIfNotExists(processedResultPath.resolve(REQUEST))
-            val processedResponsePath = FilesUtils.createFileIfNotExists(processedResultPath.resolve(EXPECTED_RESPONSE))
+            val processedConfigPath = processedResultPath.resolve(CONFIG)
+            val processedRequestPath = processedResultPath.resolve(REQUEST)
+            val processedResponsePath = processedResultPath.resolve(EXPECTED_RESPONSE)
 
-            val request = SAXReader().read(requestPath)
+            val request = requestPath?.let { SAXReader().read(requestPath) }
             val response = SAXReader().read(responsePath)
 
-            resolvedConfig.preProcessors.forEach {
-                val preProcessor = Class.forName(it).newInstance() as SquitPreProcessor
+            runPreProcessors(resolvedConfig, request, response)
 
-                preProcessor.process(request, response)
-            }
-
-            resolvedConfig.preProcessorScripts.forEach {
-                GroovyShell(javaClass.classLoader).parse(Files.newBufferedReader(it)).apply {
-                    binding = Binding(mapOf(
-                            "request" to request,
-                            "expectedResponse" to response
-                    ))
-                }.run()
-            }
-
-            request.write(processedRequestPath)
+            request?.write(processedRequestPath)
             response.write(processedResponsePath)
 
             resolvedSqlScripts.forEach { (name, content) ->
@@ -189,6 +180,17 @@ open class SquitPreProcessTask : DefaultTask() {
         } catch (error: Throwable) {
             throw GradleException("Invalid test.conf file on path of test: ${testPath.cut(sourcesPath)}"
                     + " (${error.message})")
+        }
+    }
+
+    private fun resolveRequestPath(config: Config, testPath: Path) = testPath.resolve(REQUEST).let {
+        when {
+            HttpMethod.requiresRequestBody(config.method) -> FilesUtils.validateExistence(it)
+            HttpMethod.permitsRequestBody(config.method) -> when (Files.exists(it)) {
+                true -> it
+                else -> null
+            }
+            else -> null
         }
     }
 
@@ -243,6 +245,23 @@ open class SquitPreProcessTask : DefaultTask() {
         }
 
         return result.toList()
+    }
+
+    private fun runPreProcessors(config: Config, request: Document?, response: Document) {
+        config.preProcessors.forEach {
+            val preProcessor = Class.forName(it).newInstance() as SquitPreProcessor
+
+            preProcessor.process(request, response)
+        }
+
+        config.preProcessorScripts.forEach {
+            GroovyShell(javaClass.classLoader).parse(Files.newBufferedReader(it)).apply {
+                binding = Binding(mapOf(
+                        "request" to request,
+                        "expectedResponse" to response
+                ))
+            }.run()
+        }
     }
 
     private fun isTestExcluded(config: Config) = config.shouldExclude && !shouldUnexclude

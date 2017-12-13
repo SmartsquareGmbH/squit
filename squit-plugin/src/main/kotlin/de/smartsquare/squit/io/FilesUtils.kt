@@ -63,14 +63,6 @@ object FilesUtils {
     }
 
     /**
-     * Creates and returns the file at the given [path].
-     */
-    fun createFileIfNotExists(path: Path): Path = when (Files.exists(path)) {
-        true -> path
-        false -> Files.createFile(path)
-    }
-
-    /**
      * Validates if a file or directory exists at the given [path] and returns it.
      */
     @Throws(GradleException::class)
@@ -86,7 +78,6 @@ object FilesUtils {
         val resource = javaClass.classLoader.getResource(name).readBytes()
 
         Files.createDirectories(target.parent)
-        FilesUtils.createFileIfNotExists(target)
         Files.write(target, modification(resource))
     }
 

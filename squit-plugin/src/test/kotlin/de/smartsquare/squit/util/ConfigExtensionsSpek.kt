@@ -94,6 +94,48 @@ object ConfigExtensionsSpek : Spek({
         }
     }
 
+    given("a config object with a valid method") {
+        val config = ConfigFactory.parseMap(mapOf(
+                "endpoint" to "https://example.com",
+                "method" to "GET"
+        ))
+
+        on("getting the method") {
+            val method = config.method
+
+            it("should return the given method") {
+                method shouldEqual "GET"
+            }
+        }
+    }
+
+    given("a config object with no method") {
+        val config = ConfigFactory.parseMap(mapOf("endpoint" to "https://example.com"))
+
+        on("getting the method") {
+            val method = config.method
+
+            it("should fallback to the default POST method") {
+                method shouldEqual "POST"
+            }
+        }
+    }
+
+    given("a config object with an invalid preProcessor") {
+        val config = ConfigFactory.parseMap(mapOf(
+                "endpoint" to "https://example.com",
+                "preProcessors" to listOf("not.existing")
+        ))
+
+        on("validating") {
+            val call = { config.validate() }
+
+            it("should throw a proper exception") {
+                call shouldThrow ClassNotFoundException::class withMessage "not.existing"
+            }
+        }
+    }
+
     given("a config object with a valid preProcessor") {
         val config = ConfigFactory.parseMap(mapOf(
                 "endpoint" to "https://example.com",

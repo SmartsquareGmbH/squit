@@ -1,0 +1,11 @@
+plugins {
+    id 'de.smartsquare.squit'
+}
+
+squit {
+    jdbcDrivers = ["org.h2.Driver"]
+}
+
+task clean(type: Delete) {
+    delete project.buildDir
+}

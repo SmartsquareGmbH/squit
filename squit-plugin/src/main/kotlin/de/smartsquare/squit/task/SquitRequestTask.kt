@@ -20,12 +20,15 @@ import de.smartsquare.squit.util.databaseConfigurations
 import de.smartsquare.squit.util.endpoint
 import de.smartsquare.squit.util.lifecycleOnSameLine
 import de.smartsquare.squit.util.mediaType
+import de.smartsquare.squit.util.method
 import de.smartsquare.squit.util.newLineIfNeeded
+import okhttp3.Call
 import okhttp3.HttpUrl
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import okhttp3.internal.http.HttpMethod
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
@@ -122,7 +125,7 @@ open class SquitRequestTask : DefaultTask() {
                 val configPath = FilesUtils.validateExistence(testDirectoryPath.resolve(CONFIG))
                 val config = ConfigFactory.parseFile(configPath.toFile())
 
-                val requestPath = FilesUtils.validateExistence(testDirectoryPath.resolve(REQUEST))
+                val requestPath = resolveRequestPath(config, testDirectoryPath)
 
                 doRequestAndScriptExecutions(testDirectoryPath, requestPath, config)
             }
@@ -131,12 +134,23 @@ open class SquitRequestTask : DefaultTask() {
         logger.newLineIfNeeded()
     }
 
-    private fun doRequestAndScriptExecutions(testDirectoryPath: Path, requestPath: Path, config: Config) {
+    private fun resolveRequestPath(config: Config, testPath: Path) = testPath.resolve(REQUEST).let {
+        when {
+            HttpMethod.requiresRequestBody(config.method) -> FilesUtils.validateExistence(it)
+            HttpMethod.permitsRequestBody(config.method) -> when (Files.exists(it)) {
+                true -> it
+                else -> null
+            }
+            else -> null
+        }
+    }
+
+    private fun doRequestAndScriptExecutions(testDirectoryPath: Path, requestPath: Path?, config: Config) {
         val resultResponsePath = Files.createDirectories(actualResponsesPath
                 .resolve(testDirectoryPath.cut(processedSourcesPath)))
 
-        val resultResponseFilePath = FilesUtils.createFileIfNotExists(resultResponsePath.resolve(ACTUAL_RESPONSE))
-        val metaFilePath = FilesUtils.createFileIfNotExists(resultResponsePath.resolve(META))
+        val resultResponseFilePath = resultResponsePath.resolve(ACTUAL_RESPONSE)
+        val metaFilePath = resultResponsePath.resolve(META)
 
         val startTime = System.currentTimeMillis()
 
@@ -145,15 +159,15 @@ open class SquitRequestTask : DefaultTask() {
         }
 
         try {
-            val soapResponse = constructApiCall(config.endpoint, requestPath, config.mediaType)
+            val apiResponse = constructApiCall(config.endpoint, requestPath, config.method, config.mediaType)
                     .execute()
                     .body()
                     ?.string() ?: ""
 
-            Files.write(resultResponseFilePath, soapResponse.toByteArray(Charsets.UTF_8))
+            Files.write(resultResponseFilePath, apiResponse.toByteArray(Charsets.UTF_8))
         } catch (error: IOException) {
             logger.newLineIfNeeded()
-            logger.warn("Request failed for test ${requestPath.parent.cut(processedSourcesPath)} " +
+            logger.warn("Request failed for test ${testDirectoryPath.cut(processedSourcesPath)} " +
                     "(${error.toString().trim()})")
         }
 
@@ -167,12 +181,14 @@ open class SquitRequestTask : DefaultTask() {
         Files.write(metaFilePath, metaInfo.toJson().toByteArray())
     }
 
-    private fun constructApiCall(url: HttpUrl, requestPath: Path, mediaType: MediaType) = okHttpClient
-            .newCall(Request.Builder()
-                    .post(RequestBody.create(mediaType, Files.readAllBytes(requestPath)))
-                    .url(url)
-                    .build()
-            )
+    private fun constructApiCall(url: HttpUrl, requestPath: Path?, method: String, mediaType: MediaType): Call {
+        val requestBody = requestPath?.let { RequestBody.create(mediaType, Files.readAllBytes(requestPath)) }
+
+        return okHttpClient.newCall(Request.Builder()
+                .method(method, requestBody)
+                .url(url)
+                .build())
+    }
 
     private fun executeScriptIfExisting(
             path: Path,

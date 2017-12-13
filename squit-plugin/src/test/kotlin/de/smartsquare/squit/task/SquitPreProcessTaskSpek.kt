@@ -14,7 +14,6 @@ import org.jetbrains.spek.subject.SubjectSpek
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.streams.toList
 
 /**
  * @author Ruben Gees
@@ -24,6 +23,8 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
     subject { Paths.get(this.javaClass.classLoader.getResource("test-project").toURI()) }
 
     val subjectInvalid = Paths.get(this.javaClass.classLoader.getResource("invalid-test-project").toURI())
+    val subjectGet = Paths.get(this.javaClass.classLoader.getResource("test-project-get").toURI())
+    val subjectOptions = Paths.get(this.javaClass.classLoader.getResource("test-project-options").toURI())
 
     val buildPath = subject
             .resolve("build")
@@ -54,6 +55,19 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
     val call4PreSqlScript = call4Directory.resolve("test_pre.sql")
     val call4PostSqlScript = call4Directory.resolve("test_post.sql")
 
+    val getCall1Directory = subjectGet
+            .resolve("build")
+            .resolve("squit")
+            .resolve("sources")
+            .resolve("project")
+            .resolve("call1")
+
+    val optionsSourcesPath = subjectOptions
+            .resolve("build")
+            .resolve("squit")
+            .resolve("sources")
+            .resolve("project")
+
     given("a test project") {
         on("running the pre-process task") {
             val arguments = listOf("clean", "squitPreProcess", "-Pendpoint=https://example.com",
@@ -76,7 +90,6 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
             }
 
             it("should correctly pre-process sql scripts which are applied only once") {
-                println(Files.list(call4PostSqlScript.parent.parent).toList().joinToString())
                 Files.readAllBytes(call1PreSqlScript).toString(Charsets.UTF_8) shouldContain "INSERT INTO CARS"
                 Files.readAllBytes(call1PostSqlScript).toString(Charsets.UTF_8) shouldNotContain "DROP TABLE CARS"
 
@@ -117,23 +130,73 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
     }
 
     given("an invalid test project") {
-        val arguments = listOf("clean", "squitPreProcess")
+        on("running the pre-process task") {
+            val arguments = listOf("clean", "squitPreProcess")
 
-        val result = GradleRunner.create()
-                .withProjectDir(subjectInvalid.toFile())
-                .withArguments(arguments)
-                .withTestClasspath()
-                .forwardOutput()
-                .withJaCoCo()
-                .buildAndFail()
+            val result = GradleRunner.create()
+                    .withProjectDir(subjectInvalid.toFile())
+                    .withArguments(arguments)
+                    .withTestClasspath()
+                    .forwardOutput()
+                    .withJaCoCo()
+                    .buildAndFail()
 
-        it("should fail the build") {
-            result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.FAILED
+            it("should fail the build") {
+                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.FAILED
+            }
+
+            it("should print an appropriate message") {
+                result.output shouldContain "Invalid test.conf file on path of test: project/call1 " +
+                        "(No configuration setting found for key 'endpoint')"
+            }
         }
+    }
 
-        it("should print an appropriate message") {
-            result.output shouldContain "Invalid test.conf file on path of test: project/call1 " +
-                    "(No configuration setting found for key 'endpoint')"
+    given("a test project containing a test with method GET set") {
+        on("running the pre-process task") {
+            val arguments = listOf("clean", "squitPreProcess", "-Pendpoint=https://example.com")
+
+            val result = GradleRunner.create()
+                    .withProjectDir(subjectGet.toFile())
+                    .withArguments(arguments)
+                    .withTestClasspath()
+                    .forwardOutput()
+                    .withJaCoCo()
+                    .build()
+
+            it("should be able to complete without error") {
+                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+            }
+
+            it("should not require or create a request file") {
+                Files.exists(getCall1Directory.resolve("request.xml")) shouldBe false
+            }
+        }
+    }
+
+    given("a test project containing tests with method OPTIONS set") {
+        on("running the pre-process task") {
+            val arguments = listOf("clean", "squitPreProcess", "-Pendpoint=https://example.com")
+
+            val result = GradleRunner.create()
+                    .withProjectDir(subjectOptions.toFile())
+                    .withArguments(arguments)
+                    .withTestClasspath()
+                    .forwardOutput()
+                    .withJaCoCo()
+                    .build()
+
+            it("should be able to complete without error") {
+                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+            }
+
+            it("should copy the request file for a test with one") {
+                Files.exists(optionsSourcesPath.resolve("call1").resolve("request.xml")) shouldBe true
+            }
+
+            it("should not require or create a request file for a test with none") {
+                Files.exists(optionsSourcesPath.resolve("call2").resolve("request.xml")) shouldBe false
+            }
         }
     }
 })
