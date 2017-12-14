@@ -53,7 +53,8 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<cool/>"))
             server.enqueue(MockResponse().setBody("<test/>"))
 
-            val arguments = listOf("clean", "squitPostProcess", "-Pendpoint=${server.url("/")}", "-Ptags=call1,call2")
+            val arguments = listOf("clean", "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                    "-Psquit.rootDir=$subject", "-Ptags=call1,call2")
 
             val result = GradleRunner.create()
                     .withProjectDir(subject.toFile())

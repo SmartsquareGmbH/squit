@@ -83,7 +83,8 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<nice/>"))
             server.enqueue(MockResponse().setBody("<relevant/>"))
 
-            val arguments = listOf("clean", "squitTest", "-Pendpoint=${server.url("/")}")
+            val arguments = listOf("clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                    "-Psquit.rootDir=$subject")
 
             val result = GradleRunner.create()
                     .withProjectDir(subject.toFile())
@@ -126,7 +127,8 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<not_cool/>"))
             server.enqueue(MockResponse().setBody("<nice/>"))
 
-            val arguments = listOf("clean", "squitTest", "-Pendpoint=${server.url("/")}", "-Ptags=call1,call2")
+            val arguments = listOf("clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                    "-Psquit.rootDir=$subject", "-Ptags=call1,call2")
 
             val result = GradleRunner.create()
                     .withProjectDir(subject.toFile())
@@ -160,7 +162,8 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<nice/>"))
             server.enqueue(MockResponse().setBody("<relevant/>"))
 
-            val arguments = listOf("clean", "squitTest", "-Pendpoint=${server.url("/")}", "-Punignore")
+            val arguments = listOf("clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                    "-Psquit.rootDir=$subject", "-Punignore")
 
             val result = GradleRunner.create()
                     .withProjectDir(subject.toFile())
@@ -189,7 +192,8 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<relevant/>"))
             server.enqueue(MockResponse().setBody("<relevant/>"))
 
-            val arguments = listOf("clean", "squitTest", "-Pendpoint=${server.url("/")}", "-Punexclude")
+            val arguments = listOf("clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                    "-Psquit.rootDir=$subject", "-Punexclude")
 
             val result = GradleRunner.create()
                     .withProjectDir(subject.toFile())

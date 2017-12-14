@@ -37,7 +37,6 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -75,8 +74,8 @@ open class SquitPreProcessTask : DefaultTask() {
     @get:Input
     val projectConfig: Config by lazy {
         ConfigValueFactory.fromMap(project.properties
-                .filterValues { it is String || it is File }
-                .mapValues { it.value.toString() })
+                .filterKeys { it is String && it.startsWith("squit.") }
+                .mapKeys { (key, _) -> key.replaceFirst("squit.", "") })
                 .toConfig()
     }
 
@@ -176,7 +175,7 @@ open class SquitPreProcessTask : DefaultTask() {
         }
 
         return try {
-            result.resolveWith(projectConfig).validate()
+            projectConfig.withFallback(result).resolve().validate()
         } catch (error: Throwable) {
             throw GradleException("Invalid test.conf file on path of test: ${testPath.cut(sourcesPath)}"
                     + " (${error.message})")

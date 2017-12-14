@@ -10,9 +10,9 @@ import org.amshove.kluent.`should be in range`
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeAfter
 import org.amshove.kluent.shouldBeBefore
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldEqual
-import org.amshove.kluent.shouldEqualTo
 import org.amshove.kluent.shouldNotContain
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
@@ -81,7 +81,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<cool/>"))
             server.enqueue(MockResponse().setBody("<nice/>"))
 
-            val arguments = listOf("clean", "squitRunRequests", "-Pendpoint=${server.url("/")}", "-Ptags=call1,call2")
+            val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                    "-Psquit.rootDir=$subject", "-Ptags=call1,call2")
 
             val result = GradleRunner.create()
                     .withProjectDir(subject.toFile())
@@ -96,8 +97,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             }
 
             it("should properly receive and save the responses") {
-                Files.readAllBytes(call1Response).toString(Charsets.UTF_8) shouldEqualTo "<cool/>"
-                Files.readAllBytes(call2Response).toString(Charsets.UTF_8) shouldEqualTo "<nice/>"
+                Files.readAllBytes(call1Response).toString(Charsets.UTF_8) shouldBeEqualTo "<cool/>"
+                Files.readAllBytes(call2Response).toString(Charsets.UTF_8) shouldBeEqualTo "<nice/>"
             }
 
             it("should write a valid meta.json file") {
@@ -111,12 +112,12 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             it("should make correct requests") {
                 server.takeRequest().let {
-                    it.method shouldEqualTo "POST"
+                    it.method shouldBeEqualTo "POST"
                     it.headers.get("Content-Type") shouldEqual "application/xml"
                 }
 
                 server.takeRequest().let {
-                    it.method shouldEqualTo "POST"
+                    it.method shouldBeEqualTo "POST"
                     it.headers.get("Content-Type") shouldEqual "application/xml"
                 }
             }
@@ -128,11 +129,11 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
                     val resultSet = connection.createStatement().executeQuery("SELECT * FROM ANIMALS")
 
                     resultSet.next()
-                    resultSet.getString(2) shouldEqualTo "brown"
-                    resultSet.getString(3) shouldEqualTo "dog"
+                    resultSet.getString(2) shouldBeEqualTo "brown"
+                    resultSet.getString(3) shouldBeEqualTo "dog"
                     resultSet.next()
-                    resultSet.getString(2) shouldEqualTo "black"
-                    resultSet.getString(3) shouldEqualTo "cat"
+                    resultSet.getString(2) shouldBeEqualTo "black"
+                    resultSet.getString(3) shouldBeEqualTo "cat"
                 }
             }
         }
@@ -140,7 +141,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
         on("running the request task with a web server, returning an error") {
             server.enqueue(MockResponse().setBody("error").setResponseCode(500))
 
-            val arguments = listOf("clean", "squitRunRequests", "-Pendpoint=${server.url("/")}", "-Ptags=call1")
+            val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                    "-Psquit.rootDir=$subject", "-Ptags=call1")
 
             val result = GradleRunner.create()
                     .withProjectDir(subject.toFile())
@@ -155,14 +157,15 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             }
 
             it("should properly receive and save the error body") {
-                Files.readAllBytes(call1Response).toString(Charsets.UTF_8) shouldEqualTo "error"
+                Files.readAllBytes(call1Response).toString(Charsets.UTF_8) shouldBeEqualTo "error"
             }
         }
 
         on("running the request task with a timeout causing web server") {
             // Nothing enqueued to cause timeout.
 
-            val arguments = listOf("clean", "squitRunRequests", "-Pendpoint=${server.url("/")}", "-Ptags=call1")
+            val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                    "-Psquit.rootDir=$subject", "-Ptags=call1")
 
             val result = GradleRunner.create()
                     .withProjectDir(subject.toFile())
@@ -196,7 +199,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
         on("running the request task") {
             server.enqueue(MockResponse().setBody("<cool/>"))
 
-            val arguments = listOf("clean", "squitRunRequests", "-Pendpoint=${server.url("/")}")
+            val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                    "-Psquit.rootDir=$subject")
 
             val result = GradleRunner.create()
                     .withProjectDir(subjectInvalid.toFile())
@@ -228,7 +232,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
         on("running the request task") {
             server.enqueue(MockResponse().setBody("<cool/>"))
 
-            val arguments = listOf("clean", "squitRunRequests", "-Pendpoint=${server.url("/")}")
+            val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                    "-Psquit.rootDir=$subject")
 
             val result = GradleRunner.create()
                     .withProjectDir(subjectGet.toFile())
@@ -244,7 +249,7 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             it("should make correct requests") {
                 server.takeRequest().let {
-                    it.method shouldEqualTo "GET"
+                    it.method shouldBeEqualTo "GET"
                     it.headers.get("Content-Type") shouldBe null
                 }
             }
@@ -264,7 +269,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<cool/>"))
             server.enqueue(MockResponse().setBody("<nice/>"))
 
-            val arguments = listOf("clean", "squitRunRequests", "-Pendpoint=${server.url("/")}")
+            val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                    "-Psquit.rootDir=$subject")
 
             val result = GradleRunner.create()
                     .withProjectDir(subjectOptions.toFile())
@@ -280,12 +286,12 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             it("should make correct requests") {
                 server.takeRequest().let {
-                    it.method shouldEqualTo "OPTIONS"
+                    it.method shouldBeEqualTo "OPTIONS"
                     it.headers.get("Content-Type") shouldEqual "application/xml"
                 }
 
                 server.takeRequest().let {
-                    it.method shouldEqualTo "OPTIONS"
+                    it.method shouldBeEqualTo "OPTIONS"
                     it.headers.get("Content-Type") shouldBe null
                 }
             }
