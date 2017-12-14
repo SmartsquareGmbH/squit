@@ -106,20 +106,22 @@ Task name          | Description
 ### Configuration
 
 The plugin features a variety of configuration possibilities. As aforementioned, these are collected in `test.conf` files.
-`test.conf` files are in the [hocon](https://github.com/lightbend/config/blob/master/HOCON.md) format and support all of its features.
+`test.conf` files are in the [HOCON](https://github.com/lightbend/config/blob/master/HOCON.md) format and support all of its features.
 As of the current version, these are the supported properties:
 
 Name                   | Description                                                                                                                                        | Example
 ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------
 endpoint               | The endpoint of your backend to call.                                                                                                              | `endpoint = "http://localhost:1234/api"`
 mediaType              | The media type of your content to send.                                                                                                            | `mediaType = "application/soap+xml"`
+method                 | The method for the request to use. The default is POST and requires a request.xml. Methods like GET do not require one.                            | `method = "GET"`
 exclude                | Excludes or un-excludes the test or test group.                                                                                                    | `exclude = true`
 ignore                 | Ignores or un-ignores the test or test group. This means that the test is run, but does not show up in anything generated at the end of the build. | `ignore = true`
 databaseConfigurations | An array of database configurations to use for pre- and post scripts. See below for details.                                                       | `databaseConfigurations = [ { / *content */ } ]`
-preProcessors          | An array of pre processor classes to use                                                                                                           | `preProcessors = ["com.example.ExamplePreProcessor"]`
-postProcessors         | An array of post processor classes to use                                                                                                          | `postProcessors = ["com.example.ExamplePostProcessor"]`
-preProcessorScripts    | An array of paths to groovy pre processor scripts to use                                                                                           | `preProcessorScripts = [./scripts/pre_processor.groovy]`
-postProcessorScripts   | An array of paths to groovy post processor scripts to use                                                                                          | `postProcessorScripts = [./scripts/post_processor.groovy]`
+preProcessors          | An array of pre processor classes to use.                                                                                                          | `preProcessors = ["com.example.ExamplePreProcessor"]`
+postProcessors         | An array of post processor classes to use.                                                                                                         | `postProcessors = ["com.example.ExamplePostProcessor"]`
+preProcessorScripts    | An array of paths to groovy pre processor scripts to use.                                                                                          | `preProcessorScripts = [./scripts/pre_processor.groovy]`
+postProcessorScripts   | An array of paths to groovy post processor scripts to use.                                                                                         | `postProcessorScripts = [./scripts/post_processor.groovy]`
+headers                | A map of headers to use for requests.                                                                                                              | `headers = { "some-header": "value" }`
 
 > The parameter `endpoint` is required and the build will fail if it is missing for a test.
 
@@ -127,7 +129,7 @@ postProcessorScripts   | An array of paths to groovy post processor scripts to u
 
 It may be useful to have a placeholder in a `test.conf` file and fill it at runtime, for example when the port of an endpoint is dynamic or when running in a CI environment.
 
-`Squit` features a simple templating engine, borrowed from [Groovy](http://docs.groovy-lang.org/next/html/documentation/template-engines.html). An example for such a template would look like this:
+The `HOCON` config format which `Squit` uses comes with support out of the box for it:
 
 ```properties
 endpoint = "http://localhost:"${port}"/someEndpoint"
