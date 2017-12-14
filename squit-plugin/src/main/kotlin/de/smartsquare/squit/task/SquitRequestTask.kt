@@ -18,13 +18,13 @@ import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.cut
 import de.smartsquare.squit.util.databaseConfigurations
 import de.smartsquare.squit.util.endpoint
+import de.smartsquare.squit.util.headers
 import de.smartsquare.squit.util.lifecycleOnSameLine
 import de.smartsquare.squit.util.mediaType
 import de.smartsquare.squit.util.method
 import de.smartsquare.squit.util.newLineIfNeeded
 import okhttp3.Call
-import okhttp3.HttpUrl
-import okhttp3.MediaType
+import okhttp3.Headers
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
@@ -159,7 +159,7 @@ open class SquitRequestTask : DefaultTask() {
         }
 
         try {
-            val apiResponse = constructApiCall(config.endpoint, requestPath, config.method, config.mediaType)
+            val apiResponse = constructApiCall(requestPath, config)
                     .execute()
                     .body()
                     ?.string() ?: ""
@@ -181,12 +181,13 @@ open class SquitRequestTask : DefaultTask() {
         Files.write(metaFilePath, metaInfo.toJson().toByteArray())
     }
 
-    private fun constructApiCall(url: HttpUrl, requestPath: Path?, method: String, mediaType: MediaType): Call {
-        val requestBody = requestPath?.let { RequestBody.create(mediaType, Files.readAllBytes(requestPath)) }
+    private fun constructApiCall(requestPath: Path?, config: Config): Call {
+        val requestBody = requestPath?.let { RequestBody.create(config.mediaType, Files.readAllBytes(requestPath)) }
 
         return okHttpClient.newCall(Request.Builder()
-                .method(method, requestBody)
-                .url(url)
+                .headers(Headers.of(config.headers))
+                .method(config.method, requestBody)
+                .url(config.endpoint)
                 .build())
     }
 

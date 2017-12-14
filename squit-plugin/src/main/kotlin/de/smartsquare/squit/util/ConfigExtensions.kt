@@ -1,6 +1,7 @@
 package de.smartsquare.squit.util
 
 import com.typesafe.config.Config
+import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigRenderOptions
 import com.typesafe.config.ConfigValueFactory
 import de.smartsquare.squit.entity.SquitDatabaseConfiguration
@@ -28,6 +29,7 @@ private const val DATABASE_CONFIGURATION_NAME = "name"
 private const val DATABASE_CONFIGURATION_JDBC_ADDRESS = "jdbc"
 private const val DATABASE_CONFIGURATION_USERNAME = "username"
 private const val DATABASE_CONFIGURATION_PASSWORD = "password"
+private const val HEADERS = "headers"
 
 /**
  * The endpoint to request against.
@@ -99,6 +101,13 @@ val Config.databaseConfigurations
         )
     }
 
+val Config.headers
+    get() = getSafeConfig(HEADERS)
+            .entrySet()
+            .map { it.toPair() }
+            .map { (key, value) -> key to value.unwrapped().toString() }
+            .toMap()
+
 /**
  * Merges the given [tag] into the existing List of tags or creates a new one with it.
  */
@@ -110,7 +119,7 @@ fun Config.mergeTag(tag: String): Config = withValue(TAGS, ConfigValueFactory.fr
 @Suppress("ComplexMethod", "ThrowsCount")
 fun Config.validate() = this.apply {
     // Call getters of properties to check existence and correct declaration.
-    endpoint; mediaType; shouldExclude; shouldIgnore
+    endpoint; mediaType; shouldExclude; shouldIgnore; headers
 
     preProcessors.forEach { Class.forName(it) }
     preProcessorScripts.forEach { FilesUtils.validateExistence(it) }
@@ -151,6 +160,11 @@ private fun Config.getSafeStringList(
         fallback: List<String> = emptyList()
 ): List<String> = when (hasPath(path)) {
     true -> getStringList(path)
+    false -> fallback
+}
+
+private fun Config.getSafeConfig(path: String, fallback: Config = ConfigFactory.empty()) = when (hasPath(path)) {
+    true -> getConfig(path)
     false -> fallback
 }
 

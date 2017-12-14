@@ -4,6 +4,7 @@ import com.typesafe.config.ConfigFactory
 import okhttp3.HttpUrl
 import okhttp3.MediaType
 import org.amshove.kluent.AnyException
+import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldNotThrow
 import org.amshove.kluent.shouldThrow
@@ -384,6 +385,33 @@ object ConfigExtensionsSpek : Spek({
 
             it("should throw a proper exception") {
                 call shouldThrow IllegalStateException::class withMessage "password of a databaseConfiguration cannot be empty."
+            }
+        }
+    }
+
+    given(" a config object with valid headers") {
+        val config = ConfigFactory.parseMap(mapOf(
+                "endpoint" to "https://example.com",
+                "headers" to mapOf(
+                        "abc" to "def",
+                        "ghi" to "jkl"
+                )
+        ))
+
+        on("getting the headers") {
+            val headers = config.headers
+
+            it("should be parsed correctly") {
+                headers shouldContain ("abc" to "def")
+                headers shouldContain ("ghi" to "jkl")
+            }
+        }
+
+        on("validating") {
+            val call = { config.validate() }
+
+            it("should not throw") {
+                call shouldNotThrow AnyException
             }
         }
     }
