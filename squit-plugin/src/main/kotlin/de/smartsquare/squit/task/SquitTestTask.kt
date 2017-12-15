@@ -107,12 +107,16 @@ open class SquitTestTask : DefaultTask() {
         writeHtmlReport(results)
         copyFailures(results)
 
-        val successfulTestAmount = results.count { it.isSuccess }
-        val failedTestAmount = results.count { !it.isSuccess }
+        val successfulAmount = results.count { !it.isIgnored && it.isSuccess }
+        val failedAmount = results.count { !it.isIgnored && !it.isSuccess }
+        val ignoredAmount = results.count { it.isIgnored }
 
-        println("${results.size} tests ran.\n$successfulTestAmount successful and $failedTestAmount failed.")
+        val totalText = if (results.size == 1) "One test ran." else "${results.size} tests ran."
+        val ignoredText = if (ignoredAmount > 0) " ($ignoredAmount ignored)" else ""
 
-        if (failedTestAmount > 0) throw GradleException("Failing tests.")
+        println("$totalText\n$successfulAmount successful and $failedAmount failed$ignoredText.")
+
+        if (failedAmount > 0) throw GradleException("Failing tests.")
     }
 
     private fun runTests(): List<SquitResult> {
@@ -140,7 +144,7 @@ open class SquitTestTask : DefaultTask() {
 
                 resultList += constructResult(diffBuilder.differences.joinToString("\n"), actualResponsePath)
             } else {
-                logger.warn("Ignoring test ${actualResponsePath.cut(processedResponsesPath)}")
+                resultList += constructResult("", actualResponsePath, true)
             }
         }
 
@@ -176,7 +180,11 @@ open class SquitTestTask : DefaultTask() {
         }
     }
 
-    private fun constructResult(differences: String, actualResponsePath: Path): SquitResult {
+    private fun constructResult(
+            differences: String,
+            actualResponsePath: Path,
+            isIgnored: Boolean = false
+    ): SquitResult {
         val squitBuildDirectoryPath = Paths.get(project.buildDir.path, SQUIT_DIRECTORY)
         val contextPath = actualResponsePath.parent.parent.cut(processedResponsesPath)
         val suitePath = actualResponsePath.parent.fileName
@@ -184,8 +192,11 @@ open class SquitTestTask : DefaultTask() {
         val id = nextResultId++
 
         return when (differences.isNotBlank()) {
-            true -> SquitResult(id, differences, contextPath, suitePath, testDirectoryPath, squitBuildDirectoryPath)
-            false -> SquitResult(id, "", contextPath, suitePath, testDirectoryPath, squitBuildDirectoryPath)
+            true -> SquitResult(id, differences, isIgnored, contextPath, suitePath,
+                    testDirectoryPath, squitBuildDirectoryPath)
+
+            false -> SquitResult(id, "", isIgnored, contextPath, suitePath,
+                    testDirectoryPath, squitBuildDirectoryPath)
         }
     }
 

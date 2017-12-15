@@ -168,8 +168,20 @@ fun DIV.squitLeafItem(resultTree: SquitResultTree, level: Int) {
 
         +resultTree.name
 
-        span(classes = "badge ${if (resultTree.isSuccess) "badge-success" else "badge-failure"}") {
-            +if (resultTree.isSuccess) "Passed" else "Failed"
+        val badgeType = when {
+            resultTree.isIgnored -> "badge-ignored"
+            resultTree.isSuccess -> "badge-success"
+            else -> "badge-failure"
+        }
+
+        val text = when {
+            resultTree.isIgnored -> "Ignored"
+            resultTree.isSuccess -> "Passed"
+            else -> "Failed"
+        }
+
+        span(classes = "badge $badgeType") {
+            +text
         }
     }
 }
@@ -189,8 +201,14 @@ fun DIV.squitContainerItem(resultTree: SquitResultTree, level: Int) {
 
         +resultTree.name
 
-        span(classes = "badge ${if (resultTree.isSuccess) "badge-success" else "badge-failure"}") {
-            +"${resultTree.successfulTests}/${resultTree.totalTests} passed"
+        val badgeType = when {
+            resultTree.isIgnored -> "badge-ignored"
+            resultTree.isSuccess -> "badge-success"
+            else -> "badge-failure"
+        }
+
+        span(classes = "badge $badgeType") {
+            +"${resultTree.successfulTests}/${resultTree.totalTests - resultTree.ignoredTests} passed"
         }
     }
 

@@ -28,7 +28,8 @@ object XmlReportWriter {
                 addAttribute("timestamp", tests.firstOrNull()?.metaInfo?.date?.toString() ?: "")
                 addAttribute("hostname", InetAddress.getLocalHost().hostName)
                 addAttribute("tests", "${tests.size}")
-                addAttribute("failures", "${tests.count { !it.isSuccess }}")
+                addAttribute("failures", "${tests.count { !it.isIgnored && !it.isSuccess }}")
+                addAttribute("skipped", "${tests.count { it.isIgnored }}")
                 addAttribute("errors", "0")
                 addAttribute("time", "${tests.sumBy { it.metaInfo.duration.toInt() } / 1000f}")
             }
@@ -39,7 +40,9 @@ object XmlReportWriter {
                     addAttribute("time", "${it.metaInfo.duration.toInt() / 1000f}")
                 }
 
-                if (!it.isSuccess) {
+                if (it.isIgnored) {
+                    testElement.addElement("skipped").addText(it.result)
+                } else if (!it.isSuccess) {
                     testElement.addElement("failure").addText(it.result)
                 }
             }

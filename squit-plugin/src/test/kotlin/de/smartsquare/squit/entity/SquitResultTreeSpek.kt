@@ -19,13 +19,14 @@ object SquitResultTreeSpek : Spek({
                 contextPath: Path,
                 suitePath: Path,
                 testDirectoryPath: Path,
-                result: String = ""
-        ) = SquitResult(0, result, contextPath, suitePath, testDirectoryPath, Paths.get(""))
+                result: String = "",
+                isIgnored: Boolean = false
+        ) = SquitResult(0, result, isIgnored, contextPath, suitePath, testDirectoryPath, Paths.get(""))
 
         val resultList = listOf(
                 constructTestSquitResult(Paths.get("a"), Paths.get("b"), Paths.get("c")),
                 constructTestSquitResult(Paths.get("a"), Paths.get("b"), Paths.get("c").resolve("c")),
-                constructTestSquitResult(Paths.get("a"), Paths.get("b"), Paths.get("d")),
+                constructTestSquitResult(Paths.get("a"), Paths.get("b"), Paths.get("d"), isIgnored = true),
                 constructTestSquitResult(Paths.get("a"), Paths.get("c"), Paths.get(""), "xyz"),
                 constructTestSquitResult(Paths.get("x"), Paths.get("y").resolve("z"), Paths.get("x"))
         )
@@ -37,7 +38,8 @@ object SquitResultTreeSpek : Spek({
                 resultTrees.size shouldBe 2
 
                 resultTrees.first().name shouldBeEqualTo "a"
-                resultTrees.first().successfulTests shouldBe 3
+                resultTrees.first().successfulTests shouldBe 2
+                resultTrees.first().ignoredTests shouldBe 1
                 resultTrees.first().failedTests shouldBe 1
                 resultTrees.first().totalTests shouldBe 4
                 resultTrees.first().isSuccess shouldBe false

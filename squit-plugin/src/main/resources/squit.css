@@ -17,3 +17,7 @@
 .badge-failure {
     background-color: #F44336;
 }
+
+.badge-ignored {
+    background-color: #757575;
+}

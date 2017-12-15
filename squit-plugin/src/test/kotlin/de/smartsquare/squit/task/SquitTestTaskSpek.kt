@@ -99,7 +99,11 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             }
 
             it("should print the amount of executed tests") {
-                result.output shouldContain "2 tests ran."
+                result.output shouldContain "3 tests ran."
+            }
+
+            it("should print the amount of successful, failed and ignored tests") {
+                result.output shouldContain "2 successful and 0 failed (1 ignored)."
             }
 
             it("should generate a xml report") {

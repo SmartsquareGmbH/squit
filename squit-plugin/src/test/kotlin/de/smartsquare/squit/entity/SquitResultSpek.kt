@@ -13,7 +13,8 @@ import java.nio.file.Paths
 object SquitResultSpek : Spek({
 
     given("a result with a full path") {
-        val subject = SquitResult(0, "", Paths.get("a"), Paths.get("b"), Paths.get("c"), Paths.get("x"))
+        val subject = SquitResult(0, "", false,
+                Paths.get("a"), Paths.get("b"), Paths.get("c"), Paths.get("x"))
 
         on("cutting the first path element") {
             val result = subject.cutFirstPathElement()
@@ -25,7 +26,8 @@ object SquitResultSpek : Spek({
     }
 
     given("a result without a context path") {
-        val subject = SquitResult(0, "", Paths.get(""), Paths.get("b"), Paths.get("c"), Paths.get("x"))
+        val subject = SquitResult(0, "", false,
+                Paths.get(""), Paths.get("b"), Paths.get("c"), Paths.get("x"))
 
         on("cutting the first path element") {
             val result = subject.cutFirstPathElement()
@@ -37,7 +39,8 @@ object SquitResultSpek : Spek({
     }
 
     given("a result with only a testDirectoryPath") {
-        val subject = SquitResult(0, "", Paths.get(""), Paths.get(""), Paths.get("c"), Paths.get("x"))
+        val subject = SquitResult(0, "", false,
+                Paths.get(""), Paths.get(""), Paths.get("c"), Paths.get("x"))
 
         on("cutting the first path element") {
             val result = subject.cutFirstPathElement()
@@ -49,7 +52,8 @@ object SquitResultSpek : Spek({
     }
 
     given("a result with an empty path") {
-        val subject = SquitResult(0, "", Paths.get(""), Paths.get(""), Paths.get(""), Paths.get("x"))
+        val subject = SquitResult(0, "", false,
+                Paths.get(""), Paths.get(""), Paths.get(""), Paths.get("x"))
 
         on("cutting the first path element") {
             val result = subject.cutFirstPathElement()

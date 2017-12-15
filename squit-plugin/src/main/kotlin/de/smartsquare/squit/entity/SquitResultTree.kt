@@ -17,7 +17,8 @@ data class SquitResultTree(
         val children: List<SquitResultTree>,
         val name: String,
         val successfulTests: Int,
-        val failedTests: Int
+        val failedTests: Int,
+        val ignoredTests: Int
 ) {
 
     companion object {
@@ -31,14 +32,15 @@ data class SquitResultTree(
             return groupedResultList.map { (_, group) ->
                 val path = group.first().fullPath
                 val name = path.first().fileName.toString()
-                val successfulTests = group.count { it.isSuccess }
-                val failedTests = group.count { !it.isSuccess }
+                val successfulTests = group.count { !it.isIgnored && it.isSuccess }
+                val failedTests = group.count { !it.isIgnored && !it.isSuccess }
+                val ignoredTests = group.count { it.isIgnored }
 
                 if (group.size == 1 && path.toList().size == 1) {
-                    SquitResultTree(group.first().id, emptyList(), name, successfulTests, failedTests)
+                    SquitResultTree(group.first().id, emptyList(), name, successfulTests, failedTests, ignoredTests)
                 } else {
                     SquitResultTree(-1, fromList(group.map { it.cutFirstPathElement() }), name,
-                            successfulTests, failedTests)
+                            successfulTests, failedTests, ignoredTests)
                 }
             }
         }
@@ -47,10 +49,15 @@ data class SquitResultTree(
     /**
      * Convenience property for the total amount of tests.
      */
-    val totalTests = successfulTests + failedTests
+    val totalTests = successfulTests + failedTests + ignoredTests
 
     /**
      * Convenience property indicating if this group is a success.
      */
     val isSuccess = failedTests == 0
+
+    /**
+     * Convenience property indicating if this group is ignored.
+     */
+    val isIgnored = successfulTests == 0 && failedTests == 0
 }

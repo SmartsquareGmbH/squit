@@ -13,6 +13,7 @@ import java.nio.file.Paths
  * @property id A unique id to use for further processing.
  * @property result The result of the test. An empty String means the test was successful, otherwise it contains the
  * XMLUnit diff.
+ * @property isIgnored If this result is ignored.
  * @param contextPath The path of the context the test has been run in. This means the test path without the suite
  * and the actual test directory.
  * @param suitePath The path of the suite the test has been run in. This means the parent directory of the test.
@@ -25,6 +26,7 @@ import java.nio.file.Paths
 data class SquitResult(
         val id: Long,
         val result: String,
+        val isIgnored: Boolean,
         private val contextPath: Path,
         private val suitePath: Path,
         private val testDirectoryPath: Path,
