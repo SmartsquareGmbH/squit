@@ -9,6 +9,7 @@ import de.smartsquare.squit.entity.SquitMetaInfo
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.util.Constants.ACTUAL_RESPONSE
 import de.smartsquare.squit.util.Constants.CONFIG
+import de.smartsquare.squit.util.Constants.ERROR
 import de.smartsquare.squit.util.Constants.META
 import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
 import de.smartsquare.squit.util.Constants.REQUEST
@@ -122,12 +123,29 @@ open class SquitRequestTask : DefaultTask() {
                 logger.lifecycleOnSameLine("Running test ${index + 1}",
                         project.gradle.startParameter.consoleOutput)
 
-                val configPath = FilesUtils.validateExistence(testDirectoryPath.resolve(CONFIG))
-                val config = ConfigFactory.parseFile(configPath.toFile())
+                val resultResponsePath = Files.createDirectories(actualResponsesPath
+                        .resolve(testDirectoryPath.cut(processedSourcesPath)))
 
-                val requestPath = resolveRequestPath(config, testDirectoryPath)
+                val errorFile = testDirectoryPath.resolve(ERROR)
+                val metaFilePath = resultResponsePath.resolve(META)
 
-                doRequestAndScriptExecutions(testDirectoryPath, requestPath, config)
+                val startTime = System.currentTimeMillis()
+
+                if (Files.exists(errorFile)) {
+                    Files.copy(errorFile, resultResponsePath.resolve(ERROR))
+                } else {
+                    val configPath = FilesUtils.validateExistence(testDirectoryPath.resolve(CONFIG))
+                    val config = ConfigFactory.parseFile(configPath.toFile())
+
+                    val requestPath = resolveRequestPath(config, testDirectoryPath)
+
+                    doRequestAndScriptExecutions(testDirectoryPath, resultResponsePath, requestPath, config)
+                }
+
+                val endTime = System.currentTimeMillis()
+                val metaInfo = SquitMetaInfo(LocalDateTime.now(), endTime - startTime)
+
+                Files.write(metaFilePath, metaInfo.toJson().toByteArray())
             }
         }
 
@@ -145,14 +163,13 @@ open class SquitRequestTask : DefaultTask() {
         }
     }
 
-    private fun doRequestAndScriptExecutions(testDirectoryPath: Path, requestPath: Path?, config: Config) {
-        val resultResponsePath = Files.createDirectories(actualResponsesPath
-                .resolve(testDirectoryPath.cut(processedSourcesPath)))
-
+    private fun doRequestAndScriptExecutions(
+            testDirectoryPath: Path,
+            resultResponsePath: Path,
+            requestPath: Path?,
+            config: Config
+    ) {
         val resultResponseFilePath = resultResponsePath.resolve(ACTUAL_RESPONSE)
-        val metaFilePath = resultResponsePath.resolve(META)
-
-        val startTime = System.currentTimeMillis()
 
         config.databaseConfigurations.forEach { (name, jdbcAddress, username, password) ->
             executeScriptIfExisting(testDirectoryPath.resolve("${name}_pre.sql"), jdbcAddress, username, password)
@@ -162,23 +179,17 @@ open class SquitRequestTask : DefaultTask() {
             val apiResponse = constructApiCall(requestPath, config)
                     .execute()
                     .body()
-                    ?.string() ?: ""
+                    ?.string()
+                    ?: throw IOException("Subject did not answer with a body")
 
             Files.write(resultResponseFilePath, apiResponse.toByteArray(Charsets.UTF_8))
         } catch (error: IOException) {
-            logger.newLineIfNeeded()
-            logger.warn("Request failed for test ${testDirectoryPath.cut(processedSourcesPath)} " +
-                    "(${error.toString().trim()})")
+            Files.write(resultResponsePath.resolve(ERROR), error.toString().toByteArray())
         }
 
         config.databaseConfigurations.forEach { (name, jdbcAddress, username, password) ->
             executeScriptIfExisting(testDirectoryPath.resolve("${name}_post.sql"), jdbcAddress, username, password)
         }
-
-        val endTime = System.currentTimeMillis()
-        val metaInfo = SquitMetaInfo(LocalDateTime.now(), endTime - startTime)
-
-        Files.write(metaFilePath, metaInfo.toJson().toByteArray())
     }
 
     private fun constructApiCall(requestPath: Path?, config: Config): Call {

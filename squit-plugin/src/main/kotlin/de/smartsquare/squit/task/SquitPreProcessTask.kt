@@ -6,8 +6,8 @@ import com.typesafe.config.ConfigValueFactory
 import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.SquitPreProcessor
 import de.smartsquare.squit.io.FilesUtils
-import de.smartsquare.squit.util.Constants
 import de.smartsquare.squit.util.Constants.CONFIG
+import de.smartsquare.squit.util.Constants.ERROR
 import de.smartsquare.squit.util.Constants.EXPECTED_RESPONSE
 import de.smartsquare.squit.util.Constants.REQUEST
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
@@ -141,13 +141,17 @@ open class SquitPreProcessTask : DefaultTask() {
             val processedRequestPath = processedResultPath.resolve(REQUEST)
             val processedResponsePath = processedResultPath.resolve(EXPECTED_RESPONSE)
 
-            val request = requestPath?.let { SAXReader().read(requestPath) }
-            val response = SAXReader().read(responsePath)
+            try {
+                val request = requestPath?.let { SAXReader().read(requestPath) }
+                val response = SAXReader().read(responsePath)
 
-            runPreProcessors(resolvedConfig, request, response)
+                runPreProcessors(resolvedConfig, request, response)
 
-            request?.write(processedRequestPath)
-            response.write(processedResponsePath)
+                request?.write(processedRequestPath)
+                response.write(processedResponsePath)
+            } catch (error: Throwable) {
+                Files.write(processedResultPath.resolve(ERROR), error.toString().toByteArray())
+            }
 
             resolvedSqlScripts.forEach { (name, content) ->
                 Files.write(processedResultPath.resolve(name), content.toByteArray())
@@ -157,13 +161,13 @@ open class SquitPreProcessTask : DefaultTask() {
         }
     }
 
-    @Suppress("TooGenericExceptionCaught", "SwallowedException")
+    @Suppress("SwallowedException")
     private fun resolveConfig(testPath: Path): Config {
         var currentDirectoryPath = testPath
         var result = ConfigFactory.empty()
 
         while (!currentDirectoryPath.endsWith(sourcesPath.parent)) {
-            currentDirectoryPath.resolve(Constants.CONFIG).also { configPath ->
+            currentDirectoryPath.resolve(CONFIG).also { configPath ->
                 val newConfig = configCache.getOrPut(configPath, {
                     ConfigFactory.parseFile(configPath.toFile())
                 })

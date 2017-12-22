@@ -38,6 +38,16 @@ object Constants {
     const val META = "meta.json"
 
     /**
+     * Filename of the diff.
+     */
+    const val DIFF = "diff.txt"
+
+    /**
+     * Filename of the error file.
+     */
+    const val ERROR = "error.txt"
+
+    /**
      * The root directory name of everything generated.
      */
     const val SQUIT_DIRECTORY = "squit"

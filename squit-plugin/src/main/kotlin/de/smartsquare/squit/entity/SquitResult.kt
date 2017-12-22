@@ -1,7 +1,13 @@
 package de.smartsquare.squit.entity
 
-import de.smartsquare.squit.util.Constants
+import de.smartsquare.squit.util.Constants.ACTUAL_RESPONSE
+import de.smartsquare.squit.util.Constants.ERROR
+import de.smartsquare.squit.util.Constants.EXPECTED_RESPONSE
 import de.smartsquare.squit.util.Constants.META
+import de.smartsquare.squit.util.Constants.PROCESSED_DIRECTORY
+import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
+import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
+import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
@@ -39,6 +45,12 @@ data class SquitResult(
     val isSuccess = result.isBlank()
 
     /**
+     * Convenience property being true if this result is an error.
+     * This differs from a failure as such an exception has been thrown.
+     */
+    val isError by lazy { Files.exists(errorPath) }
+
+    /**
      * Convenience property with the name of this test.
      *
      * The name is denoted by the filename of the directory it resides in.
@@ -65,29 +77,47 @@ data class SquitResult(
     /**
      * [List] of lines of the expected response.
      */
-    val expectedLines: List<String> by lazy { Files.readAllLines(expectedResponsePath) }
+    val expectedLines: List<String> by lazy {
+        if (isError) {
+            Files.readAllLines(errorPath)
+        } else {
+            Files.readAllLines(expectedResponsePath)
+        }
+    }
 
     /**
      * [List] of lines of the actual response.
      */
-    val actualLines: List<String> by lazy { Files.readAllLines(actualResponsePath) }
+    val actualLines: List<String> by lazy {
+        if (isError) {
+            Files.readAllLines(errorPath)
+        } else {
+            Files.readAllLines(actualResponsePath)
+        }
+    }
 
     private val metaInfoPath = squitBuildDirectoryPath
-            .resolve(Constants.RESPONSES_DIRECTORY)
-            .resolve(Constants.RAW_DIRECTORY)
+            .resolve(RESPONSES_DIRECTORY)
+            .resolve(RAW_DIRECTORY)
             .resolve(fullPath)
             .resolve(META)
 
     private val expectedResponsePath = squitBuildDirectoryPath
-            .resolve(Constants.SOURCES_DIRECTORY)
+            .resolve(SOURCES_DIRECTORY)
             .resolve(fullPath)
-            .resolve(Constants.EXPECTED_RESPONSE)
+            .resolve(EXPECTED_RESPONSE)
 
     private val actualResponsePath = squitBuildDirectoryPath
-            .resolve(Constants.RESPONSES_DIRECTORY)
-            .resolve(Constants.PROCESSED_DIRECTORY)
+            .resolve(RESPONSES_DIRECTORY)
+            .resolve(PROCESSED_DIRECTORY)
             .resolve(fullPath)
-            .resolve(Constants.ACTUAL_RESPONSE)
+            .resolve(ACTUAL_RESPONSE)
+
+    private val errorPath = squitBuildDirectoryPath
+            .resolve(RESPONSES_DIRECTORY)
+            .resolve(PROCESSED_DIRECTORY)
+            .resolve(fullPath)
+            .resolve(ERROR)
 
     /**
      * Returns a copy of this result with the first part of the [fullPath] cut.

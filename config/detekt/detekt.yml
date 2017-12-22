@@ -4,6 +4,10 @@ potential-bugs:
   UnsafeCast:
     active: false
 
+exceptions:
+  TooGenericExceptionCaught:
+    active: false
+
 style:
   FunctionMaxLength:
     active: false

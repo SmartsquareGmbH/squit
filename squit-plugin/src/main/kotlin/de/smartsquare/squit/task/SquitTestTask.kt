@@ -9,6 +9,8 @@ import de.smartsquare.squit.report.HtmlReportWriter
 import de.smartsquare.squit.report.XmlReportWriter
 import de.smartsquare.squit.util.Constants.ACTUAL_RESPONSE
 import de.smartsquare.squit.util.Constants.CONFIG
+import de.smartsquare.squit.util.Constants.DIFF
+import de.smartsquare.squit.util.Constants.ERROR
 import de.smartsquare.squit.util.Constants.EXPECTED_RESPONSE
 import de.smartsquare.squit.util.Constants.PROCESSED_DIRECTORY
 import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
@@ -26,6 +28,7 @@ import org.gradle.api.tasks.TaskAction
 import org.xmlunit.builder.DiffBuilder
 import org.xmlunit.builder.Input
 import java.io.ByteArrayInputStream
+import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -129,20 +132,30 @@ open class SquitTestTask : DefaultTask() {
             val config = ConfigFactory.parseFile(configPath.toFile())
 
             if (shouldReportTest(config)) {
-                val actualResponseFilePath = FilesUtils.validateExistence(actualResponsePath.resolve(ACTUAL_RESPONSE))
-                val expectedResponseFilePath = FilesUtils.validateExistence(processedSourcesPath
-                        .resolve(actualResponsePath.cut(processedResponsesPath))
-                        .resolve(EXPECTED_RESPONSE))
+                val errorFile = actualResponsePath.resolve(ERROR)
 
-                val expectedResponse = Files.readAllBytes(expectedResponseFilePath)
-                val actualResponse = Files.readAllBytes(actualResponseFilePath)
+                if (Files.exists(errorFile)) {
+                    resultList += constructResult(Files.readAllBytes(errorFile).toString(Charset.defaultCharset()),
+                            actualResponsePath)
+                } else {
+                    val actualResponseFilePath = FilesUtils.validateExistence(actualResponsePath
+                            .resolve(ACTUAL_RESPONSE))
 
-                val diffBuilder = DiffBuilder.compare(Input.fromStream(ByteArrayInputStream(expectedResponse)))
-                        .withTest(Input.fromStream(ByteArrayInputStream(actualResponse)))
-                        .ignoreWhitespace()
-                        .build()
+                    val expectedResponseFilePath = FilesUtils.validateExistence(processedSourcesPath
+                            .resolve(actualResponsePath.cut(processedResponsesPath))
+                            .resolve(EXPECTED_RESPONSE))
 
-                resultList += constructResult(diffBuilder.differences.joinToString("\n"), actualResponsePath)
+                    val expectedResponse = Files.readAllBytes(expectedResponseFilePath)
+                    val actualResponse = Files.readAllBytes(actualResponseFilePath)
+
+                    val diffBuilder = DiffBuilder.compare(Input.fromStream(ByteArrayInputStream(expectedResponse)))
+                            .withTest(Input.fromStream(ByteArrayInputStream(actualResponse)))
+                            .ignoreWhitespace()
+                            .build()
+
+                    resultList += constructResult(diffBuilder.differences.joinToString("\n"),
+                            actualResponsePath)
+                }
             } else {
                 resultList += constructResult("", actualResponsePath, true)
             }
@@ -172,7 +185,7 @@ open class SquitTestTask : DefaultTask() {
 
             val testProcessedSourcesPath = FilesUtils.validateExistence(processedSourcesPath.resolve(it.fullPath))
             val testActualResponsesPath = FilesUtils.validateExistence(processedResponsesPath.resolve(it.fullPath))
-            val testDifferenceFile = Files.createFile(resultDirectoryPath.resolve("diff.txt"))
+            val testDifferenceFile = Files.createFile(resultDirectoryPath.resolve(DIFF))
 
             FilesUtils.copyFilesFromDirectory(testProcessedSourcesPath, resultDirectoryPath)
             FilesUtils.copyFilesFromDirectory(testActualResponsesPath, resultDirectoryPath)

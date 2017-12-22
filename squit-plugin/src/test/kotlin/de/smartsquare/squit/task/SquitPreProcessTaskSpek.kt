@@ -3,6 +3,7 @@ package de.smartsquare.squit.task
 import de.smartsquare.squit.withJaCoCo
 import de.smartsquare.squit.withTestClasspath
 import org.amshove.kluent.shouldBe
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldNotContain
 import org.gradle.testkit.runner.GradleRunner
@@ -11,6 +12,7 @@ import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import org.jetbrains.spek.subject.SubjectSpek
+import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -23,6 +25,7 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
     subject { Paths.get(this.javaClass.classLoader.getResource("test-project").toURI()) }
 
     val subjectInvalid = Paths.get(this.javaClass.classLoader.getResource("invalid-test-project").toURI())
+    val subjectInvalid3 = Paths.get(this.javaClass.classLoader.getResource("invalid-test-project-3").toURI())
     val subjectGet = Paths.get(this.javaClass.classLoader.getResource("test-project-get").toURI())
     val subjectOptions = Paths.get(this.javaClass.classLoader.getResource("test-project-options").toURI())
 
@@ -67,6 +70,14 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
             .resolve("squit")
             .resolve("sources")
             .resolve("project")
+
+    val invalid3Call1Error = subjectInvalid3
+            .resolve("build")
+            .resolve("squit")
+            .resolve("sources")
+            .resolve("project")
+            .resolve("call1")
+            .resolve("error.txt")
 
     given("a test project") {
         on("running the pre-process task") {
@@ -130,7 +141,7 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
         }
     }
 
-    given("an invalid test project") {
+    given("an invalid test project (invalid test.conf)") {
         on("running the pre-process task") {
             val arguments = listOf("clean", "squitPreProcess")
 
@@ -149,6 +160,30 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
             it("should print an appropriate message") {
                 result.output shouldContain "Invalid test.conf file on path of test: project/call1 " +
                         "(No configuration setting found for key 'endpoint')"
+            }
+        }
+    }
+
+    given("an invalid test project (invalid response.xml)") {
+        on("running the pre-process task") {
+            val arguments = listOf("clean", "squitPreProcess")
+
+            val result = GradleRunner.create()
+                    .withProjectDir(subjectInvalid3.toFile())
+                    .withArguments(arguments)
+                    .withTestClasspath()
+                    .forwardOutput()
+                    .withJaCoCo()
+                    .build()
+
+            it("should succeed nonetheless") {
+                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+            }
+
+            it("should generate an error file") {
+                Files.readAllBytes(invalid3Call1Error).toString(Charset.defaultCharset()) shouldBeEqualTo
+                        "org.dom4j.DocumentException: Error on line 4 of document  : XML document structures " +
+                                "must start and end within the same entity."
             }
         }
     }

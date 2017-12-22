@@ -7,6 +7,7 @@ import de.smartsquare.squit.SquitPostProcessor
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.util.Constants.ACTUAL_RESPONSE
 import de.smartsquare.squit.util.Constants.CONFIG
+import de.smartsquare.squit.util.Constants.ERROR
 import de.smartsquare.squit.util.Constants.EXPECTED_RESPONSE
 import de.smartsquare.squit.util.Constants.PROCESSED_DIRECTORY
 import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
@@ -81,28 +82,38 @@ open class SquitPostProcessTask : DefaultTask() {
         Files.createDirectories(processedActualResponsesPath)
 
         FilesUtils.getSortedLeafDirectories(actualResponsesPath).forEach { testDir ->
-            val configPath = FilesUtils.validateExistence(processedSourcesPath
-                    .resolve(testDir.cut(actualResponsesPath)))
-                    .resolve(CONFIG)
-
-            val config = ConfigFactory.parseFile(configPath.toFile())
-
-            val actualResponsePath = FilesUtils.validateExistence(testDir.resolve(ACTUAL_RESPONSE))
-            val expectedResponsePath = FilesUtils.validateExistence(processedSourcesPath
-                    .resolve(testDir.cut(actualResponsesPath))
-                    .resolve(EXPECTED_RESPONSE))
-
             val resultActualResponsePath = Files.createDirectories(processedActualResponsesPath
                     .resolve(testDir.cut(actualResponsesPath)))
 
-            val resultActualResponseFilePath = resultActualResponsePath.resolve(ACTUAL_RESPONSE)
+            val errorFile = testDir.resolve(ERROR)
 
-            val actualResponse = SAXReader().read(actualResponsePath)
-            val expectedResponse = SAXReader().read(expectedResponsePath)
+            if (Files.exists(errorFile)) {
+                Files.copy(errorFile, resultActualResponsePath.resolve(ERROR))
+            } else {
+                val configPath = FilesUtils.validateExistence(processedSourcesPath
+                        .resolve(testDir.cut(actualResponsesPath)))
+                        .resolve(CONFIG)
 
-            runPostProcessors(config, actualResponse, expectedResponse)
+                val config = ConfigFactory.parseFile(configPath.toFile())
 
-            actualResponse.write(resultActualResponseFilePath)
+                val actualResponsePath = FilesUtils.validateExistence(testDir.resolve(ACTUAL_RESPONSE))
+                val expectedResponsePath = FilesUtils.validateExistence(processedSourcesPath
+                        .resolve(testDir.cut(actualResponsesPath))
+                        .resolve(EXPECTED_RESPONSE))
+
+                val resultActualResponseFilePath = resultActualResponsePath.resolve(ACTUAL_RESPONSE)
+
+                try {
+                    val actualResponse = SAXReader().read(actualResponsePath)
+                    val expectedResponse = SAXReader().read(expectedResponsePath)
+
+                    runPostProcessors(config, actualResponse, expectedResponse)
+
+                    actualResponse.write(resultActualResponseFilePath)
+                } catch (error: Throwable) {
+                    Files.write(resultActualResponsePath.resolve(ERROR), error.toString().toByteArray())
+                }
+            }
         }
     }
 

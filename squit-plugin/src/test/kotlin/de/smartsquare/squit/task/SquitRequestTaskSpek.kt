@@ -6,11 +6,11 @@ import de.smartsquare.squit.withJaCoCo
 import de.smartsquare.squit.withTestClasspath
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.amshove.kluent.`should be in range`
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeAfter
 import org.amshove.kluent.shouldBeBefore
 import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldBeInRange
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldNotContain
@@ -35,7 +35,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
     subject { File(this.javaClass.classLoader.getResource("test-project").toURI()).toPath() }
 
-    val subjectInvalid = File(this.javaClass.classLoader.getResource("invalid-test-project-2").toURI()).toPath()
+    val subjectInvalid2 = File(this.javaClass.classLoader.getResource("invalid-test-project-2").toURI()).toPath()
+    val subjectInvalid3 = File(this.javaClass.classLoader.getResource("invalid-test-project-3").toURI()).toPath()
     val subjectGet = File(this.javaClass.classLoader.getResource("test-project-get").toURI()).toPath()
     val subjectOptions = File(this.javaClass.classLoader.getResource("test-project-options").toURI()).toPath()
 
@@ -62,9 +63,22 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             .resolve("call1")
             .resolve("meta.json")
 
+    val call1Error = rawResponsesDirectory
+            .resolve("call1")
+            .resolve("error.txt")
+
     val call2Response = rawResponsesDirectory
             .resolve("call2")
             .resolve("actual_response.xml")
+
+    val invalid3Call1Error = subjectInvalid3
+            .resolve("build")
+            .resolve("squit")
+            .resolve("responses")
+            .resolve("raw")
+            .resolve("project")
+            .resolve("call1")
+            .resolve("error.txt")
 
     given("a test project") {
         beforeEachTest {
@@ -107,7 +121,7 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
                 date shouldBeBefore LocalDateTime.now()
                 date shouldBeAfter LocalDateTime.now().minusMinutes(5)
-                duration `should be in range` 5L..5000L
+                duration shouldBeInRange 5L..5000L
             }
 
             it("should make correct requests") {
@@ -140,7 +154,7 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             }
         }
 
-        on("running the request task with a web server, returning an error") {
+        on("running the request task with a web server returning an error") {
             server.enqueue(MockResponse().setBody("error").setResponseCode(500))
 
             val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
@@ -181,8 +195,9 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
                 result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
             }
 
-            it("should print an appropriate warning") {
-                result.output shouldContain "Request failed for test project/call1"
+            it("should generate an error file") {
+                Files.readAllBytes(call1Error).toString(Charset.defaultCharset()) shouldBeEqualTo
+                        "java.net.SocketTimeoutException: timeout"
             }
         }
     }
@@ -205,7 +220,7 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
                     "-Psquit.rootDir=$subject")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subjectInvalid.toFile())
+                    .withProjectDir(subjectInvalid2.toFile())
                     .withArguments(arguments)
                     .withTestClasspath()
                     .forwardOutput()
@@ -218,6 +233,30 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             it("should print an appropriate warning") {
                 result.output shouldContain "Could not run database script test_pre.sql for test project/call1"
+            }
+        }
+    }
+
+    given("a test project with an error from a previous task") {
+        on("running the request task") {
+            val arguments = listOf("clean", "squitRunRequests")
+
+            val result = GradleRunner.create()
+                    .withProjectDir(subjectInvalid3.toFile())
+                    .withArguments(arguments)
+                    .withTestClasspath()
+                    .forwardOutput()
+                    .withJaCoCo()
+                    .build()
+
+            it("should succeed nonetheless") {
+                result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
+            }
+
+            it("should propagate the error file") {
+                Files.readAllBytes(invalid3Call1Error).toString(Charset.defaultCharset()) shouldBeEqualTo
+                        "org.dom4j.DocumentException: Error on line 4 of document  : XML document structures " +
+                                "must start and end within the same entity."
             }
         }
     }

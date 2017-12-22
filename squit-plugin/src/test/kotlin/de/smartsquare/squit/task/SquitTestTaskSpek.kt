@@ -8,6 +8,7 @@ import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeDir
 import org.amshove.kluent.shouldBeEmpty
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeFile
 import org.amshove.kluent.shouldContain
 import org.gradle.testkit.runner.GradleRunner
@@ -16,6 +17,8 @@ import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import org.jetbrains.spek.subject.SubjectSpek
+import java.io.File
+import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -28,6 +31,8 @@ import kotlin.streams.toList
 object SquitTestTaskSpek : SubjectSpek<Path>({
 
     subject { Paths.get(this.javaClass.classLoader.getResource("test-project").toURI()) }
+
+    val subjectInvalid3 = File(this.javaClass.classLoader.getResource("invalid-test-project-3").toURI()).toPath()
 
     var server by Delegates.notNull<MockWebServer>()
 
@@ -66,6 +71,15 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
     val call4FailuresDirectory = failuresDirectory
             .resolve("project")
             .resolve("call4")
+
+    val invalid3Call1Error = subjectInvalid3
+            .resolve("build")
+            .resolve("squit")
+            .resolve("reports")
+            .resolve("failures")
+            .resolve("project")
+            .resolve("call1")
+            .resolve("error.txt")
 
     given("a test project") {
         beforeEachTest {
@@ -217,6 +231,30 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
 
             it("should also report the excluded test") {
                 Files.exists(call4FailuresDirectory) shouldBe true
+            }
+        }
+    }
+
+    given("a test project with an error from a previous task") {
+        on("running the test task") {
+            val arguments = listOf("clean", "squitTest")
+
+            val result = GradleRunner.create()
+                    .withProjectDir(subjectInvalid3.toFile())
+                    .withArguments(arguments)
+                    .withTestClasspath()
+                    .forwardOutput()
+                    .withJaCoCo()
+                    .buildAndFail()
+
+            it("should fail the build") {
+                result.task(":squitTest")?.outcome shouldBe TaskOutcome.FAILED
+            }
+
+            it("should create an error file in the failures directory") {
+                Files.readAllBytes(invalid3Call1Error).toString(Charset.defaultCharset()) shouldBeEqualTo
+                        "org.dom4j.DocumentException: Error on line 4 of document  : XML document structures " +
+                                "must start and end within the same entity."
             }
         }
     }

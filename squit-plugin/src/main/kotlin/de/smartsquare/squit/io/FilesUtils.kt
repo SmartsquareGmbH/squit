@@ -4,6 +4,7 @@ import de.smartsquare.squit.util.cut
 import org.gradle.api.GradleException
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
 /**
  * Object with io related utility methods in the style of [java.nio.file.Files].
@@ -58,7 +59,9 @@ object FilesUtils {
      */
     fun copyFilesFromDirectory(source: Path, dest: Path) {
         Files.newDirectoryStream(source, { Files.isRegularFile(it) }).use { files ->
-            files.forEach { file -> Files.copy(file, dest.resolve(file.cut(source))) }
+            files.forEach { file ->
+                Files.copy(file, dest.resolve(file.cut(source)), REPLACE_EXISTING)
+            }
         }
     }
 
