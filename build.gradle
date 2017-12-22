@@ -27,7 +27,6 @@ subprojects {
 
     repositories {
         jcenter()
-        mavenCentral()
     }
 
     tasks.matching { it.name.matches('compile.*Kotlin') }.all {
@@ -42,5 +41,5 @@ task clean(type: Delete) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = project.ext.gradleVersion
+    setGradleVersion(project.ext.gradleVersion)
 }

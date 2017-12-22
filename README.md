@@ -46,12 +46,12 @@ Projects are structured in arbitrarily deep folders. The plugin expects the root
 
 A single test is represented by one leaf folder. That folder **must** contain:
 
-- A `request.xml` file.
 - A `response.xml` file.
 
 Further it **can** contain:
 
 - A `test.conf` file.
+- A `request.xml` file.
 - `db_$name_pre.sql` files.
 - `db_$name_post.sql` files.
 

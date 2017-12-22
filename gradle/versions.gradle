@@ -1,5 +1,5 @@
 ext {
-    gradleVersion = '4.4'
+    gradleVersion = '4.4.1'
     squitVersion = '1.1.2-SNAPSHOT'
 
     gradlePublishVersion = '0.9.9'
@@ -30,6 +30,6 @@ ext {
 
     junitPlatformVersion = '1.0.2'
     spekVersion = '1.1.5'
-    kluentVersion = '1.32'
+    kluentVersion = '1.33'
     h2Version = '1.4.196'
 }

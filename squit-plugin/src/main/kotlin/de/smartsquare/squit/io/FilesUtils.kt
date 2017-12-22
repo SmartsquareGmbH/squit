@@ -21,17 +21,14 @@ object FilesUtils {
                 val firstNumber = first.fileName.toString().substringBefore("-").toIntOrNull()
                 val secondNumber = second.fileName.toString().substringBefore("-").toIntOrNull()
 
-                if (firstNumber != null) {
-                    if (secondNumber != null) {
-                        firstNumber.compareTo(secondNumber)
-                    } else {
-                        -1
+                when {
+                    firstNumber != null -> when {
+                        secondNumber != null -> firstNumber.compareTo(secondNumber)
+                        else -> -1
                     }
-                } else {
-                    if (secondNumber != null) {
-                        1
-                    } else {
-                        first.fileName.compareTo(second.fileName)
+                    else -> when {
+                        secondNumber != null -> 1
+                        else -> first.fileName.compareTo(second.fileName)
                     }
                 }
             })
