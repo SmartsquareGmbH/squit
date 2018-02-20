@@ -1,11 +1,11 @@
 ext {
     gradleVersion = '4.4.1'
-    squitVersion = '1.1.2-SNAPSHOT'
+    squitVersion = '1.1.2'
 
     gradlePublishVersion = '0.9.9'
     bintrayPublishVersion = '1.8.0'
 
-    kotlinVersion = '1.2.10'
+    kotlinVersion = '1.2.21'
     dokkaVersion = '0.9.15'
 
     jacocoVersion = '0.7.9'
