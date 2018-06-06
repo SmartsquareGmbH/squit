@@ -1,13 +1,13 @@
 package de.smartsquare.squit.entity
 
-import de.smartsquare.squit.util.Constants.ACTUAL_RESPONSE
+import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.util.Constants.ERROR
-import de.smartsquare.squit.util.Constants.EXPECTED_RESPONSE
 import de.smartsquare.squit.util.Constants.META
 import de.smartsquare.squit.util.Constants.PROCESSED_DIRECTORY
 import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
 import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
+import okhttp3.MediaType
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
@@ -20,6 +20,7 @@ import java.nio.file.Paths
  * @property result The result of the test. An empty String means the test was successful, otherwise it contains the
  * XMLUnit diff.
  * @property isIgnored If this result is ignored.
+ * @property mediaType The media type of the associated request and response.
  * @param contextPath The path of the context the test has been run in. This means the test path without the suite
  * and the actual test directory.
  * @param suitePath The path of the suite the test has been run in. This means the parent directory of the test.
@@ -33,6 +34,7 @@ data class SquitResult(
     val id: Long,
     val result: String,
     val isIgnored: Boolean,
+    val mediaType: MediaType,
     private val contextPath: Path,
     private val suitePath: Path,
     private val testDirectoryPath: Path,
@@ -105,13 +107,13 @@ data class SquitResult(
     private val expectedResponsePath = squitBuildDirectoryPath
         .resolve(SOURCES_DIRECTORY)
         .resolve(fullPath)
-        .resolve(EXPECTED_RESPONSE)
+        .resolve(MediaTypeFactory.expectedResponse(mediaType))
 
     private val actualResponsePath = squitBuildDirectoryPath
         .resolve(RESPONSES_DIRECTORY)
         .resolve(PROCESSED_DIRECTORY)
         .resolve(fullPath)
-        .resolve(ACTUAL_RESPONSE)
+        .resolve(MediaTypeFactory.actualResponse(mediaType))
 
     private val errorPath = squitBuildDirectoryPath
         .resolve(RESPONSES_DIRECTORY)

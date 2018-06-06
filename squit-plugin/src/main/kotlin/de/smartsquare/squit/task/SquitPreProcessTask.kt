@@ -4,32 +4,22 @@ import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
 import de.smartsquare.squit.SquitExtension
-import de.smartsquare.squit.SquitPreProcessor
 import de.smartsquare.squit.io.FilesUtils
+import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.util.Constants.CONFIG
 import de.smartsquare.squit.util.Constants.ERROR
-import de.smartsquare.squit.util.Constants.EXPECTED_RESPONSE
-import de.smartsquare.squit.util.Constants.REQUEST
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
-import de.smartsquare.squit.util.Constants.SOURCE_RESPONSE
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.cut
 import de.smartsquare.squit.util.databaseConfigurations
+import de.smartsquare.squit.util.mediaType
 import de.smartsquare.squit.util.mergeTag
 import de.smartsquare.squit.util.method
-import de.smartsquare.squit.util.preProcessorScripts
-import de.smartsquare.squit.util.preProcessors
-import de.smartsquare.squit.util.read
 import de.smartsquare.squit.util.shouldExclude
 import de.smartsquare.squit.util.tags
 import de.smartsquare.squit.util.validate
-import de.smartsquare.squit.util.write
 import de.smartsquare.squit.util.writeTo
-import groovy.lang.Binding
-import groovy.lang.GroovyShell
 import okhttp3.internal.http.HttpMethod
-import org.dom4j.Document
-import org.dom4j.io.SAXReader
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
@@ -97,7 +87,7 @@ open class SquitPreProcessTask : DefaultTask() {
     @get:Internal
     internal var extension by Delegates.notNull<SquitExtension>()
 
-    private val leafDirectoriesWithProperties by lazy {
+    private val leafDirectoriesWithConfig by lazy {
         FilesUtils.getSortedLeafDirectories(sourcesPath)
             .map { it to resolveConfig(it) }
             .filter { (testPath, resolvedProperties) ->
@@ -130,25 +120,26 @@ open class SquitPreProcessTask : DefaultTask() {
         FilesUtils.deleteRecursivelyIfExisting(processedSourcesPath)
         Files.createDirectories(processedSourcesPath)
 
-        leafDirectoriesWithProperties.forEach { (testPath, resolvedConfig) ->
+        leafDirectoriesWithConfig.forEach { (testPath, resolvedConfig) ->
             val requestPath = resolveRequestPath(resolvedConfig, testPath)
 
-            val responsePath = FilesUtils.validateExistence(testPath.resolve(SOURCE_RESPONSE))
+            val responsePath = FilesUtils.validateExistence(testPath
+                .resolve(MediaTypeFactory.sourceResponse(resolvedConfig.mediaType)))
+
             val resolvedSqlScripts = resolveSqlScripts(testPath, resolvedConfig)
 
             val processedResultPath = Files.createDirectories(processedSourcesPath.resolve(testPath.cut(sourcesPath)))
             val processedConfigPath = processedResultPath.resolve(CONFIG)
-            val processedRequestPath = processedResultPath.resolve(REQUEST)
-            val processedResponsePath = processedResultPath.resolve(EXPECTED_RESPONSE)
+
+            val processedRequestPath = processedResultPath
+                .resolve(MediaTypeFactory.request(resolvedConfig.mediaType))
+
+            val processedResponsePath = processedResultPath
+                .resolve(MediaTypeFactory.expectedResponse(resolvedConfig.mediaType))
 
             try {
-                val request = requestPath?.let { SAXReader().read(requestPath) }
-                val response = SAXReader().read(responsePath)
-
-                runPreProcessors(resolvedConfig, request, response)
-
-                request?.write(processedRequestPath)
-                response.write(processedResponsePath)
+                MediaTypeFactory.processor(resolvedConfig.mediaType)
+                    .preProcess(requestPath, responsePath, processedRequestPath, processedResponsePath, resolvedConfig)
             } catch (error: Throwable) {
                 Files.write(processedResultPath.resolve(ERROR), error.toString().toByteArray())
             }
@@ -186,16 +177,18 @@ open class SquitPreProcessTask : DefaultTask() {
         }
     }
 
-    private fun resolveRequestPath(config: Config, testPath: Path) = testPath.resolve(REQUEST).let {
-        when {
-            HttpMethod.requiresRequestBody(config.method) -> FilesUtils.validateExistence(it)
-            HttpMethod.permitsRequestBody(config.method) -> when (Files.exists(it)) {
-                true -> it
+    private fun resolveRequestPath(config: Config, testPath: Path) = testPath
+        .resolve(MediaTypeFactory.request(config.mediaType))
+        .let {
+            when {
+                HttpMethod.requiresRequestBody(config.method) -> FilesUtils.validateExistence(it)
+                HttpMethod.permitsRequestBody(config.method) -> when (Files.exists(it)) {
+                    true -> it
+                    else -> null
+                }
                 else -> null
             }
-            else -> null
         }
-    }
 
     private fun resolveSqlScripts(testPath: Path, config: Config): List<Pair<String, String>> {
         val result = mutableMapOf<String, String>()
@@ -203,7 +196,7 @@ open class SquitPreProcessTask : DefaultTask() {
 
         while (!currentDirectoryPath.endsWith(sourcesPath.parent)) {
             val leafsFromHere = pathCache.getOrPut(currentDirectoryPath, {
-                leafDirectoriesWithProperties
+                leafDirectoriesWithConfig
                     .filter { (path, _) -> path.startsWith(currentDirectoryPath) }
                     .map { (path, _) -> path }
             })
@@ -240,7 +233,7 @@ open class SquitPreProcessTask : DefaultTask() {
                 if (Files.exists(postOncePath) && leafsFromHere.indexOf(testPath) == leafsFromHere.lastIndex) {
                     val content = Files.readAllBytes(postOncePath).toString(Charsets.UTF_8)
 
-                    result.put(postName, result.getOrDefault(postName, "") + content)
+                    result[postName] = result.getOrDefault(postName, "") + content
                 }
             }
 
@@ -248,23 +241,6 @@ open class SquitPreProcessTask : DefaultTask() {
         }
 
         return result.toList()
-    }
-
-    private fun runPreProcessors(config: Config, request: Document?, response: Document) {
-        config.preProcessors.forEach {
-            val preProcessor = Class.forName(it).newInstance() as SquitPreProcessor
-
-            preProcessor.process(request, response)
-        }
-
-        config.preProcessorScripts.forEach {
-            GroovyShell(javaClass.classLoader).parse(Files.newBufferedReader(it)).apply {
-                binding = Binding(mapOf(
-                    "request" to request,
-                    "expectedResponse" to response
-                ))
-            }.run()
-        }
     }
 
     private fun isTestExcluded(config: Config) = config.shouldExclude && !shouldUnexclude

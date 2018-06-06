@@ -1,5 +1,6 @@
 package de.smartsquare.squit.entity
 
+import okhttp3.MediaType
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.jetbrains.spek.api.Spek
@@ -19,15 +20,19 @@ object SquitResultTreeSpek : Spek({
             contextPath: Path,
             suitePath: Path,
             testDirectoryPath: Path,
+            mediaType: MediaType = MediaType.parse("application/xml") ?: throw NullPointerException(),
             result: String = "",
             isIgnored: Boolean = false
-        ) = SquitResult(0, result, isIgnored, contextPath, suitePath, testDirectoryPath, Paths.get(""))
+        ): SquitResult {
+            return SquitResult(0, result, isIgnored, mediaType,
+                contextPath, suitePath, testDirectoryPath, Paths.get(""))
+        }
 
         val resultList = listOf(
             constructTestSquitResult(Paths.get("a"), Paths.get("b"), Paths.get("c")),
             constructTestSquitResult(Paths.get("a"), Paths.get("b"), Paths.get("c").resolve("c")),
             constructTestSquitResult(Paths.get("a"), Paths.get("b"), Paths.get("d"), isIgnored = true),
-            constructTestSquitResult(Paths.get("a"), Paths.get("c"), Paths.get(""), "xyz"),
+            constructTestSquitResult(Paths.get("a"), Paths.get("c"), Paths.get(""), result = "xyz"),
             constructTestSquitResult(Paths.get("x"), Paths.get("y").resolve("z"), Paths.get("x"))
         )
 

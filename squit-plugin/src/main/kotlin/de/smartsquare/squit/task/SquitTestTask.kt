@@ -5,19 +5,20 @@ import com.typesafe.config.ConfigFactory
 import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.entity.SquitResult
 import de.smartsquare.squit.io.FilesUtils
+import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.report.HtmlReportWriter
 import de.smartsquare.squit.report.XmlReportWriter
-import de.smartsquare.squit.util.Constants.ACTUAL_RESPONSE
 import de.smartsquare.squit.util.Constants.CONFIG
 import de.smartsquare.squit.util.Constants.DIFF
 import de.smartsquare.squit.util.Constants.ERROR
-import de.smartsquare.squit.util.Constants.EXPECTED_RESPONSE
 import de.smartsquare.squit.util.Constants.PROCESSED_DIRECTORY
 import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.cut
+import de.smartsquare.squit.util.mediaType
 import de.smartsquare.squit.util.shouldIgnore
+import okhttp3.MediaType
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputDirectory
@@ -136,14 +137,14 @@ open class SquitTestTask : DefaultTask() {
 
                 if (Files.exists(errorFile)) {
                     resultList += constructResult(Files.readAllBytes(errorFile).toString(Charset.defaultCharset()),
-                        actualResponsePath)
+                        actualResponsePath, config.mediaType)
                 } else {
                     val actualResponseFilePath = FilesUtils.validateExistence(actualResponsePath
-                        .resolve(ACTUAL_RESPONSE))
+                        .resolve(MediaTypeFactory.actualResponse(config.mediaType)))
 
                     val expectedResponseFilePath = FilesUtils.validateExistence(processedSourcesPath
                         .resolve(actualResponsePath.cut(processedResponsesPath))
-                        .resolve(EXPECTED_RESPONSE))
+                        .resolve(MediaTypeFactory.expectedResponse(config.mediaType)))
 
                     val expectedResponse = Files.readAllBytes(expectedResponseFilePath)
                     val actualResponse = Files.readAllBytes(actualResponseFilePath)
@@ -154,10 +155,10 @@ open class SquitTestTask : DefaultTask() {
                         .build()
 
                     resultList += constructResult(diffBuilder.differences.joinToString("\n"),
-                        actualResponsePath)
+                        actualResponsePath, config.mediaType)
                 }
             } else {
-                resultList += constructResult("", actualResponsePath, true)
+                resultList += constructResult("", actualResponsePath, config.mediaType, true)
             }
         }
 
@@ -196,6 +197,7 @@ open class SquitTestTask : DefaultTask() {
     private fun constructResult(
         differences: String,
         actualResponsePath: Path,
+        mediaType: MediaType,
         isIgnored: Boolean = false
     ): SquitResult {
         val squitBuildDirectoryPath = Paths.get(project.buildDir.path, SQUIT_DIRECTORY)
@@ -205,10 +207,10 @@ open class SquitTestTask : DefaultTask() {
         val id = nextResultId++
 
         return when (differences.isNotBlank()) {
-            true -> SquitResult(id, differences, isIgnored, contextPath, suitePath,
+            true -> SquitResult(id, differences, isIgnored, mediaType, contextPath, suitePath,
                 testDirectoryPath, squitBuildDirectoryPath)
 
-            false -> SquitResult(id, "", isIgnored, contextPath, suitePath,
+            false -> SquitResult(id, "", isIgnored, mediaType, contextPath, suitePath,
                 testDirectoryPath, squitBuildDirectoryPath)
         }
     }

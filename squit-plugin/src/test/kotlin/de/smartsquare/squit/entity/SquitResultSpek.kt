@@ -1,5 +1,6 @@
 package de.smartsquare.squit.entity
 
+import okhttp3.MediaType
 import org.amshove.kluent.shouldEqual
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
@@ -12,8 +13,10 @@ import java.nio.file.Paths
  */
 object SquitResultSpek : Spek({
 
+    val mediaType = MediaType.parse("application/xml") ?: throw NullPointerException()
+
     given("a result with a full path") {
-        val subject = SquitResult(0, "", false,
+        val subject = SquitResult(0, "", false, mediaType,
             Paths.get("a"), Paths.get("b"), Paths.get("c"), Paths.get("x"))
 
         on("cutting the first path element") {
@@ -26,7 +29,7 @@ object SquitResultSpek : Spek({
     }
 
     given("a result without a context path") {
-        val subject = SquitResult(0, "", false,
+        val subject = SquitResult(0, "", false, mediaType,
             Paths.get(""), Paths.get("b"), Paths.get("c"), Paths.get("x"))
 
         on("cutting the first path element") {
@@ -39,7 +42,7 @@ object SquitResultSpek : Spek({
     }
 
     given("a result with only a testDirectoryPath") {
-        val subject = SquitResult(0, "", false,
+        val subject = SquitResult(0, "", false, mediaType,
             Paths.get(""), Paths.get(""), Paths.get("c"), Paths.get("x"))
 
         on("cutting the first path element") {
@@ -52,7 +55,7 @@ object SquitResultSpek : Spek({
     }
 
     given("a result with an empty path") {
-        val subject = SquitResult(0, "", false,
+        val subject = SquitResult(0, "", false, mediaType,
             Paths.get(""), Paths.get(""), Paths.get(""), Paths.get("x"))
 
         on("cutting the first path element") {

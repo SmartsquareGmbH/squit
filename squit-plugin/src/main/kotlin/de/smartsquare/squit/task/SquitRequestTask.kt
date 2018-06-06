@@ -7,12 +7,11 @@ import de.smartsquare.squit.db.ConnectionCollection
 import de.smartsquare.squit.db.executeScript
 import de.smartsquare.squit.entity.SquitMetaInfo
 import de.smartsquare.squit.io.FilesUtils
-import de.smartsquare.squit.util.Constants.ACTUAL_RESPONSE
+import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.util.Constants.CONFIG
 import de.smartsquare.squit.util.Constants.ERROR
 import de.smartsquare.squit.util.Constants.META
 import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
-import de.smartsquare.squit.util.Constants.REQUEST
 import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
@@ -112,7 +111,7 @@ open class SquitRequestTask : DefaultTask() {
     @TaskAction
     fun run() {
         jdbcDriverClassNames.forEach {
-            DriverManager.registerDriver(Class.forName(it).newInstance() as Driver)
+            DriverManager.registerDriver(Class.forName(it).getConstructor().newInstance() as Driver)
         }
 
         FilesUtils.deleteRecursivelyIfExisting(actualResponsesPath)
@@ -152,16 +151,18 @@ open class SquitRequestTask : DefaultTask() {
         logger.newLineIfNeeded()
     }
 
-    private fun resolveRequestPath(config: Config, testPath: Path) = testPath.resolve(REQUEST).let {
-        when {
-            HttpMethod.requiresRequestBody(config.method) -> FilesUtils.validateExistence(it)
-            HttpMethod.permitsRequestBody(config.method) -> when (Files.exists(it)) {
-                true -> it
+    private fun resolveRequestPath(config: Config, testPath: Path) = testPath
+        .resolve(MediaTypeFactory.request(config.mediaType))
+        .let {
+            when {
+                HttpMethod.requiresRequestBody(config.method) -> FilesUtils.validateExistence(it)
+                HttpMethod.permitsRequestBody(config.method) -> when (Files.exists(it)) {
+                    true -> it
+                    else -> null
+                }
                 else -> null
             }
-            else -> null
         }
-    }
 
     private fun doRequestAndScriptExecutions(
         testDirectoryPath: Path,
@@ -169,7 +170,7 @@ open class SquitRequestTask : DefaultTask() {
         requestPath: Path?,
         config: Config
     ) {
-        val resultResponseFilePath = resultResponsePath.resolve(ACTUAL_RESPONSE)
+        val resultResponseFilePath = resultResponsePath.resolve(MediaTypeFactory.actualResponse(config.mediaType))
 
         config.databaseConfigurations.forEach { (name, jdbcAddress, username, password) ->
             executeScriptIfExisting(testDirectoryPath.resolve("${name}_pre.sql"), jdbcAddress, username, password)

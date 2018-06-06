@@ -2,8 +2,8 @@ package de.smartsquare.squit.task
 
 import de.smartsquare.squit.TestUtils
 import de.smartsquare.squit.entity.SquitMetaInfo
+import de.smartsquare.squit.withExtendedPluginClasspath
 import de.smartsquare.squit.withJaCoCo
-import de.smartsquare.squit.withTestClasspath
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
@@ -14,6 +14,7 @@ import org.amshove.kluent.shouldBeInRange
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldNotContain
+import org.amshove.kluent.shouldStartWith
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.spek.api.dsl.given
@@ -39,6 +40,7 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
     val subjectInvalid3 = File(this.javaClass.classLoader.getResource("invalid-test-project-3").toURI()).toPath()
     val subjectGet = File(this.javaClass.classLoader.getResource("test-project-get").toURI()).toPath()
     val subjectOptions = File(this.javaClass.classLoader.getResource("test-project-options").toURI()).toPath()
+    val subjectJson = File(this.javaClass.classLoader.getResource("test-project-json").toURI()).toPath()
 
     var server by Delegates.notNull<MockWebServer>()
 
@@ -80,6 +82,15 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
         .resolve("call1")
         .resolve("error.txt")
 
+    val jsonCall1Response = subjectJson
+        .resolve("build")
+        .resolve("squit")
+        .resolve("responses")
+        .resolve("raw")
+        .resolve("project")
+        .resolve("call1")
+        .resolve("actual_response.json")
+
     given("a test project") {
         beforeEachTest {
             server = MockWebServer()
@@ -100,8 +111,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .build()
@@ -162,8 +173,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .build()
@@ -185,8 +196,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .build()
@@ -221,8 +232,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectInvalid2.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .build()
@@ -243,8 +254,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectInvalid3.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .build()
@@ -254,9 +265,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             }
 
             it("should propagate the error file") {
-                Files.readAllBytes(invalid3Call1Error).toString(Charset.defaultCharset()) shouldBeEqualTo
-                    "org.dom4j.DocumentException: Error on line 4 of document  : XML document structures " +
-                    "must start and end within the same entity."
+                Files.readAllBytes(invalid3Call1Error).toString(Charset.defaultCharset()) shouldStartWith
+                    "org.dom4j.DocumentException: Error on line 4 of document"
             }
         }
     }
@@ -278,8 +288,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectGet.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .build()
@@ -315,8 +325,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectOptions.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .build()
@@ -334,6 +344,45 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
                 server.takeRequest().let {
                     it.method shouldBeEqualTo "OPTIONS"
                     it.headers.get("Content-Type") shouldBe null
+                }
+            }
+        }
+    }
+
+    given("a test project with json requests") {
+        beforeEachTest {
+            server = MockWebServer()
+        }
+
+        afterEachTest {
+            server.shutdown()
+        }
+
+        on("running the request task") {
+            server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}"))
+
+            val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subjectJson")
+
+            val result = GradleRunner.create()
+                .withProjectDir(subjectJson.toFile())
+                .withExtendedPluginClasspath()
+                .withArguments(arguments)
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
+
+            it("should be able to complete without errors") {
+                result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
+            }
+
+            it("should properly receive and save the responses") {
+                Files.readAllBytes(jsonCall1Response).toString(Charsets.UTF_8) shouldBeEqualTo "{\n  \"cool\": true\n}"
+            }
+
+            it("should make correct requests") {
+                server.takeRequest().let {
+                    it.headers.get("Content-Type") shouldEqual "application/json"
                 }
             }
         }

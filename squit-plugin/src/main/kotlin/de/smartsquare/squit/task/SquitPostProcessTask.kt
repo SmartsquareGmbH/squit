@@ -1,28 +1,18 @@
 package de.smartsquare.squit.task
 
-import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import de.smartsquare.squit.SquitExtension
-import de.smartsquare.squit.SquitPostProcessor
 import de.smartsquare.squit.io.FilesUtils
-import de.smartsquare.squit.util.Constants.ACTUAL_RESPONSE
+import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.util.Constants.CONFIG
 import de.smartsquare.squit.util.Constants.ERROR
-import de.smartsquare.squit.util.Constants.EXPECTED_RESPONSE
 import de.smartsquare.squit.util.Constants.PROCESSED_DIRECTORY
 import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
 import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.cut
-import de.smartsquare.squit.util.postProcessorScripts
-import de.smartsquare.squit.util.postProcessors
-import de.smartsquare.squit.util.read
-import de.smartsquare.squit.util.write
-import groovy.lang.Binding
-import groovy.lang.GroovyShell
-import org.dom4j.Document
-import org.dom4j.io.SAXReader
+import de.smartsquare.squit.util.mediaType
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
@@ -96,41 +86,23 @@ open class SquitPostProcessTask : DefaultTask() {
 
                 val config = ConfigFactory.parseFile(configPath.toFile())
 
-                val actualResponsePath = FilesUtils.validateExistence(testDir.resolve(ACTUAL_RESPONSE))
+                val actualResponsePath = FilesUtils.validateExistence(testDir
+                    .resolve(MediaTypeFactory.actualResponse(config.mediaType)))
+
                 val expectedResponsePath = FilesUtils.validateExistence(processedSourcesPath
                     .resolve(testDir.cut(actualResponsesPath))
-                    .resolve(EXPECTED_RESPONSE))
+                    .resolve(MediaTypeFactory.expectedResponse(config.mediaType)))
 
-                val resultActualResponseFilePath = resultActualResponsePath.resolve(ACTUAL_RESPONSE)
+                val resultActualResponseFilePath = resultActualResponsePath
+                    .resolve(MediaTypeFactory.actualResponse(config.mediaType))
 
                 try {
-                    val actualResponse = SAXReader().read(actualResponsePath)
-                    val expectedResponse = SAXReader().read(expectedResponsePath)
-
-                    runPostProcessors(config, actualResponse, expectedResponse)
-
-                    actualResponse.write(resultActualResponseFilePath)
+                    MediaTypeFactory.processor(config.mediaType)
+                        .postProcess(actualResponsePath, expectedResponsePath, resultActualResponseFilePath, config)
                 } catch (error: Throwable) {
                     Files.write(resultActualResponsePath.resolve(ERROR), error.toString().toByteArray())
                 }
             }
-        }
-    }
-
-    private fun runPostProcessors(config: Config, actualResponse: Document, expectedResponse: Document) {
-        config.postProcessors.forEach {
-            val postProcessor = Class.forName(it).newInstance() as SquitPostProcessor
-
-            postProcessor.process(actualResponse, expectedResponse)
-        }
-
-        config.postProcessorScripts.forEach {
-            GroovyShell(javaClass.classLoader).parse(Files.newBufferedReader(it)).apply {
-                binding = Binding(mapOf(
-                    "actualResponse" to actualResponse,
-                    "expectedResponse" to expectedResponse
-                ))
-            }.run()
         }
     }
 }

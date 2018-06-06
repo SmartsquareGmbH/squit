@@ -1,7 +1,4 @@
 plugins {
+    id 'base'
     id 'de.smartsquare.squit'
-}
-
-task clean(type: Delete) {
-    delete project.buildDir
 }

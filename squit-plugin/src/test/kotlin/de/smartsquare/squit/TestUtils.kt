@@ -3,7 +3,6 @@ package de.smartsquare.squit
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.internal.PluginUnderTestMetadataReading
 import java.io.File
-import java.net.URLClassLoader
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -21,14 +20,11 @@ object TestUtils {
 }
 
 /**
- * Helper method for adding the testImplementation classpath to the gradle test-kit runner.
+ * Adds the plugin classpath to this runner with additional needed dependencies, not being included by default.
  */
-@Suppress("ExpressionBodySyntax")
-fun GradleRunner.withTestClasspath(): GradleRunner {
-    val classpath = mutableSetOf<File>()
-
-    classpath.addAll(PluginUnderTestMetadataReading.readImplementationClasspath())
-    classpath.addAll((javaClass.classLoader as URLClassLoader).urLs.map { File(it.file) })
+fun GradleRunner.withExtendedPluginClasspath(): GradleRunner {
+    val classpath = PluginUnderTestMetadataReading.readImplementationClasspath()
+        .plus(File(org.h2.Driver::class.java.protectionDomain.codeSource.location.toURI()))
 
     return withPluginClasspath(classpath)
 }

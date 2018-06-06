@@ -1,13 +1,13 @@
 package de.smartsquare.squit.task
 
 import de.smartsquare.squit.TestUtils
+import de.smartsquare.squit.withExtendedPluginClasspath
 import de.smartsquare.squit.withJaCoCo
-import de.smartsquare.squit.withTestClasspath
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
-import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldContain
+import org.amshove.kluent.shouldStartWith
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.spek.api.dsl.given
@@ -28,6 +28,7 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
     subject { File(this.javaClass.classLoader.getResource("test-project").toURI()).toPath() }
 
     val subjectInvalid3 = File(this.javaClass.classLoader.getResource("invalid-test-project-3").toURI()).toPath()
+    val subjectJson = File(this.javaClass.classLoader.getResource("test-project-json").toURI()).toPath()
 
     var server by Delegates.notNull<MockWebServer>()
 
@@ -56,6 +57,15 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
         .resolve("call1")
         .resolve("error.txt")
 
+    val jsonCall2Response = subjectJson
+        .resolve("build")
+        .resolve("squit")
+        .resolve("responses")
+        .resolve("processed")
+        .resolve("project")
+        .resolve("call1")
+        .resolve("actual_response.json")
+
     given("a test project") {
         beforeEachTest {
             server = MockWebServer()
@@ -76,8 +86,8 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .build()
@@ -100,8 +110,8 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .build()
@@ -111,9 +121,8 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
             }
 
             it("should create an error file") {
-                Files.readAllBytes(call2Error).toString(Charsets.UTF_8) shouldBeEqualTo
-                    "org.dom4j.DocumentException: Error on line 1 of document  : XML document structures " +
-                    "must start and end within the same entity."
+                Files.readAllBytes(call2Error).toString(Charsets.UTF_8) shouldStartWith
+                    "org.dom4j.DocumentException: Error on line 1 of document"
             }
         }
     }
@@ -124,8 +133,8 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectInvalid3.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .build()
@@ -135,9 +144,41 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
             }
 
             it("should propagate the error file") {
-                Files.readAllBytes(invalid3Call1Error).toString(Charset.defaultCharset()) shouldBeEqualTo
-                    "org.dom4j.DocumentException: Error on line 4 of document  : XML document structures " +
-                    "must start and end within the same entity."
+                Files.readAllBytes(invalid3Call1Error).toString(Charset.defaultCharset()) shouldStartWith
+                    "org.dom4j.DocumentException: Error on line 4 of document"
+            }
+        }
+    }
+
+    given("a test project with json requests") {
+        beforeEachTest {
+            server = MockWebServer()
+        }
+
+        afterEachTest {
+            server.shutdown()
+        }
+
+        on("running the post-process task") {
+            server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}"))
+
+            val arguments = listOf("clean", "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subjectJson")
+
+            val result = GradleRunner.create()
+                .withProjectDir(subjectJson.toFile())
+                .withExtendedPluginClasspath()
+                .withArguments(arguments)
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
+
+            it("should be able to complete without errors") {
+                result.task(":squitPostProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+            }
+
+            it("should correctly post-process") {
+                Files.readAllBytes(jsonCall2Response).toString(Charsets.UTF_8) shouldContain "{\n  \"cool\": true\n}"
             }
         }
     }

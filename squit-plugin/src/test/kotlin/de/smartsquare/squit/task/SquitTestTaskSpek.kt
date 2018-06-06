@@ -1,16 +1,16 @@
 package de.smartsquare.squit.task
 
 import de.smartsquare.squit.TestUtils
+import de.smartsquare.squit.withExtendedPluginClasspath
 import de.smartsquare.squit.withJaCoCo
-import de.smartsquare.squit.withTestClasspath
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeDir
 import org.amshove.kluent.shouldBeEmpty
-import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeFile
 import org.amshove.kluent.shouldContain
+import org.amshove.kluent.shouldStartWith
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.spek.api.dsl.given
@@ -33,6 +33,7 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
     subject { Paths.get(this.javaClass.classLoader.getResource("test-project").toURI()) }
 
     val subjectInvalid3 = File(this.javaClass.classLoader.getResource("invalid-test-project-3").toURI()).toPath()
+    val subjectJson = File(this.javaClass.classLoader.getResource("test-project-json").toURI()).toPath()
 
     var server by Delegates.notNull<MockWebServer>()
 
@@ -102,8 +103,8 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .build()
@@ -150,8 +151,8 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .buildAndFail()
@@ -185,8 +186,8 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .buildAndFail()
@@ -215,8 +216,8 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .buildAndFail()
@@ -241,8 +242,8 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectInvalid3.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .buildAndFail()
@@ -252,9 +253,37 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             }
 
             it("should create an error file in the failures directory") {
-                Files.readAllBytes(invalid3Call1Error).toString(Charset.defaultCharset()) shouldBeEqualTo
-                    "org.dom4j.DocumentException: Error on line 4 of document  : XML document structures " +
-                    "must start and end within the same entity."
+                Files.readAllBytes(invalid3Call1Error).toString(Charset.defaultCharset()) shouldStartWith
+                    "org.dom4j.DocumentException: Error on line 4 of document"
+            }
+        }
+    }
+
+    given("a test project") {
+        beforeEachTest {
+            server = MockWebServer()
+        }
+
+        afterEachTest {
+            server.shutdown()
+        }
+
+        on("running the test task") {
+            server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}"))
+
+            val arguments = listOf("clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subjectJson")
+
+            val result = GradleRunner.create()
+                .withProjectDir(subjectJson.toFile())
+                .withExtendedPluginClasspath()
+                .withArguments(arguments)
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
+
+            it("should be able to complete without errors") {
+                result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
             }
         }
     }

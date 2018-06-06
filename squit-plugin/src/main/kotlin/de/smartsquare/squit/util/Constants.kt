@@ -13,26 +13,6 @@ object Constants {
     const val CONFIG = "test.conf"
 
     /**
-     * Filename of the request.
-     */
-    const val REQUEST = "request.xml"
-
-    /**
-     * Filename of the source response.
-     */
-    const val SOURCE_RESPONSE = "response.xml"
-
-    /**
-     * Filename of the expected response.
-     */
-    const val EXPECTED_RESPONSE = "expected_response.xml"
-
-    /**
-     * Filename of the actual response.
-     */
-    const val ACTUAL_RESPONSE = "actual_response.xml"
-
-    /**
      * Filename of the meta json.
      */
     const val META = "meta.json"

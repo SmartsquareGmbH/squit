@@ -14,7 +14,7 @@ import java.nio.file.Paths
 
 private const val ENDPOINT = "endpoint"
 private const val MEDIA_TYPE = "mediaType"
-private const val MEDIA_TYPE_FALLBACK = "application/xml"
+private const val MEDIA_TYPE_FALLBACK = "text/plain"
 private const val METHOD = "method"
 private const val METHOD_FALLBACK = "POST"
 private const val EXCLUDE = "exclude"

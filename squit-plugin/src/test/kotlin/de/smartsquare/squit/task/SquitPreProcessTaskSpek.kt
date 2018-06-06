@@ -1,11 +1,11 @@
 package de.smartsquare.squit.task
 
+import de.smartsquare.squit.withExtendedPluginClasspath
 import de.smartsquare.squit.withJaCoCo
-import de.smartsquare.squit.withTestClasspath
 import org.amshove.kluent.shouldBe
-import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldNotContain
+import org.amshove.kluent.shouldStartWith
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.spek.api.dsl.given
@@ -28,6 +28,7 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
     val subjectInvalid3 = Paths.get(this.javaClass.classLoader.getResource("invalid-test-project-3").toURI())
     val subjectGet = Paths.get(this.javaClass.classLoader.getResource("test-project-get").toURI())
     val subjectOptions = Paths.get(this.javaClass.classLoader.getResource("test-project-options").toURI())
+    val subjectJson = Paths.get(this.javaClass.classLoader.getResource("test-project-json").toURI())
 
     val buildPath = subject
         .resolve("build")
@@ -79,6 +80,13 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
         .resolve("call1")
         .resolve("error.txt")
 
+    val jsonCall1Directory = subjectJson
+        .resolve("build")
+        .resolve("squit")
+        .resolve("sources")
+        .resolve("project")
+        .resolve("call1")
+
     given("a test project") {
         on("running the pre-process task") {
             val arguments = listOf("clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
@@ -86,8 +94,8 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .build()
@@ -125,8 +133,8 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .build()
@@ -147,8 +155,8 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectInvalid.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .buildAndFail()
@@ -170,8 +178,8 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectInvalid3.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .build()
@@ -181,9 +189,8 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
             }
 
             it("should generate an error file") {
-                Files.readAllBytes(invalid3Call1Error).toString(Charset.defaultCharset()) shouldBeEqualTo
-                    "org.dom4j.DocumentException: Error on line 4 of document  : XML document structures " +
-                    "must start and end within the same entity."
+                Files.readAllBytes(invalid3Call1Error).toString(Charset.defaultCharset()) shouldStartWith
+                    "org.dom4j.DocumentException: Error on line 4 of document"
             }
         }
     }
@@ -195,8 +202,8 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectGet.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .build()
@@ -218,8 +225,8 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectOptions.toFile())
+                .withExtendedPluginClasspath()
                 .withArguments(arguments)
-                .withTestClasspath()
                 .forwardOutput()
                 .withJaCoCo()
                 .build()
@@ -234,6 +241,29 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
             it("should not require or create a request file for a test with none") {
                 Files.exists(optionsSourcesPath.resolve("call2").resolve("request.xml")) shouldBe false
+            }
+        }
+    }
+
+    given("a test project with json requests") {
+        on("running the pre-process task") {
+            val arguments = listOf("clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
+                "-Psquit.rootDir=$subjectJson")
+
+            val result = GradleRunner.create()
+                .withProjectDir(subjectJson.toFile())
+                .withExtendedPluginClasspath()
+                .withArguments(arguments)
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
+
+            it("should be able to complete without error") {
+                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+            }
+
+            it("should copy the request file") {
+                Files.exists(jsonCall1Directory.resolve("request.json")) shouldBe true
             }
         }
     }
