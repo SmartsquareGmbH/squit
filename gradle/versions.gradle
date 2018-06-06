@@ -1,23 +1,23 @@
 ext {
-    gradleVersion = '4.4.1'
+    gradleVersion = '4.8'
     squitVersion = '1.1.2'
 
-    gradlePublishVersion = '0.9.9'
+    gradlePublishVersion = '0.9.10'
     bintrayPublishVersion = '1.8.0'
 
-    kotlinVersion = '1.2.21'
-    dokkaVersion = '0.9.15'
+    kotlinVersion = '1.2.41'
+    dokkaVersion = '0.9.17'
 
-    jacocoVersion = '0.7.9'
+    jacocoVersion = '0.8.1'
     jacocoTestkitVersion = '1.0.3'
     gradleVersionsVersion = '0.17.0'
     gradleTestIdeaFixVersion = '0.1.0'
 
     dom4jVersion = '2.1.0'
-    xmlUnitVersion = '2.5.1'
-    typesafeConfigVersion = '1.3.2'
-    okhttpVersion = '3.9.1'
-    kotlinHtmlVersion = '0.6.8'
+    xmlUnitVersion = '2.6.0'
+    typesafeConfigVersion = '1.3.3'
+    okhttpVersion = '3.10.0'
+    kotlinHtmlVersion = '0.6.10'
     diffUtilsVersion = '2.2'
 
     bootstrapVersion = '3.3.7-1'
@@ -25,11 +25,11 @@ ext {
     awesomeBootstrapCheckboxVersion = '0.3.7'
     diff2htmlVersion = '2.3.2'
 
-    detektVersion = '1.0.0.RC5-6'
-    ktlintVersion = '0.14.0'
+    detektVersion = '1.0.0.RC7'
+    ktlintVersion = '0.23.1'
 
-    junitPlatformVersion = '1.0.2'
+    junitPlatformVersion = '1.2.0'
     spekVersion = '1.1.5'
-    kluentVersion = '1.33'
-    h2Version = '1.4.196'
+    kluentVersion = '1.38'
+    h2Version = '1.4.197'
 }

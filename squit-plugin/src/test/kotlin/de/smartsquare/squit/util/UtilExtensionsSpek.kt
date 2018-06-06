@@ -20,11 +20,11 @@ object UtilExtensionsSpek : Spek({
     val testProjects = Paths.get(this.javaClass.classLoader.getResource("test-project").toURI())
 
     val sampleXmlPath = testProjects
-            .resolve("src")
-            .resolve("test")
-            .resolve("project")
-            .resolve("call1")
-            .resolve("request.xml")
+        .resolve("src")
+        .resolve("test")
+        .resolve("project")
+        .resolve("call1")
+        .resolve("request.xml")
 
     given("two paths") {
         val first = Paths.get("a/b/c/d/e")
@@ -69,7 +69,7 @@ object UtilExtensionsSpek : Spek({
 
             it("should throw a proper exception") {
                 val expectedMessage = "Could not read xml file: $nonExisting " +
-                        "(java.nio.file.NoSuchFileException: $nonExisting)"
+                    "(java.nio.file.NoSuchFileException: $nonExisting)"
 
                 readCall shouldThrow GradleException::class withMessage expectedMessage
             }

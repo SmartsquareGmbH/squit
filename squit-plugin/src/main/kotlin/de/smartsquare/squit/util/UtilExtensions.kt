@@ -22,16 +22,16 @@ fun Path.cut(other: Path): Path {
     var mutableOther = other.toList()
 
     return this.toMutableList()
-            .dropWhile {
-                val isSame = it.fileName == mutableOther.firstOrNull()?.fileName ?: ""
+        .dropWhile {
+            val isSame = it.fileName == mutableOther.firstOrNull()?.fileName ?: ""
 
-                if (mutableOther.isNotEmpty()) {
-                    mutableOther = mutableOther.drop(1)
-                }
-
-                isSame
+            if (mutableOther.isNotEmpty()) {
+                mutableOther = mutableOther.drop(1)
             }
-            .fold(Paths.get(""), { acc, path -> acc.resolve(path) })
+
+            isSame
+        }
+        .fold(Paths.get(""), { acc, path -> acc.resolve(path) })
 }
 
 /**
@@ -63,11 +63,11 @@ fun XmlDocument.write(path: Path, outputFormat: OutputFormat = SquitOutputFormat
  * Cleans this [String] by removing sql comments, newlines and blanks, followed by trimming ([trim]).
  */
 fun String.cleanSqlString() = this
-        .replace(Regex("--.*?\n", DOT_MATCHES_ALL), "")
-        .replace("\n", " ")
-        .replace("\r", " ")
-        .replace("\uFEFF", "") // This is a weird unicode blank character, present in some sql files.
-        .trim()
+    .replace(Regex("--.*?\n", DOT_MATCHES_ALL), "")
+    .replace("\n", " ")
+    .replace("\r", " ")
+    .replace("\uFEFF", "") // This is a weird unicode blank character, present in some sql files.
+    .trim()
 
 /**
  * Prints the given [message] to the standard output stream and flushes it afterwards.

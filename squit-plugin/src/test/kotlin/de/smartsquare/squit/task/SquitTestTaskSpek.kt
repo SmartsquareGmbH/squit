@@ -37,49 +37,49 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
     var server by Delegates.notNull<MockWebServer>()
 
     val call4Directory = subject
-            .resolve("build")
-            .resolve("squit")
-            .resolve("responses")
-            .resolve("raw")
-            .resolve("project")
-            .resolve("call4")
+        .resolve("build")
+        .resolve("squit")
+        .resolve("responses")
+        .resolve("raw")
+        .resolve("project")
+        .resolve("call4")
 
     val reportsDirectory = subject
-            .resolve("build")
-            .resolve("squit")
-            .resolve("reports")
+        .resolve("build")
+        .resolve("squit")
+        .resolve("reports")
 
     val xmlReportPath = reportsDirectory
-            .resolve("xml")
-            .resolve("main.xml")
+        .resolve("xml")
+        .resolve("main.xml")
 
     val htmlReportPath = reportsDirectory
-            .resolve("html")
-            .resolve("main.html")
+        .resolve("html")
+        .resolve("main.html")
 
     val failuresDirectory = reportsDirectory
-            .resolve("failures")
+        .resolve("failures")
 
     val call1FailuresDirectory = failuresDirectory
-            .resolve("project")
-            .resolve("call1")
+        .resolve("project")
+        .resolve("call1")
 
     val call3FailuresDirectory = failuresDirectory
-            .resolve("project")
-            .resolve("call3")
+        .resolve("project")
+        .resolve("call3")
 
     val call4FailuresDirectory = failuresDirectory
-            .resolve("project")
-            .resolve("call4")
+        .resolve("project")
+        .resolve("call4")
 
     val invalid3Call1Error = subjectInvalid3
-            .resolve("build")
-            .resolve("squit")
-            .resolve("reports")
-            .resolve("failures")
-            .resolve("project")
-            .resolve("call1")
-            .resolve("error.txt")
+        .resolve("build")
+        .resolve("squit")
+        .resolve("reports")
+        .resolve("failures")
+        .resolve("project")
+        .resolve("call1")
+        .resolve("error.txt")
 
     given("a test project") {
         beforeEachTest {
@@ -98,15 +98,15 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<relevant/>"))
 
             val arguments = listOf("clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                    "-Psquit.rootDir=$subject")
+                "-Psquit.rootDir=$subject")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subject.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .build()
+                .withProjectDir(subject.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
 
             it("should be able to complete without errors") {
                 result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -146,15 +146,15 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<nice/>"))
 
             val arguments = listOf("clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                    "-Psquit.rootDir=$subject", "-Ptags=call1,call2")
+                "-Psquit.rootDir=$subject", "-Ptags=call1,call2")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subject.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .buildAndFail()
+                .withProjectDir(subject.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .buildAndFail()
 
             it("should fail the build") {
                 result.task(":squitTest")?.outcome shouldBe TaskOutcome.FAILED
@@ -181,15 +181,15 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<relevant/>"))
 
             val arguments = listOf("clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                    "-Psquit.rootDir=$subject", "-Punignore")
+                "-Psquit.rootDir=$subject", "-Punignore")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subject.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .buildAndFail()
+                .withProjectDir(subject.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .buildAndFail()
 
             it("should fail the build") {
                 result.task(":squitTest")?.outcome shouldBe TaskOutcome.FAILED
@@ -211,15 +211,15 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<relevant/>"))
 
             val arguments = listOf("clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                    "-Psquit.rootDir=$subject", "-Punexclude")
+                "-Psquit.rootDir=$subject", "-Punexclude")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subject.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .buildAndFail()
+                .withProjectDir(subject.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .buildAndFail()
 
             it("should fail the build") {
                 result.task(":squitTest")?.outcome shouldBe TaskOutcome.FAILED
@@ -240,12 +240,12 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             val arguments = listOf("clean", "squitTest")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subjectInvalid3.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .buildAndFail()
+                .withProjectDir(subjectInvalid3.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .buildAndFail()
 
             it("should fail the build") {
                 result.task(":squitTest")?.outcome shouldBe TaskOutcome.FAILED
@@ -253,8 +253,8 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
 
             it("should create an error file in the failures directory") {
                 Files.readAllBytes(invalid3Call1Error).toString(Charset.defaultCharset()) shouldBeEqualTo
-                        "org.dom4j.DocumentException: Error on line 4 of document  : XML document structures " +
-                                "must start and end within the same entity."
+                    "org.dom4j.DocumentException: Error on line 4 of document  : XML document structures " +
+                    "must start and end within the same entity."
             }
         }
     }

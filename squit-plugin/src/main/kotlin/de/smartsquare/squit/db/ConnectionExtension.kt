@@ -16,10 +16,10 @@ fun Connection.executeScript(path: Path) {
     try {
         createStatement().use { statement ->
             Files.readAllBytes(path).toString(Charsets.UTF_8).cleanSqlString()
-                    .split(";")
-                    .map { it.cleanSqlString() }
-                    .filter { it.isNotBlank() }
-                    .forEach { statement.execute(it) }
+                .split(";")
+                .map { it.cleanSqlString() }
+                .filter { it.isNotBlank() }
+                .forEach { statement.execute(it) }
         }
 
         commit()

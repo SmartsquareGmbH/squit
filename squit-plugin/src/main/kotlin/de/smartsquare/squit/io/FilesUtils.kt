@@ -17,35 +17,35 @@ object FilesUtils {
      * Returns all leaf directories of the given [path], sorted by alphanumeric order.
      */
     fun getSortedLeafDirectories(path: Path): List<Path> = getChildDirectories(path)
-            .sortedWith(Comparator { first, second ->
-                val firstNumber = first.fileName.toString().substringBefore("-").toIntOrNull()
-                val secondNumber = second.fileName.toString().substringBefore("-").toIntOrNull()
+        .sortedWith(Comparator { first, second ->
+            val firstNumber = first.fileName.toString().substringBefore("-").toIntOrNull()
+            val secondNumber = second.fileName.toString().substringBefore("-").toIntOrNull()
 
-                when {
-                    firstNumber != null -> when {
-                        secondNumber != null -> firstNumber.compareTo(secondNumber)
-                        else -> -1
-                    }
-                    else -> when {
-                        secondNumber != null -> 1
-                        else -> first.fileName.compareTo(second.fileName)
-                    }
+            when {
+                firstNumber != null -> when {
+                    secondNumber != null -> firstNumber.compareTo(secondNumber)
+                    else -> -1
                 }
-            })
-            .fold(listOf(), { current, it ->
-                current + when (containsDirectories(it)) {
-                    true -> getSortedLeafDirectories(it)
-                    false -> listOf(it)
+                else -> when {
+                    secondNumber != null -> 1
+                    else -> first.fileName.compareTo(second.fileName)
                 }
-            })
+            }
+        })
+        .fold(listOf(), { current, it ->
+            current + when (containsDirectories(it)) {
+                true -> getSortedLeafDirectories(it)
+                false -> listOf(it)
+            }
+        })
 
     /**
      * Deletes the given [path] recursively, if existing.
      */
     fun deleteRecursivelyIfExisting(path: Path) = when {
         Files.exists(path) -> Files.walk(path)
-                .sorted(Comparator.reverseOrder())
-                .forEach { Files.delete(it) }
+            .sorted(Comparator.reverseOrder())
+            .forEach { Files.delete(it) }
         else -> Unit
     }
 
@@ -86,5 +86,5 @@ object FilesUtils {
     }
 
     private fun getChildDirectories(path: Path) = Files.newDirectoryStream(path, { Files.isDirectory(it) })
-            .use { it.toList() }
+        .use { it.toList() }
 }

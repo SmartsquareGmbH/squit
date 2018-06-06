@@ -48,7 +48,7 @@ open class SquitTestTask : DefaultTask() {
     @Suppress("MemberVisibilityCanPrivate")
     @get:InputDirectory
     val processedSourcesPath: Path = Paths.get(project.buildDir.path,
-            SQUIT_DIRECTORY, SOURCES_DIRECTORY)
+        SQUIT_DIRECTORY, SOURCES_DIRECTORY)
 
     /**
      * The directory of the previously requested responses.
@@ -56,7 +56,7 @@ open class SquitTestTask : DefaultTask() {
     @Suppress("MemberVisibilityCanPrivate")
     @get:InputDirectory
     val processedResponsesPath: Path = Paths.get(project.buildDir.path,
-            SQUIT_DIRECTORY, RESPONSES_DIRECTORY, PROCESSED_DIRECTORY)
+        SQUIT_DIRECTORY, RESPONSES_DIRECTORY, PROCESSED_DIRECTORY)
 
     /**
      * The directory to generate the xml report file into.
@@ -127,7 +127,7 @@ open class SquitTestTask : DefaultTask() {
 
         FilesUtils.getSortedLeafDirectories(processedResponsesPath).forEach { actualResponsePath ->
             val configPath = FilesUtils.validateExistence(processedSourcesPath
-                    .resolve(actualResponsePath.cut(processedResponsesPath)).resolve(CONFIG))
+                .resolve(actualResponsePath.cut(processedResponsesPath)).resolve(CONFIG))
 
             val config = ConfigFactory.parseFile(configPath.toFile())
 
@@ -136,25 +136,25 @@ open class SquitTestTask : DefaultTask() {
 
                 if (Files.exists(errorFile)) {
                     resultList += constructResult(Files.readAllBytes(errorFile).toString(Charset.defaultCharset()),
-                            actualResponsePath)
+                        actualResponsePath)
                 } else {
                     val actualResponseFilePath = FilesUtils.validateExistence(actualResponsePath
-                            .resolve(ACTUAL_RESPONSE))
+                        .resolve(ACTUAL_RESPONSE))
 
                     val expectedResponseFilePath = FilesUtils.validateExistence(processedSourcesPath
-                            .resolve(actualResponsePath.cut(processedResponsesPath))
-                            .resolve(EXPECTED_RESPONSE))
+                        .resolve(actualResponsePath.cut(processedResponsesPath))
+                        .resolve(EXPECTED_RESPONSE))
 
                     val expectedResponse = Files.readAllBytes(expectedResponseFilePath)
                     val actualResponse = Files.readAllBytes(actualResponseFilePath)
 
                     val diffBuilder = DiffBuilder.compare(Input.fromStream(ByteArrayInputStream(expectedResponse)))
-                            .withTest(Input.fromStream(ByteArrayInputStream(actualResponse)))
-                            .ignoreWhitespace()
-                            .build()
+                        .withTest(Input.fromStream(ByteArrayInputStream(actualResponse)))
+                        .ignoreWhitespace()
+                        .build()
 
                     resultList += constructResult(diffBuilder.differences.joinToString("\n"),
-                            actualResponsePath)
+                        actualResponsePath)
                 }
             } else {
                 resultList += constructResult("", actualResponsePath, true)
@@ -194,9 +194,9 @@ open class SquitTestTask : DefaultTask() {
     }
 
     private fun constructResult(
-            differences: String,
-            actualResponsePath: Path,
-            isIgnored: Boolean = false
+        differences: String,
+        actualResponsePath: Path,
+        isIgnored: Boolean = false
     ): SquitResult {
         val squitBuildDirectoryPath = Paths.get(project.buildDir.path, SQUIT_DIRECTORY)
         val contextPath = actualResponsePath.parent.parent.cut(processedResponsesPath)
@@ -206,14 +206,14 @@ open class SquitTestTask : DefaultTask() {
 
         return when (differences.isNotBlank()) {
             true -> SquitResult(id, differences, isIgnored, contextPath, suitePath,
-                    testDirectoryPath, squitBuildDirectoryPath)
+                testDirectoryPath, squitBuildDirectoryPath)
 
             false -> SquitResult(id, "", isIgnored, contextPath, suitePath,
-                    testDirectoryPath, squitBuildDirectoryPath)
+                testDirectoryPath, squitBuildDirectoryPath)
         }
     }
 
-    private fun shouldReportTest(config: Config) = !config.shouldIgnore
-            || project.properties.containsKey("unexclude")
-            || project.properties.containsKey("unignore")
+    private fun shouldReportTest(config: Config) = !config.shouldIgnore ||
+        project.properties.containsKey("unexclude") ||
+        project.properties.containsKey("unignore")
 }

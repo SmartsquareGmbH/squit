@@ -21,28 +21,28 @@ object HtmlReportWriter {
     private const val DIFF_FILE_NAME = "Result"
     private const val DIFF_CONTEXT_SIZE = 1000000
 
-    private val bootstrapPath = "META-INF/resources/webjars/bootstrap/3.3.7-1"
-    private val fontAwesomePath = "META-INF/resources/webjars/font-awesome/4.7.0"
-    private val awesomeBootstrapCheckboxPath = "META-INF/resources/webjars/awesome-bootstrap-checkbox/0.3.7"
-    private val jqueryPath = "META-INF/resources/webjars/jquery/1.11.1"
-    private val diff2htmlPath = "META-INF/resources/webjars/diff2html/2.3.2"
+    private const val bootstrapPath = "META-INF/resources/webjars/bootstrap/3.3.7-1"
+    private const val fontAwesomePath = "META-INF/resources/webjars/font-awesome/4.7.0"
+    private const val awesomeBootstrapCheckboxPath = "META-INF/resources/webjars/awesome-bootstrap-checkbox/0.3.7"
+    private const val jqueryPath = "META-INF/resources/webjars/jquery/1.11.1"
+    private const val diff2htmlPath = "META-INF/resources/webjars/diff2html/2.3.2"
 
     private val resources = arrayOf(
-            bootstrapPath + "/css/bootstrap.min.css" to "css/bootstrap.css",
-            bootstrapPath + "/js/bootstrap.min.js" to "js/bootstrap.js",
-            fontAwesomePath + "/css/font-awesome.min.css" to "css/font-awesome.css",
-            fontAwesomePath + "/fonts/fontawesome-webfont.eot" to "fonts/fontawesome-webfont.eot",
-            fontAwesomePath + "/fonts/fontawesome-webfont.svg" to "fonts/fontawesome-webfont.svg",
-            fontAwesomePath + "/fonts/fontawesome-webfont.ttf" to "fonts/fontawesome-webfont.ttf",
-            fontAwesomePath + "/fonts/fontawesome-webfont.woff" to "fonts/fontawesome-webfont.woff",
-            fontAwesomePath + "/fonts/fontawesome-webfont.woff2" to "fonts/fontawesome-webfont.woff2",
-            awesomeBootstrapCheckboxPath + "/awesome-bootstrap-checkbox.css" to "css/awesome-bootstrap-checkbox.css",
-            jqueryPath + "/jquery.min.js" to "js/jquery.js",
-            diff2htmlPath + "/dist/diff2html.min.css" to "css/diff2html.css",
-            diff2htmlPath + "/dist/diff2html.min.js" to "js/diff2html.js",
-            diff2htmlPath + "/dist/diff2html-ui.min.js" to "js/diff2html-ui.js",
-            "squit.css" to "css/squit.css",
-            "squit.js" to "js/squit.js"
+        "$bootstrapPath/css/bootstrap.min.css" to "css/bootstrap.css",
+        "$bootstrapPath/js/bootstrap.min.js" to "js/bootstrap.js",
+        "$fontAwesomePath/css/font-awesome.min.css" to "css/font-awesome.css",
+        "$fontAwesomePath/fonts/fontawesome-webfont.eot" to "fonts/fontawesome-webfont.eot",
+        "$fontAwesomePath/fonts/fontawesome-webfont.svg" to "fonts/fontawesome-webfont.svg",
+        "$fontAwesomePath/fonts/fontawesome-webfont.ttf" to "fonts/fontawesome-webfont.ttf",
+        "$fontAwesomePath/fonts/fontawesome-webfont.woff" to "fonts/fontawesome-webfont.woff",
+        "$fontAwesomePath/fonts/fontawesome-webfont.woff2" to "fonts/fontawesome-webfont.woff2",
+        "$awesomeBootstrapCheckboxPath/awesome-bootstrap-checkbox.css" to "css/awesome-bootstrap-checkbox.css",
+        "$jqueryPath/jquery.min.js" to "js/jquery.js",
+        "$diff2htmlPath/dist/diff2html.min.css" to "css/diff2html.css",
+        "$diff2htmlPath/dist/diff2html.min.js" to "js/diff2html.js",
+        "$diff2htmlPath/dist/diff2html-ui.min.js" to "js/diff2html-ui.js",
+        "squit.css" to "css/squit.css",
+        "squit.js" to "js/squit.js"
     )
 
     private val emptyDiffHeader = listOf("--- $DIFF_FILE_NAME", "+++ $DIFF_FILE_NAME", "@@ -1 +1 @@")
@@ -74,8 +74,8 @@ object HtmlReportWriter {
             FilesUtils.copyResource("squit-detail.css", detailCssPath)
             FilesUtils.copyResource("squit-detail.js", detailJsPath, {
                 it.toString(Charset.defaultCharset())
-                        .replace(Regex("diffPlaceholder"), Matcher.quoteReplacement(unifiedDiffForJs))
-                        .toByteArray()
+                    .replace(Regex("diffPlaceholder"), Matcher.quoteReplacement(unifiedDiffForJs))
+                    .toByteArray()
             })
         }
 
@@ -89,7 +89,7 @@ object HtmlReportWriter {
     private fun generateDiff(result: SquitResult): List<String> {
         val diff = DiffUtils.diff(result.expectedLines, result.actualLines)
         val unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(DIFF_FILE_NAME, DIFF_FILE_NAME,
-                result.expectedLines, diff, DIFF_CONTEXT_SIZE)
+            result.expectedLines, diff, DIFF_CONTEXT_SIZE)
 
         return when (unifiedDiff.isEmpty()) {
             true -> emptyDiffHeader.plus(result.actualLines.map { " $it" })

@@ -11,6 +11,8 @@ exceptions:
 style:
   FunctionMaxLength:
     active: false
+  MagicNumber:
+    active: false
   VariableMinLength:
     minimumVariableNameLength: 2
   VariableMaxLength:

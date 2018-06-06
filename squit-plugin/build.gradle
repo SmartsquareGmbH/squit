@@ -36,7 +36,7 @@ configurations {
 dependencies {
     implementation project(':squit-library')
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-html-jvm:$kotlinHtmlVersion"
 

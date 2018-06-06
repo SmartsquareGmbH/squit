@@ -22,7 +22,7 @@ apply plugin: 'org.jetbrains.dokka'
 apply plugin: 'io.gitlab.arturbosch.detekt'
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
 
     api "org.dom4j:dom4j:$dom4jVersion"
 }
@@ -55,6 +55,7 @@ bintray {
     user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
     key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
     publications = ['mavenJava']
+
     pkg {
         repo = 'squit'
         name = 'squit-library'

@@ -1,1 +1,3 @@
 include 'squit-plugin', 'squit-library'
+
+enableFeaturePreview('STABLE_PUBLISHING')

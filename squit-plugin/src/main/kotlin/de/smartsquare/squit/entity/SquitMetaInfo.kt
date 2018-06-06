@@ -27,8 +27,8 @@ data class SquitMetaInfo(val date: LocalDateTime, val duration: Long) {
             val config = ConfigFactory.parseString(json)
 
             return SquitMetaInfo(
-                    LocalDateTime.parse(config.getString(DATE)),
-                    config.getLong(DURATION)
+                LocalDateTime.parse(config.getString(DATE)),
+                config.getLong(DURATION)
             )
         }
     }
@@ -37,7 +37,7 @@ data class SquitMetaInfo(val date: LocalDateTime, val duration: Long) {
      * Converts this instance into a Json representation.
      */
     fun toJson(): String = ConfigValueFactory.fromMap(mapOf(
-            DATE to date.toString(),
-            DURATION to duration)
+        DATE to date.toString(),
+        DURATION to duration)
     ).render(ConfigRenderOptions.concise())
 }

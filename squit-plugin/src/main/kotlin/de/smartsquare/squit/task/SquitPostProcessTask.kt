@@ -46,7 +46,7 @@ open class SquitPostProcessTask : DefaultTask() {
     @Suppress("MemberVisibilityCanPrivate")
     @InputDirectory
     val processedSourcesPath: Path = Paths.get(project.buildDir.path,
-            SQUIT_DIRECTORY, SOURCES_DIRECTORY)
+        SQUIT_DIRECTORY, SOURCES_DIRECTORY)
 
     /**
      * The directory of the previously requested responses.
@@ -54,7 +54,7 @@ open class SquitPostProcessTask : DefaultTask() {
     @Suppress("MemberVisibilityCanPrivate")
     @InputDirectory
     val actualResponsesPath: Path = Paths.get(project.buildDir.path,
-            SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)
+        SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)
 
     /**
      * The directory to save the results in.
@@ -62,7 +62,7 @@ open class SquitPostProcessTask : DefaultTask() {
     @Suppress("MemberVisibilityCanPrivate")
     @OutputDirectory
     val processedActualResponsesPath: Path = Paths.get(project.buildDir.path,
-            SQUIT_DIRECTORY, RESPONSES_DIRECTORY, PROCESSED_DIRECTORY)
+        SQUIT_DIRECTORY, RESPONSES_DIRECTORY, PROCESSED_DIRECTORY)
 
     @get:Internal
     internal var extension by Delegates.notNull<SquitExtension>()
@@ -83,7 +83,7 @@ open class SquitPostProcessTask : DefaultTask() {
 
         FilesUtils.getSortedLeafDirectories(actualResponsesPath).forEach { testDir ->
             val resultActualResponsePath = Files.createDirectories(processedActualResponsesPath
-                    .resolve(testDir.cut(actualResponsesPath)))
+                .resolve(testDir.cut(actualResponsesPath)))
 
             val errorFile = testDir.resolve(ERROR)
 
@@ -91,15 +91,15 @@ open class SquitPostProcessTask : DefaultTask() {
                 Files.copy(errorFile, resultActualResponsePath.resolve(ERROR))
             } else {
                 val configPath = FilesUtils.validateExistence(processedSourcesPath
-                        .resolve(testDir.cut(actualResponsesPath)))
-                        .resolve(CONFIG)
+                    .resolve(testDir.cut(actualResponsesPath)))
+                    .resolve(CONFIG)
 
                 val config = ConfigFactory.parseFile(configPath.toFile())
 
                 val actualResponsePath = FilesUtils.validateExistence(testDir.resolve(ACTUAL_RESPONSE))
                 val expectedResponsePath = FilesUtils.validateExistence(processedSourcesPath
-                        .resolve(testDir.cut(actualResponsesPath))
-                        .resolve(EXPECTED_RESPONSE))
+                    .resolve(testDir.cut(actualResponsesPath))
+                    .resolve(EXPECTED_RESPONSE))
 
                 val resultActualResponseFilePath = resultActualResponsePath.resolve(ACTUAL_RESPONSE)
 
@@ -127,8 +127,8 @@ open class SquitPostProcessTask : DefaultTask() {
         config.postProcessorScripts.forEach {
             GroovyShell(javaClass.classLoader).parse(Files.newBufferedReader(it)).apply {
                 binding = Binding(mapOf(
-                        "actualResponse" to actualResponse,
-                        "expectedResponse" to expectedResponse
+                    "actualResponse" to actualResponse,
+                    "expectedResponse" to expectedResponse
                 ))
             }.run()
         }

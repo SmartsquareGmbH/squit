@@ -16,19 +16,19 @@ object SquitResultTreeSpek : Spek({
 
     given("a list of SquitResults") {
         fun constructTestSquitResult(
-                contextPath: Path,
-                suitePath: Path,
-                testDirectoryPath: Path,
-                result: String = "",
-                isIgnored: Boolean = false
+            contextPath: Path,
+            suitePath: Path,
+            testDirectoryPath: Path,
+            result: String = "",
+            isIgnored: Boolean = false
         ) = SquitResult(0, result, isIgnored, contextPath, suitePath, testDirectoryPath, Paths.get(""))
 
         val resultList = listOf(
-                constructTestSquitResult(Paths.get("a"), Paths.get("b"), Paths.get("c")),
-                constructTestSquitResult(Paths.get("a"), Paths.get("b"), Paths.get("c").resolve("c")),
-                constructTestSquitResult(Paths.get("a"), Paths.get("b"), Paths.get("d"), isIgnored = true),
-                constructTestSquitResult(Paths.get("a"), Paths.get("c"), Paths.get(""), "xyz"),
-                constructTestSquitResult(Paths.get("x"), Paths.get("y").resolve("z"), Paths.get("x"))
+            constructTestSquitResult(Paths.get("a"), Paths.get("b"), Paths.get("c")),
+            constructTestSquitResult(Paths.get("a"), Paths.get("b"), Paths.get("c").resolve("c")),
+            constructTestSquitResult(Paths.get("a"), Paths.get("b"), Paths.get("d"), isIgnored = true),
+            constructTestSquitResult(Paths.get("a"), Paths.get("c"), Paths.get(""), "xyz"),
+            constructTestSquitResult(Paths.get("x"), Paths.get("y").resolve("z"), Paths.get("x"))
         )
 
         on("constructing a SquitResultTree") {

@@ -13,12 +13,12 @@ package de.smartsquare.squit.entity
  * @author Ruben Gees
  */
 data class SquitResultTree(
-        val id: Long,
-        val children: List<SquitResultTree>,
-        val name: String,
-        val successfulTests: Int,
-        val failedTests: Int,
-        val ignoredTests: Int
+    val id: Long,
+    val children: List<SquitResultTree>,
+    val name: String,
+    val successfulTests: Int,
+    val failedTests: Int,
+    val ignoredTests: Int
 ) {
 
     companion object {
@@ -40,7 +40,7 @@ data class SquitResultTree(
                     SquitResultTree(group.first().id, emptyList(), name, successfulTests, failedTests, ignoredTests)
                 } else {
                     SquitResultTree(-1, fromList(group.map { it.cutFirstPathElement() }), name,
-                            successfulTests, failedTests, ignoredTests)
+                        successfulTests, failedTests, ignoredTests)
                 }
             }
         }

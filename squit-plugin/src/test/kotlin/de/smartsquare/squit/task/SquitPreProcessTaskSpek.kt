@@ -30,23 +30,23 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
     val subjectOptions = Paths.get(this.javaClass.classLoader.getResource("test-project-options").toURI())
 
     val buildPath = subject
-            .resolve("build")
-            .resolve("squit")
+        .resolve("build")
+        .resolve("squit")
 
     val call1Directory = buildPath
-            .resolve("sources")
-            .resolve("project")
-            .resolve("call1")
+        .resolve("sources")
+        .resolve("project")
+        .resolve("call1")
 
     val call2Directory = buildPath
-            .resolve("sources")
-            .resolve("project")
-            .resolve("call2")
+        .resolve("sources")
+        .resolve("project")
+        .resolve("call2")
 
     val call4Directory = buildPath
-            .resolve("sources")
-            .resolve("project")
-            .resolve("call4")
+        .resolve("sources")
+        .resolve("project")
+        .resolve("call4")
 
     val call1Request = call1Directory.resolve("request.xml")
     val call1PreSqlScript = call1Directory.resolve("test_pre.sql")
@@ -59,38 +59,38 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
     val call4PostSqlScript = call4Directory.resolve("test_post.sql")
 
     val getCall1Directory = subjectGet
-            .resolve("build")
-            .resolve("squit")
-            .resolve("sources")
-            .resolve("project")
-            .resolve("call1")
+        .resolve("build")
+        .resolve("squit")
+        .resolve("sources")
+        .resolve("project")
+        .resolve("call1")
 
     val optionsSourcesPath = subjectOptions
-            .resolve("build")
-            .resolve("squit")
-            .resolve("sources")
-            .resolve("project")
+        .resolve("build")
+        .resolve("squit")
+        .resolve("sources")
+        .resolve("project")
 
     val invalid3Call1Error = subjectInvalid3
-            .resolve("build")
-            .resolve("squit")
-            .resolve("sources")
-            .resolve("project")
-            .resolve("call1")
-            .resolve("error.txt")
+        .resolve("build")
+        .resolve("squit")
+        .resolve("sources")
+        .resolve("project")
+        .resolve("call1")
+        .resolve("error.txt")
 
     given("a test project") {
         on("running the pre-process task") {
             val arguments = listOf("clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                    "-Psquit.rootDir=$subject", "-Ptags=call1,call2,call4")
+                "-Psquit.rootDir=$subject", "-Ptags=call1,call2,call4")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subject.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .build()
+                .withProjectDir(subject.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
 
             it("should be able to complete without error") {
                 result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -121,15 +121,15 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
         on("running the pre-process task with the unignore flag") {
             val arguments = listOf("clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                    "-Psquit.rootDir=$subject", "-Punignore")
+                "-Psquit.rootDir=$subject", "-Punignore")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subject.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .build()
+                .withProjectDir(subject.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
 
             it("should be able to complete without error") {
                 result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -146,12 +146,12 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
             val arguments = listOf("clean", "squitPreProcess")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subjectInvalid.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .buildAndFail()
+                .withProjectDir(subjectInvalid.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .buildAndFail()
 
             it("should fail the build") {
                 result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.FAILED
@@ -159,7 +159,7 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
             it("should print an appropriate message") {
                 result.output shouldContain "Invalid test.conf file on path of test: project/call1 " +
-                        "(No configuration setting found for key 'endpoint')"
+                    "(No configuration setting found for key 'endpoint')"
             }
         }
     }
@@ -169,12 +169,12 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
             val arguments = listOf("clean", "squitPreProcess")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subjectInvalid3.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .build()
+                .withProjectDir(subjectInvalid3.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
 
             it("should succeed nonetheless") {
                 result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -182,8 +182,8 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
             it("should generate an error file") {
                 Files.readAllBytes(invalid3Call1Error).toString(Charset.defaultCharset()) shouldBeEqualTo
-                        "org.dom4j.DocumentException: Error on line 4 of document  : XML document structures " +
-                                "must start and end within the same entity."
+                    "org.dom4j.DocumentException: Error on line 4 of document  : XML document structures " +
+                    "must start and end within the same entity."
             }
         }
     }
@@ -191,15 +191,15 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
     given("a test project containing a test with method GET set") {
         on("running the pre-process task") {
             val arguments = listOf("clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                    "-Psquit.rootDir=$subject")
+                "-Psquit.rootDir=$subject")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subjectGet.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .build()
+                .withProjectDir(subjectGet.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
 
             it("should be able to complete without error") {
                 result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -214,15 +214,15 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
     given("a test project containing tests with method OPTIONS set") {
         on("running the pre-process task") {
             val arguments = listOf("clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                    "-Psquit.rootDir=$subject")
+                "-Psquit.rootDir=$subject")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subjectOptions.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .build()
+                .withProjectDir(subjectOptions.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
 
             it("should be able to complete without error") {
                 result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS

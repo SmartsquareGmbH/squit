@@ -74,9 +74,9 @@ open class SquitPreProcessTask : DefaultTask() {
     @get:Input
     val projectConfig: Config by lazy {
         ConfigValueFactory.fromMap(project.properties
-                .filterKeys { it is String && it.startsWith("squit.") }
-                .mapKeys { (key, _) -> key.replaceFirst("squit.", "") })
-                .toConfig()
+            .filterKeys { it is String && it.startsWith("squit.") }
+            .mapKeys { (key, _) -> key.replaceFirst("squit.", "") })
+            .toConfig()
     }
 
     /**
@@ -92,25 +92,25 @@ open class SquitPreProcessTask : DefaultTask() {
     @Suppress("MemberVisibilityCanPrivate")
     @get:OutputDirectory
     val processedSourcesPath: Path = Paths.get(project.buildDir.path,
-            SQUIT_DIRECTORY, SOURCES_DIRECTORY)
+        SQUIT_DIRECTORY, SOURCES_DIRECTORY)
 
     @get:Internal
     internal var extension by Delegates.notNull<SquitExtension>()
 
     private val leafDirectoriesWithProperties by lazy {
         FilesUtils.getSortedLeafDirectories(sourcesPath)
-                .map { it to resolveConfig(it) }
-                .filter { (testPath, resolvedProperties) ->
-                    when {
-                        isTestExcluded(resolvedProperties) -> {
-                            logger.warn("Excluding test ${testPath.cut(sourcesPath)}")
+            .map { it to resolveConfig(it) }
+            .filter { (testPath, resolvedProperties) ->
+                when {
+                    isTestExcluded(resolvedProperties) -> {
+                        logger.warn("Excluding test ${testPath.cut(sourcesPath)}")
 
-                            false
-                        }
-                        !isTestCoveredByTags(resolvedProperties) -> false
-                        else -> true
+                        false
                     }
+                    !isTestCoveredByTags(resolvedProperties) -> false
+                    else -> true
                 }
+            }
     }
 
     private val configCache = mutableMapOf<Path, Config>()
@@ -181,8 +181,8 @@ open class SquitPreProcessTask : DefaultTask() {
         return try {
             projectConfig.withFallback(result).resolve().validate()
         } catch (error: Throwable) {
-            throw GradleException("Invalid test.conf file on path of test: ${testPath.cut(sourcesPath)}"
-                    + " (${error.message})")
+            throw GradleException("Invalid test.conf file on path of test: ${testPath.cut(sourcesPath)} " +
+                "(${error.message})")
         }
     }
 
@@ -204,8 +204,8 @@ open class SquitPreProcessTask : DefaultTask() {
         while (!currentDirectoryPath.endsWith(sourcesPath.parent)) {
             val leafsFromHere = pathCache.getOrPut(currentDirectoryPath, {
                 leafDirectoriesWithProperties
-                        .filter { (path, _) -> path.startsWith(currentDirectoryPath) }
-                        .map { (path, _) -> path }
+                    .filter { (path, _) -> path.startsWith(currentDirectoryPath) }
+                    .map { (path, _) -> path }
             })
 
             config.databaseConfigurations.forEach { (name, _, _, _) ->
@@ -260,8 +260,8 @@ open class SquitPreProcessTask : DefaultTask() {
         config.preProcessorScripts.forEach {
             GroovyShell(javaClass.classLoader).parse(Files.newBufferedReader(it)).apply {
                 binding = Binding(mapOf(
-                        "request" to request,
-                        "expectedResponse" to response
+                    "request" to request,
+                    "expectedResponse" to response
                 ))
             }.run()
         }

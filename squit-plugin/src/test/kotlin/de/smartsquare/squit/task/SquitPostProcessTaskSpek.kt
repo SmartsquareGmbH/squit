@@ -32,29 +32,29 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
     var server by Delegates.notNull<MockWebServer>()
 
     val buildPath = subject
-            .resolve("build")
-            .resolve("squit")
+        .resolve("build")
+        .resolve("squit")
 
     val call2Directory = buildPath
-            .resolve("responses")
-            .resolve("processed")
-            .resolve("project")
-            .resolve("call2")
+        .resolve("responses")
+        .resolve("processed")
+        .resolve("project")
+        .resolve("call2")
 
     val call2Response = call2Directory
-            .resolve("actual_response.xml")
+        .resolve("actual_response.xml")
 
     val call2Error = call2Directory
-            .resolve("error.txt")
+        .resolve("error.txt")
 
     val invalid3Call1Error = subjectInvalid3
-            .resolve("build")
-            .resolve("squit")
-            .resolve("responses")
-            .resolve("processed")
-            .resolve("project")
-            .resolve("call1")
-            .resolve("error.txt")
+        .resolve("build")
+        .resolve("squit")
+        .resolve("responses")
+        .resolve("processed")
+        .resolve("project")
+        .resolve("call1")
+        .resolve("error.txt")
 
     given("a test project") {
         beforeEachTest {
@@ -72,15 +72,15 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<test/>"))
 
             val arguments = listOf("clean", "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                    "-Psquit.rootDir=$subject", "-Ptags=call1,call2")
+                "-Psquit.rootDir=$subject", "-Ptags=call1,call2")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subject.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .build()
+                .withProjectDir(subject.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
 
             it("should be able to complete without errors") {
                 result.task(":squitPostProcess")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -96,15 +96,15 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<unclosed_tag>"))
 
             val arguments = listOf("clean", "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                    "-Psquit.rootDir=$subject", "-Ptags=call1,call2")
+                "-Psquit.rootDir=$subject", "-Ptags=call1,call2")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subject.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .build()
+                .withProjectDir(subject.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
 
             it("should be able to complete successfully nonetheless") {
                 result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -112,8 +112,8 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
 
             it("should create an error file") {
                 Files.readAllBytes(call2Error).toString(Charsets.UTF_8) shouldBeEqualTo
-                        "org.dom4j.DocumentException: Error on line 1 of document  : XML document structures " +
-                                "must start and end within the same entity."
+                    "org.dom4j.DocumentException: Error on line 1 of document  : XML document structures " +
+                    "must start and end within the same entity."
             }
         }
     }
@@ -123,12 +123,12 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
             val arguments = listOf("clean", "squitPostProcess")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subjectInvalid3.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .build()
+                .withProjectDir(subjectInvalid3.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
 
             it("should succeed nonetheless") {
                 result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -136,8 +136,8 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
 
             it("should propagate the error file") {
                 Files.readAllBytes(invalid3Call1Error).toString(Charset.defaultCharset()) shouldBeEqualTo
-                        "org.dom4j.DocumentException: Error on line 4 of document  : XML document structures " +
-                                "must start and end within the same entity."
+                    "org.dom4j.DocumentException: Error on line 4 of document  : XML document structures " +
+                    "must start and end within the same entity."
             }
         }
     }

@@ -16,8 +16,8 @@ object TestUtils {
      * Deletes all database files found in the passed [path] directory.
      */
     fun deleteDatabaseFiles(path: Path) = Files.list(path)
-            .filter { Files.isRegularFile(it) && it.fileName.toString().endsWith(".db") }
-            .forEach { Files.delete(it) }
+        .filter { Files.isRegularFile(it) && it.fileName.toString().endsWith(".db") }
+        .forEach { Files.delete(it) }
 }
 
 /**
@@ -38,8 +38,8 @@ fun GradleRunner.withTestClasspath(): GradleRunner {
  */
 fun GradleRunner.withJaCoCo(): GradleRunner {
     javaClass.classLoader
-            .getResourceAsStream("testkit-gradle.properties")
-            .copyTo(File(projectDir, "gradle.properties").outputStream())
+        .getResourceAsStream("testkit-gradle.properties")
+        .copyTo(File(projectDir, "gradle.properties").outputStream())
 
     return this
 }

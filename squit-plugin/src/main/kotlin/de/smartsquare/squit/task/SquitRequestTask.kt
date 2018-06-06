@@ -62,13 +62,13 @@ open class SquitRequestTask : DefaultTask() {
     @get:Input
     val jdbcDriverClassNames by lazy {
         extension.jdbcDrivers
-                .map { it.trim() }
-                .filter { it.isNotBlank() }
-                .let {
-                    logger.info("Using $it for jdbc connections.")
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .let {
+                logger.info("Using $it for jdbc connections.")
 
-                    it
-                }
+                it
+            }
     }
 
     /**
@@ -77,7 +77,7 @@ open class SquitRequestTask : DefaultTask() {
     @Suppress("MemberVisibilityCanPrivate")
     @get:InputDirectory
     val processedSourcesPath: Path = Paths.get(project.buildDir.path,
-            SQUIT_DIRECTORY, SOURCES_DIRECTORY)
+        SQUIT_DIRECTORY, SOURCES_DIRECTORY)
 
     /**
      * The directory to save the results in.
@@ -85,17 +85,17 @@ open class SquitRequestTask : DefaultTask() {
     @Suppress("MemberVisibilityCanPrivate")
     @get:OutputDirectory
     val actualResponsesPath: Path = Paths.get(project.buildDir.path,
-            SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)
+        SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)
 
     @get:Internal
     internal var extension by Delegates.notNull<SquitExtension>()
 
     private val okHttpClient by lazy {
         OkHttpClient.Builder()
-                .connectTimeout(extension.timeout, TimeUnit.SECONDS)
-                .writeTimeout(extension.timeout, TimeUnit.SECONDS)
-                .readTimeout(extension.timeout, TimeUnit.SECONDS)
-                .build()
+            .connectTimeout(extension.timeout, TimeUnit.SECONDS)
+            .writeTimeout(extension.timeout, TimeUnit.SECONDS)
+            .readTimeout(extension.timeout, TimeUnit.SECONDS)
+            .build()
     }
 
     private val dbConnections = ConnectionCollection()
@@ -121,10 +121,10 @@ open class SquitRequestTask : DefaultTask() {
         dbConnections.use {
             FilesUtils.getSortedLeafDirectories(processedSourcesPath).forEachIndexed { index, testDirectoryPath ->
                 logger.lifecycleOnSameLine("Running test ${index + 1}",
-                        project.gradle.startParameter.consoleOutput)
+                    project.gradle.startParameter.consoleOutput)
 
                 val resultResponsePath = Files.createDirectories(actualResponsesPath
-                        .resolve(testDirectoryPath.cut(processedSourcesPath)))
+                    .resolve(testDirectoryPath.cut(processedSourcesPath)))
 
                 val errorFile = testDirectoryPath.resolve(ERROR)
                 val metaFilePath = resultResponsePath.resolve(META)
@@ -164,10 +164,10 @@ open class SquitRequestTask : DefaultTask() {
     }
 
     private fun doRequestAndScriptExecutions(
-            testDirectoryPath: Path,
-            resultResponsePath: Path,
-            requestPath: Path?,
-            config: Config
+        testDirectoryPath: Path,
+        resultResponsePath: Path,
+        requestPath: Path?,
+        config: Config
     ) {
         val resultResponseFilePath = resultResponsePath.resolve(ACTUAL_RESPONSE)
 
@@ -177,10 +177,10 @@ open class SquitRequestTask : DefaultTask() {
 
         try {
             val apiResponse = constructApiCall(requestPath, config)
-                    .execute()
-                    .body()
-                    ?.string()
-                    ?: throw IOException("Subject did not answer with a body")
+                .execute()
+                .body()
+                ?.string()
+                ?: throw IOException("Subject did not answer with a body")
 
             Files.write(resultResponseFilePath, apiResponse.toByteArray(Charsets.UTF_8))
         } catch (error: IOException) {
@@ -196,17 +196,17 @@ open class SquitRequestTask : DefaultTask() {
         val requestBody = requestPath?.let { RequestBody.create(config.mediaType, Files.readAllBytes(requestPath)) }
 
         return okHttpClient.newCall(Request.Builder()
-                .headers(Headers.of(config.headers))
-                .method(config.method, requestBody)
-                .url(config.endpoint)
-                .build())
+            .headers(Headers.of(config.headers))
+            .method(config.method, requestBody)
+            .url(config.endpoint)
+            .build())
     }
 
     private fun executeScriptIfExisting(
-            path: Path,
-            jdbc: String,
-            username: String,
-            password: String
+        path: Path,
+        jdbc: String,
+        username: String,
+        password: String
     ) = if (Files.exists(path)) {
         try {
             dbConnections.createOrGet(jdbc, username, password).executeScript(path)
@@ -215,7 +215,7 @@ open class SquitRequestTask : DefaultTask() {
         } catch (error: SQLException) {
             logger.newLineIfNeeded()
             logger.warn("Could not run database script ${path.fileName} for test " +
-                    "${path.parent.cut(processedSourcesPath)} (${error.toString().trim()})")
+                "${path.parent.cut(processedSourcesPath)} (${error.toString().trim()})")
 
             false
         }

@@ -11,6 +11,7 @@ buildscript {
 }
 
 apply plugin: 'com.github.ben-manes.versions'
+apply plugin: 'base'
 
 allprojects {
     group = 'de.smartsquare'
@@ -36,10 +37,6 @@ subprojects {
     }
 }
 
-task clean(type: Delete) {
-    delete project.buildDir
-}
-
-task wrapper(type: Wrapper) {
-    setGradleVersion(project.ext.gradleVersion)
+wrapper {
+    gradleVersion = project.ext.gradleVersion
 }

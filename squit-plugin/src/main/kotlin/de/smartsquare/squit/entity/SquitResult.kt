@@ -30,13 +30,13 @@ import java.nio.file.Paths
  * @author Ruben Gees
  */
 data class SquitResult(
-        val id: Long,
-        val result: String,
-        val isIgnored: Boolean,
-        private val contextPath: Path,
-        private val suitePath: Path,
-        private val testDirectoryPath: Path,
-        private val squitBuildDirectoryPath: Path
+    val id: Long,
+    val result: String,
+    val isIgnored: Boolean,
+    private val contextPath: Path,
+    private val suitePath: Path,
+    private val testDirectoryPath: Path,
+    private val squitBuildDirectoryPath: Path
 ) {
 
     /**
@@ -97,27 +97,27 @@ data class SquitResult(
     }
 
     private val metaInfoPath = squitBuildDirectoryPath
-            .resolve(RESPONSES_DIRECTORY)
-            .resolve(RAW_DIRECTORY)
-            .resolve(fullPath)
-            .resolve(META)
+        .resolve(RESPONSES_DIRECTORY)
+        .resolve(RAW_DIRECTORY)
+        .resolve(fullPath)
+        .resolve(META)
 
     private val expectedResponsePath = squitBuildDirectoryPath
-            .resolve(SOURCES_DIRECTORY)
-            .resolve(fullPath)
-            .resolve(EXPECTED_RESPONSE)
+        .resolve(SOURCES_DIRECTORY)
+        .resolve(fullPath)
+        .resolve(EXPECTED_RESPONSE)
 
     private val actualResponsePath = squitBuildDirectoryPath
-            .resolve(RESPONSES_DIRECTORY)
-            .resolve(PROCESSED_DIRECTORY)
-            .resolve(fullPath)
-            .resolve(ACTUAL_RESPONSE)
+        .resolve(RESPONSES_DIRECTORY)
+        .resolve(PROCESSED_DIRECTORY)
+        .resolve(fullPath)
+        .resolve(ACTUAL_RESPONSE)
 
     private val errorPath = squitBuildDirectoryPath
-            .resolve(RESPONSES_DIRECTORY)
-            .resolve(PROCESSED_DIRECTORY)
-            .resolve(fullPath)
-            .resolve(ERROR)
+        .resolve(RESPONSES_DIRECTORY)
+        .resolve(PROCESSED_DIRECTORY)
+        .resolve(fullPath)
+        .resolve(ERROR)
 
     /**
      * Returns a copy of this result with the first part of the [fullPath] cut.
@@ -128,18 +128,18 @@ data class SquitResult(
         val isSquitPathEmpty = suitePath.fileName.toString().isBlank()
 
         val newContextPath = contextPath.drop(1)
-                .fold(Paths.get(""), { acc, path -> acc.resolve(path) })
+            .fold(Paths.get(""), { acc, path -> acc.resolve(path) })
 
         val newSuitePath = if (isContextPathEmpty) {
             suitePath.drop(1)
-                    .fold(Paths.get(""), { acc, path -> acc.resolve(path) })
+                .fold(Paths.get(""), { acc, path -> acc.resolve(path) })
         } else {
             suitePath
         }
 
         val newTestDirectoryPath = if (isContextPathEmpty && isSquitPathEmpty) {
             testDirectoryPath.drop(1)
-                    .fold(Paths.get(""), { acc, path -> acc.resolve(path) })
+                .fold(Paths.get(""), { acc, path -> acc.resolve(path) })
         } else {
             testDirectoryPath
         }

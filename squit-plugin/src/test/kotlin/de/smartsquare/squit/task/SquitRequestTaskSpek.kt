@@ -47,38 +47,38 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
     val password = "test"
 
     val buildPath = subject
-            .resolve("build")
-            .resolve("squit")
+        .resolve("build")
+        .resolve("squit")
 
     val rawResponsesDirectory = buildPath
-            .resolve("responses")
-            .resolve("raw")
-            .resolve("project")
+        .resolve("responses")
+        .resolve("raw")
+        .resolve("project")
 
     val call1Response = rawResponsesDirectory
-            .resolve("call1")
-            .resolve("actual_response.xml")
+        .resolve("call1")
+        .resolve("actual_response.xml")
 
     val call1Meta = rawResponsesDirectory
-            .resolve("call1")
-            .resolve("meta.json")
+        .resolve("call1")
+        .resolve("meta.json")
 
     val call1Error = rawResponsesDirectory
-            .resolve("call1")
-            .resolve("error.txt")
+        .resolve("call1")
+        .resolve("error.txt")
 
     val call2Response = rawResponsesDirectory
-            .resolve("call2")
-            .resolve("actual_response.xml")
+        .resolve("call2")
+        .resolve("actual_response.xml")
 
     val invalid3Call1Error = subjectInvalid3
-            .resolve("build")
-            .resolve("squit")
-            .resolve("responses")
-            .resolve("raw")
-            .resolve("project")
-            .resolve("call1")
-            .resolve("error.txt")
+        .resolve("build")
+        .resolve("squit")
+        .resolve("responses")
+        .resolve("raw")
+        .resolve("project")
+        .resolve("call1")
+        .resolve("error.txt")
 
     given("a test project") {
         beforeEachTest {
@@ -96,15 +96,15 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<nice/>"))
 
             val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                    "-Psquit.rootDir=$subject", "-Ptags=call1,call2")
+                "-Psquit.rootDir=$subject", "-Ptags=call1,call2")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subject.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .build()
+                .withProjectDir(subject.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
 
             it("should be able to complete without errors") {
                 result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -117,7 +117,7 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             it("should write a valid meta.json file") {
                 val (date, duration) = SquitMetaInfo.fromJson(Files.readAllBytes(call1Meta)
-                        .toString(Charset.defaultCharset()))
+                    .toString(Charset.defaultCharset()))
 
                 date shouldBeBefore LocalDateTime.now()
                 date shouldBeAfter LocalDateTime.now().minusMinutes(5)
@@ -158,15 +158,15 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("error").setResponseCode(500))
 
             val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                    "-Psquit.rootDir=$subject", "-Ptags=call1")
+                "-Psquit.rootDir=$subject", "-Ptags=call1")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subject.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .build()
+                .withProjectDir(subject.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
 
             it("should be able to complete successfully nonetheless") {
                 result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -181,15 +181,15 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             // Nothing enqueued to cause timeout.
 
             val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                    "-Psquit.rootDir=$subject", "-Ptags=call1")
+                "-Psquit.rootDir=$subject", "-Ptags=call1")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subject.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .build()
+                .withProjectDir(subject.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
 
             it("should be able to complete successfully nonetheless") {
                 result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -197,7 +197,7 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             it("should generate an error file") {
                 Files.readAllBytes(call1Error).toString(Charset.defaultCharset()) shouldBeEqualTo
-                        "java.net.SocketTimeoutException: timeout"
+                    "java.net.SocketTimeoutException: timeout"
             }
         }
     }
@@ -217,15 +217,15 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<cool/>"))
 
             val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                    "-Psquit.rootDir=$subject")
+                "-Psquit.rootDir=$subject")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subjectInvalid2.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .build()
+                .withProjectDir(subjectInvalid2.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
 
             it("should be able to complete successfully nonetheless") {
                 result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -242,12 +242,12 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             val arguments = listOf("clean", "squitRunRequests")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subjectInvalid3.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .build()
+                .withProjectDir(subjectInvalid3.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
 
             it("should succeed nonetheless") {
                 result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -255,8 +255,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             it("should propagate the error file") {
                 Files.readAllBytes(invalid3Call1Error).toString(Charset.defaultCharset()) shouldBeEqualTo
-                        "org.dom4j.DocumentException: Error on line 4 of document  : XML document structures " +
-                                "must start and end within the same entity."
+                    "org.dom4j.DocumentException: Error on line 4 of document  : XML document structures " +
+                    "must start and end within the same entity."
             }
         }
     }
@@ -274,15 +274,15 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<cool/>"))
 
             val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                    "-Psquit.rootDir=$subject")
+                "-Psquit.rootDir=$subject")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subjectGet.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .build()
+                .withProjectDir(subjectGet.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
 
             it("should be able to complete without errors") {
                 result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -311,15 +311,15 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<nice/>"))
 
             val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                    "-Psquit.rootDir=$subject")
+                "-Psquit.rootDir=$subject")
 
             val result = GradleRunner.create()
-                    .withProjectDir(subjectOptions.toFile())
-                    .withArguments(arguments)
-                    .withTestClasspath()
-                    .forwardOutput()
-                    .withJaCoCo()
-                    .build()
+                .withProjectDir(subjectOptions.toFile())
+                .withArguments(arguments)
+                .withTestClasspath()
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
 
             it("should be able to complete without errors") {
                 result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS

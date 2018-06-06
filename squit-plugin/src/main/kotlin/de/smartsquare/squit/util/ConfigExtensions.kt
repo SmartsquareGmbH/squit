@@ -94,19 +94,19 @@ val Config.tags get() = getSafeStringList(TAGS)
 val Config.databaseConfigurations
     get() = getSafeConfigList(DATABASE_CONFIGURATIONS).map {
         SquitDatabaseConfiguration(
-                it.getString(DATABASE_CONFIGURATION_NAME),
-                it.getString(DATABASE_CONFIGURATION_JDBC_ADDRESS),
-                it.getString(DATABASE_CONFIGURATION_USERNAME),
-                it.getString(DATABASE_CONFIGURATION_PASSWORD)
+            it.getString(DATABASE_CONFIGURATION_NAME),
+            it.getString(DATABASE_CONFIGURATION_JDBC_ADDRESS),
+            it.getString(DATABASE_CONFIGURATION_USERNAME),
+            it.getString(DATABASE_CONFIGURATION_PASSWORD)
         )
     }
 
 val Config.headers
     get() = getSafeConfig(HEADERS)
-            .entrySet()
-            .map { it.toPair() }
-            .map { (key, value) -> key to value.unwrapped().toString() }
-            .toMap()
+        .entrySet()
+        .map { it.toPair() }
+        .map { (key, value) -> key to value.unwrapped().toString() }
+        .toMap()
 
 /**
  * Merges the given [tag] into the existing List of tags or creates a new one with it.
@@ -138,11 +138,11 @@ fun Config.validate() = this.apply {
  * Writes this config to the given [path] and applies the given [options] when rendering.
  */
 fun Config.writeTo(
-        path: Path,
-        options: ConfigRenderOptions = ConfigRenderOptions.defaults()
-                .setComments(false)
-                .setOriginComments(false)
-                .setJson(false)
+    path: Path,
+    options: ConfigRenderOptions = ConfigRenderOptions.defaults()
+        .setComments(false)
+        .setOriginComments(false)
+        .setJson(false)
 ): Path = Files.write(path, root().render(options).toByteArray())
 
 private fun Config.getSafeBoolean(path: String, fallback: Boolean = false) = when (hasPath(path)) {
@@ -156,8 +156,8 @@ private fun Config.getSafeString(path: String, fallback: String = "") = when (ha
 }
 
 private fun Config.getSafeStringList(
-        path: String,
-        fallback: List<String> = emptyList()
+    path: String,
+    fallback: List<String> = emptyList()
 ): List<String> = when (hasPath(path)) {
     true -> getStringList(path)
     false -> fallback

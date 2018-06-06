@@ -97,8 +97,8 @@ object ConfigExtensionsSpek : Spek({
 
     given("a config object with a valid method") {
         val config = ConfigFactory.parseMap(mapOf(
-                "endpoint" to "https://example.com",
-                "method" to "GET"
+            "endpoint" to "https://example.com",
+            "method" to "GET"
         ))
 
         on("getting the method") {
@@ -124,8 +124,8 @@ object ConfigExtensionsSpek : Spek({
 
     given("a config object with an invalid preProcessor") {
         val config = ConfigFactory.parseMap(mapOf(
-                "endpoint" to "https://example.com",
-                "preProcessors" to listOf("not.existing")
+            "endpoint" to "https://example.com",
+            "preProcessors" to listOf("not.existing")
         ))
 
         on("validating") {
@@ -139,8 +139,8 @@ object ConfigExtensionsSpek : Spek({
 
     given("a config object with a valid preProcessor") {
         val config = ConfigFactory.parseMap(mapOf(
-                "endpoint" to "https://example.com",
-                "preProcessors" to listOf("java.lang.String")
+            "endpoint" to "https://example.com",
+            "preProcessors" to listOf("java.lang.String")
         ))
 
         on("validating") {
@@ -154,8 +154,8 @@ object ConfigExtensionsSpek : Spek({
 
     given("a config object with an invalid preProcessor") {
         val config = ConfigFactory.parseMap(mapOf(
-                "endpoint" to "https://example.com",
-                "preProcessors" to listOf("not.existing")
+            "endpoint" to "https://example.com",
+            "preProcessors" to listOf("not.existing")
         ))
 
         on("validating") {
@@ -169,8 +169,8 @@ object ConfigExtensionsSpek : Spek({
 
     given("a config object with a valid preProcessorScript") {
         val config = ConfigFactory.parseMap(mapOf(
-                "endpoint" to "https://example.com",
-                "preProcessorScripts" to listOf(testProject.resolve("build.gradle").toString())
+            "endpoint" to "https://example.com",
+            "preProcessorScripts" to listOf(testProject.resolve("build.gradle").toString())
         ))
 
         on("validating") {
@@ -185,8 +185,8 @@ object ConfigExtensionsSpek : Spek({
     given("a config object with an invalid preProcessorScript") {
         val notExistingFilePath = testProject.resolve("not/existing")
         val config = ConfigFactory.parseMap(mapOf(
-                "endpoint" to "https://example.com",
-                "preProcessorScripts" to listOf(notExistingFilePath.toString())
+            "endpoint" to "https://example.com",
+            "preProcessorScripts" to listOf(notExistingFilePath.toString())
         ))
 
         on("validating") {
@@ -200,8 +200,8 @@ object ConfigExtensionsSpek : Spek({
 
     given("a config object with a valid postProcessor") {
         val config = ConfigFactory.parseMap(mapOf(
-                "endpoint" to "https://example.com",
-                "postProcessors" to listOf("java.lang.String")
+            "endpoint" to "https://example.com",
+            "postProcessors" to listOf("java.lang.String")
         ))
 
         on("validating") {
@@ -215,8 +215,8 @@ object ConfigExtensionsSpek : Spek({
 
     given("a config object with an invalid postProcessor") {
         val config = ConfigFactory.parseMap(mapOf(
-                "endpoint" to "https://example.com",
-                "postProcessors" to listOf("not.existing")
+            "endpoint" to "https://example.com",
+            "postProcessors" to listOf("not.existing")
         ))
 
         on("validating") {
@@ -230,8 +230,8 @@ object ConfigExtensionsSpek : Spek({
 
     given("a config object with a valid postProcessorScript") {
         val config = ConfigFactory.parseMap(mapOf(
-                "endpoint" to "https://example.com",
-                "postProcessorScripts" to listOf(testProject.resolve("build.gradle").toString())
+            "endpoint" to "https://example.com",
+            "postProcessorScripts" to listOf(testProject.resolve("build.gradle").toString())
         ))
 
         on("validating") {
@@ -246,8 +246,8 @@ object ConfigExtensionsSpek : Spek({
     given("a config object with an invalid postProcessorScript") {
         val notExistingFilePath = testProject.resolve("not/existing")
         val config = ConfigFactory.parseMap(mapOf(
-                "endpoint" to "https://example.com",
-                "postProcessorScripts" to listOf(notExistingFilePath.toString())
+            "endpoint" to "https://example.com",
+            "postProcessorScripts" to listOf(notExistingFilePath.toString())
         ))
 
         on("validating") {
@@ -261,8 +261,8 @@ object ConfigExtensionsSpek : Spek({
 
     given("a config object with valid tags") {
         val config = ConfigFactory.parseMap(mapOf(
-                "endpoint" to "https://example.com",
-                "tags" to listOf("a", "b")
+            "endpoint" to "https://example.com",
+            "tags" to listOf("a", "b")
         ))
 
         on("validating") {
@@ -276,8 +276,8 @@ object ConfigExtensionsSpek : Spek({
 
     given("a config object with an empty tag") {
         val config = ConfigFactory.parseMap(mapOf(
-                "endpoint" to "https://example.com",
-                "tags" to listOf("a", "")
+            "endpoint" to "https://example.com",
+            "tags" to listOf("a", "")
         ))
 
         on("validating") {
@@ -291,13 +291,13 @@ object ConfigExtensionsSpek : Spek({
 
     given("a config object with a valid databaseConfiguration") {
         val config = ConfigFactory.parseMap(mapOf(
-                "endpoint" to "https://example.com",
-                "databaseConfigurations" to listOf(mapOf(
-                        "name" to "test1",
-                        "jdbc" to "test2",
-                        "username" to "test3",
-                        "password" to "test4"
-                ))
+            "endpoint" to "https://example.com",
+            "databaseConfigurations" to listOf(mapOf(
+                "name" to "test1",
+                "jdbc" to "test2",
+                "username" to "test3",
+                "password" to "test4"
+            ))
         ))
 
         on("validating") {
@@ -311,13 +311,13 @@ object ConfigExtensionsSpek : Spek({
 
     given("a config object with a invalid databaseConfiguration (empty name)") {
         val config = ConfigFactory.parseMap(mapOf(
-                "endpoint" to "https://example.com",
-                "databaseConfigurations" to listOf(mapOf(
-                        "name" to "",
-                        "jdbc" to "test2",
-                        "username" to "test3",
-                        "password" to "test4"
-                ))
+            "endpoint" to "https://example.com",
+            "databaseConfigurations" to listOf(mapOf(
+                "name" to "",
+                "jdbc" to "test2",
+                "username" to "test3",
+                "password" to "test4"
+            ))
         ))
 
         on("validating") {
@@ -331,13 +331,13 @@ object ConfigExtensionsSpek : Spek({
 
     given("a config object with a invalid databaseConfiguration (empty jdbc)") {
         val config = ConfigFactory.parseMap(mapOf(
-                "endpoint" to "https://example.com",
-                "databaseConfigurations" to listOf(mapOf(
-                        "name" to "test1",
-                        "jdbc" to "",
-                        "username" to "test3",
-                        "password" to "test4"
-                ))
+            "endpoint" to "https://example.com",
+            "databaseConfigurations" to listOf(mapOf(
+                "name" to "test1",
+                "jdbc" to "",
+                "username" to "test3",
+                "password" to "test4"
+            ))
         ))
 
         on("validating") {
@@ -351,13 +351,13 @@ object ConfigExtensionsSpek : Spek({
 
     given("a config object with a invalid databaseConfiguration (empty username)") {
         val config = ConfigFactory.parseMap(mapOf(
-                "endpoint" to "https://example.com",
-                "databaseConfigurations" to listOf(mapOf(
-                        "name" to "test1",
-                        "jdbc" to "test2",
-                        "username" to "",
-                        "password" to "test4"
-                ))
+            "endpoint" to "https://example.com",
+            "databaseConfigurations" to listOf(mapOf(
+                "name" to "test1",
+                "jdbc" to "test2",
+                "username" to "",
+                "password" to "test4"
+            ))
         ))
 
         on("validating") {
@@ -371,13 +371,13 @@ object ConfigExtensionsSpek : Spek({
 
     given("a config object with a invalid databaseConfiguration (empty password)") {
         val config = ConfigFactory.parseMap(mapOf(
-                "endpoint" to "https://example.com",
-                "databaseConfigurations" to listOf(mapOf(
-                        "name" to "test1",
-                        "jdbc" to "test2",
-                        "username" to "test3",
-                        "password" to ""
-                ))
+            "endpoint" to "https://example.com",
+            "databaseConfigurations" to listOf(mapOf(
+                "name" to "test1",
+                "jdbc" to "test2",
+                "username" to "test3",
+                "password" to ""
+            ))
         ))
 
         on("validating") {
@@ -391,11 +391,11 @@ object ConfigExtensionsSpek : Spek({
 
     given(" a config object with valid headers") {
         val config = ConfigFactory.parseMap(mapOf(
-                "endpoint" to "https://example.com",
-                "headers" to mapOf(
-                        "abc" to "def",
-                        "ghi" to "jkl"
-                )
+            "endpoint" to "https://example.com",
+            "headers" to mapOf(
+                "abc" to "def",
+                "ghi" to "jkl"
+            )
         ))
 
         on("getting the headers") {
