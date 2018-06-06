@@ -27,6 +27,7 @@ ext {
 
     detektVersion = '1.0.0.RC7'
     ktlintVersion = '0.23.1'
+    ktlintPluginVersion = '4.0.0'
 
     junitPlatformVersion = '1.2.0'
     spekVersion = '1.1.5'
