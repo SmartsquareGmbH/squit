@@ -12,6 +12,7 @@ import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import org.jetbrains.spek.subject.SubjectSpek
+import java.io.File
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
@@ -166,7 +167,7 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
             }
 
             it("should print an appropriate message") {
-                result.output shouldContain "Invalid test.conf file on path of test: project/call1 " +
+                result.output shouldContain "Invalid test.conf file on path of test: project${File.separator}call1 " +
                     "(No configuration setting found for key 'endpoint')"
             }
         }

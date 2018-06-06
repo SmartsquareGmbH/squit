@@ -207,8 +207,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             }
 
             it("should generate an error file") {
-                Files.readAllBytes(call1Error).toString(Charset.defaultCharset()) shouldBeEqualTo
-                    "java.net.SocketTimeoutException: timeout"
+                Files.readAllBytes(call1Error).toString(Charset.defaultCharset()) shouldStartWith
+                    "java.net.SocketTimeoutException"
             }
         }
     }
@@ -243,7 +243,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             }
 
             it("should print an appropriate warning") {
-                result.output shouldContain "Could not run database script test_pre.sql for test project/call1"
+                result.output shouldContain "Could not run database script test_pre.sql " +
+                    "for test project${File.separator}call1"
             }
         }
     }

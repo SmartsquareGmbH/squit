@@ -81,9 +81,8 @@ object FilesUtils {
         Files.write(target, modification(resource))
     }
 
-    private fun containsDirectories(path: Path) = Files.list(path).use {
-        it.anyMatch { current -> Files.isDirectory(current) }
-    }
+    private fun containsDirectories(path: Path) = Files.newDirectoryStream(path, { Files.isDirectory(it) })
+        .use { it.any() }
 
     private fun getChildDirectories(path: Path) = Files.newDirectoryStream(path, { Files.isDirectory(it) })
         .use { it.toList() }

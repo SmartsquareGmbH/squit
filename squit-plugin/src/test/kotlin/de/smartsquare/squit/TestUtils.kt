@@ -3,6 +3,7 @@ package de.smartsquare.squit
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.internal.PluginUnderTestMetadataReading
 import java.io.File
+import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -11,12 +12,16 @@ import java.nio.file.Path
  */
 object TestUtils {
 
+    private val DB_FILTER = { it: Path ->
+        Files.isRegularFile(it) && it.fileName.toString().endsWith(".db")
+    }
+
     /**
      * Deletes all database files found in the passed [path] directory.
      */
-    fun deleteDatabaseFiles(path: Path) = Files.list(path)
-        .filter { Files.isRegularFile(it) && it.fileName.toString().endsWith(".db") }
-        .forEach { Files.delete(it) }
+    fun deleteDatabaseFiles(path: Path) = Files.newDirectoryStream(path, DB_FILTER).use { files ->
+        files.forEach { Files.delete(it) }
+    }
 }
 
 /**
@@ -30,12 +35,15 @@ fun GradleRunner.withExtendedPluginClasspath(): GradleRunner {
 }
 
 /**
- * Helper method for using the gradle test-kit with jacoco.
+ * Helper method for using the Gradle testkit with Jacoco.
  */
 fun GradleRunner.withJaCoCo(): GradleRunner {
-    javaClass.classLoader
-        .getResourceAsStream("testkit-gradle.properties")
-        .copyTo(File(projectDir, "gradle.properties").outputStream())
+    val testkitProperties = javaClass.classLoader.getResourceAsStream("testkit-gradle.properties").readBytes()
+    val fixedProperties = testkitProperties.toString(Charset.defaultCharset())
+        .replace("/", File.separator)
+        .replace("\\", "\\\\")
+
+    File(projectDir, "gradle.properties").writeText(fixedProperties)
 
     return this
 }

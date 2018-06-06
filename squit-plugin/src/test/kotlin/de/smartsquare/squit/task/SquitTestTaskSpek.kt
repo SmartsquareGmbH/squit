@@ -138,7 +138,7 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
 
             it("should run, but not report tests which are ignored for report") {
                 Files.exists(call4Directory) shouldBe true
-                Files.list(failuresDirectory).toList().shouldBeEmpty()
+                Files.list(failuresDirectory).use { it.toList().shouldBeEmpty() }
             }
         }
 
