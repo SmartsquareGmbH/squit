@@ -72,7 +72,7 @@ bintray {
         publicDownloadNumbers = true
         version {
             name = squitVersion
-            desc = 'Gradle plugin for testing Xml/Soap based apis.'
+            desc = 'Gradle plugin for simple testing of json/xml/soap/etc. apis.'
             vcsTag = squitVersion
         }
     }

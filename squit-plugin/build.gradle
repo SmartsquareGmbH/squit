@@ -103,7 +103,7 @@ dokka {
 pluginBundle {
     website = 'https://github.com/SmartsquareGmbH/squit'
     vcsUrl = 'https://github.com/SmartsquareGmbH/squit'
-    description = 'Gradle plugin for testing Xml/Soap based apis.'
+    description = 'Gradle plugin for simple testing of json/xml/soap/etc. apis.'
     tags = ['testing', 'soap', 'xml', 'automation']
 
     plugins {
