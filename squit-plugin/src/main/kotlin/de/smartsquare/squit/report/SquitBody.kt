@@ -163,8 +163,8 @@ fun DIV.squitItemContainers(resultTrees: List<SquitResultTree>, level: Int) {
  */
 fun DIV.squitLeafItem(resultTree: SquitResultTree, level: Int) {
     a(href = "detail/${resultTree.id}/detail.html", classes = "list-group-item") {
-        attributes.put("data-success", if (resultTree.isSuccess) "true" else "false")
-        attributes.put("style", "padding-left: ${12 * level + 8}px")
+        attributes["data-success"] = if (resultTree.isSuccess) "true" else "false"
+        attributes["style"] = "padding-left: ${12 * level + 8}px"
 
         +resultTree.name
 
@@ -193,9 +193,9 @@ fun DIV.squitContainerItem(resultTree: SquitResultTree, level: Int) {
     val currentId = IdHolder.currentId++
 
     a(href = "#$currentId", classes = "list-group-item") {
-        attributes.put("data-success", if (resultTree.isSuccess) "true" else "false")
-        attributes.put("style", "padding-left: ${12 * level}px")
-        attributes.put("data-toggle", "collapse")
+        attributes["data-success"] = if (resultTree.isSuccess) "true" else "false"
+        attributes["style"] = "padding-left: ${12 * level}px"
+        attributes["data-toggle"] = "collapse"
 
         span(classes = "fa fa-chevron-right fa-fw start-item") {}
 

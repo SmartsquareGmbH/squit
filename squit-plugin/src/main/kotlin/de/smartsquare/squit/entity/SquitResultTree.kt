@@ -9,7 +9,7 @@ package de.smartsquare.squit.entity
  * @property successfulTests The amount of successful tests. If this is a leaf, this may be at most one.
  * @property failedTests The amount of failed tests. If this is a leaf, this may be at most one.
  * @property totalTests The total amount of tests. If this is a leaf, this is one.
- * @property ignored The amount of ignored tests. If this is a leaf, this may be at most one.
+ * @property ignoredTests The amount of ignored tests. If this is a leaf, this may be at most one.
  *
  * @author Ruben Gees
  */

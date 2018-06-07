@@ -215,19 +215,19 @@ open class SquitPreProcessTask : DefaultTask() {
                 if (Files.exists(prePath)) {
                     val content = Files.readAllBytes(prePath).toString(Charsets.UTF_8)
 
-                    result.put(preName, content + result.getOrDefault(preName, ""))
+                    result[preName] = content + result.getOrDefault(preName, "")
                 }
 
                 if (Files.exists(postPath)) {
                     val content = Files.readAllBytes(postPath).toString(Charsets.UTF_8)
 
-                    result.put(postName, result.getOrDefault(postName, "") + content)
+                    result[postName] = result.getOrDefault(postName, "") + content
                 }
 
                 if (Files.exists(preOncePath) && leafsFromHere.indexOf(testPath) == 0) {
                     val content = Files.readAllBytes(preOncePath).toString(Charsets.UTF_8)
 
-                    result.put(preName, content + result.getOrDefault(preName, ""))
+                    result[preName] = content + result.getOrDefault(preName, "")
                 }
 
                 if (Files.exists(postOncePath) && leafsFromHere.indexOf(testPath) == leafsFromHere.lastIndex) {

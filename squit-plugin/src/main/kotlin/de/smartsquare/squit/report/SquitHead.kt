@@ -14,7 +14,7 @@ import kotlinx.html.title
 fun HTML.squitHead() {
     head {
         meta(charset = "utf-8")
-        meta(content = "ie=edge") { attributes.put("http-equiv", "x-ua-compatible") }
+        meta(content = "ie=edge") { attributes["http-equiv"] = "x-ua-compatible" }
         meta(name = "viewport", content = "width=device-width, initial-scale=1.0")
 
         link(rel = "stylesheet", href = "css/bootstrap.css")

@@ -21,7 +21,7 @@ class ConnectionCollection : AutoCloseable {
     fun createOrGet(jdbc: String, username: String, password: String): Connection {
         val key = Triple(jdbc, username, password)
         val result = connections[key] ?: DriverManager.getConnection(key.first, key.second, key.third).also {
-            connections.put(key, it)
+            connections[key] = it
         }
 
         result.autoCommit = false
