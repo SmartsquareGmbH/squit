@@ -1,5 +1,10 @@
 package de.smartsquare.squit.util
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonElement
+import com.google.gson.JsonParseException
+import com.google.gson.JsonParser
 import de.smartsquare.squit.entity.SquitOutputFormat
 import org.dom4j.io.OutputFormat
 import org.dom4j.io.SAXReader
@@ -40,7 +45,7 @@ fun Path.cut(other: Path): Path {
  * This is a safe operation, as such the file is correctly closed.
  */
 fun SAXReader.read(path: Path): XmlDocument = try {
-    Files.newInputStream(path).use {
+    Files.newBufferedReader(path).use {
         read(it)
     }
 } catch (error: IOException) {
@@ -56,6 +61,35 @@ fun SAXReader.read(path: Path): XmlDocument = try {
 fun XmlDocument.write(path: Path, outputFormat: OutputFormat = SquitOutputFormat) {
     Files.newBufferedWriter(path).use {
         XMLWriter(it, outputFormat).write(document)
+    }
+}
+
+/**
+ * Reads and returns a [JsonElement] at the given [path].
+ *
+ * This is a safe operation, as such the file is correctly closed.
+ */
+fun JsonParser.read(path: Path): JsonElement = try {
+    val jsonElement = Files.newBufferedReader(path).use {
+        parse(it)
+    }
+
+    jsonElement
+} catch (error: IOException) {
+    throw GradleException("Could not read json file: $path ($error)")
+} catch (error: JsonParseException) {
+    throw GradleException("Could not read json file: $path ($error)")
+}
+
+/**
+ * Writes this [JsonElement] to the given [path], with the specified [gson] instance
+ * (defaulting to a pretty printing one).
+ *
+ * This is a safe operation, as such the file is correctly closed.
+ */
+fun JsonElement.write(path: Path, gson: Gson = GsonBuilder().setPrettyPrinting().create()) {
+    Files.newBufferedWriter(path).use {
+        gson.toJson(this, it)
     }
 }
 

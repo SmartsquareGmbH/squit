@@ -1,8 +1,7 @@
 package de.smartsquare.squit.entity
 
+import com.google.gson.Gson
 import com.typesafe.config.ConfigFactory
-import com.typesafe.config.ConfigRenderOptions
-import com.typesafe.config.ConfigValueFactory
 import java.time.LocalDateTime
 
 /**
@@ -36,8 +35,8 @@ data class SquitMetaInfo(val date: LocalDateTime, val duration: Long) {
     /**
      * Converts this instance into a Json representation.
      */
-    fun toJson(): String = ConfigValueFactory.fromMap(mapOf(
+    fun toJson(): String = Gson().toJson(mapOf(
         DATE to date.toString(),
         DURATION to duration)
-    ).render(ConfigRenderOptions.concise())
+    )
 }

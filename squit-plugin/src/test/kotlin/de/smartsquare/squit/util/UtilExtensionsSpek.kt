@@ -1,5 +1,6 @@
 package de.smartsquare.squit.util
 
+import com.google.gson.JsonParser
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldThrow
@@ -17,14 +18,22 @@ import java.nio.file.Paths
  */
 object UtilExtensionsSpek : Spek({
 
-    val testProjects = Paths.get(this.javaClass.classLoader.getResource("test-project").toURI())
+    val testProject = Paths.get(this.javaClass.classLoader.getResource("test-project").toURI())
+    val jsonTestProject = Paths.get(this.javaClass.classLoader.getResource("test-project-json").toURI())
 
-    val sampleXmlPath = testProjects
+    val sampleXmlPath = testProject
         .resolve("src")
         .resolve("test")
         .resolve("project")
         .resolve("call1")
         .resolve("request.xml")
+
+    val sampleJsonPath = jsonTestProject
+        .resolve("src")
+        .resolve("test")
+        .resolve("project")
+        .resolve("call1")
+        .resolve("request.json")
 
     given("two paths") {
         val first = Paths.get("a/b/c/d/e")
@@ -61,8 +70,18 @@ object UtilExtensionsSpek : Spek({
         }
     }
 
+    given("a path to a valid json file") {
+        on("reading it") {
+            val element = JsonParser().read(sampleJsonPath)
+
+            it("should be read correctly") {
+                element.asJsonObject["test"].asInt == 123
+            }
+        }
+    }
+
     given("a path to a non-existing xml file") {
-        val nonExisting = testProjects.resolve("non-existing")
+        val nonExisting = testProject.resolve("non-existing")
 
         on("reading it") {
             val readCall = { SAXReader().read(nonExisting) }

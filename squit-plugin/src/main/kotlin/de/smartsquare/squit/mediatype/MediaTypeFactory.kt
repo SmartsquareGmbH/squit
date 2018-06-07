@@ -2,6 +2,7 @@ package de.smartsquare.squit.mediatype
 
 import de.smartsquare.squit.mediatype.generic.GenericBodyProcessor
 import de.smartsquare.squit.mediatype.generic.GenericDiffer
+import de.smartsquare.squit.mediatype.json.JsonBodyProcessor
 import de.smartsquare.squit.mediatype.xml.XmlBodyProcessor
 import de.smartsquare.squit.mediatype.xml.XmlDiffer
 import okhttp3.MediaType
@@ -58,6 +59,7 @@ object MediaTypeFactory {
      */
     fun processor(mediaType: MediaType) = when (mediaType) {
         xmlMediaType, soapMediaType -> XmlBodyProcessor
+        jsonMediaType -> JsonBodyProcessor
         else -> GenericBodyProcessor
     }
 

@@ -1,7 +1,10 @@
 package de.smartsquare.squit.mediatype
 
 import de.smartsquare.squit.mediatype.generic.GenericBodyProcessor
+import de.smartsquare.squit.mediatype.generic.GenericDiffer
+import de.smartsquare.squit.mediatype.json.JsonBodyProcessor
 import de.smartsquare.squit.mediatype.xml.XmlBodyProcessor
+import de.smartsquare.squit.mediatype.xml.XmlDiffer
 import okhttp3.MediaType
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldEqual
@@ -47,6 +50,12 @@ object MediaTypeFactorySpek : Spek({
                 MediaTypeFactory.processor(mediaType) shouldBe XmlBodyProcessor
             }
         }
+
+        on("getting the differ") {
+            it("should return the xml differ") {
+                MediaTypeFactory.differ(mediaType) shouldBe XmlDiffer
+            }
+        }
     }
 
     given("a json mediaType") {
@@ -77,8 +86,14 @@ object MediaTypeFactorySpek : Spek({
         }
 
         on("getting the processor") {
-            it("should return the default processor") {
-                MediaTypeFactory.processor(mediaType) shouldBe GenericBodyProcessor
+            it("should return the json processor") {
+                MediaTypeFactory.processor(mediaType) shouldBe JsonBodyProcessor
+            }
+        }
+
+        on("getting the differ") {
+            it("should return the generic differ") {
+                MediaTypeFactory.differ(mediaType) shouldBe GenericDiffer
             }
         }
     }
@@ -111,7 +126,7 @@ object MediaTypeFactorySpek : Spek({
         }
 
         on("getting the processor") {
-            it("should return the default processor") {
+            it("should return the generic processor") {
                 MediaTypeFactory.processor(mediaType) shouldBe GenericBodyProcessor
             }
         }

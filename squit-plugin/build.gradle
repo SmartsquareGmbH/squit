@@ -35,6 +35,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-html-jvm:$kotlinHtmlVersion"
 
     implementation "org.dom4j:dom4j:$dom4jVersion"
+    implementation "com.google.code.gson:gson:$gsonVersion"
     implementation "org.xmlunit:xmlunit-core:$xmlUnitVersion"
     implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
     implementation "com.typesafe:config:$typesafeConfigVersion"
