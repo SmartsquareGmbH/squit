@@ -1,8 +1,8 @@
 package de.smartsquare.squit.mediatype.xml
 
 import com.typesafe.config.Config
-import de.smartsquare.squit.SquitPostProcessor
-import de.smartsquare.squit.SquitPreProcessor
+import de.smartsquare.squit.SquitXmlPostProcessor
+import de.smartsquare.squit.SquitXmlPreProcessor
 import de.smartsquare.squit.mediatype.BodyProcessor
 import de.smartsquare.squit.util.postProcessorScripts
 import de.smartsquare.squit.util.postProcessors
@@ -56,11 +56,9 @@ object XmlBodyProcessor : BodyProcessor {
     }
 
     private fun runPreProcessors(config: Config, request: Document?, response: Document) {
-        config.preProcessors.forEach {
-            val preProcessor = Class.forName(it).getConstructor().newInstance() as SquitPreProcessor
-
-            preProcessor.process(request, response)
-        }
+        config.preProcessors.map { Class.forName(it).getConstructor().newInstance() }
+            .filterIsInstance(SquitXmlPreProcessor::class.java)
+            .forEach { it.process(request, response) }
 
         config.preProcessorScripts.forEach {
             GroovyShell(javaClass.classLoader).parse(Files.newBufferedReader(it)).apply {
@@ -73,11 +71,9 @@ object XmlBodyProcessor : BodyProcessor {
     }
 
     private fun runPostProcessors(config: Config, actualResponse: Document, expectedResponse: Document) {
-        config.postProcessors.forEach {
-            val postProcessor = Class.forName(it).getConstructor().newInstance() as SquitPostProcessor
-
-            postProcessor.process(actualResponse, expectedResponse)
-        }
+        config.postProcessors.map { Class.forName(it).getConstructor().newInstance() }
+            .filterIsInstance(SquitXmlPostProcessor::class.java)
+            .forEach { it.process(actualResponse, expectedResponse) }
 
         config.postProcessorScripts.forEach {
             GroovyShell(javaClass.classLoader).parse(Files.newBufferedReader(it)).apply {
