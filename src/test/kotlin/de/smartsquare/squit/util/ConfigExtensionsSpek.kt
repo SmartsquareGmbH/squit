@@ -324,7 +324,8 @@ object ConfigExtensionsSpek : Spek({
             val call = { config.validate() }
 
             it("should throw a proper exception") {
-                call shouldThrow IllegalStateException::class withMessage "name of a databaseConfiguration cannot be empty."
+                call shouldThrow IllegalStateException::class withMessage
+                    "name of a databaseConfiguration cannot be empty."
             }
         }
     }
@@ -344,7 +345,8 @@ object ConfigExtensionsSpek : Spek({
             val call = { config.validate() }
 
             it("should throw a proper exception") {
-                call shouldThrow IllegalStateException::class withMessage "jdbc of a databaseConfiguration cannot be empty."
+                call shouldThrow IllegalStateException::class withMessage
+                    "jdbc of a databaseConfiguration cannot be empty."
             }
         }
     }
@@ -364,7 +366,8 @@ object ConfigExtensionsSpek : Spek({
             val call = { config.validate() }
 
             it("should throw a proper exception") {
-                call shouldThrow IllegalStateException::class withMessage "username of a databaseConfiguration cannot be empty."
+                call shouldThrow IllegalStateException::class withMessage
+                    "username of a databaseConfiguration cannot be empty."
             }
         }
     }
@@ -384,7 +387,8 @@ object ConfigExtensionsSpek : Spek({
             val call = { config.validate() }
 
             it("should throw a proper exception") {
-                call shouldThrow IllegalStateException::class withMessage "password of a databaseConfiguration cannot be empty."
+                call shouldThrow IllegalStateException::class withMessage
+                    "password of a databaseConfiguration cannot be empty."
             }
         }
     }
