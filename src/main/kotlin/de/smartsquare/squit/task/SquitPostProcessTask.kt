@@ -33,7 +33,7 @@ open class SquitPostProcessTask : DefaultTask() {
     /**
      * The directory of the test sources.
      */
-    @Suppress("MemberVisibilityCanPrivate")
+    @Suppress("MemberVisibilityCanBePrivate")
     @InputDirectory
     val processedSourcesPath: Path = Paths.get(project.buildDir.path,
         SQUIT_DIRECTORY, SOURCES_DIRECTORY)
@@ -41,7 +41,7 @@ open class SquitPostProcessTask : DefaultTask() {
     /**
      * The directory of the previously requested responses.
      */
-    @Suppress("MemberVisibilityCanPrivate")
+    @Suppress("MemberVisibilityCanBePrivate")
     @InputDirectory
     val actualResponsesPath: Path = Paths.get(project.buildDir.path,
         SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)
@@ -49,7 +49,7 @@ open class SquitPostProcessTask : DefaultTask() {
     /**
      * The directory to save the results in.
      */
-    @Suppress("MemberVisibilityCanPrivate")
+    @Suppress("MemberVisibilityCanBePrivate")
     @OutputDirectory
     val processedActualResponsesPath: Path = Paths.get(project.buildDir.path,
         SQUIT_DIRECTORY, RESPONSES_DIRECTORY, PROCESSED_DIRECTORY)

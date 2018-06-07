@@ -57,7 +57,7 @@ open class SquitRequestTask : DefaultTask() {
     /**
      * The class name of the jdbc [Driver] to use.
      */
-    @Suppress("MemberVisibilityCanPrivate")
+    @Suppress("MemberVisibilityCanBePrivate")
     @get:Input
     val jdbcDriverClassNames by lazy {
         extension.jdbcDrivers
@@ -73,7 +73,7 @@ open class SquitRequestTask : DefaultTask() {
     /**
      * The directory of the test sources.
      */
-    @Suppress("MemberVisibilityCanPrivate")
+    @Suppress("MemberVisibilityCanBePrivate")
     @get:InputDirectory
     val processedSourcesPath: Path = Paths.get(project.buildDir.path,
         SQUIT_DIRECTORY, SOURCES_DIRECTORY)
@@ -81,7 +81,7 @@ open class SquitRequestTask : DefaultTask() {
     /**
      * The directory to save the results in.
      */
-    @Suppress("MemberVisibilityCanPrivate")
+    @Suppress("MemberVisibilityCanBePrivate")
     @get:OutputDirectory
     val actualResponsesPath: Path = Paths.get(project.buildDir.path,
         SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)

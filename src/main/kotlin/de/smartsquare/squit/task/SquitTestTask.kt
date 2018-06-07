@@ -2,6 +2,7 @@ package de.smartsquare.squit.task
 
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
+import com.typesafe.config.Optional
 import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.entity.SquitResult
 import de.smartsquare.squit.io.FilesUtils
@@ -11,7 +12,9 @@ import de.smartsquare.squit.report.XmlReportWriter
 import de.smartsquare.squit.util.Constants.CONFIG
 import de.smartsquare.squit.util.Constants.DIFF
 import de.smartsquare.squit.util.Constants.ERROR
+import de.smartsquare.squit.util.Constants.META
 import de.smartsquare.squit.util.Constants.PROCESSED_DIRECTORY
+import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
 import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
@@ -22,6 +25,7 @@ import okhttp3.MediaType
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
@@ -31,6 +35,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.properties.Delegates
+import kotlin.streams.toList
 
 /**
  * Task for comparing the actual responses to the expected responses and generating a report.
@@ -43,23 +48,41 @@ open class SquitTestTask : DefaultTask() {
     /**
      * The directory of the test sources.
      */
-    @Suppress("MemberVisibilityCanPrivate")
+    @Suppress("MemberVisibilityCanBePrivate")
     @get:InputDirectory
     val processedSourcesPath: Path = Paths.get(project.buildDir.path,
         SQUIT_DIRECTORY, SOURCES_DIRECTORY)
 
     /**
-     * The directory of the previously requested responses.
+     * The directory of the previously (processed) requested responses.
      */
-    @Suppress("MemberVisibilityCanPrivate")
+    @Suppress("MemberVisibilityCanBePrivate")
     @get:InputDirectory
     val processedResponsesPath: Path = Paths.get(project.buildDir.path,
         SQUIT_DIRECTORY, RESPONSES_DIRECTORY, PROCESSED_DIRECTORY)
 
     /**
+     * Collection of meta.json files for up-to-date checking.
+     */
+    @Suppress("MemberVisibilityCanBePrivate", "unused")
+    @get:InputFiles
+    @get:Optional
+    val metaPaths: List<Path> by lazy {
+        val rawDirectoryPath = Paths.get(project.buildDir.path, SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)
+
+        if (Files.exists(rawDirectoryPath)) {
+            Files.walk(rawDirectoryPath).use { stream ->
+                stream.filter { Files.isRegularFile(it) && it.fileName.toString() == META }.toList()
+            }
+        } else {
+            emptyList<Path>()
+        }
+    }
+
+    /**
      * The directory to generate the xml report file into.
      */
-    @Suppress("MemberVisibilityCanPrivate")
+    @Suppress("MemberVisibilityCanBePrivate")
     @get:OutputFile
     val xmlReportFilePath: Path by lazy {
         extension.reportsPath.resolve("xml").resolve("main.xml")
@@ -68,7 +91,7 @@ open class SquitTestTask : DefaultTask() {
     /**
      * The directory to generate the xml report file into.
      */
-    @Suppress("MemberVisibilityCanPrivate")
+    @Suppress("MemberVisibilityCanBePrivate")
     @get:OutputDirectory
     val htmlReportDirectoryPath: Path by lazy {
         extension.reportsPath.resolve("html")
@@ -77,7 +100,7 @@ open class SquitTestTask : DefaultTask() {
     /**
      * The directory to copy failed tests into.
      */
-    @Suppress("MemberVisibilityCanPrivate")
+    @Suppress("MemberVisibilityCanBePrivate")
     @get:OutputDirectory
     val failureResultDirectory by lazy {
         extension.reportsPath.resolve("failures") ?: throw IllegalArgumentException("reportPath cannot be null")

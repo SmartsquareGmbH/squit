@@ -43,7 +43,7 @@ open class SquitPreProcessTask : DefaultTask() {
     /**
      * The tags to filter by.
      */
-    @Suppress("MemberVisibilityCanPrivate")
+    @Suppress("MemberVisibilityCanBePrivate")
     @get:Input
     val tags = when (project.hasProperty("tags")) {
         true -> project.property("tags") as String?
@@ -53,14 +53,14 @@ open class SquitPreProcessTask : DefaultTask() {
     /**
      * If all excluded or ignored tests should be run nevertheless.
      */
-    @Suppress("MemberVisibilityCanPrivate")
+    @Suppress("MemberVisibilityCanBePrivate")
     @get:Input
     val shouldUnexclude by lazy { project.properties.containsKey("unexclude") }
 
     /**
      * The properties of the project parsed into a [Config] object.
      */
-    @Suppress("MemberVisibilityCanPrivate")
+    @Suppress("MemberVisibilityCanBePrivate")
     @get:Input
     val projectConfig: Config by lazy {
         ConfigValueFactory.fromMap(project.properties
@@ -72,14 +72,14 @@ open class SquitPreProcessTask : DefaultTask() {
     /**
      * The directory of the test sources.
      */
-    @Suppress("MemberVisibilityCanPrivate")
+    @Suppress("MemberVisibilityCanBePrivate")
     @get:InputDirectory
     val sourcesPath by lazy { extension.sourcesPath }
 
     /**
      * The directory to save the results in.
      */
-    @Suppress("MemberVisibilityCanPrivate")
+    @Suppress("MemberVisibilityCanBePrivate")
     @get:OutputDirectory
     val processedSourcesPath: Path = Paths.get(project.buildDir.path,
         SQUIT_DIRECTORY, SOURCES_DIRECTORY)
