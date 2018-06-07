@@ -1,4 +1,4 @@
-package de.smartsquare.squit
+package de.smartsquare.squit.interfaces
 
 import com.google.gson.JsonElement
 

@@ -1,3 +1,3 @@
-include 'squit-plugin', 'squit-library'
+rootProject.name = "squit"
 
 enableFeaturePreview('STABLE_PUBLISHING')

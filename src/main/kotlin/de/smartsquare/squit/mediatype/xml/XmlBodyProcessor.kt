@@ -1,10 +1,8 @@
-package de.smartsquare.squit.mediatype.json
+package de.smartsquare.squit.mediatype.xml
 
-import com.google.gson.JsonElement
-import com.google.gson.JsonParser
 import com.typesafe.config.Config
-import de.smartsquare.squit.SquitJsonPostProcessor
-import de.smartsquare.squit.SquitJsonPreProcessor
+import de.smartsquare.squit.interfaces.SquitXmlPostProcessor
+import de.smartsquare.squit.interfaces.SquitXmlPreProcessor
 import de.smartsquare.squit.mediatype.BodyProcessor
 import de.smartsquare.squit.util.postProcessorScripts
 import de.smartsquare.squit.util.postProcessors
@@ -14,13 +12,18 @@ import de.smartsquare.squit.util.read
 import de.smartsquare.squit.util.write
 import groovy.lang.Binding
 import groovy.lang.GroovyShell
+import org.dom4j.Document
+import org.dom4j.io.SAXReader
 import java.nio.file.Files
 import java.nio.file.Path
 
 /**
+ * Xml-specific [BodyProcessor] implementation. It allows for user-supplied pre- and post-processor implementations
+ * to run on the generated [Document] instances and saves the results.
+ *
  * @author Ruben Gees
  */
-object JsonBodyProcessor : BodyProcessor {
+object XmlBodyProcessor : BodyProcessor {
 
     override fun preProcess(
         requestPath: Path?,
@@ -29,8 +32,8 @@ object JsonBodyProcessor : BodyProcessor {
         resultResponsePath: Path,
         config: Config
     ) {
-        val request = requestPath?.let { JsonParser().read(it) }
-        val response = JsonParser().read(responsePath)
+        val request = requestPath?.let { SAXReader().read(requestPath) }
+        val response = SAXReader().read(responsePath)
 
         runPreProcessors(config, request, response)
 
@@ -44,17 +47,17 @@ object JsonBodyProcessor : BodyProcessor {
         resultActualResponseFilePath: Path,
         config: Config
     ) {
-        val actualResponse = JsonParser().read(actualResponsePath)
-        val expectedResponse = JsonParser().read(expectedResponsePath)
+        val actualResponse = SAXReader().read(actualResponsePath)
+        val expectedResponse = SAXReader().read(expectedResponsePath)
 
         runPostProcessors(config, actualResponse, expectedResponse)
 
         actualResponse.write(resultActualResponseFilePath)
     }
 
-    private fun runPreProcessors(config: Config, request: JsonElement?, response: JsonElement) {
+    private fun runPreProcessors(config: Config, request: Document?, response: Document) {
         config.preProcessors.map { Class.forName(it).getConstructor().newInstance() }
-            .filterIsInstance(SquitJsonPreProcessor::class.java)
+            .filterIsInstance(SquitXmlPreProcessor::class.java)
             .forEach { it.process(request, response) }
 
         config.preProcessorScripts.forEach {
@@ -67,9 +70,9 @@ object JsonBodyProcessor : BodyProcessor {
         }
     }
 
-    private fun runPostProcessors(config: Config, actualResponse: JsonElement, expectedResponse: JsonElement) {
+    private fun runPostProcessors(config: Config, actualResponse: Document, expectedResponse: Document) {
         config.postProcessors.map { Class.forName(it).getConstructor().newInstance() }
-            .filterIsInstance(SquitJsonPostProcessor::class.java)
+            .filterIsInstance(SquitXmlPostProcessor::class.java)
             .forEach { it.process(actualResponse, expectedResponse) }
 
         config.postProcessorScripts.forEach {
