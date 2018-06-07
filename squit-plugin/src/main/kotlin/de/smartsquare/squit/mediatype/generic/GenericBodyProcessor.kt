@@ -1,6 +1,7 @@
-package de.smartsquare.squit.mediatype
+package de.smartsquare.squit.mediatype.generic
 
 import com.typesafe.config.Config
+import de.smartsquare.squit.mediatype.BodyProcessor
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -9,7 +10,7 @@ import java.nio.file.Path
  *
  * @author Ruben Gees
  */
-object DefaultBodyProcessor : BodyProcessor {
+object GenericBodyProcessor : BodyProcessor {
 
     override fun preProcess(
         requestPath: Path?,

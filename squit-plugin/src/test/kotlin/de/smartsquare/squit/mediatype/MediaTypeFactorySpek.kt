@@ -1,5 +1,6 @@
 package de.smartsquare.squit.mediatype
 
+import de.smartsquare.squit.mediatype.generic.GenericBodyProcessor
 import de.smartsquare.squit.mediatype.xml.XmlBodyProcessor
 import okhttp3.MediaType
 import org.amshove.kluent.shouldBe
@@ -77,7 +78,7 @@ object MediaTypeFactorySpek : Spek({
 
         on("getting the processor") {
             it("should return the default processor") {
-                MediaTypeFactory.processor(mediaType) shouldBe DefaultBodyProcessor
+                MediaTypeFactory.processor(mediaType) shouldBe GenericBodyProcessor
             }
         }
     }
@@ -111,7 +112,7 @@ object MediaTypeFactorySpek : Spek({
 
         on("getting the processor") {
             it("should return the default processor") {
-                MediaTypeFactory.processor(mediaType) shouldBe DefaultBodyProcessor
+                MediaTypeFactory.processor(mediaType) shouldBe GenericBodyProcessor
             }
         }
     }

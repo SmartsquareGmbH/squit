@@ -26,9 +26,6 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.xmlunit.builder.DiffBuilder
-import org.xmlunit.builder.Input
-import java.io.ByteArrayInputStream
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
@@ -149,13 +146,9 @@ open class SquitTestTask : DefaultTask() {
                     val expectedResponse = Files.readAllBytes(expectedResponseFilePath)
                     val actualResponse = Files.readAllBytes(actualResponseFilePath)
 
-                    val diffBuilder = DiffBuilder.compare(Input.fromStream(ByteArrayInputStream(expectedResponse)))
-                        .withTest(Input.fromStream(ByteArrayInputStream(actualResponse)))
-                        .ignoreWhitespace()
-                        .build()
+                    val diff = MediaTypeFactory.differ(config.mediaType).diff(expectedResponse, actualResponse)
 
-                    resultList += constructResult(diffBuilder.differences.joinToString("\n"),
-                        actualResponsePath, config.mediaType)
+                    resultList += constructResult(diff, actualResponsePath, config.mediaType)
                 }
             } else {
                 resultList += constructResult("", actualResponsePath, config.mediaType, true)

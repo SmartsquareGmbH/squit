@@ -259,7 +259,7 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
         }
     }
 
-    given("a test project") {
+    given("a test project with json requests") {
         beforeEachTest {
             server = MockWebServer()
         }
