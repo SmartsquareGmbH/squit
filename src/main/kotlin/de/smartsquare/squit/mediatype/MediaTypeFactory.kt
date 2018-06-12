@@ -14,7 +14,8 @@ import okhttp3.MediaType
  */
 object MediaTypeFactory {
 
-    private val xmlMediaType = MediaType.parse("application/xml")
+    private val xmlMediaType = MediaType.parse("text/xml")
+    private val applicationXmlMediaType = MediaType.parse("application/xml")
     private val soapMediaType = MediaType.parse("application/soap+xml")
     private val jsonMediaType = MediaType.parse("application/json")
 
@@ -22,7 +23,7 @@ object MediaTypeFactory {
      * Returns the request name based on the given [mediaType].
      */
     fun request(mediaType: MediaType) = when (mediaType) {
-        xmlMediaType, soapMediaType -> "request.xml"
+        xmlMediaType, applicationXmlMediaType, soapMediaType -> "request.xml"
         jsonMediaType -> "request.json"
         else -> "request.txt"
     }
@@ -31,7 +32,7 @@ object MediaTypeFactory {
      * Returns the source response name based on the given [mediaType].
      */
     fun sourceResponse(mediaType: MediaType) = when (mediaType) {
-        xmlMediaType, soapMediaType -> "response.xml"
+        xmlMediaType, applicationXmlMediaType, soapMediaType -> "response.xml"
         jsonMediaType -> "response.json"
         else -> "response.txt"
     }
@@ -40,7 +41,7 @@ object MediaTypeFactory {
      * Returns the expected response name based on the given [mediaType].
      */
     fun expectedResponse(mediaType: MediaType) = when (mediaType) {
-        xmlMediaType, soapMediaType -> "expected_response.xml"
+        xmlMediaType, applicationXmlMediaType, soapMediaType -> "expected_response.xml"
         jsonMediaType -> "expected_response.json"
         else -> "expected_response.txt"
     }
@@ -49,7 +50,7 @@ object MediaTypeFactory {
      * Returns the actual response name based on the given [mediaType].
      */
     fun actualResponse(mediaType: MediaType) = when (mediaType) {
-        xmlMediaType, soapMediaType -> "actual_response.xml"
+        xmlMediaType, applicationXmlMediaType, soapMediaType -> "actual_response.xml"
         jsonMediaType -> "actual_response.json"
         else -> "actual_response.txt"
     }
@@ -58,7 +59,7 @@ object MediaTypeFactory {
      * Returns the [BodyProcessor] to use based on the given [mediaType].
      */
     fun processor(mediaType: MediaType) = when (mediaType) {
-        xmlMediaType, soapMediaType -> XmlBodyProcessor
+        xmlMediaType, applicationXmlMediaType, soapMediaType -> XmlBodyProcessor
         jsonMediaType -> JsonBodyProcessor
         else -> GenericBodyProcessor
     }
@@ -67,7 +68,7 @@ object MediaTypeFactory {
      * Returns the [Differ] to use based on the given [mediaType].
      */
     fun differ(mediaType: MediaType) = when (mediaType) {
-        xmlMediaType, soapMediaType -> XmlDiffer
+        xmlMediaType, applicationXmlMediaType, soapMediaType -> XmlDiffer
         else -> GenericDiffer
     }
 }
