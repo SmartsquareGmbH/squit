@@ -1,6 +1,6 @@
 # Squit
 
-`Squit` is a `Gradle` plugin for automated testing of `Xml` and/or `Soap` based apis.<br>
+`Squit` is a `Gradle` plugin for file-based, automated testing of `Json`, `Xml`, `Soap` and other apis.<br>
 It features high customizability and speed.
 
 ## Table of Contents
@@ -16,6 +16,7 @@ It features high customizability and speed.
     - [Interface processing](#interface-processing)
   - [Tagging](#tagging)
   - [Squit Dsl](#squit-dsl)
+  - [Supported request formats](#supported-request-types)
 
 ## Integration
 
@@ -24,12 +25,12 @@ Add the [plugin](https://plugins.gradle.org/plugin/de.smartsquare.squit) to your
 ```groovy
 buildscript {
     repositories {
-        maven { url "https://plugins.gradle.org/m2/" }
+        gradlePluginPortal()
         jcenter()
     }
 
     dependencies {
-        classpath "gradle.plugin.de.smartsquare:squit-plugin:1.1.0"
+        classpath "gradle.plugin.de.smartsquare:squit-plugin:2.0.0"
     }
 }
 ```
@@ -46,16 +47,16 @@ Projects are structured in arbitrarily deep folders. The plugin expects the root
 
 A single test is represented by one leaf folder. That folder **must** contain:
 
-- A `response.xml` file.
+- A `response` file (the file ending depends on the type of test).
 
 Further it **can** contain:
 
 - A `test.conf` file.
-- A `request.xml` file.
+- A `request` file (the file ending depends on the type of test).
 - `db_$name_pre.sql` files.
 - `db_$name_post.sql` files.
 
-The `request.xml` file contains whatever payload you want to send to your backend. The `response.xml` file contains the expected response.
+The `request` file contains whatever payload you want to send to your backend. The `response` file contains the expected response.
 
 A `test.conf` file is required at least once on the path of your test. That means that it is resolved recursively, starting at the leaf, e.g. your test folder. The `test.conf` can and must contain various properties, which are discussed in the `Configuration` section. These properties are then merged if not existing while going up the folder tree.<br>
 This allows for convenient definition of properties for multiple tests, with the ability to override properties in special cases.
@@ -78,7 +79,8 @@ A simple example looks like this:
 
 This shows a valid project structure for `Squit`. `my_suite` contains all our tests (in this case only two: `test1` and `test2`).
 
-> You *can* have more directories beneath `my_suite` (e.g. `another_suite`) and as aforementioned can also nest more deeply.<br>
+> You _can_ have more directories beneath `my_suite` (e.g. `another_suite`) and as aforementioned can also nest more deeply.
+> At least one suite folder is required though, you can't have your tests directly in the `src/test` folder.<br>
 
 `my_suite` also contains a `test.conf` file, which could look like this:
 
@@ -96,12 +98,12 @@ As the example shows, `test1` also contains a `test.conf` file. This one could b
 The plugin is composed of various `Gradle` tasks. For daily usage, only the `squitTest` is relevant.<br>
 The following table lists all tasks and their purpose:
 
-Task name          | Description
------------------- | -------------------------------------------------------------------------------------------------------------------
-`squitPreProcess`  | Pre processes the test sources in a configurable manner.
-`squitRunRequests` | Runs the actual requests against your backend.
-`squitPostProcess` | Post processes the responses in a configurable manner.
-`squitTest`        | Compares the expected and actual response and fails the build if differences were found. Also generates the report.
+| Task name          | Description                                                                                                         |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| `squitPreProcess`  | Pre processes the test sources in a configurable manner.                                                            |
+| `squitRunRequests` | Runs the actual requests against your backend.                                                                      |
+| `squitPostProcess` | Post processes the responses in a configurable manner.                                                              |
+| `squitTest`        | Compares the expected and actual response and fails the build if differences were found. Also generates the report. |
 
 ### Configuration
 
@@ -109,19 +111,19 @@ The plugin features a variety of configuration possibilities. As aforementioned,
 `test.conf` files are in the [HOCON](https://github.com/lightbend/config/blob/master/HOCON.md) format and support all of its features.
 As of the current version, these are the supported properties:
 
-Name                   | Description                                                                                                                                        | Example
----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------
-endpoint               | The endpoint of your backend to call.                                                                                                              | `endpoint = "http://localhost:1234/api"`
-mediaType              | The media type of your content to send.                                                                                                            | `mediaType = "application/soap+xml"`
-method                 | The method for the request to use. The default is POST and requires a request.xml. Methods like GET do not require one.                            | `method = "GET"`
-exclude                | Excludes or un-excludes the test or test group.                                                                                                    | `exclude = true`
-ignore                 | Ignores or un-ignores the test or test group. This means that the test is run, but does not show up in anything generated at the end of the build. | `ignore = true`
-databaseConfigurations | An array of database configurations to use for pre- and post scripts. See below for details.                                                       | `databaseConfigurations = [ { / *content */ } ]`
-preProcessors          | An array of pre processor classes to use.                                                                                                          | `preProcessors = ["com.example.ExamplePreProcessor"]`
-postProcessors         | An array of post processor classes to use.                                                                                                         | `postProcessors = ["com.example.ExamplePostProcessor"]`
-preProcessorScripts    | An array of paths to groovy pre processor scripts to use.                                                                                          | `preProcessorScripts = [./scripts/pre_processor.groovy]`
-postProcessorScripts   | An array of paths to groovy post processor scripts to use.                                                                                         | `postProcessorScripts = [./scripts/post_processor.groovy]`
-headers                | A map of headers to use for requests.                                                                                                              | `headers = { "some-header": "value" }`
+| Name                   | Description                                                                                                                                        | Example                                                    |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| endpoint               | The endpoint of your backend to call.                                                                                                              | `endpoint = "http://localhost:1234/api"`                   |
+| mediaType              | The media type of your content to send.                                                                                                            | `mediaType = "application/soap+xml"`                       |
+| method                 | The method for the request to use. The default is POST and requires a request.xml. Methods like GET do not require one.                            | `method = "GET"`                                           |
+| exclude                | Excludes or un-excludes the test or test group.                                                                                                    | `exclude = true`                                           |
+| ignore                 | Ignores or un-ignores the test or test group. This means that the test is run, but does not show up in anything generated at the end of the build. | `ignore = true`                                            |
+| databaseConfigurations | An array of database configurations to use for pre- and post scripts. See below for details.                                                       | `databaseConfigurations = [ { / *content */ } ]`           |
+| preProcessors          | An array of pre processor classes to use.                                                                                                          | `preProcessors = ["com.example.ExamplePreProcessor"]`      |
+| postProcessors         | An array of post processor classes to use.                                                                                                         | `postProcessors = ["com.example.ExamplePostProcessor"]`    |
+| preProcessorScripts    | An array of paths to groovy pre processor scripts to use.                                                                                          | `preProcessorScripts = [./scripts/pre_processor.groovy]`   |
+| postProcessorScripts   | An array of paths to groovy post processor scripts to use.                                                                                         | `postProcessorScripts = [./scripts/post_processor.groovy]` |
+| headers                | A map of headers to use for requests.                                                                                                              | `headers = { "some-header": "value" }`                     |
 
 > The parameter `endpoint` is required and the build will fail if it is missing for a test.
 
@@ -149,7 +151,7 @@ To do so, you have to add a database configuration to your `test.conf` file(s) a
 
 A simple example would look like this:
 
-```
+```properties
 # test.conf
 
 databaseConfigurations = [
@@ -186,7 +188,7 @@ The last option is to have scripts which are only run once. For this, you name t
 
 ### Pre- and Post-processing
 
-`Squit` allows you to pre- and post-process the requests and actual responses. This max be required for incremental ids you have no control over, dates or other things.
+`Squit` allows you to pre- and post-process the requests and actual responses. This may be required for incremental ids you have no control over, dates or other things.
 
 There are currently two ways to do so: Using `Groovy` scripts or implementing a specific `interface`.
 
@@ -196,13 +198,13 @@ There are currently two ways to do so: Using `Groovy` scripts or implementing a 
 
 You add a `.groovy` script somewhere in your project and supply `Squit` with the path:
 
-```
-# test.conf
+```properties
+    # test.conf
 
-preProcessorScripts = [./some/path/pre_process.groovy]
+    preProcessorScripts = [./some/path/pre_process.groovy]
 ```
 
-As for the pre process step, the script gets passed `request` and `expectedResponse` objects, which are [Dom4J Documents](https://dom4j.github.io/).
+As for the pre process step, the script gets passed `request` and `expectedResponse` objects, which types depend on the request type. See [supported request types](#supported-request-types).
 
 A simple script could look like this:
 
@@ -226,15 +228,16 @@ Create the `buildSrc` folder and set up a normal project in your preferred JVM l
 
 ```groovy
 repositories {
+    gradlePluginPortal()
     jcenter()
 }
 
 dependencies {
-    compile 'de.smartsquare:squit-library:1.1.0'
+    compile 'gradle.plugin.de.smartsquare:squit-plugin:2.0.0'
 }
 ```
 
-Then you can implement one of the `interfaces`. An example for the `SquitPreProcessor` equivalent to the scripting example could look like this:
+Then you can implement one of the `interfaces`. An example for the `SquitXmlPreProcessor` equivalent to the scripting example could look like this:
 
 ```java
 import de.smartsquare.squit.SquitPreProcessor;
@@ -242,7 +245,8 @@ import org.dom4j.Document;
 
 import java.time.LocalDate;
 
-public class MyPreProcessor implements SquitPreProcessor {
+public class MyPreProcessor implements SquitXmlPreProcessor {
+
     @Override
     public void process(Document request, Document expectedResponse) {
         request.selectNodes("//Date")
@@ -251,14 +255,14 @@ public class MyPreProcessor implements SquitPreProcessor {
 }
 ```
 
-> The other interface as of the current version is the `SquitPostProcessor`.
+> The other interfaces as of the current version are `SquitXmlPostProcessor`, `SquitJsonPostProcessor`, `SquitJsonPreProcessor`.
 
 The last step is to add the class to your `test.conf`, similar to the approach with `groovy` scripts:
 
-```
+```properties
 # test.conf
 
-preProcessors = ["com.example.ExamplePreProcessor"]
+preProcessors = ["com.example.MyPreProcessor"]
 ```
 
 ### Tagging
@@ -267,7 +271,7 @@ Tags allow to run only a subset of your tests to save time and resources if need
 
 You can specify tags in corresponding `test.conf` files. An example could look like this:
 
-```
+```properties
 tags = ["fast", "mysuite"]
 ```
 
@@ -281,6 +285,16 @@ To run only tests with the tag `fast`, you would invoke `Squit` like so:
 > You can also specify more tags by separating with a `,`.
 
 `Squit` also automatically tags your tests named on the folders they reside in. If you have a test in the folder `test1`, it would have the tag `test1` and could be run exclusively by invoking `./gradlew squitTest -Ptags=test1`
+
+### Supported request types
+
+As of the current version, Squit supports these request formats:
+
+| Media Type         | File ending | Pre- and post-processor input                                                               |
+| ------------------ | ----------- | ------------------------------------------------------------------------------------------- |
+| `application/xml`  | `.xml`      | [Dom4J Documents](http://static.javadoc.io/org.dom4j/dom4j/2.1.0/org/dom4j/Document.html)   |
+| `application/json` | `.json`     | [Gson JsonElements](https://google.github.io/gson/apidocs/com/google/gson/JsonElement.html) |
+| All others         | `.txt`      | :x:                                                                                         |
 
 ### Squit Dsl
 
