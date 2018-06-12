@@ -30,7 +30,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "gradle.plugin.de.smartsquare:squit-plugin:2.0.0"
+        classpath "gradle.plugin.de.smartsquare:squit:2.0.0"
     }
 }
 ```
@@ -233,7 +233,7 @@ repositories {
 }
 
 dependencies {
-    compile 'gradle.plugin.de.smartsquare:squit-plugin:2.0.0'
+    compile 'gradle.plugin.de.smartsquare:squit:2.0.0'
 }
 ```
 
