@@ -1,0 +1,4 @@
+plugins {
+    id 'base'
+    id 'de.smartsquare.squit'
+}

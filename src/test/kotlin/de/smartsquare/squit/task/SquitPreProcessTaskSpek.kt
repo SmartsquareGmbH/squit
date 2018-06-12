@@ -27,6 +27,7 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
     val subjectInvalid = Paths.get(this.javaClass.classLoader.getResource("invalid-test-project").toURI())
     val subjectInvalid3 = Paths.get(this.javaClass.classLoader.getResource("invalid-test-project-3").toURI())
+    val subjectInvalid4 = Paths.get(this.javaClass.classLoader.getResource("invalid-test-project-4").toURI())
     val subjectGet = Paths.get(this.javaClass.classLoader.getResource("test-project-get").toURI())
     val subjectOptions = Paths.get(this.javaClass.classLoader.getResource("test-project-options").toURI())
     val subjectJson = Paths.get(this.javaClass.classLoader.getResource("test-project-json").toURI())
@@ -192,6 +193,29 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
             it("should generate an error file") {
                 Files.readAllBytes(invalid3Call1Error).toString(Charset.defaultCharset()) shouldStartWith
                     "org.dom4j.DocumentException: Error on line 4 of document"
+            }
+        }
+    }
+
+    given("an invalid test project (invalid structure)") {
+        on("running the pre-process task") {
+            val arguments = listOf("clean", "squitPreProcess")
+
+            val result = GradleRunner.create()
+                .withProjectDir(subjectInvalid4.toFile())
+                .withExtendedPluginClasspath()
+                .withArguments(arguments)
+                .forwardOutput()
+                .withJaCoCo()
+                .buildAndFail()
+
+            it("should fail the build") {
+                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.FAILED
+            }
+
+            it("should print an appropriate message") {
+                result.output shouldContain "Invalid project structure. " +
+                    "Please add a project directory to the src/test directory."
             }
         }
     }

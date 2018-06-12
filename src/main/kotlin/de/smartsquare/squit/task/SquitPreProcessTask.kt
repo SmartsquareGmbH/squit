@@ -121,6 +121,11 @@ open class SquitPreProcessTask : DefaultTask() {
         Files.createDirectories(processedSourcesPath)
 
         leafDirectoriesWithConfig.forEach { (testPath, resolvedConfig) ->
+            if (testPath.cut(sourcesPath).toList().size < 2) {
+                throw GradleException("Invalid project structure. " +
+                    "Please add a project directory to the src/test directory.")
+            }
+
             val requestPath = resolveRequestPath(resolvedConfig, testPath)
 
             val responsePath = FilesUtils.validateExistence(testPath
