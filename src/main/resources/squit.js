@@ -33,14 +33,14 @@ $(document).ready(function () {
     collapsibleItems
         .on('show.bs.collapse shown.bs.collapse', function (e) {
             if (this === e.target) {
-                $(this).prev('.list-group-item').find('.fa:first')
+                $(this).prev('.list-group-item').find('svg:first')
                     .removeClass('fa-chevron-right')
                     .addClass('fa-chevron-down');
             }
         })
         .on('hide.bs.collapse hidden.bs.collapse', function (e) {
             if (this === e.target) {
-                $(this).prev('.list-group-item').find('.fa:first')
+                $(this).prev('.list-group-item').find('svg:first')
                     .removeClass('fa-chevron-down')
                     .addClass('fa-chevron-right');
             }

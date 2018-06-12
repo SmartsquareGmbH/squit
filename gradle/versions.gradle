@@ -21,9 +21,9 @@ ext {
     kotlinHtmlVersion = '0.6.10'
     diffUtilsVersion = '2.2'
 
-    bootstrapVersion = '3.3.7-1'
-    fontAwesomeVersion = '4.7.0'
-    awesomeBootstrapCheckboxVersion = '0.3.7'
+    bootstrapVersion = '4.1.1'
+    jqueryVersion = '3.3.1-1'
+    fontAwesomeVersion = '5.0.13'
     diff2htmlVersion = '2.3.2'
 
     detektVersion = '1.0.0.RC7'

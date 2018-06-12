@@ -130,7 +130,6 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
 
                 htmlReportPath.parent.resolve("css").toFile().shouldBeDir()
                 htmlReportPath.parent.resolve("detail").toFile().shouldBeDir()
-                htmlReportPath.parent.resolve("fonts").toFile().shouldBeDir()
                 htmlReportPath.parent.resolve("js").toFile().shouldBeDir()
 
                 htmlReportPath.parent.resolve("detail").resolve("0").resolve("detail.html").toFile().shouldBeFile()

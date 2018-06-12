@@ -4,16 +4,19 @@ package de.smartsquare.squit.report
 
 import de.smartsquare.squit.entity.SquitResult
 import de.smartsquare.squit.entity.SquitResultTree
+import kotlinx.html.ButtonType
 import kotlinx.html.DIV
 import kotlinx.html.HTML
 import kotlinx.html.InputType
 import kotlinx.html.a
 import kotlinx.html.body
+import kotlinx.html.button
 import kotlinx.html.code
 import kotlinx.html.div
 import kotlinx.html.form
 import kotlinx.html.h1
 import kotlinx.html.h4
+import kotlinx.html.i
 import kotlinx.html.id
 import kotlinx.html.input
 import kotlinx.html.label
@@ -47,8 +50,8 @@ fun HTML.squitBody(results: List<SquitResult>) {
 
     body {
         div(classes = "container") {
-            div(classes = "row") {
-                div(classes = "col-xs-12") {
+            div(classes = "row mt-2") {
+                div(classes = "col-12") {
                     h1 { +"Squit Results" }
                     h4 {
                         +when {
@@ -62,8 +65,8 @@ fun HTML.squitBody(results: List<SquitResult>) {
             }
 
             div(classes = "row") {
-                div(classes = "col-xs-12") {
-                    div(classes = "responsive-table") {
+                div(classes = "col-12") {
+                    div(classes = "table-responsive") {
                         table(classes = "table table-striped table-bordered") {
                             tbody {
                                 tr {
@@ -95,16 +98,16 @@ fun HTML.squitBody(results: List<SquitResult>) {
             }
 
             div(classes = "row") {
-                div(classes = "col-xs-6") {
+                div(classes = "col-6 d-flex align-items-center") {
                     form {
                         role = "form"
 
-                        div(classes = "checkbox checkbox-primary") {
-                            input(type = InputType.checkBox, classes = "styled") {
+                        div(classes = "custom-control custom-checkbox") {
+                            input(type = InputType.checkBox, classes = "custom-control-input") {
                                 id = "failed-only"
                             }
 
-                            label {
+                            label(classes = "custom-control-label") {
                                 attributes += "for" to "failed-only"
 
                                 +"Show only failed tests"
@@ -113,16 +116,16 @@ fun HTML.squitBody(results: List<SquitResult>) {
                     }
                 }
 
-                div(classes = "col-xs-6") {
-                    a(classes = "btn btn-primary pull-right") {
-                        attributes += "role" to "button"
+                div(classes = "col-6") {
+                    button(classes = "btn btn-primary float-right") {
+                        type = ButtonType.button
                         id = "collapse-all"
 
                         +"Collapse all"
                     }
 
-                    a(classes = "btn btn-primary pull-right start-item") {
-                        attributes += "role" to "button"
+                    button(classes = "btn btn-primary float-right mr-2") {
+                        type = ButtonType.button
                         id = "expand-all"
 
                         +"Expand all"
@@ -130,17 +133,20 @@ fun HTML.squitBody(results: List<SquitResult>) {
                 }
             }
 
-            div(classes = "row") {
+            div(classes = "row mt-3 mb-2") {
                 id = "result-tree"
 
-                div(classes = "col-xs-12") {
+                div(classes = "col-12") {
                     squitItemContainers(SquitResultTree.fromList(results), 1)
                 }
             }
         }
 
         script(src = "js/jquery.js") {}
+        script(src = "js/popper.js") {}
         script(src = "js/bootstrap.js") {}
+        script(src = "js/fa-solid.js") {}
+        script(src = "js/fontawesome.js") {}
         script(src = "js/squit.js") {}
     }
 }
@@ -162,16 +168,16 @@ fun DIV.squitItemContainers(resultTrees: List<SquitResultTree>, level: Int) {
  * Helper function for generating a single leaf item with the given [resultTree] and [level] for indentation.
  */
 fun DIV.squitLeafItem(resultTree: SquitResultTree, level: Int) {
-    a(href = "detail/${resultTree.id}/detail.html", classes = "list-group-item") {
+    a(href = "detail/${resultTree.id}/detail.html", classes = "list-group-item list-group-item-action") {
         attributes["data-success"] = if (resultTree.isSuccess) "true" else "false"
-        attributes["style"] = "padding-left: ${12 * level + 8}px"
+        attributes["style"] = "padding-left: ${12 * level}px"
 
         +resultTree.name
 
         val badgeType = when {
-            resultTree.isIgnored -> "badge-ignored"
+            resultTree.isIgnored -> "badge-secondary"
             resultTree.isSuccess -> "badge-success"
-            else -> "badge-failure"
+            else -> "badge-danger"
         }
 
         val text = when {
@@ -180,7 +186,7 @@ fun DIV.squitLeafItem(resultTree: SquitResultTree, level: Int) {
             else -> "Failed"
         }
 
-        span(classes = "badge $badgeType") {
+        span(classes = "badge $badgeType float-right") {
             +text
         }
     }
@@ -192,22 +198,22 @@ fun DIV.squitLeafItem(resultTree: SquitResultTree, level: Int) {
 fun DIV.squitContainerItem(resultTree: SquitResultTree, level: Int) {
     val currentId = IdHolder.currentId++
 
-    a(href = "#$currentId", classes = "list-group-item") {
+    a(href = "#$currentId", classes = "list-group-item list-group-item-action") {
         attributes["data-success"] = if (resultTree.isSuccess) "true" else "false"
         attributes["style"] = "padding-left: ${12 * level}px"
         attributes["data-toggle"] = "collapse"
 
-        span(classes = "fa fa-chevron-right fa-fw start-item") {}
+        i(classes = "fas fa-fw fa-chevron-right mr-2") {}
 
         +resultTree.name
 
         val badgeType = when {
-            resultTree.isIgnored -> "badge-ignored"
+            resultTree.isIgnored -> "badge-secondary"
             resultTree.isSuccess -> "badge-success"
-            else -> "badge-failure"
+            else -> "badge-danger"
         }
 
-        span(classes = "badge $badgeType") {
+        span(classes = "badge $badgeType float-right") {
             +"${resultTree.successfulTests}/${resultTree.totalTests - resultTree.ignoredTests} passed"
         }
     }
