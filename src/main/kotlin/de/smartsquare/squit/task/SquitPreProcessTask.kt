@@ -89,6 +89,7 @@ open class SquitPreProcessTask : DefaultTask() {
 
     private val leafDirectoriesWithConfig by lazy {
         FilesUtils.getSortedLeafDirectories(sourcesPath)
+            .filter { Files.newDirectoryStream(it).use { it.any() } }
             .map { it to resolveConfig(it) }
             .filter { (testPath, resolvedProperties) ->
                 when {
