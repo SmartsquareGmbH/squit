@@ -70,6 +70,7 @@ object HtmlReportWriter {
             FilesUtils.copyResource("squit-detail.js", detailJsPath, {
                 it.toString(Charset.defaultCharset())
                     .replace(Regex("diffPlaceholder"), Matcher.quoteReplacement(unifiedDiffForJs))
+                    .replace("titlePlaceholder", result.name)
                     .toByteArray()
             })
         }

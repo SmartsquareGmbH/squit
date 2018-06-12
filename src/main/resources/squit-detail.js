@@ -1,4 +1,5 @@
 var diff = 'diffPlaceholder';
+var title = 'titlePlaceholder';
 var diff2html = new Diff2HtmlUI({diff: diff});
 
 $(document).ready(function () {
@@ -27,5 +28,7 @@ function drawDiff(outputFormat) {
         matching: 'lines'
     });
 
+    $('.d2h-file-name').text(title);
+    $('.d2h-icon-wrapper').remove();
     $('.d2h-tag').remove();
 }

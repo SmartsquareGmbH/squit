@@ -9,6 +9,7 @@ import kotlinx.html.div
 import kotlinx.html.i
 import kotlinx.html.id
 import kotlinx.html.script
+import kotlinx.html.span
 
 /**
  * Extension function for generating the html body of a Squit detail page.
@@ -21,16 +22,19 @@ fun HTML.squitDetailBody() {
                     a(href = "../../main.html", classes = "btn btn-primary") {
                         attributes += "role" to "button"
 
-                        i(classes = "fas fa-fw fa-arrow-left fa-fw") {}
-
-                        +"Back"
+                        i(classes = "fas fa-fw fa-arrow-left align-middle") {}
+                        span(classes = "align-middle") {
+                            +" Back"
+                        }
                     }
 
                     button(classes = "btn btn-primary float-right") {
                         type = ButtonType.button
                         id = "output-toggle"
 
-                        +"Show side by side"
+                        span(classes = "align-middle") {
+                            +"Show side by side"
+                        }
                     }
                 }
             }
@@ -47,6 +51,8 @@ fun HTML.squitDetailBody() {
         script(src = "../../js/bootstrap.js") {}
         script(src = "../../js/diff2html.js") {}
         script(src = "../../js/diff2html-ui.js") {}
+        script(src = "../../js/fa-solid.js") {}
+        script(src = "../../js/fontawesome.js") {}
         script(src = "detail.js") {}
     }
 }
