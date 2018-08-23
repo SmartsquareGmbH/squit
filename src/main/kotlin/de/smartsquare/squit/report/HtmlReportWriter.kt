@@ -21,19 +21,17 @@ object HtmlReportWriter {
     private const val DIFF_FILE_NAME = "Result"
     private const val DIFF_CONTEXT_SIZE = 1000000
 
-    private const val bootstrapPath = "META-INF/resources/webjars/bootstrap/4.1.1"
-    private const val fontAwesomePath = "META-INF/resources/webjars/font-awesome/5.0.13/svg-with-js"
+    private const val bootstrapPath = "META-INF/resources/webjars/bootstrap/4.1.3"
+    private const val fontAwesomePath = "META-INF/resources/webjars/font-awesome/5.2.0"
     private const val jqueryPath = "META-INF/resources/webjars/jquery/3.3.1-1"
-    private const val popperJsPath = "META-INF/resources/webjars/popper.js/1.14.1/umd"
+    private const val popperJsPath = "META-INF/resources/webjars/popper.js/1.14.3/umd"
     private const val diff2htmlPath = "META-INF/resources/webjars/diff2html/2.3.2"
 
     private val resources = arrayOf(
         "$bootstrapPath/css/bootstrap.min.css" to "css/bootstrap.css",
         "$bootstrapPath/js/bootstrap.min.js" to "js/bootstrap.js",
-        "$fontAwesomePath/css/fa-svg-with-js.css" to "css/fa-svg-with-js.css",
-        "$fontAwesomePath/css/fa-svg-with-js-jsf.css" to "css/fa-svg-with-js-jsf.css",
-        "$fontAwesomePath/js/fa-solid.min.js" to "js/fa-solid.js",
-        "$fontAwesomePath/js/fontawesome.min.js" to "js/fontawesome.js",
+        "$fontAwesomePath/css/all.min.css" to "css/fontawesome.css",
+        "$fontAwesomePath/js/all.min.js" to "js/fontawesome.js",
         "$jqueryPath/jquery.min.js" to "js/jquery.js",
         "$popperJsPath/popper.min.js" to "js/popper.js",
         "$diff2htmlPath/dist/diff2html.min.css" to "css/diff2html.css",
@@ -67,12 +65,12 @@ object HtmlReportWriter {
             Files.createDirectories(detailPath)
             Files.write(detailHtmlPath, detailDocument.toString().toByteArray())
 
-            FilesUtils.copyResource("squit-detail.js", detailJsPath, {
+            FilesUtils.copyResource("squit-detail.js", detailJsPath) {
                 it.toString(Charset.defaultCharset())
                     .replace(Regex("diffPlaceholder"), Matcher.quoteReplacement(unifiedDiffForJs))
                     .replace("titlePlaceholder", result.name)
                     .toByteArray()
-            })
+            }
         }
 
         resources.forEach { (name, target) ->

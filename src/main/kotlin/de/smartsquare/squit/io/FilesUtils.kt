@@ -32,12 +32,12 @@ object FilesUtils {
                 }
             }
         })
-        .fold(listOf(), { current, it ->
+        .fold(listOf()) { current, it ->
             current + when (containsDirectories(it)) {
                 true -> getSortedLeafDirectories(it)
                 false -> listOf(it)
             }
-        })
+        }
 
     /**
      * Deletes the given [path] recursively, if existing.

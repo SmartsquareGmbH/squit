@@ -50,6 +50,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-html-jvm:$kotlinHtmlVersion"
 
+    implementation "jaxen:jaxen:$jaxenVersion"
     implementation "org.dom4j:dom4j:$dom4jVersion"
     implementation "com.google.code.gson:gson:$gsonVersion"
     implementation "org.xmlunit:xmlunit-core:$xmlUnitVersion"
