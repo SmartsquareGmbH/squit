@@ -14,6 +14,7 @@ object XmlDiffer : Differ {
         val diffBuilder = DiffBuilder.compare(Input.fromStream(ByteArrayInputStream(expectedResponse)))
             .withTest(Input.fromStream(ByteArrayInputStream(actualResponse)))
             .ignoreWhitespace()
+            .checkForSimilar()
             .build()
 
         return diffBuilder.differences.joinToString("\n")
