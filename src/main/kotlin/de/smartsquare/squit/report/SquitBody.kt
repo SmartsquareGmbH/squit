@@ -145,7 +145,6 @@ fun HTML.squitBody(results: List<SquitResult>) {
         script(src = "js/jquery.js") {}
         script(src = "js/popper.js") {}
         script(src = "js/bootstrap.js") {}
-        script(src = "js/fa-solid.js") {}
         script(src = "js/fontawesome.js") {}
         script(src = "js/squit.js") {}
     }

@@ -51,7 +51,6 @@ fun HTML.squitDetailBody() {
         script(src = "../../js/bootstrap.js") {}
         script(src = "../../js/diff2html.js") {}
         script(src = "../../js/diff2html-ui.js") {}
-        script(src = "../../js/fa-solid.js") {}
         script(src = "../../js/fontawesome.js") {}
         script(src = "detail.js") {}
     }
