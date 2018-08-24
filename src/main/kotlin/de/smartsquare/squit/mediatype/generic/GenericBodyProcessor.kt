@@ -10,7 +10,7 @@ import java.nio.file.Path
  *
  * @author Ruben Gees
  */
-object GenericBodyProcessor : BodyProcessor {
+class GenericBodyProcessor : BodyProcessor {
 
     override fun preProcess(
         requestPath: Path?,

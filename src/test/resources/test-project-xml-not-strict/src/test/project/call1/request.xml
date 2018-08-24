@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<animals>
+    <animal name="dog"/>
+    <animal name="cat"/>
+</animals>

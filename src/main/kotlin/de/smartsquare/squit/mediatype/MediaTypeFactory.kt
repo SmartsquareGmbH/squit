@@ -1,5 +1,6 @@
 package de.smartsquare.squit.mediatype
 
+import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.mediatype.generic.GenericBodyProcessor
 import de.smartsquare.squit.mediatype.generic.GenericDiffer
 import de.smartsquare.squit.mediatype.json.JsonBodyProcessor
@@ -59,16 +60,16 @@ object MediaTypeFactory {
      * Returns the [BodyProcessor] to use based on the given [mediaType].
      */
     fun processor(mediaType: MediaType) = when (mediaType) {
-        xmlMediaType, applicationXmlMediaType, soapMediaType -> XmlBodyProcessor
-        jsonMediaType -> JsonBodyProcessor
-        else -> GenericBodyProcessor
+        xmlMediaType, applicationXmlMediaType, soapMediaType -> XmlBodyProcessor()
+        jsonMediaType -> JsonBodyProcessor()
+        else -> GenericBodyProcessor()
     }
 
     /**
      * Returns the [Differ] to use based on the given [mediaType].
      */
-    fun differ(mediaType: MediaType) = when (mediaType) {
-        xmlMediaType, applicationXmlMediaType, soapMediaType -> XmlDiffer
-        else -> GenericDiffer
+    fun differ(mediaType: MediaType, extension: SquitExtension) = when (mediaType) {
+        xmlMediaType, applicationXmlMediaType, soapMediaType -> XmlDiffer(extension)
+        else -> GenericDiffer()
     }
 }

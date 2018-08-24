@@ -23,7 +23,7 @@ import java.nio.file.Path
  *
  * @author Ruben Gees
  */
-object XmlBodyProcessor : BodyProcessor {
+class XmlBodyProcessor : BodyProcessor {
 
     override fun preProcess(
         requestPath: Path?,

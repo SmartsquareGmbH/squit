@@ -20,7 +20,7 @@ import java.nio.file.Path
 /**
  * @author Ruben Gees
  */
-object JsonBodyProcessor : BodyProcessor {
+class JsonBodyProcessor : BodyProcessor {
 
     override fun preProcess(
         requestPath: Path?,

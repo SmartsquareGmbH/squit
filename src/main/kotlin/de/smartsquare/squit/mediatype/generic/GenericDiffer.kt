@@ -7,7 +7,7 @@ import java.nio.charset.Charset
 /**
  * @author Ruben Gees
  */
-object GenericDiffer : Differ {
+class GenericDiffer : Differ {
 
     override fun diff(expectedResponse: ByteArray, actualResponse: ByteArray): String {
         val diff = DiffUtils.diff(expectedResponse.toString(Charset.defaultCharset()),

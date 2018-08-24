@@ -35,6 +35,9 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
     val subjectInvalid3 = File(this.javaClass.classLoader.getResource("invalid-test-project-3").toURI()).toPath()
     val subjectJson = File(this.javaClass.classLoader.getResource("test-project-json").toURI()).toPath()
 
+    val subjectNonStrictXml =
+        File(this.javaClass.classLoader.getResource("test-project-xml-not-strict").toURI()).toPath()
+
     var server by Delegates.notNull<MockWebServer>()
 
     val call4Directory = subject
@@ -98,8 +101,10 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<nice/>"))
             server.enqueue(MockResponse().setBody("<relevant/>"))
 
-            val arguments = listOf("clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject")
+            val arguments = listOf(
+                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subject"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
@@ -145,8 +150,10 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<not_cool/>"))
             server.enqueue(MockResponse().setBody("<nice/>"))
 
-            val arguments = listOf("clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject", "-Ptags=call1,call2")
+            val arguments = listOf(
+                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subject", "-Ptags=call1,call2"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
@@ -180,8 +187,10 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<nice/>"))
             server.enqueue(MockResponse().setBody("<relevant/>"))
 
-            val arguments = listOf("clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject", "-Punignore")
+            val arguments = listOf(
+                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subject", "-Punignore"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
@@ -210,8 +219,10 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<relevant/>"))
             server.enqueue(MockResponse().setBody("<relevant/>"))
 
-            val arguments = listOf("clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject", "-Punexclude")
+            val arguments = listOf(
+                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subject", "-Punexclude"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
@@ -258,6 +269,37 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
         }
     }
 
+    given("a test project with non strict xml diffing") {
+        beforeEachTest {
+            server = MockWebServer()
+        }
+
+        afterEachTest {
+            server.shutdown()
+        }
+
+        on("running the test task") {
+            server.enqueue(MockResponse().setBody("<abc:cool xmlns:abc='https://example.com'/>"))
+
+            val arguments = listOf(
+                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subjectNonStrictXml"
+            )
+
+            val result = GradleRunner.create()
+                .withProjectDir(subjectNonStrictXml.toFile())
+                .withExtendedPluginClasspath()
+                .withArguments(arguments)
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
+
+            it("should be able to complete without errors") {
+                result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
+            }
+        }
+    }
+
     given("a test project with json requests") {
         beforeEachTest {
             server = MockWebServer()
@@ -270,8 +312,10 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
         on("running the test task") {
             server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}"))
 
-            val arguments = listOf("clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subjectJson")
+            val arguments = listOf(
+                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subjectJson"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectJson.toFile())

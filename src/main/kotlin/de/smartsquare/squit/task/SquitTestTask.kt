@@ -50,16 +50,20 @@ open class SquitTestTask : DefaultTask() {
      */
     @Suppress("MemberVisibilityCanBePrivate")
     @get:InputDirectory
-    val processedSourcesPath: Path = Paths.get(project.buildDir.path,
-        SQUIT_DIRECTORY, SOURCES_DIRECTORY)
+    val processedSourcesPath: Path = Paths.get(
+        project.buildDir.path,
+        SQUIT_DIRECTORY, SOURCES_DIRECTORY
+    )
 
     /**
      * The directory of the previously (processed) requested responses.
      */
     @Suppress("MemberVisibilityCanBePrivate")
     @get:InputDirectory
-    val processedResponsesPath: Path = Paths.get(project.buildDir.path,
-        SQUIT_DIRECTORY, RESPONSES_DIRECTORY, PROCESSED_DIRECTORY)
+    val processedResponsesPath: Path = Paths.get(
+        project.buildDir.path,
+        SQUIT_DIRECTORY, RESPONSES_DIRECTORY, PROCESSED_DIRECTORY
+    )
 
     /**
      * Collection of meta.json files for up-to-date checking.
@@ -147,8 +151,10 @@ open class SquitTestTask : DefaultTask() {
         val resultList = arrayListOf<SquitResult>()
 
         FilesUtils.getSortedLeafDirectories(processedResponsesPath).forEach { actualResponsePath ->
-            val configPath = FilesUtils.validateExistence(processedSourcesPath
-                .resolve(actualResponsePath.cut(processedResponsesPath)).resolve(CONFIG))
+            val configPath = FilesUtils.validateExistence(
+                processedSourcesPath
+                    .resolve(actualResponsePath.cut(processedResponsesPath)).resolve(CONFIG)
+            )
 
             val config = ConfigFactory.parseFile(configPath.toFile())
 
@@ -156,20 +162,27 @@ open class SquitTestTask : DefaultTask() {
                 val errorFile = actualResponsePath.resolve(ERROR)
 
                 if (Files.exists(errorFile)) {
-                    resultList += constructResult(Files.readAllBytes(errorFile).toString(Charset.defaultCharset()),
-                        actualResponsePath, config.mediaType)
+                    resultList += constructResult(
+                        Files.readAllBytes(errorFile).toString(Charset.defaultCharset()),
+                        actualResponsePath, config.mediaType
+                    )
                 } else {
-                    val actualResponseFilePath = FilesUtils.validateExistence(actualResponsePath
-                        .resolve(MediaTypeFactory.actualResponse(config.mediaType)))
+                    val actualResponseFilePath = FilesUtils.validateExistence(
+                        actualResponsePath
+                            .resolve(MediaTypeFactory.actualResponse(config.mediaType))
+                    )
 
-                    val expectedResponseFilePath = FilesUtils.validateExistence(processedSourcesPath
-                        .resolve(actualResponsePath.cut(processedResponsesPath))
-                        .resolve(MediaTypeFactory.expectedResponse(config.mediaType)))
+                    val expectedResponseFilePath = FilesUtils.validateExistence(
+                        processedSourcesPath
+                            .resolve(actualResponsePath.cut(processedResponsesPath))
+                            .resolve(MediaTypeFactory.expectedResponse(config.mediaType))
+                    )
 
                     val expectedResponse = Files.readAllBytes(expectedResponseFilePath)
                     val actualResponse = Files.readAllBytes(actualResponseFilePath)
 
-                    val diff = MediaTypeFactory.differ(config.mediaType).diff(expectedResponse, actualResponse)
+                    val diff = MediaTypeFactory.differ(config.mediaType, extension)
+                        .diff(expectedResponse, actualResponse)
 
                     resultList += constructResult(diff, actualResponsePath, config.mediaType)
                 }
@@ -223,11 +236,15 @@ open class SquitTestTask : DefaultTask() {
         val id = nextResultId++
 
         return when (differences.isNotBlank()) {
-            true -> SquitResult(id, differences, isIgnored, mediaType, contextPath, suitePath,
-                testDirectoryPath, squitBuildDirectoryPath)
+            true -> SquitResult(
+                id, differences, isIgnored, mediaType, contextPath, suitePath,
+                testDirectoryPath, squitBuildDirectoryPath
+            )
 
-            false -> SquitResult(id, "", isIgnored, mediaType, contextPath, suitePath,
-                testDirectoryPath, squitBuildDirectoryPath)
+            false -> SquitResult(
+                id, "", isIgnored, mediaType, contextPath, suitePath,
+                testDirectoryPath, squitBuildDirectoryPath
+            )
         }
     }
 

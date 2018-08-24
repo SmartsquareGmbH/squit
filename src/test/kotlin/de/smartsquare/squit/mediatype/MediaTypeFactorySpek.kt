@@ -1,13 +1,15 @@
 package de.smartsquare.squit.mediatype
 
+import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.mediatype.generic.GenericBodyProcessor
 import de.smartsquare.squit.mediatype.generic.GenericDiffer
 import de.smartsquare.squit.mediatype.json.JsonBodyProcessor
 import de.smartsquare.squit.mediatype.xml.XmlBodyProcessor
 import de.smartsquare.squit.mediatype.xml.XmlDiffer
 import okhttp3.MediaType
-import org.amshove.kluent.shouldBe
+import org.amshove.kluent.shouldBeInstanceOf
 import org.amshove.kluent.shouldEqual
+import org.gradle.testfixtures.ProjectBuilder
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -47,13 +49,15 @@ object MediaTypeFactorySpek : Spek({
 
         on("getting the processor") {
             it("should return the xml processor") {
-                MediaTypeFactory.processor(mediaType) shouldBe XmlBodyProcessor
+                MediaTypeFactory.processor(mediaType) shouldBeInstanceOf XmlBodyProcessor::class.java
             }
         }
 
         on("getting the differ") {
             it("should return the xml differ") {
-                MediaTypeFactory.differ(mediaType) shouldBe XmlDiffer
+                val differ = MediaTypeFactory.differ(mediaType, SquitExtension(ProjectBuilder.builder().build()))
+
+                differ shouldBeInstanceOf XmlDiffer::class.java
             }
         }
     }
@@ -87,13 +91,15 @@ object MediaTypeFactorySpek : Spek({
 
         on("getting the processor") {
             it("should return the json processor") {
-                MediaTypeFactory.processor(mediaType) shouldBe JsonBodyProcessor
+                MediaTypeFactory.processor(mediaType) shouldBeInstanceOf JsonBodyProcessor::class.java
             }
         }
 
         on("getting the differ") {
             it("should return the generic differ") {
-                MediaTypeFactory.differ(mediaType) shouldBe GenericDiffer
+                val differ = MediaTypeFactory.differ(mediaType, SquitExtension(ProjectBuilder.builder().build()))
+
+                differ shouldBeInstanceOf GenericDiffer::class.java
             }
         }
     }
@@ -127,7 +133,7 @@ object MediaTypeFactorySpek : Spek({
 
         on("getting the processor") {
             it("should return the generic processor") {
-                MediaTypeFactory.processor(mediaType) shouldBe GenericBodyProcessor
+                MediaTypeFactory.processor(mediaType) shouldBeInstanceOf GenericBodyProcessor::class.java
             }
         }
     }
