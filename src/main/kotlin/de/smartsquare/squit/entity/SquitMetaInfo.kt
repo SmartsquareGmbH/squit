@@ -35,8 +35,10 @@ data class SquitMetaInfo(val date: LocalDateTime, val duration: Long) {
     /**
      * Converts this instance into a Json representation.
      */
-    fun toJson(): String = Gson().toJson(mapOf(
-        DATE to date.toString(),
-        DURATION to duration)
+    fun toJson(): String = Gson().toJson(
+        mapOf(
+            DATE to date.toString(),
+            DURATION to duration
+        )
     )
 }

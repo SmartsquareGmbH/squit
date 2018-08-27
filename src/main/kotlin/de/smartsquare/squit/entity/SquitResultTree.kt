@@ -38,10 +38,23 @@ data class SquitResultTree(
                 val ignoredTests = group.count { it.isIgnored }
 
                 if (group.size == 1 && path.toList().size == 1) {
-                    SquitResultTree(group.first().id, emptyList(), name, successfulTests, failedTests, ignoredTests)
+                    SquitResultTree(
+                        group.first().id,
+                        emptyList(),
+                        name,
+                        successfulTests,
+                        failedTests,
+                        ignoredTests
+                    )
                 } else {
-                    SquitResultTree(-1, fromList(group.map { it.cutFirstPathElement() }), name,
-                        successfulTests, failedTests, ignoredTests)
+                    SquitResultTree(
+                        -1,
+                        fromList(group.map { it.cutFirstPathElement() }),
+                        name,
+                        successfulTests,
+                        failedTests,
+                        ignoredTests
+                    )
                 }
             }
         }

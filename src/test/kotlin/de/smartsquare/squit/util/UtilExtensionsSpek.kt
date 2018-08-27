@@ -75,7 +75,7 @@ object UtilExtensionsSpek : Spek({
             val element = JsonParser().read(sampleJsonPath)
 
             it("should be read correctly") {
-                element.asJsonObject["test"].asInt == 123
+                element.asJsonObject["test"].asInt shouldBe 123
             }
         }
     }

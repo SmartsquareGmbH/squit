@@ -81,15 +81,14 @@ open class SquitPreProcessTask : DefaultTask() {
      */
     @Suppress("MemberVisibilityCanBePrivate")
     @get:OutputDirectory
-    val processedSourcesPath: Path = Paths.get(project.buildDir.path,
-        SQUIT_DIRECTORY, SOURCES_DIRECTORY)
+    val processedSourcesPath: Path = Paths.get(project.buildDir.path, SQUIT_DIRECTORY, SOURCES_DIRECTORY)
 
     @get:Internal
     internal var extension by Delegates.notNull<SquitExtension>()
 
     private val leafDirectoriesWithConfig by lazy {
         FilesUtils.getSortedLeafDirectories(sourcesPath)
-            .filter { Files.newDirectoryStream(it).use { it.any() } }
+            .filter { Files.newDirectoryStream(it).use { directories -> directories.any() } }
             .map { it to resolveConfig(it) }
             .filter { (testPath, resolvedProperties) ->
                 when {
@@ -123,14 +122,16 @@ open class SquitPreProcessTask : DefaultTask() {
 
         leafDirectoriesWithConfig.forEach { (testPath, resolvedConfig) ->
             if (testPath.cut(sourcesPath).toList().size < 2) {
-                throw GradleException("Invalid project structure. " +
-                    "Please add a project directory to the src/test directory.")
+                throw GradleException(
+                    "Invalid project structure. Please add a project directory to the src/test directory."
+                )
             }
 
             val requestPath = resolveRequestPath(resolvedConfig, testPath)
 
-            val responsePath = FilesUtils.validateExistence(testPath
-                .resolve(MediaTypeFactory.sourceResponse(resolvedConfig.mediaType)))
+            val responsePath = FilesUtils.validateExistence(
+                testPath.resolve(MediaTypeFactory.sourceResponse(resolvedConfig.mediaType))
+            )
 
             val resolvedSqlScripts = resolveSqlScripts(testPath, resolvedConfig)
 
@@ -165,9 +166,9 @@ open class SquitPreProcessTask : DefaultTask() {
 
         while (!currentDirectoryPath.endsWith(sourcesPath.parent)) {
             currentDirectoryPath.resolve(CONFIG).also { configPath ->
-                val newConfig = configCache.getOrPut(configPath, {
+                val newConfig = configCache.getOrPut(configPath) {
                     ConfigFactory.parseFile(configPath.toFile())
-                })
+                }
 
                 result = result.withFallback(newConfig).mergeTag(configPath.parent.fileName.toString())
             }
@@ -178,8 +179,9 @@ open class SquitPreProcessTask : DefaultTask() {
         return try {
             projectConfig.withFallback(result).resolve().validate()
         } catch (error: Throwable) {
-            throw GradleException("Invalid test.conf file on path of test: ${testPath.cut(sourcesPath)} " +
-                "(${error.message})")
+            throw GradleException(
+                "Invalid test.conf file on path of test: ${testPath.cut(sourcesPath)} (${error.message})"
+            )
         }
     }
 
@@ -201,11 +203,11 @@ open class SquitPreProcessTask : DefaultTask() {
         var currentDirectoryPath = testPath
 
         while (!currentDirectoryPath.endsWith(sourcesPath.parent)) {
-            val leafsFromHere = pathCache.getOrPut(currentDirectoryPath, {
+            val leafsFromHere = pathCache.getOrPut(currentDirectoryPath) {
                 leafDirectoriesWithConfig
                     .filter { (path, _) -> path.startsWith(currentDirectoryPath) }
                     .map { (path, _) -> path }
-            })
+            }
 
             config.databaseConfigurations.forEach { (name, _, _, _) ->
                 val preName = "${name}_pre.sql"

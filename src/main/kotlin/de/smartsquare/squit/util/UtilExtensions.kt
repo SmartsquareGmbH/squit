@@ -36,7 +36,7 @@ fun Path.cut(other: Path): Path {
 
             isSame
         }
-        .fold(Paths.get(""), { acc, path -> acc.resolve(path) })
+        .fold(Paths.get("")) { acc, path -> acc.resolve(path) }
 }
 
 /**

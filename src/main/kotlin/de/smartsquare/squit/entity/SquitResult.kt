@@ -130,18 +130,18 @@ data class SquitResult(
         val isSquitPathEmpty = suitePath.fileName.toString().isBlank()
 
         val newContextPath = contextPath.drop(1)
-            .fold(Paths.get(""), { acc, path -> acc.resolve(path) })
+            .fold(Paths.get("")) { acc, path -> acc.resolve(path) }
 
         val newSuitePath = if (isContextPathEmpty) {
             suitePath.drop(1)
-                .fold(Paths.get(""), { acc, path -> acc.resolve(path) })
+                .fold(Paths.get("")) { acc, path -> acc.resolve(path) }
         } else {
             suitePath
         }
 
         val newTestDirectoryPath = if (isContextPathEmpty && isSquitPathEmpty) {
             testDirectoryPath.drop(1)
-                .fold(Paths.get(""), { acc, path -> acc.resolve(path) })
+                .fold(Paths.get("")) { acc, path -> acc.resolve(path) }
         } else {
             testDirectoryPath
         }

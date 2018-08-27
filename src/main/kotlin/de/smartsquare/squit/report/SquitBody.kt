@@ -44,7 +44,7 @@ fun HTML.squitBody(results: List<SquitResult>) {
 
     val totalFailedTests = results.count { !it.isSuccess }
     val firstTest = results.minBy { it.metaInfo.date }
-    val duration = results.fold(0L, { acc, next -> acc + next.metaInfo.duration })
+    val duration = results.fold(0L) { acc, next -> acc + next.metaInfo.duration }
     val averageTime = results.map { it.metaInfo.duration }.average().let { if (it.isNaN()) 0L else it.toLong() }
     val slowestTest = results.maxBy { it.metaInfo.duration }
 

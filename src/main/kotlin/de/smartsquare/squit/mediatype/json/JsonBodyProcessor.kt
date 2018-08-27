@@ -59,10 +59,12 @@ class JsonBodyProcessor : BodyProcessor {
 
         config.preProcessorScripts.forEach {
             GroovyShell(javaClass.classLoader).parse(Files.newBufferedReader(it)).apply {
-                binding = Binding(mapOf(
-                    "request" to request,
-                    "expectedResponse" to response
-                ))
+                binding = Binding(
+                    mapOf(
+                        "request" to request,
+                        "expectedResponse" to response
+                    )
+                )
             }.run()
         }
     }
@@ -74,10 +76,12 @@ class JsonBodyProcessor : BodyProcessor {
 
         config.postProcessorScripts.forEach {
             GroovyShell(javaClass.classLoader).parse(Files.newBufferedReader(it)).apply {
-                binding = Binding(mapOf(
-                    "actualResponse" to actualResponse,
-                    "expectedResponse" to expectedResponse
-                ))
+                binding = Binding(
+                    mapOf(
+                        "actualResponse" to actualResponse,
+                        "expectedResponse" to expectedResponse
+                    )
+                )
             }.run()
         }
     }

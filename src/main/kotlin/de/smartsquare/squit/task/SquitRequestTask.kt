@@ -75,16 +75,23 @@ open class SquitRequestTask : DefaultTask() {
      */
     @Suppress("MemberVisibilityCanBePrivate")
     @get:InputDirectory
-    val processedSourcesPath: Path = Paths.get(project.buildDir.path,
-        SQUIT_DIRECTORY, SOURCES_DIRECTORY)
+    val processedSourcesPath: Path = Paths.get(
+        project.buildDir.path,
+        SQUIT_DIRECTORY,
+        SOURCES_DIRECTORY
+    )
 
     /**
      * The directory to save the results in.
      */
     @Suppress("MemberVisibilityCanBePrivate")
     @get:OutputDirectory
-    val actualResponsesPath: Path = Paths.get(project.buildDir.path,
-        SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)
+    val actualResponsesPath: Path = Paths.get(
+        project.buildDir.path,
+        SQUIT_DIRECTORY,
+        RESPONSES_DIRECTORY,
+        RAW_DIRECTORY
+    )
 
     @get:Internal
     internal var extension by Delegates.notNull<SquitExtension>()
@@ -119,11 +126,14 @@ open class SquitRequestTask : DefaultTask() {
 
         dbConnections.use {
             FilesUtils.getSortedLeafDirectories(processedSourcesPath).forEachIndexed { index, testDirectoryPath ->
-                logger.lifecycleOnSameLine("Running test ${index + 1}",
-                    project.gradle.startParameter.consoleOutput)
+                logger.lifecycleOnSameLine(
+                    "Running test ${index + 1}",
+                    project.gradle.startParameter.consoleOutput
+                )
 
-                val resultResponsePath = Files.createDirectories(actualResponsesPath
-                    .resolve(testDirectoryPath.cut(processedSourcesPath)))
+                val resultResponsePath = Files.createDirectories(
+                    actualResponsesPath.resolve(testDirectoryPath.cut(processedSourcesPath))
+                )
 
                 val errorFile = testDirectoryPath.resolve(ERROR)
                 val metaFilePath = resultResponsePath.resolve(META)
@@ -196,11 +206,13 @@ open class SquitRequestTask : DefaultTask() {
     private fun constructApiCall(requestPath: Path?, config: Config): Call {
         val requestBody = requestPath?.let { RequestBody.create(config.mediaType, Files.readAllBytes(requestPath)) }
 
-        return okHttpClient.newCall(Request.Builder()
-            .headers(Headers.of(config.headers))
-            .method(config.method, requestBody)
-            .url(config.endpoint)
-            .build())
+        return okHttpClient.newCall(
+            Request.Builder()
+                .headers(Headers.of(config.headers))
+                .method(config.method, requestBody)
+                .url(config.endpoint)
+                .build()
+        )
     }
 
     private fun executeScriptIfExisting(
@@ -215,8 +227,10 @@ open class SquitRequestTask : DefaultTask() {
             true
         } catch (error: SQLException) {
             logger.newLineIfNeeded()
-            logger.warn("Could not run database script ${path.fileName} for test " +
-                "${path.parent.cut(processedSourcesPath)} (${error.toString().trim()})")
+            logger.warn(
+                "Could not run database script ${path.fileName} for test " +
+                    "${path.parent.cut(processedSourcesPath)} (${error.toString().trim()})"
+            )
 
             false
         }

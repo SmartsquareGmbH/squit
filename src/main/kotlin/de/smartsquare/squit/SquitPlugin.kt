@@ -29,7 +29,7 @@ class SquitPlugin : Plugin<Project> {
                 it.extension = extension
 
                 it.dependsOn("squitPreProcess")
-                it.outputs.upToDateWhen { false }
+                it.outputs.upToDateWhen { _ -> false }
             }
 
             project.tasks.create("squitPostProcess", SquitPostProcessTask::class.java) {

@@ -10,8 +10,10 @@ import java.nio.charset.Charset
 class GenericDiffer : Differ {
 
     override fun diff(expectedResponse: ByteArray, actualResponse: ByteArray): String {
-        val diff = DiffUtils.diff(expectedResponse.toString(Charset.defaultCharset()),
-            actualResponse.toString(Charset.defaultCharset()))
+        val diff = DiffUtils.diff(
+            expectedResponse.toString(Charset.defaultCharset()),
+            actualResponse.toString(Charset.defaultCharset())
+        )
 
         return diff.deltas.joinToString("\n") {
             "Expected '${it.original.lines.joinToString("\n")}' but was " +

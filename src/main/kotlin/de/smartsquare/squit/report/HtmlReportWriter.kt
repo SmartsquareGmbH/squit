@@ -81,8 +81,13 @@ object HtmlReportWriter {
 
     private fun generateDiff(result: SquitResult): List<String> {
         val diff = DiffUtils.diff(result.expectedLines, result.actualLines)
-        val unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(DIFF_FILE_NAME, DIFF_FILE_NAME,
-            result.expectedLines, diff, DIFF_CONTEXT_SIZE)
+        val unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(
+            DIFF_FILE_NAME,
+            DIFF_FILE_NAME,
+            result.expectedLines,
+            diff,
+            DIFF_CONTEXT_SIZE
+        )
 
         return when (unifiedDiff.isEmpty()) {
             true -> emptyDiffHeader.plus(result.actualLines.map { " $it" })

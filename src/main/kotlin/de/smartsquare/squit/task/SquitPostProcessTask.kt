@@ -35,24 +35,35 @@ open class SquitPostProcessTask : DefaultTask() {
      */
     @Suppress("MemberVisibilityCanBePrivate")
     @InputDirectory
-    val processedSourcesPath: Path = Paths.get(project.buildDir.path,
-        SQUIT_DIRECTORY, SOURCES_DIRECTORY)
+    val processedSourcesPath: Path = Paths.get(
+        project.buildDir.path,
+        SQUIT_DIRECTORY,
+        SOURCES_DIRECTORY
+    )
 
     /**
      * The directory of the previously requested responses.
      */
     @Suppress("MemberVisibilityCanBePrivate")
     @InputDirectory
-    val actualResponsesPath: Path = Paths.get(project.buildDir.path,
-        SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)
+    val actualResponsesPath: Path = Paths.get(
+        project.buildDir.path,
+        SQUIT_DIRECTORY,
+        RESPONSES_DIRECTORY,
+        RAW_DIRECTORY
+    )
 
     /**
      * The directory to save the results in.
      */
     @Suppress("MemberVisibilityCanBePrivate")
     @OutputDirectory
-    val processedActualResponsesPath: Path = Paths.get(project.buildDir.path,
-        SQUIT_DIRECTORY, RESPONSES_DIRECTORY, PROCESSED_DIRECTORY)
+    val processedActualResponsesPath: Path = Paths.get(
+        project.buildDir.path,
+        SQUIT_DIRECTORY,
+        RESPONSES_DIRECTORY,
+        PROCESSED_DIRECTORY
+    )
 
     @get:Internal
     internal var extension by Delegates.notNull<SquitExtension>()
@@ -72,26 +83,31 @@ open class SquitPostProcessTask : DefaultTask() {
         Files.createDirectories(processedActualResponsesPath)
 
         FilesUtils.getSortedLeafDirectories(actualResponsesPath).forEach { testDir ->
-            val resultActualResponsePath = Files.createDirectories(processedActualResponsesPath
-                .resolve(testDir.cut(actualResponsesPath)))
+            val resultActualResponsePath = Files.createDirectories(
+                processedActualResponsesPath.resolve(testDir.cut(actualResponsesPath))
+            )
 
             val errorFile = testDir.resolve(ERROR)
 
             if (Files.exists(errorFile)) {
                 Files.copy(errorFile, resultActualResponsePath.resolve(ERROR))
             } else {
-                val configPath = FilesUtils.validateExistence(processedSourcesPath
-                    .resolve(testDir.cut(actualResponsesPath)))
+                val configPath = FilesUtils.validateExistence(
+                    processedSourcesPath.resolve(testDir.cut(actualResponsesPath))
+                )
                     .resolve(CONFIG)
 
                 val config = ConfigFactory.parseFile(configPath.toFile())
 
-                val actualResponsePath = FilesUtils.validateExistence(testDir
-                    .resolve(MediaTypeFactory.actualResponse(config.mediaType)))
+                val actualResponsePath = FilesUtils.validateExistence(
+                    testDir.resolve(MediaTypeFactory.actualResponse(config.mediaType))
+                )
 
-                val expectedResponsePath = FilesUtils.validateExistence(processedSourcesPath
-                    .resolve(testDir.cut(actualResponsesPath))
-                    .resolve(MediaTypeFactory.expectedResponse(config.mediaType)))
+                val expectedResponsePath = FilesUtils.validateExistence(
+                    processedSourcesPath
+                        .resolve(testDir.cut(actualResponsesPath))
+                        .resolve(MediaTypeFactory.expectedResponse(config.mediaType))
+                )
 
                 val resultActualResponseFilePath = resultActualResponsePath
                     .resolve(MediaTypeFactory.actualResponse(config.mediaType))

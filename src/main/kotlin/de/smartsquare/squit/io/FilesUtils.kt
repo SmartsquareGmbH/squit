@@ -55,7 +55,7 @@ object FilesUtils {
      * This is not recursive.
      */
     fun copyFilesFromDirectory(source: Path, dest: Path) {
-        Files.newDirectoryStream(source, { Files.isRegularFile(it) }).use { files ->
+        Files.newDirectoryStream(source) { Files.isRegularFile(it) }.use { files ->
             files.forEach { file ->
                 Files.copy(file, dest.resolve(file.cut(source)), REPLACE_EXISTING)
             }
@@ -81,9 +81,9 @@ object FilesUtils {
         Files.write(target, modification(resource))
     }
 
-    private fun containsDirectories(path: Path) = Files.newDirectoryStream(path, { Files.isDirectory(it) })
+    private fun containsDirectories(path: Path) = Files.newDirectoryStream(path) { Files.isDirectory(it) }
         .use { it.any() }
 
-    private fun getChildDirectories(path: Path) = Files.newDirectoryStream(path, { Files.isDirectory(it) })
+    private fun getChildDirectories(path: Path) = Files.newDirectoryStream(path) { Files.isDirectory(it) }
         .use { it.toList() }
 }
