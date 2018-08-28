@@ -1,1 +1,1 @@
-new File("build/resources/test/test-project/build/pre_run.txt").createNewFile()
+new File(config.getString("rootDir") + "/build/pre_run.txt").createNewFile()
