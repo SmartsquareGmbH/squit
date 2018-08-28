@@ -13,6 +13,7 @@ import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInRange
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldExist
 import org.amshove.kluent.shouldNotContain
 import org.amshove.kluent.shouldStartWith
 import org.gradle.testkit.runner.GradleRunner
@@ -106,8 +107,10 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<cool/>"))
             server.enqueue(MockResponse().setBody("<nice/>"))
 
-            val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject", "-Ptags=call1,call2")
+            val arguments = listOf(
+                "clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subject", "-Ptags=call1,call2"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
@@ -127,8 +130,10 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             }
 
             it("should write a valid meta.json file") {
-                val (date, duration) = SquitMetaInfo.fromJson(Files.readAllBytes(call1Meta)
-                    .toString(Charset.defaultCharset()))
+                val (date, duration) = SquitMetaInfo.fromJson(
+                    Files.readAllBytes(call1Meta)
+                        .toString(Charset.defaultCharset())
+                )
 
                 date shouldBeBefore LocalDateTime.now()
                 date shouldBeAfter LocalDateTime.now().minusMinutes(5)
@@ -163,13 +168,21 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
                     resultSet.getString(3) shouldBeEqualTo "cat"
                 }
             }
+
+            it("should properly run pre and post runner scripts") {
+                // Files created by pre- and post runners.
+                subject.resolve("build/pre_run.txt").toFile().shouldExist()
+                subject.resolve("build/post_run.txt").toFile().shouldExist()
+            }
         }
 
         on("running the request task with a web server returning an error") {
             server.enqueue(MockResponse().setBody("error").setResponseCode(500))
 
-            val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject", "-Ptags=call1")
+            val arguments = listOf(
+                "clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subject", "-Ptags=call1"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
@@ -191,8 +204,10 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
         on("running the request task with a timeout causing web server") {
             // Nothing enqueued to cause timeout.
 
-            val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject", "-Ptags=call1")
+            val arguments = listOf(
+                "clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subject", "-Ptags=call1"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
@@ -227,8 +242,10 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
         on("running the request task") {
             server.enqueue(MockResponse().setBody("<cool/>"))
 
-            val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject")
+            val arguments = listOf(
+                "clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subject"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectInvalid2.toFile())
@@ -284,8 +301,10 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
         on("running the request task") {
             server.enqueue(MockResponse().setBody("<cool/>"))
 
-            val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject")
+            val arguments = listOf(
+                "clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subject"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectGet.toFile())
@@ -321,8 +340,10 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<cool/>"))
             server.enqueue(MockResponse().setBody("<nice/>"))
 
-            val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject")
+            val arguments = listOf(
+                "clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subject"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectOptions.toFile())
@@ -362,8 +383,10 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
         on("running the request task") {
             server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}"))
 
-            val arguments = listOf("clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subjectJson")
+            val arguments = listOf(
+                "clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subjectJson"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectJson.toFile())

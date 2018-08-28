@@ -6,6 +6,8 @@ import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.db.ConnectionCollection
 import de.smartsquare.squit.db.executeScript
 import de.smartsquare.squit.entity.SquitMetaInfo
+import de.smartsquare.squit.interfaces.SquitPostRunner
+import de.smartsquare.squit.interfaces.SquitPreRunner
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.util.Constants.CONFIG
@@ -23,6 +25,12 @@ import de.smartsquare.squit.util.lifecycleOnSameLine
 import de.smartsquare.squit.util.mediaType
 import de.smartsquare.squit.util.method
 import de.smartsquare.squit.util.newLineIfNeeded
+import de.smartsquare.squit.util.postRunnerScripts
+import de.smartsquare.squit.util.postRunners
+import de.smartsquare.squit.util.preRunnerScripts
+import de.smartsquare.squit.util.preRunners
+import groovy.lang.Binding
+import groovy.lang.GroovyShell
 import okhttp3.Call
 import okhttp3.Headers
 import okhttp3.OkHttpClient
@@ -106,6 +114,9 @@ open class SquitRequestTask : DefaultTask() {
 
     private val dbConnections = ConnectionCollection()
 
+    private val preRunnersCache = mutableMapOf<String, SquitPreRunner>()
+    private val postRunnersCache = mutableMapOf<String, SquitPostRunner>()
+
     init {
         group = "Build"
         description = "Performs the integration tests specified in the test source directory."
@@ -182,9 +193,7 @@ open class SquitRequestTask : DefaultTask() {
     ) {
         val resultResponseFilePath = resultResponsePath.resolve(MediaTypeFactory.actualResponse(config.mediaType))
 
-        config.databaseConfigurations.forEach { (name, jdbcAddress, username, password) ->
-            executeScriptIfExisting(testDirectoryPath.resolve("${name}_pre.sql"), jdbcAddress, username, password)
-        }
+        doPreScriptExecutions(config, testDirectoryPath)
 
         try {
             val apiResponse = constructApiCall(requestPath, config)
@@ -198,8 +207,46 @@ open class SquitRequestTask : DefaultTask() {
             Files.write(resultResponsePath.resolve(ERROR), error.toString().toByteArray())
         }
 
+        doPostScriptExecutions(config, testDirectoryPath)
+    }
+
+    private fun doPreScriptExecutions(config: Config, testDirectoryPath: Path) {
+        config
+            .preRunners
+            .map {
+                preRunnersCache.getOrPut(it) { Class.forName(it).getConstructor().newInstance() as SquitPreRunner }
+            }
+            .forEach { it.run(config) }
+
+        config.preRunnerScripts.forEach {
+            GroovyShell(javaClass.classLoader)
+                .parse(Files.newBufferedReader(it))
+                .apply { binding = Binding(mapOf("config" to config)) }
+                .run()
+        }
+
+        config.databaseConfigurations.forEach { (name, jdbcAddress, username, password) ->
+            executeScriptIfExisting(testDirectoryPath.resolve("${name}_pre.sql"), jdbcAddress, username, password)
+        }
+    }
+
+    private fun doPostScriptExecutions(config: Config, testDirectoryPath: Path) {
         config.databaseConfigurations.forEach { (name, jdbcAddress, username, password) ->
             executeScriptIfExisting(testDirectoryPath.resolve("${name}_post.sql"), jdbcAddress, username, password)
+        }
+
+        config
+            .postRunners
+            .map {
+                postRunnersCache.getOrPut(it) { Class.forName(it).getConstructor().newInstance() as SquitPostRunner }
+            }
+            .forEach { it.run(config) }
+
+        config.postRunnerScripts.forEach {
+            GroovyShell(javaClass.classLoader)
+                .parse(Files.newBufferedReader(it))
+                .apply { binding = Binding(mapOf("config" to config)) }
+                .run()
         }
     }
 

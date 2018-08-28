@@ -21,8 +21,12 @@ private const val EXCLUDE = "exclude"
 private const val IGNORE = "ignore"
 private const val PRE_PROCESSORS = "preProcessors"
 private const val PRE_PROCESSOR_SCRIPTS = "preProcessorScripts"
+private const val PRE_RUNNERS = "preRunners"
+private const val PRE_RUN_SCRIPTS = "preRunnerScripts"
 private const val POST_PROCESSORS = "postProcessors"
 private const val POST_PROCESSOR_SCRIPTS = "postProcessorScripts"
+private const val POST_RUNNERS = "postRunners"
+private const val POST_RUN_SCRIPTS = "postRunnerScripts"
 private const val TAGS = "tags"
 private const val DATABASE_CONFIGURATIONS = "databaseConfigurations"
 private const val DATABASE_CONFIGURATION_NAME = "name"
@@ -74,6 +78,16 @@ val Config.preProcessors get() = getSafeStringList(PRE_PROCESSORS)
 val Config.preProcessorScripts get() = getSafePathList(PRE_PROCESSOR_SCRIPTS)
 
 /**
+ * List of pre-runners to use.
+ */
+val Config.preRunners get() = getSafeStringList(PRE_RUNNERS)
+
+/**
+ * List of paths to pre-run scripts to use.
+ */
+val Config.preRunnerScripts get() = getSafePathList(PRE_RUN_SCRIPTS)
+
+/**
  * List of post-processors to use.
  */
 val Config.postProcessors get() = getSafeStringList(POST_PROCESSORS)
@@ -82,6 +96,16 @@ val Config.postProcessors get() = getSafeStringList(POST_PROCESSORS)
  * List of paths to post-processor scripts to use.
  */
 val Config.postProcessorScripts get() = getSafePathList(POST_PROCESSOR_SCRIPTS)
+
+/**
+ * List of post-runners to use.
+ */
+val Config.postRunners get() = getSafeStringList(POST_RUNNERS)
+
+/**
+ * List of paths to pre-run scripts to use.
+ */
+val Config.postRunnerScripts get() = getSafePathList(POST_RUN_SCRIPTS)
 
 /**
  * List of tags associated with the test.
@@ -101,6 +125,9 @@ val Config.databaseConfigurations
         )
     }
 
+/**
+ * List of headers to use for the request.
+ */
 val Config.headers
     get() = getSafeConfig(HEADERS)
         .entrySet()
@@ -123,8 +150,12 @@ fun Config.validate() = this.apply {
 
     preProcessors.forEach { Class.forName(it) }
     preProcessorScripts.forEach { FilesUtils.validateExistence(it) }
+    preRunnerScripts.forEach { FilesUtils.validateExistence(it) }
+    preRunners.forEach { Class.forName(it) }
     postProcessors.forEach { Class.forName(it) }
     postProcessorScripts.forEach { FilesUtils.validateExistence(it) }
+    postRunnerScripts.forEach { FilesUtils.validateExistence(it) }
+    postRunners.forEach { Class.forName(it) }
     tags.forEach { if (it.isEmpty()) throw IllegalStateException("tags cannot be empty.") }
     databaseConfigurations.forEach { (name, jdbcAddress, username, password) ->
         if (name.isEmpty()) throw IllegalStateException("name of a databaseConfiguration cannot be empty.")
