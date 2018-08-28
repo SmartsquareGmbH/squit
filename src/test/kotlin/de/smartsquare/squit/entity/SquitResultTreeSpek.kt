@@ -24,8 +24,10 @@ object SquitResultTreeSpek : Spek({
             result: String = "",
             isIgnored: Boolean = false
         ): SquitResult {
-            return SquitResult(0, result, isIgnored, mediaType,
-                contextPath, suitePath, testDirectoryPath, Paths.get(""))
+            return SquitResult(
+                0, result, isIgnored, mediaType,
+                contextPath, suitePath, testDirectoryPath, Paths.get("")
+            )
         }
 
         val resultList = listOf(

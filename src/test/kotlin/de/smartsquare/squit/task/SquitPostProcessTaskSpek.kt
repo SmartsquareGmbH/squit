@@ -81,8 +81,10 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<cool/>"))
             server.enqueue(MockResponse().setBody("<test/>"))
 
-            val arguments = listOf("clean", "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject", "-Ptags=call1,call2")
+            val arguments = listOf(
+                "clean", "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subject", "-Ptags=call1,call2"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
@@ -105,8 +107,10 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
             server.enqueue(MockResponse().setBody("<cool/>"))
             server.enqueue(MockResponse().setBody("<unclosed_tag>"))
 
-            val arguments = listOf("clean", "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject", "-Ptags=call1,call2")
+            val arguments = listOf(
+                "clean", "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subject", "-Ptags=call1,call2"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
@@ -162,8 +166,10 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
         on("running the post-process task") {
             server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}"))
 
-            val arguments = listOf("clean", "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subjectJson")
+            val arguments = listOf(
+                "clean", "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subjectJson"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectJson.toFile())

@@ -91,8 +91,10 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
     given("a test project") {
         on("running the pre-process task") {
-            val arguments = listOf("clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                "-Psquit.rootDir=$subject", "-Ptags=call1,call2,call4")
+            val arguments = listOf(
+                "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
+                "-Psquit.rootDir=$subject", "-Ptags=call1,call2,call4"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
@@ -130,8 +132,10 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
         }
 
         on("running the pre-process task with the unignore flag") {
-            val arguments = listOf("clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                "-Psquit.rootDir=$subject", "-Punignore")
+            val arguments = listOf(
+                "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
+                "-Psquit.rootDir=$subject", "-Punignore"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subject.toFile())
@@ -222,8 +226,10 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
     given("a test project containing a test with method GET set") {
         on("running the pre-process task") {
-            val arguments = listOf("clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                "-Psquit.rootDir=$subject")
+            val arguments = listOf(
+                "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
+                "-Psquit.rootDir=$subject"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectGet.toFile())
@@ -245,8 +251,10 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
     given("a test project containing tests with method OPTIONS set") {
         on("running the pre-process task") {
-            val arguments = listOf("clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                "-Psquit.rootDir=$subject")
+            val arguments = listOf(
+                "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
+                "-Psquit.rootDir=$subject"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectOptions.toFile())
@@ -272,8 +280,10 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
     given("a test project with json requests") {
         on("running the pre-process task") {
-            val arguments = listOf("clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                "-Psquit.rootDir=$subjectJson")
+            val arguments = listOf(
+                "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
+                "-Psquit.rootDir=$subjectJson"
+            )
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectJson.toFile())
