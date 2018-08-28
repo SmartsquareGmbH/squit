@@ -272,9 +272,9 @@ preProcessors = ["com.example.MyPreProcessor"]
 
 ### Pre- and Post-runners
 
-Similar to [#pre--and-post-processing], it is possible to specify implementations or scripts, which can run arbitrary
-code before and after each request. The setup is analogous to pre- and post-processors. See [#configuration] for the
-different options to enable them in your `test.conf`.
+Similar to [Pre- and Post-processing](#pre--and-post-processing), it is possible to specify implementations or scripts,
+which can run arbitrary code before and after each request. The setup is analogous to pre- and post-processors.
+See the [configuration](#configuration) section for the different options to enable them in your `test.conf`.
 
 ### Tagging
 
