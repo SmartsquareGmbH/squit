@@ -14,6 +14,7 @@ It features high customizability and speed.
   - [Pre- and Post-processing](#pre--and-post-processing)
     - [Groovy processing](#groovy-processing)
     - [Interface processing](#interface-processing)
+  - [Pre- and Post-runners](#pre--and-post-runners)
   - [Tagging](#tagging)
   - [Squit Dsl](#squit-dsl)
   - [Supported request formats](#supported-request-types)
@@ -123,6 +124,10 @@ As of the current version, these are the supported properties:
 | postProcessors         | An array of post processor classes to use.                                                                                                         | `postProcessors = ["com.example.ExamplePostProcessor"]`    |
 | preProcessorScripts    | An array of paths to groovy pre processor scripts to use.                                                                                          | `preProcessorScripts = [./scripts/pre_processor.groovy]`   |
 | postProcessorScripts   | An array of paths to groovy post processor scripts to use.                                                                                         | `postProcessorScripts = [./scripts/post_processor.groovy]` |
+| preRunners             | An array of pre runner classes to use.                                                                                                             | `preRunners= ["com.example.ExamplePreRunner"]`      |
+| postRunners            | An array of post runner classes to use.                                                                                                            | `postRunners = ["com.example.ExamplePostRunner"]`    |
+| preRunnerScripts       | An array of paths to groovy pre runner scripts to use.                                                                                             | `preRunnerScripts = [./scripts/pre_runner.groovy]`   |
+| postRunnerScripts      | An array of paths to groovy post runner scripts to use.                                                                                            | `postRunnerScripts = [./scripts/post_runner.groovy]` |
 | headers                | A map of headers to use for requests.                                                                                                              | `headers = { "some-header": "value" }`                     |
 
 > The parameter `endpoint` is required and the build will fail if it is missing for a test.
@@ -265,6 +270,12 @@ The last step is to add the class to your `test.conf`, similar to the approach w
 preProcessors = ["com.example.MyPreProcessor"]
 ```
 
+### Pre- and Post-runners
+
+Similar to [#pre--and-post-processing], it is possible to specify implementations or scripts, which can run arbitrary
+code before and after each request. The setup is analogous to pre- and post-processors. See [#configuration] for the
+different options to enable them in your `test.conf`.
+
 ### Tagging
 
 Tags allow to run only a subset of your tests to save time and resources if needed.
@@ -313,6 +324,12 @@ squit {
 
     // The timeout for requests before squit fails. The default is 10.
     timeout = 60
+    
+    xml {
+        // If the xml diffing should be strict.
+        // If not, differences like namespace prefixes are not reported as differences.
+        strict = true
+    }
 }
 ```
 
