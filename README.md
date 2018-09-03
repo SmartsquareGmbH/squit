@@ -124,11 +124,12 @@ As of the current version, these are the supported properties:
 | postProcessors         | An array of post processor classes to use.                                                                                                         | `postProcessors = ["com.example.ExamplePostProcessor"]`    |
 | preProcessorScripts    | An array of paths to groovy pre processor scripts to use.                                                                                          | `preProcessorScripts = [./scripts/pre_processor.groovy]`   |
 | postProcessorScripts   | An array of paths to groovy post processor scripts to use.                                                                                         | `postProcessorScripts = [./scripts/post_processor.groovy]` |
-| preRunners             | An array of pre runner classes to use.                                                                                                             | `preRunners= ["com.example.ExamplePreRunner"]`      |
-| postRunners            | An array of post runner classes to use.                                                                                                            | `postRunners = ["com.example.ExamplePostRunner"]`    |
-| preRunnerScripts       | An array of paths to groovy pre runner scripts to use.                                                                                             | `preRunnerScripts = [./scripts/pre_runner.groovy]`   |
-| postRunnerScripts      | An array of paths to groovy post runner scripts to use.                                                                                            | `postRunnerScripts = [./scripts/post_runner.groovy]` |
+| preRunners             | An array of pre runner classes to use.                                                                                                             | `preRunners= ["com.example.ExamplePreRunner"]`             |
+| postRunners            | An array of post runner classes to use.                                                                                                            | `postRunners = ["com.example.ExamplePostRunner"]`          |
+| preRunnerScripts       | An array of paths to groovy pre runner scripts to use.                                                                                             | `preRunnerScripts = [./scripts/pre_runner.groovy]`         |
+| postRunnerScripts      | An array of paths to groovy post runner scripts to use.                                                                                            | `postRunnerScripts = [./scripts/post_runner.groovy]`       |
 | headers                | A map of headers to use for requests.                                                                                                              | `headers = { "some-header": "value" }`                     |
+| title                  | An optional alternative title for the test.                                                                                                        | `title = "Something"`                                      |
 
 > The parameter `endpoint` is required and the build will fail if it is missing for a test.
 

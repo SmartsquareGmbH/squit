@@ -35,6 +35,7 @@ data class SquitResult(
     val result: String,
     val isIgnored: Boolean,
     val mediaType: MediaType,
+    val alternativeName: String,
     private val contextPath: Path,
     private val suitePath: Path,
     private val testDirectoryPath: Path,
@@ -55,9 +56,10 @@ data class SquitResult(
     /**
      * Convenience property with the name of this test.
      *
-     * The name is denoted by the filename of the directory it resides in.
+     * The name is denoted by the filename of the directory it resides in and optionally
+     * by a title set in the corresponding test.conf file.
      */
-    val name = testDirectoryPath.fileName.toString()
+    val name = testDirectoryPath.fileName.toString() + if (alternativeName.isNotBlank()) " ($alternativeName)" else ""
 
     /**
      * Convenience property with the path to the test without the actual test directory.

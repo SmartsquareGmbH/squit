@@ -21,7 +21,7 @@ import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.cut
 import de.smartsquare.squit.util.mediaType
 import de.smartsquare.squit.util.shouldIgnore
-import okhttp3.MediaType
+import de.smartsquare.squit.util.title
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputDirectory
@@ -164,7 +164,7 @@ open class SquitTestTask : DefaultTask() {
                 if (Files.exists(errorFile)) {
                     resultList += constructResult(
                         Files.readAllBytes(errorFile).toString(Charset.defaultCharset()),
-                        actualResponsePath, config.mediaType
+                        actualResponsePath, config
                     )
                 } else {
                     val actualResponseFilePath = FilesUtils.validateExistence(
@@ -184,10 +184,10 @@ open class SquitTestTask : DefaultTask() {
                     val diff = MediaTypeFactory.differ(config.mediaType, extension)
                         .diff(expectedResponse, actualResponse)
 
-                    resultList += constructResult(diff, actualResponsePath, config.mediaType)
+                    resultList += constructResult(diff, actualResponsePath, config)
                 }
             } else {
-                resultList += constructResult("", actualResponsePath, config.mediaType, true)
+                resultList += constructResult("", actualResponsePath, config, true)
             }
         }
 
@@ -226,7 +226,7 @@ open class SquitTestTask : DefaultTask() {
     private fun constructResult(
         differences: String,
         actualResponsePath: Path,
-        mediaType: MediaType,
+        config: Config,
         isIgnored: Boolean = false
     ): SquitResult {
         val squitBuildDirectoryPath = Paths.get(project.buildDir.path, SQUIT_DIRECTORY)
@@ -237,12 +237,12 @@ open class SquitTestTask : DefaultTask() {
 
         return when (differences.isNotBlank()) {
             true -> SquitResult(
-                id, differences, isIgnored, mediaType, contextPath, suitePath,
+                id, differences, isIgnored, config.mediaType, config.title, contextPath, suitePath,
                 testDirectoryPath, squitBuildDirectoryPath
             )
 
             false -> SquitResult(
-                id, "", isIgnored, mediaType, contextPath, suitePath,
+                id, "", isIgnored, config.mediaType, config.title, contextPath, suitePath,
                 testDirectoryPath, squitBuildDirectoryPath
             )
         }

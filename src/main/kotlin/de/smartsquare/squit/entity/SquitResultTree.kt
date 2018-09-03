@@ -32,7 +32,6 @@ data class SquitResultTree(
 
             return groupedResultList.map { (_, group) ->
                 val path = group.first().fullPath
-                val name = path.first().fileName.toString()
                 val successfulTests = group.count { !it.isIgnored && it.isSuccess }
                 val failedTests = group.count { !it.isIgnored && !it.isSuccess }
                 val ignoredTests = group.count { it.isIgnored }
@@ -41,7 +40,7 @@ data class SquitResultTree(
                     SquitResultTree(
                         group.first().id,
                         emptyList(),
-                        name,
+                        group.first().name,
                         successfulTests,
                         failedTests,
                         ignoredTests
@@ -50,7 +49,7 @@ data class SquitResultTree(
                     SquitResultTree(
                         -1,
                         fromList(group.map { it.cutFirstPathElement() }),
-                        name,
+                        path.first().fileName.toString(),
                         successfulTests,
                         failedTests,
                         ignoredTests

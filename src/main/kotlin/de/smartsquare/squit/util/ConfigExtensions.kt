@@ -12,6 +12,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
+private const val TITLE = "title"
 private const val ENDPOINT = "endpoint"
 private const val MEDIA_TYPE = "mediaType"
 private const val MEDIA_TYPE_FALLBACK = "text/plain"
@@ -34,6 +35,12 @@ private const val DATABASE_CONFIGURATION_JDBC_ADDRESS = "jdbc"
 private const val DATABASE_CONFIGURATION_USERNAME = "username"
 private const val DATABASE_CONFIGURATION_PASSWORD = "password"
 private const val HEADERS = "headers"
+
+/**
+ * The alternative title of the test.
+ */
+val Config.title: String
+    get() = getSafeString(TITLE)
 
 /**
  * The endpoint to request against.
