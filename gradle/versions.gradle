@@ -21,6 +21,7 @@ ext {
     okhttpVersion = '3.11.0'
     kotlinHtmlVersion = '0.6.11'
     diffUtilsVersion = '2.2'
+    alphanumericComparatorVersion = "1.4.1"
 
     bootstrapVersion = '4.1.1'
     jqueryVersion = '3.3.1-1'

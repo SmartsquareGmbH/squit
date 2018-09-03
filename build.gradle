@@ -56,6 +56,7 @@ dependencies {
     implementation "org.xmlunit:xmlunit-core:$xmlUnitVersion"
     implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
     implementation "com.typesafe:config:$typesafeConfigVersion"
+    implementation "se.sawano.java:alphanumeric-comparator:$alphanumericComparatorVersion"
     implementation("com.github.wumpz:diffutils:$diffUtilsVersion") {
         exclude group: 'org.eclipse.jgit', module: '*'
     }

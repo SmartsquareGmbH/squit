@@ -2,6 +2,7 @@ package de.smartsquare.squit.io
 
 import de.smartsquare.squit.util.cut
 import org.gradle.api.GradleException
+import se.sawano.java.text.AlphanumericComparator
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
@@ -17,21 +18,7 @@ object FilesUtils {
      * Returns all leaf directories of the given [path], sorted by alphanumeric order.
      */
     fun getSortedLeafDirectories(path: Path): List<Path> = getChildDirectories(path)
-        .sortedWith(Comparator { first, second ->
-            val firstNumber = first.fileName.toString().substringBefore("-").toIntOrNull()
-            val secondNumber = second.fileName.toString().substringBefore("-").toIntOrNull()
-
-            when {
-                firstNumber != null -> when {
-                    secondNumber != null -> firstNumber.compareTo(secondNumber)
-                    else -> -1
-                }
-                else -> when {
-                    secondNumber != null -> 1
-                    else -> first.fileName.compareTo(second.fileName)
-                }
-            }
-        })
+        .sortedWith(compareBy(AlphanumericComparator()) { it: Path -> it.fileName.toString() })
         .fold(listOf()) { current, it ->
             current + when (containsDirectories(it)) {
                 true -> getSortedLeafDirectories(it)

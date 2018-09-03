@@ -14,13 +14,13 @@ object FilesUtilsSpek : Spek({
     given("a directory structure") {
         on("getting sorted leaf directories") {
             val root = createTempDir(prefix = "root").toPath()
-            val child1 = createTempDir(prefix = "1-child1", directory = root.toFile()).toPath()
-            val child2 = createTempDir(prefix = "2-child2", directory = root.toFile()).toPath()
-            val child3 = createTempDir(prefix = "child3", directory = root.toFile()).toPath()
+            val child1 = createTempDir(prefix = "2-child1", directory = root.toFile()).toPath()
+            val child2 = createTempDir(prefix = "3-child2", directory = root.toFile()).toPath()
+            val child3 = createTempDir(prefix = "1-child3", directory = root.toFile()).toPath()
             val grandChild21 = createTempDir(prefix = "grandChild21", directory = child2.toFile()).toPath()
 
             it("should return a correct list") {
-                FilesUtils.getSortedLeafDirectories(root) shouldEqual listOf(child1, grandChild21, child3)
+                FilesUtils.getSortedLeafDirectories(root) shouldEqual listOf(child3, child1, grandChild21)
             }
         }
 
