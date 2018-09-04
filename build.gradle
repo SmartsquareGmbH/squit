@@ -1,14 +1,13 @@
 buildscript {
-    apply from: './gradle/versions.gradle'
+    apply from: "./gradle/versions.gradle"
 
     repositories {
-        maven { url 'https://plugins.gradle.org/m2/' }
+        gradlePluginPortal()
         jcenter()
     }
 
     dependencies {
         classpath "com.github.ben-manes:gradle-versions-plugin:$gradleVersionsVersion"
-
         classpath "com.gradle.publish:plugin-publish-plugin:$gradlePublishVersion"
 
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
@@ -20,23 +19,23 @@ buildscript {
     }
 }
 
-apply plugin: 'com.github.ben-manes.versions'
+apply plugin: "com.github.ben-manes.versions"
 
-apply plugin: 'com.gradle.plugin-publish'
+apply plugin: "com.gradle.plugin-publish"
 
-apply plugin: 'java-gradle-plugin'
-apply plugin: 'java-library'
-apply plugin: 'maven-publish'
-apply plugin: 'jacoco'
+apply plugin: "java-gradle-plugin"
+apply plugin: "java-library"
+apply plugin: "maven-publish"
+apply plugin: "jacoco"
 
-apply plugin: 'kotlin'
-apply plugin: 'org.jetbrains.dokka'
+apply plugin: "kotlin"
+apply plugin: "org.jetbrains.dokka"
 
-apply plugin: 'io.gitlab.arturbosch.detekt'
-apply plugin: 'org.jlleitschuh.gradle.ktlint'
-apply plugin: 'pl.droidsonroids.jacoco.testkit'
+apply plugin: "io.gitlab.arturbosch.detekt"
+apply plugin: "org.jlleitschuh.gradle.ktlint"
+apply plugin: "pl.droidsonroids.jacoco.testkit"
 
-group = 'de.smartsquare'
+group = "de.smartsquare"
 version = squitVersion
 
 sourceCompatibility = 1.8
@@ -58,15 +57,15 @@ dependencies {
     implementation "com.typesafe:config:$typesafeConfigVersion"
     implementation "se.sawano.java:alphanumeric-comparator:$alphanumericComparatorVersion"
     implementation("com.github.wumpz:diffutils:$diffUtilsVersion") {
-        exclude group: 'org.eclipse.jgit', module: '*'
+        exclude group: "org.eclipse.jgit", module: "*"
     }
 
-    implementation "org.webjars:bootstrap:$bootstrapVersion"
     implementation "org.webjars:jquery:$jqueryVersion"
+    implementation "org.webjars:bootstrap:$bootstrapVersion"
     implementation "org.webjars:font-awesome:$fontAwesomeVersion"
-    implementation 'org.webjars.npm:marked:0.5.0'
+    implementation "org.webjars.npm:marked:$markedVersion"
     implementation("org.webjars.npm:diff2html:$diff2htmlVersion") {
-        exclude group: 'org.webjars.npm', module: '*'
+        exclude group: "org.webjars.npm", module: "*"
     }
 
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
@@ -121,15 +120,15 @@ dokka {
 }
 
 pluginBundle {
-    website = 'https://github.com/SmartsquareGmbH/squit'
-    vcsUrl = 'https://github.com/SmartsquareGmbH/squit'
-    description = 'Gradle plugin for simple testing of json/xml/soap/etc. apis.'
-    tags = ['testing', 'soap', 'xml', 'automation']
+    website = "https://github.com/SmartsquareGmbH/squit"
+    vcsUrl = "https://github.com/SmartsquareGmbH/squit"
+    description = "Gradle plugin for simple testing of json/xml/soap/etc. apis."
+    tags = ["testing", "soap", "xml", "automation"]
 
     plugins {
         squit {
-            id = 'de.smartsquare.squit'
-            displayName = 'Squit'
+            id = "de.smartsquare.squit"
+            displayName = "Squit"
         }
     }
 }
@@ -146,12 +145,12 @@ gradlePlugin {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifactId 'squit'
+            artifactId "squit"
 
             from components.java
 
             artifact sourceJar {
-                classifier 'sources'
+                classifier "sources"
             }
 
             artifact javadocJar {
@@ -165,7 +164,7 @@ wrapper {
     gradleVersion = project.ext.gradleVersion
 }
 
-tasks.matching { it.name.matches('compile.*Kotlin') }.all {
+tasks.matching { it.name.matches("compile.*Kotlin") }.all {
     kotlinOptions {
         jvmTarget = "1.8"
     }

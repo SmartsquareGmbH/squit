@@ -197,7 +197,7 @@ fun DIV.squitLeafItem(resultTree: SquitResultTree, level: Int) {
 fun DIV.squitContainerItem(resultTree: SquitResultTree, level: Int) {
     val currentId = IdHolder.currentId++
 
-    a(href = "#$currentId", classes = "list-group-item list-group-item-action") {
+    a(href = "#item-$currentId", classes = "list-group-item list-group-item-action") {
         attributes["data-success"] = if (resultTree.isSuccess) "true" else "false"
         attributes["style"] = "padding-left: ${12 * level}px"
         attributes["data-toggle"] = "collapse"
@@ -218,7 +218,7 @@ fun DIV.squitContainerItem(resultTree: SquitResultTree, level: Int) {
     }
 
     div(classes = "list-group collapse") {
-        id = currentId.toString()
+        id = "item-$currentId"
 
         squitItemContainers(resultTree.children, level + 1)
     }

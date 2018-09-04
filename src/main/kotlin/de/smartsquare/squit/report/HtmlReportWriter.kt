@@ -20,10 +20,10 @@ object HtmlReportWriter {
     private const val DIFF_FILE_NAME = "Result"
     private const val DIFF_CONTEXT_SIZE = 1000000
 
-    private const val bootstrapPath = "META-INF/resources/webjars/bootstrap/4.1.1"
-    private const val fontAwesomePath = "META-INF/resources/webjars/font-awesome/5.2.0"
+    private const val bootstrapPath = "META-INF/resources/webjars/bootstrap/4.1.3"
+    private const val fontAwesomePath = "META-INF/resources/webjars/font-awesome/5.3.1"
     private const val jqueryPath = "META-INF/resources/webjars/jquery/3.3.1-1"
-    private const val popperJsPath = "META-INF/resources/webjars/popper.js/1.14.1/umd"
+    private const val popperJsPath = "META-INF/resources/webjars/popper.js/1.14.3/umd"
     private const val markedPath = "META-INF/resources/webjars/marked/0.5.0"
     private const val diff2htmlPath = "META-INF/resources/webjars/diff2html/2.3.2"
 
