@@ -85,7 +85,7 @@ fun HTML.squitBody(results: List<SquitResult>) {
                                     td { +"Slowest test" }
                                     td {
                                         code {
-                                            +(slowestTest?.name ?: "None")
+                                            +(slowestTest?.simpleName ?: "None")
                                         }
 
                                         +" (${durationToString(slowestTest?.metaInfo?.duration ?: 0)})"

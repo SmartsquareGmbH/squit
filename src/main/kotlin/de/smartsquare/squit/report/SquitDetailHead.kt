@@ -19,6 +19,7 @@ fun HTML.squitDetailHead() {
 
         link(rel = "stylesheet", href = "../../css/bootstrap.css")
         link(rel = "stylesheet", href = "../../css/diff2html.css")
+        link(rel = "stylesheet", href = "detail.css")
 
         title("Squit Results")
     }

@@ -40,7 +40,7 @@ data class SquitResultTree(
                     SquitResultTree(
                         group.first().id,
                         emptyList(),
-                        group.first().name,
+                        group.first().combinedName,
                         successfulTests,
                         failedTests,
                         ignoredTests

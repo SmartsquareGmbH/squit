@@ -1,9 +1,11 @@
 var diff = "diffPlaceholder";
 
-var title = "titlePlaceholder";
+var name = "namePlaceholder";
+var alternativeName = "alternativeNamePlaceholder";
 var description = "descriptionPlaceholder";
 
 var titleElement = $("#title");
+var subtitleElement = $("#subtitle");
 var descriptionElement = $("#description");
 var descriptionContainerElement = $("#description-container");
 var outputToggleElement = $("#output-toggle");
@@ -41,7 +43,12 @@ $(document).ready(function () {
 });
 
 function drawHeader() {
-    titleElement.text(title);
+    if (alternativeName.length > 0) {
+        titleElement.text(alternativeName);
+        subtitleElement.text(name);
+    } else {
+        titleElement.text(name);
+    }
 
     if (description) {
         descriptionElement.html(marked(description));

@@ -9,11 +9,11 @@ import kotlinx.html.body
 import kotlinx.html.button
 import kotlinx.html.div
 import kotlinx.html.h1
+import kotlinx.html.h4
 import kotlinx.html.i
 import kotlinx.html.id
 import kotlinx.html.script
 import kotlinx.html.span
-import kotlinx.html.title
 
 /**
  * Extension function for generating the html body of a Squit detail page.
@@ -22,27 +22,36 @@ fun HTML.squitDetailBody() {
     body {
         div(classes = "container") {
             div(classes = "row mt-2 mb-2") {
-                div(classes = "col-12 d-flex align-items-center") {
-                    a(classes = "mr-1", href = "#description-container") {
-                        id = "description-toggle"
-                        title = "Show description"
-
-                        attributes["data-toggle"] = "collapse"
-
-                        i(classes = "fas fa-fw fa-chevron-right align-middle") {}
-                    }
-
-                    h1(classes = "d-inline-block") {
+                div(classes = "col-12") {
+                    h1 {
                         id = "title"
                     }
+
+                    h4 {
+                        id = "subtitle"
+                    }
                 }
+            }
 
+            div(classes = "row") {
                 div(classes = "col-12") {
-                    div(classes = "collapse") {
-                        id = "description-container"
+                    div(classes = "card card-body") {
+                        a(classes = "link-unstyled", href = "#description-container") {
+                            id = "description-toggle"
 
-                        div(classes = "card card-body") {
-                            id = "description"
+                            attributes["data-toggle"] = "collapse"
+
+                            i(classes = "fas fa-fw fa-chevron-right mr-2") {}
+
+                            +"Description"
+                        }
+
+                        div(classes = "collapse") {
+                            id = "description-container"
+
+                            div(classes = "mt-4") {
+                                id = "description"
+                            }
                         }
                     }
                 }

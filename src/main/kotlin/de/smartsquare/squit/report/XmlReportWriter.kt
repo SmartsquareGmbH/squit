@@ -36,7 +36,7 @@ object XmlReportWriter {
 
             tests.forEach {
                 val testElement = suiteElement.addElement("testcase").apply {
-                    addAttribute("name", it.name)
+                    addAttribute("name", it.simpleName)
                     addAttribute("time", "${it.metaInfo.duration.toInt() / 1000f}")
                 }
 

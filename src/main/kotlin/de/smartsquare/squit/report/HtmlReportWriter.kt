@@ -59,6 +59,7 @@ object HtmlReportWriter {
 
             val detailPath = reportDirectoryPath.resolve("detail").resolve(result.id.toString())
             val detailHtmlPath = detailPath.resolve("detail.html")
+            val detailCssPath = detailPath.resolve("detail.css")
             val detailJsPath = detailPath.resolve("detail.js")
 
             val unifiedDiffForJs = generateDiff(result).joinToString("\\n\\\n")
@@ -71,10 +72,12 @@ object HtmlReportWriter {
             Files.createDirectories(detailPath)
             Files.write(detailHtmlPath, detailDocument.toString().toByteArray())
 
+            FilesUtils.copyResource("squit-detail.css", detailCssPath)
             FilesUtils.copyResource("squit-detail.js", detailJsPath) {
                 it.toString(Charset.defaultCharset())
                     .replace("diffPlaceholder", unifiedDiffForJs)
-                    .replace("titlePlaceholder", result.name)
+                    .replace("namePlaceholder", result.simpleName)
+                    .replace("alternativeNamePlaceholder", result.alternativeName)
                     .replace("\"descriptionPlaceholder\"", descriptionForReplacement)
                     .toByteArray()
             }

@@ -60,7 +60,9 @@ data class SquitResult(
      * The name is denoted by the filename of the directory it resides in and optionally
      * by a title set in the corresponding test.conf file.
      */
-    val name = testDirectoryPath.fileName.toString() + if (alternativeName.isNotBlank()) " ($alternativeName)" else ""
+    val simpleName = testDirectoryPath.fileName.toString()
+
+    val combinedName = simpleName + if (alternativeName.isNotBlank()) " ($alternativeName)" else ""
 
     /**
      * An optional description of the test.
