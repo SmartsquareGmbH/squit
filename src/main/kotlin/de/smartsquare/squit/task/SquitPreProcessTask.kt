@@ -7,6 +7,7 @@ import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.util.Constants.CONFIG
+import de.smartsquare.squit.util.Constants.DESCRIPTION
 import de.smartsquare.squit.util.Constants.ERROR
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
@@ -134,6 +135,7 @@ open class SquitPreProcessTask : DefaultTask() {
             )
 
             val resolvedSqlScripts = resolveSqlScripts(testPath, resolvedConfig)
+            val resolvedDescriptions = resolveDescriptions(testPath)
 
             val processedResultPath = Files.createDirectories(processedSourcesPath.resolve(testPath.cut(sourcesPath)))
             val processedConfigPath = processedResultPath.resolve(CONFIG)
@@ -154,6 +156,12 @@ open class SquitPreProcessTask : DefaultTask() {
             resolvedSqlScripts.forEach { (name, content) ->
                 Files.write(processedResultPath.resolve(name), content.toByteArray())
             }
+
+            resolvedDescriptions.map { it.trim() }
+                .joinToString(separator = "\n\n")
+                .also { joinedDescription ->
+                    Files.write(processedResultPath.resolve(DESCRIPTION), joinedDescription.toByteArray())
+                }
 
             resolvedConfig.writeTo(processedConfigPath)
         }
@@ -249,6 +257,23 @@ open class SquitPreProcessTask : DefaultTask() {
         }
 
         return result.toList()
+    }
+
+    private fun resolveDescriptions(testPath: Path): List<String> {
+        val result = mutableListOf<String>()
+        var currentDirectoryPath = testPath
+
+        while (!currentDirectoryPath.endsWith(sourcesPath.parent)) {
+            currentDirectoryPath.resolve(DESCRIPTION).also { descriptionPath ->
+                if (Files.exists(descriptionPath)) {
+                    result.add(0, Files.readAllBytes(descriptionPath).toString(Charsets.UTF_8))
+                }
+            }
+
+            currentDirectoryPath = currentDirectoryPath.parent
+        }
+
+        return result
     }
 
     private fun isTestExcluded(config: Config) = config.shouldExclude && !shouldUnexclude

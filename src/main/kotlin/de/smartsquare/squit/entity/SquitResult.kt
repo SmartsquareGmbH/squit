@@ -1,6 +1,7 @@
 package de.smartsquare.squit.entity
 
 import de.smartsquare.squit.mediatype.MediaTypeFactory
+import de.smartsquare.squit.util.Constants.DESCRIPTION
 import de.smartsquare.squit.util.Constants.ERROR
 import de.smartsquare.squit.util.Constants.META
 import de.smartsquare.squit.util.Constants.PROCESSED_DIRECTORY
@@ -62,6 +63,17 @@ data class SquitResult(
     val name = testDirectoryPath.fileName.toString() + if (alternativeName.isNotBlank()) " ($alternativeName)" else ""
 
     /**
+     * An optional description of the test.
+     */
+    val description by lazy {
+        if (Files.exists(sourcesPath)) {
+            Files.readAllBytes(sourcesPath.resolve(DESCRIPTION)).toString(Charset.defaultCharset())
+        } else {
+            null
+        }
+    }
+
+    /**
      * Convenience property with the path to the test without the actual test directory.
      */
     val path: Path = contextPath.resolve(suitePath)
@@ -106,9 +118,11 @@ data class SquitResult(
         .resolve(fullPath)
         .resolve(META)
 
-    private val expectedResponsePath = squitBuildDirectoryPath
+    private val sourcesPath = squitBuildDirectoryPath
         .resolve(SOURCES_DIRECTORY)
         .resolve(fullPath)
+
+    private val expectedResponsePath = sourcesPath
         .resolve(MediaTypeFactory.expectedResponse(mediaType))
 
     private val actualResponsePath = squitBuildDirectoryPath

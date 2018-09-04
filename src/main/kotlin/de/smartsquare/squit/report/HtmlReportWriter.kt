@@ -9,7 +9,6 @@ import kotlinx.html.stream.appendHTML
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.regex.Matcher
 
 /**
  * Object for writing the Squit html report.
@@ -25,6 +24,7 @@ object HtmlReportWriter {
     private const val fontAwesomePath = "META-INF/resources/webjars/font-awesome/5.2.0"
     private const val jqueryPath = "META-INF/resources/webjars/jquery/3.3.1-1"
     private const val popperJsPath = "META-INF/resources/webjars/popper.js/1.14.1/umd"
+    private const val markedPath = "META-INF/resources/webjars/marked/0.5.0"
     private const val diff2htmlPath = "META-INF/resources/webjars/diff2html/2.3.2"
 
     private val resources = arrayOf(
@@ -33,6 +33,7 @@ object HtmlReportWriter {
         "$fontAwesomePath/js/all.min.js" to "js/fontawesome.js",
         "$jqueryPath/jquery.min.js" to "js/jquery.js",
         "$popperJsPath/popper.min.js" to "js/popper.js",
+        "$markedPath/marked.min.js" to "js/marked.js",
         "$diff2htmlPath/dist/diff2html.min.css" to "css/diff2html.css",
         "$diff2htmlPath/dist/diff2html.min.js" to "js/diff2html.js",
         "$diff2htmlPath/dist/diff2html-ui.min.js" to "js/diff2html-ui.js",
@@ -51,7 +52,6 @@ object HtmlReportWriter {
         }
 
         results.forEach { result ->
-            val unifiedDiffForJs = generateDiff(result).joinToString("\\n\\\n").replace("'", "\\'")
             val detailDocument = StringBuilder("<!doctype html>").appendHTML().html {
                 squitDetailHead()
                 squitDetailBody()
@@ -61,13 +61,21 @@ object HtmlReportWriter {
             val detailHtmlPath = detailPath.resolve("detail.html")
             val detailJsPath = detailPath.resolve("detail.js")
 
+            val unifiedDiffForJs = generateDiff(result).joinToString("\\n\\\n")
+                .replace("'", "\\'")
+                .replace("\"", "\\\"")
+
+            val descriptionForReplacement = if (result.description == null) "null" else "\"${result.description}\""
+                .replace("\n", "\\n\\\n")
+
             Files.createDirectories(detailPath)
             Files.write(detailHtmlPath, detailDocument.toString().toByteArray())
 
             FilesUtils.copyResource("squit-detail.js", detailJsPath) {
                 it.toString(Charset.defaultCharset())
-                    .replace(Regex("diffPlaceholder"), Matcher.quoteReplacement(unifiedDiffForJs))
+                    .replace("diffPlaceholder", unifiedDiffForJs)
                     .replace("titlePlaceholder", result.name)
+                    .replace("\"descriptionPlaceholder\"", descriptionForReplacement)
                     .toByteArray()
             }
         }

@@ -3,6 +3,7 @@ package de.smartsquare.squit.task
 import de.smartsquare.squit.withExtendedPluginClasspath
 import de.smartsquare.squit.withJaCoCo
 import org.amshove.kluent.shouldBe
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldNotContain
 import org.amshove.kluent.shouldStartWith
@@ -54,6 +55,7 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
     val call1Request = call1Directory.resolve("request.xml")
     val call1PreSqlScript = call1Directory.resolve("test_pre.sql")
     val call1PostSqlScript = call1Directory.resolve("test_post.sql")
+    val call1Description = call1Directory.resolve("description.md")
 
     val call2PreSqlScript = call2Directory.resolve("test_pre.sql")
     val call2PostSqlScript = call2Directory.resolve("test_post.sql")
@@ -121,6 +123,20 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
                 Files.exists(call4PreSqlScript) shouldBe false
                 Files.readAllBytes(call4PostSqlScript).toString(Charsets.UTF_8) shouldContain "DROP TABLE CARS"
+            }
+
+            it("should correctly merge description files") {
+                val expected = """
+                    # Root description
+
+                    This is the root description.
+
+                    # Individual description
+
+                    This is an individual description.
+                """.trimIndent()
+
+                Files.readAllBytes(call1Description).toString(Charsets.UTF_8) shouldBeEqualTo expected
             }
 
             it("should respect the passed tags") {

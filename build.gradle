@@ -64,6 +64,7 @@ dependencies {
     implementation "org.webjars:bootstrap:$bootstrapVersion"
     implementation "org.webjars:jquery:$jqueryVersion"
     implementation "org.webjars:font-awesome:$fontAwesomeVersion"
+    implementation 'org.webjars.npm:marked:0.5.0'
     implementation("org.webjars.npm:diff2html:$diff2htmlVersion") {
         exclude group: 'org.webjars.npm', module: '*'
     }

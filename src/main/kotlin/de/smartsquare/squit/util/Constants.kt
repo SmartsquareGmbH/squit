@@ -28,6 +28,11 @@ object Constants {
     const val ERROR = "error.txt"
 
     /**
+     * Filename of the description file.
+     */
+    const val DESCRIPTION = "description.md"
+
+    /**
      * The root directory name of everything generated.
      */
     const val SQUIT_DIRECTORY = "squit"
