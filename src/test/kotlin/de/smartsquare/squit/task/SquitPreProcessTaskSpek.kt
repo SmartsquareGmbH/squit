@@ -134,6 +134,7 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
                     # Individual description
 
                     This is an individual description.
+
                 """.trimIndent()
 
                 Files.readAllBytes(call1Description).toString(Charsets.UTF_8) shouldBeEqualTo expected
