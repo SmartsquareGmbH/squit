@@ -53,6 +53,7 @@ A single test is represented by one leaf folder. That folder **must** contain:
 Further it **can** contain:
 
 - A `test.conf` file.
+- A `description.md` file.
 - A `request` file (the file ending depends on the type of test).
 - `db_$name_pre.sql` files.
 - `db_$name_post.sql` files.
@@ -61,6 +62,9 @@ The `request` file contains whatever payload you want to send to your backend. T
 
 A `test.conf` file is required at least once on the path of your test. That means that it is resolved recursively, starting at the leaf, e.g. your test folder. The `test.conf` can and must contain various properties, which are discussed in the `Configuration` section. These properties are then merged if not existing while going up the folder tree.<br>
 This allows for convenient definition of properties for multiple tests, with the ability to override properties in special cases.
+
+The `description.md` file is an optional file containing additional descriptions for tests in the [Markdown](https://en.wikipedia.org/wiki/Markdown) format.
+If the tests are nested inside each other and there are multiple description files on the path, they are merged together from top to bottom.
 
 A simple example looks like this:
 
@@ -72,6 +76,7 @@ A simple example looks like this:
 --------- request.xml
 --------- response.xml
 --------- test.conf
+--------- description.md
 ------- test2 (folder)
 --------- request.xml
 --------- response.xml
@@ -81,7 +86,7 @@ A simple example looks like this:
 This shows a valid project structure for `Squit`. `my_suite` contains all our tests (in this case only two: `test1` and `test2`).
 
 > You _can_ have more directories beneath `my_suite` (e.g. `another_suite`) and as aforementioned can also nest more deeply.
-> At least one suite folder is required though, you can't have your tests directly in the `src/test` folder.<br>
+> At least one suite folder is required though, you can't have your tests directly in the `src/test` folder.
 
 `my_suite` also contains a `test.conf` file, which could look like this:
 
