@@ -157,8 +157,7 @@ open class SquitPreProcessTask : DefaultTask() {
                 Files.write(processedResultPath.resolve(name), content.toByteArray())
             }
 
-            resolvedDescriptions.map { it.trim() }
-                .joinToString(separator = "\n\n")
+            resolvedDescriptions.joinToString(separator = "\n\n", postfix = "\n") { it.trim() }
                 .also { joinedDescription ->
                     Files.write(processedResultPath.resolve(DESCRIPTION), joinedDescription.toByteArray())
                 }
