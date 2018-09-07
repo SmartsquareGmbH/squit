@@ -210,9 +210,9 @@ There are currently two ways to do so: Using `Groovy` scripts or implementing a 
 You add a `.groovy` script somewhere in your project and supply `Squit` with the path:
 
 ```properties
-    # test.conf
+# test.conf
 
-    preProcessorScripts = [./some/path/pre_process.groovy]
+preProcessorScripts = [./some/path/pre_process.groovy]
 ```
 
 As for the pre process step, the script gets passed `request` and `expectedResponse` objects, which types depend on the request type. See [supported request types](#supported-request-types).
