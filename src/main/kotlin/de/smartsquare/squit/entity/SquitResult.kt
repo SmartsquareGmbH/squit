@@ -68,8 +68,10 @@ data class SquitResult(
      * An optional description of the test.
      */
     val description by lazy {
-        if (Files.exists(sourcesPath)) {
-            Files.readAllBytes(sourcesPath.resolve(DESCRIPTION)).toString(Charset.defaultCharset())
+        val descriptionPath = sourcesPath.resolve(DESCRIPTION)
+
+        if (Files.exists(descriptionPath)) {
+            Files.readAllBytes(descriptionPath).toString(Charset.defaultCharset())
         } else {
             null
         }

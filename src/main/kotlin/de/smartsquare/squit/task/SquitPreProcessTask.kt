@@ -157,10 +157,12 @@ open class SquitPreProcessTask : DefaultTask() {
                 Files.write(processedResultPath.resolve(name), content.toByteArray())
             }
 
-            resolvedDescriptions.joinToString(separator = "\n\n", postfix = "\n") { it.trim() }
-                .also { joinedDescription ->
-                    Files.write(processedResultPath.resolve(DESCRIPTION), joinedDescription.toByteArray())
-                }
+            if (resolvedDescriptions.isNotEmpty()) {
+                resolvedDescriptions.joinToString(separator = "\n\n", postfix = "\n") { it.trim() }
+                    .also { joinedDescription ->
+                        Files.write(processedResultPath.resolve(DESCRIPTION), joinedDescription.toByteArray())
+                    }
+            }
 
             resolvedConfig.writeTo(processedConfigPath)
         }
@@ -272,7 +274,7 @@ open class SquitPreProcessTask : DefaultTask() {
             currentDirectoryPath = currentDirectoryPath.parent
         }
 
-        return result
+        return result.filter { it.isNotBlank() }
     }
 
     private fun isTestExcluded(config: Config) = config.shouldExclude && !shouldUnexclude

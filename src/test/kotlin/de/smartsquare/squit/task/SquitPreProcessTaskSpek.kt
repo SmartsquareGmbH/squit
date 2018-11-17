@@ -4,6 +4,7 @@ import de.smartsquare.squit.withExtendedPluginClasspath
 import de.smartsquare.squit.withJaCoCo
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldBeFalse
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldNotContain
 import org.amshove.kluent.shouldStartWith
@@ -262,6 +263,10 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
             it("should not require or create a request file") {
                 Files.exists(getCall1Directory.resolve("request.xml")) shouldBe false
+            }
+
+            it("should not generate a description file, because the project does not contain one") {
+                Files.exists(getCall1Directory.resolve("description.md")).shouldBeFalse()
             }
         }
     }
