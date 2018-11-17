@@ -8,7 +8,9 @@ import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeDir
 import org.amshove.kluent.shouldBeEmpty
+import org.amshove.kluent.shouldBeFalse
 import org.amshove.kluent.shouldBeFile
+import org.amshove.kluent.shouldBeTrue
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldStartWith
 import org.gradle.testkit.runner.GradleRunner
@@ -141,7 +143,7 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             }
 
             it("should run, but not report tests which are ignored for report") {
-                Files.exists(call4Directory) shouldBe true
+                Files.exists(call4Directory).shouldBeTrue()
                 Files.list(failuresDirectory).use { it.toList().shouldBeEmpty() }
             }
         }
@@ -172,13 +174,13 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             }
 
             it("should generate a \"failures\" directory with all relevant files") {
-                Files.exists(call1FailuresDirectory.resolve("actual_response.xml")) shouldBe true
-                Files.exists(call1FailuresDirectory.resolve("test.conf")) shouldBe true
-                Files.exists(call1FailuresDirectory.resolve("diff.txt")) shouldBe true
-                Files.exists(call1FailuresDirectory.resolve("expected_response.xml")) shouldBe true
-                Files.exists(call1FailuresDirectory.resolve("request.xml")) shouldBe true
-                Files.exists(call1FailuresDirectory.resolve("test_post.sql")) shouldBe true
-                Files.exists(call1FailuresDirectory.resolve("test_pre.sql")) shouldBe true
+                Files.exists(call1FailuresDirectory.resolve("actual_response.xml")).shouldBeTrue()
+                Files.exists(call1FailuresDirectory.resolve("test.conf")).shouldBeTrue()
+                Files.exists(call1FailuresDirectory.resolve("diff.txt")).shouldBeTrue()
+                Files.exists(call1FailuresDirectory.resolve("expected_response.xml")).shouldBeTrue()
+                Files.exists(call1FailuresDirectory.resolve("request.xml")).shouldBeTrue()
+                Files.exists(call1FailuresDirectory.resolve("test_post.sql")).shouldBeTrue()
+                Files.exists(call1FailuresDirectory.resolve("test_pre.sql")).shouldBeTrue()
             }
         }
 
@@ -205,11 +207,11 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             }
 
             it("should also report the ignored test") {
-                Files.exists(call4FailuresDirectory) shouldBe true
+                Files.exists(call4FailuresDirectory).shouldBeTrue()
             }
 
             it("should not report the excluded test") {
-                Files.exists(call3FailuresDirectory) shouldBe false
+                Files.exists(call3FailuresDirectory).shouldBeFalse()
             }
         }
 
@@ -237,11 +239,11 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             }
 
             it("should also report the ignored test") {
-                Files.exists(call3FailuresDirectory) shouldBe true
+                Files.exists(call3FailuresDirectory).shouldBeTrue()
             }
 
             it("should also report the excluded test") {
-                Files.exists(call4FailuresDirectory) shouldBe true
+                Files.exists(call4FailuresDirectory).shouldBeTrue()
             }
         }
     }

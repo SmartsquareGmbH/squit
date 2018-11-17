@@ -1,6 +1,8 @@
 package de.smartsquare.squit.db
 
 import org.amshove.kluent.shouldBe
+import org.amshove.kluent.shouldBeFalse
+import org.amshove.kluent.shouldBeTrue
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -22,7 +24,7 @@ object ConnectionCollectionSpek : Spek({
             val connection = connectionCollection.createOrGet(jdbc, username, password)
 
             it("should be a valid connection") {
-                connection.isClosed shouldBe false
+                connection.isClosed.shouldBeFalse()
             }
         }
 
@@ -41,7 +43,7 @@ object ConnectionCollectionSpek : Spek({
             connectionCollection.close()
 
             it("should close all connections") {
-                connection.isClosed shouldBe true
+                connection.isClosed.shouldBeTrue()
             }
         }
     }

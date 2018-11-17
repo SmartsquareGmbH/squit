@@ -5,6 +5,7 @@ import de.smartsquare.squit.withJaCoCo
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeFalse
+import org.amshove.kluent.shouldBeTrue
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldNotContain
 import org.amshove.kluent.shouldStartWith
@@ -119,10 +120,10 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
                 Files.readAllBytes(call1PreSqlScript).toString(Charsets.UTF_8) shouldContain "INSERT INTO CARS"
                 Files.readAllBytes(call1PostSqlScript).toString(Charsets.UTF_8) shouldNotContain "DROP TABLE CARS"
 
-                Files.exists(call2PreSqlScript) shouldBe false
-                Files.exists(call2PostSqlScript) shouldBe false
+                Files.exists(call2PreSqlScript).shouldBeFalse()
+                Files.exists(call2PostSqlScript).shouldBeFalse()
 
-                Files.exists(call4PreSqlScript) shouldBe false
+                Files.exists(call4PreSqlScript).shouldBeFalse()
                 Files.readAllBytes(call4PostSqlScript).toString(Charsets.UTF_8) shouldContain "DROP TABLE CARS"
             }
 
@@ -142,10 +143,10 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
             }
 
             it("should respect the passed tags") {
-                Files.exists(buildPath.resolve("sources").resolve("project").resolve("call1")) shouldBe true
-                Files.exists(buildPath.resolve("sources").resolve("project").resolve("call2")) shouldBe true
-                Files.exists(buildPath.resolve("sources").resolve("project").resolve("call3")) shouldBe false
-                Files.exists(buildPath.resolve("sources").resolve("project").resolve("call4")) shouldBe true
+                Files.exists(buildPath.resolve("sources").resolve("project").resolve("call1")).shouldBeTrue()
+                Files.exists(buildPath.resolve("sources").resolve("project").resolve("call2")).shouldBeTrue()
+                Files.exists(buildPath.resolve("sources").resolve("project").resolve("call3")).shouldBeFalse()
+                Files.exists(buildPath.resolve("sources").resolve("project").resolve("call4")).shouldBeTrue()
             }
         }
 
@@ -168,7 +169,7 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
             }
 
             it("should also pre-process the ignored test") {
-                Files.exists(buildPath.resolve("sources").resolve("project").resolve("call4")) shouldBe true
+                Files.exists(buildPath.resolve("sources").resolve("project").resolve("call4")).shouldBeTrue()
             }
         }
     }
@@ -262,7 +263,7 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
             }
 
             it("should not require or create a request file") {
-                Files.exists(getCall1Directory.resolve("request.xml")) shouldBe false
+                Files.exists(getCall1Directory.resolve("request.xml")).shouldBeFalse()
             }
 
             it("should not generate a description file, because the project does not contain one") {
@@ -291,11 +292,11 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
             }
 
             it("should copy the request file for a test with one") {
-                Files.exists(optionsSourcesPath.resolve("call1").resolve("request.xml")) shouldBe true
+                Files.exists(optionsSourcesPath.resolve("call1").resolve("request.xml")).shouldBeTrue()
             }
 
             it("should not require or create a request file for a test with none") {
-                Files.exists(optionsSourcesPath.resolve("call2").resolve("request.xml")) shouldBe false
+                Files.exists(optionsSourcesPath.resolve("call2").resolve("request.xml")).shouldBeFalse()
             }
         }
     }
@@ -320,7 +321,7 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
             }
 
             it("should copy the request file") {
-                Files.exists(jsonCall1Directory.resolve("request.json")) shouldBe true
+                Files.exists(jsonCall1Directory.resolve("request.json")).shouldBeTrue()
             }
         }
     }

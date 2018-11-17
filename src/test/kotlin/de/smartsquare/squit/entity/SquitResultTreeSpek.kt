@@ -3,6 +3,8 @@ package de.smartsquare.squit.entity
 import okhttp3.MediaType
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldBeFalse
+import org.amshove.kluent.shouldBeTrue
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -49,14 +51,14 @@ object SquitResultTreeSpek : Spek({
                 resultTrees.first().ignoredTests shouldBe 1
                 resultTrees.first().failedTests shouldBe 1
                 resultTrees.first().totalTests shouldBe 4
-                resultTrees.first().isSuccess shouldBe false
+                resultTrees.first().isSuccess.shouldBeFalse()
                 resultTrees.first().children.size shouldBe 2
 
                 resultTrees.last().name shouldBeEqualTo "x"
                 resultTrees.last().children.first().children.first().children.first().name shouldBeEqualTo "x"
                 resultTrees.last().children.first().children.first().children.first().successfulTests shouldBe 1
                 resultTrees.last().children.first().children.first().children.first().failedTests shouldBe 0
-                resultTrees.last().children.first().children.first().children.first().isSuccess shouldBe true
+                resultTrees.last().children.first().children.first().children.first().isSuccess.shouldBeTrue()
             }
         }
     }
