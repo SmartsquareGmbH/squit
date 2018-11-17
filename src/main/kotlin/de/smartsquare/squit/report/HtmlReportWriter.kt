@@ -54,7 +54,7 @@ object HtmlReportWriter {
         results.forEach { result ->
             val detailDocument = StringBuilder("<!doctype html>").appendHTML().html {
                 squitDetailHead()
-                squitDetailBody()
+                squitDetailBody(result)
             }
 
             val detailPath = reportDirectoryPath.resolve("detail").resolve(result.id.toString())

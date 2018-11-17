@@ -2,6 +2,7 @@
 
 package de.smartsquare.squit.report
 
+import de.smartsquare.squit.entity.SquitResult
 import kotlinx.html.ButtonType
 import kotlinx.html.HTML
 import kotlinx.html.a
@@ -18,7 +19,7 @@ import kotlinx.html.span
 /**
  * Extension function for generating the html body of a Squit detail page.
  */
-fun HTML.squitDetailBody() {
+fun HTML.squitDetailBody(result: SquitResult) {
     body {
         div(classes = "container") {
             div(classes = "row mt-4 mb-2") {
@@ -33,24 +34,26 @@ fun HTML.squitDetailBody() {
                 }
             }
 
-            div(classes = "row") {
-                div(classes = "col-12") {
-                    div(classes = "card card-body") {
-                        a(classes = "link-unstyled", href = "#description-container") {
-                            id = "description-toggle"
+            if (result.description != null) {
+                div(classes = "row") {
+                    div(classes = "col-12") {
+                        div(classes = "card card-body") {
+                            a(classes = "link-unstyled", href = "#description-container") {
+                                id = "description-toggle"
 
-                            attributes["data-toggle"] = "collapse"
+                                attributes["data-toggle"] = "collapse"
 
-                            i(classes = "fas fa-fw fa-chevron-right mr-2") {}
+                                i(classes = "fas fa-fw fa-chevron-right mr-2") {}
 
-                            +"Description"
-                        }
+                                +"Description"
+                            }
 
-                        div(classes = "collapse") {
-                            id = "description-container"
+                            div(classes = "collapse") {
+                                id = "description-container"
 
-                            div(classes = "mt-4") {
-                                id = "description"
+                                div(classes = "mt-4") {
+                                    id = "description"
+                                }
                             }
                         }
                     }

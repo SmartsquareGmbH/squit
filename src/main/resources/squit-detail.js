@@ -52,8 +52,6 @@ function drawHeader() {
 
     if (description) {
         descriptionElement.html(marked(description));
-    } else {
-        descriptionToggleElement.hide();
     }
 }
 
