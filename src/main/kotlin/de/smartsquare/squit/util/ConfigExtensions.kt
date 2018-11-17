@@ -51,7 +51,7 @@ val Config.endpoint: HttpUrl
     }
 
 /**
- * The mediaType to use for the request. If none is given, application/xml is used as fallback.
+ * The mediaType to use for the request. If none is given, text/plain is used as fallback.
  */
 val Config.mediaType
     get() = getSafeString(MEDIA_TYPE, MEDIA_TYPE_FALLBACK).let { mediaType ->

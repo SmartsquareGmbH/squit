@@ -181,7 +181,7 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             val arguments = listOf(
                 "clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject", "-Ptags=call1"
+                "-Psquit.rootDir=$subject", "-Ptags=call1", "--info"
             )
 
             val result = GradleRunner.create()
@@ -198,6 +198,11 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             it("should properly receive and save the error body") {
                 Files.readAllBytes(call1Response).toString(Charsets.UTF_8) shouldBeEqualTo "error"
+            }
+
+            it("should print an appropriate info") {
+                result.output shouldContain "Unsuccessful request for test project${File.separator}call1 " +
+                    "(status code: 500)"
             }
         }
 
@@ -224,6 +229,32 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
             it("should generate an error file") {
                 Files.readAllBytes(call1Error).toString(Charset.defaultCharset()) shouldStartWith
                     "java.net.SocketTimeoutException"
+            }
+        }
+
+        on("running the request task with a web server answering with a different media type") {
+            server.enqueue(MockResponse().setBody("<cool/>").setHeader("Content-Type", "text/plain"))
+
+            val arguments = listOf(
+                "clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subject", "-Ptags=call1", "--info"
+            )
+
+            val result = GradleRunner.create()
+                .withProjectDir(subject.toFile())
+                .withExtendedPluginClasspath()
+                .withArguments(arguments)
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
+
+            it("should be able to complete without errors") {
+                result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
+            }
+
+            it("should print an appropriate info") {
+                result.output shouldContain "Unexpected Media type text/plain for " +
+                    "test project${File.separator}call1. Expected application/xml"
             }
         }
     }

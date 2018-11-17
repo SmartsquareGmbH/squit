@@ -196,13 +196,28 @@ open class SquitRequestTask : DefaultTask() {
         doPreScriptExecutions(config, testDirectoryPath)
 
         try {
-            val apiResponse = constructApiCall(requestPath, config)
-                .execute()
-                .body()
-                ?.string()
-                ?: throw IOException("Subject did not answer with a body")
+            val apiResponse = constructApiCall(requestPath, config).execute()
+            val apiBody = apiResponse.body()?.string() ?: throw IOException("Subject did not answer with a body")
+            val mediaType = apiResponse.body()?.contentType()
 
-            Files.write(resultResponseFilePath, apiResponse.toByteArray(Charsets.UTF_8))
+            Files.write(resultResponseFilePath, apiBody.toByteArray())
+
+            if (!apiResponse.isSuccessful) {
+                logger.newLineIfNeeded()
+                logger.info(
+                    "Unsuccessful request for test ${testDirectoryPath.cut(processedSourcesPath)} " +
+                        "(status code: ${apiResponse.code()})"
+                )
+            } else if (
+                mediaType?.type() != config.mediaType.type() ||
+                mediaType?.subtype() != config.mediaType.subtype()
+            ) {
+                logger.newLineIfNeeded()
+                logger.info(
+                    "Unexpected Media type $mediaType for test ${testDirectoryPath.cut(processedSourcesPath)}. " +
+                        "Expected ${config.mediaType}"
+                )
+            }
         } catch (error: IOException) {
             Files.write(resultResponsePath.resolve(ERROR), error.toString().toByteArray())
         }
