@@ -50,7 +50,7 @@ fun HTML.squitBody(results: List<SquitResult>) {
 
     body {
         div(classes = "container") {
-            div(classes = "row mt-2") {
+            div(classes = "row mt-4") {
                 div(classes = "col-12") {
                     h1 { +"Squit Results" }
                     h4 {

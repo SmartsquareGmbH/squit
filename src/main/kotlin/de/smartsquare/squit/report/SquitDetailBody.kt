@@ -21,7 +21,7 @@ import kotlinx.html.span
 fun HTML.squitDetailBody() {
     body {
         div(classes = "container") {
-            div(classes = "row mt-2 mb-2") {
+            div(classes = "row mt-4 mb-2") {
                 div(classes = "col-12") {
                     h1 {
                         id = "title"
