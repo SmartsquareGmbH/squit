@@ -12,12 +12,13 @@ class GenericDiffer : Differ {
     override fun diff(expectedResponse: ByteArray, actualResponse: ByteArray): String {
         val diff = DiffUtils.diff(
             expectedResponse.toString(Charset.defaultCharset()),
-            actualResponse.toString(Charset.defaultCharset())
+            actualResponse.toString(Charset.defaultCharset()),
+            null
         )
 
         return diff.deltas.joinToString("\n") {
-            "Expected '${it.original.lines.joinToString("\n")}' but was " +
-                "'${it.revised.lines.joinToString("\n")}' at line ${it.original.position + 1}"
+            "Expected '${it.source.lines.joinToString("\n")}' but was " +
+                "'${it.target.lines.joinToString("\n")}' at line ${it.target.position + 1}"
         }
     }
 }

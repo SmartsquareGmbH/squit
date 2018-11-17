@@ -13,6 +13,8 @@ style:
     active: false
   MagicNumber:
     active: false
+  UnnecessaryApply:
+    active: false
   VariableMinLength:
     minimumVariableNameLength: 2
   VariableMaxLength:

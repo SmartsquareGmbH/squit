@@ -18,11 +18,11 @@ object FilesUtils {
      * Returns all leaf directories of the given [path], sorted by alphanumeric order.
      */
     fun getSortedLeafDirectories(path: Path): List<Path> = getChildDirectories(path)
-        .sortedWith(compareBy(AlphanumericComparator()) { it: Path -> it.fileName.toString() })
-        .fold(listOf()) { current, it ->
-            current + when (containsDirectories(it)) {
-                true -> getSortedLeafDirectories(it)
-                false -> listOf(it)
+        .sortedWith(compareBy(AlphanumericComparator()) { it.fileName.toString() })
+        .fold(listOf()) { current, next ->
+            current + when (containsDirectories(next)) {
+                true -> getSortedLeafDirectories(next)
+                false -> listOf(next)
             }
         }
 

@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
 buildscript {
     apply from: "./gradle/versions.gradle"
 
@@ -13,8 +16,8 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokkaVersion"
 
-        classpath "gradle.plugin.org.jlleitschuh.gradle:ktlint-gradle:$ktlintPluginVersion"
-        classpath "gradle.plugin.io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detektVersion"
+        classpath "org.jlleitschuh.gradle:ktlint-gradle:$ktlintPluginVersion"
+        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detektVersion"
         classpath "gradle.plugin.pl.droidsonroids.gradle.jacoco:jacoco-testkit-plugin:$jacocoTestkitVersion"
     }
 }
@@ -60,8 +63,9 @@ dependencies {
         exclude group: "org.eclipse.jgit", module: "*"
     }
 
-    implementation "org.webjars:jquery:$jqueryVersion"
-    implementation "org.webjars:bootstrap:$bootstrapVersion"
+    implementation "org.webjars.npm:jquery:$jqueryVersion"
+    implementation "org.webjars.npm:bootstrap:$bootstrapVersion"
+    implementation "org.webjars.npm:popper.js:$popperVersion"
     implementation "org.webjars:font-awesome:$fontAwesomeVersion"
     implementation "org.webjars.npm:marked:$markedVersion"
     implementation("org.webjars.npm:diff2html:$diff2htmlVersion") {
@@ -79,6 +83,12 @@ dependencies {
     testRuntime "org.jetbrains.spek:spek-junit-platform-engine:$spekVersion"
 }
 
+tasks.withType(KotlinCompile).all {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
 task sourceJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
@@ -92,21 +102,23 @@ test {
 }
 
 jacoco {
-    setToolVersion(jacocoVersion)
+    toolVersion = jacocoVersion
 }
 
 ktlint {
     version = ktlintVersion
-    reporters = ["CHECKSTYLE"]
+    reporters = [ReporterType.CHECKSTYLE]
 }
 
 detekt {
-    version = detektVersion
+    toolVersion = detektVersion
 
-    profile("main") {
-        input = "$projectDir/src/main/kotlin"
-        config = "${rootProject.projectDir}/config/detekt/detekt.yml"
-        output = "$buildDir/reports/detekt"
+    config = files("${rootProject.projectDir}/config/detekt/detekt.yml")
+    input = files("$projectDir/src/main/kotlin")
+
+    reports {
+        xml.destination = file("$buildDir/reports/detekt/detekt.xml")
+        html.destination = file("$buildDir/reports/detekt/detekt.html")
     }
 }
 
@@ -122,8 +134,8 @@ dokka {
 pluginBundle {
     website = "https://github.com/SmartsquareGmbH/squit"
     vcsUrl = "https://github.com/SmartsquareGmbH/squit"
-    description = "Gradle plugin for simple testing of json/xml/soap/etc. apis."
-    tags = ["testing", "soap", "xml", "automation"]
+    description = "Gradle plugin for simple testing of json/xml/soap/... APIs."
+    tags = ["testing", "json", "xml", "soap", "automation"]
 
     plugins {
         squit {
@@ -164,14 +176,6 @@ wrapper {
     gradleVersion = project.ext.gradleVersion
 }
 
-tasks.matching { it.name.matches("compile.*Kotlin") }.all {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
-
 gradle.projectsEvaluated {
-    check.dependsOn detektCheck
-
     test { finalizedBy jacocoTestReport }
 }
