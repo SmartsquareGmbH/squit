@@ -1,6 +1,6 @@
 # Squit
 
-`Squit` is a `Gradle` plugin for file-based, automated testing of `Json`, `Xml`, `Soap` and other apis.<br>
+`Squit` is a `Gradle` plugin for file-based, automated testing of `JSON`, `XML`, `SOAP` and other apis.<br>
 It features high customizability and speed.
 
 ## Table of Contents

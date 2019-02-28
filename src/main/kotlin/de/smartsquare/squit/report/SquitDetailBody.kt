@@ -4,6 +4,7 @@ package de.smartsquare.squit.report
 
 import de.smartsquare.squit.entity.SquitResult
 import kotlinx.html.ButtonType
+import kotlinx.html.DIV
 import kotlinx.html.HTML
 import kotlinx.html.a
 import kotlinx.html.body
@@ -21,72 +22,15 @@ import kotlinx.html.span
  */
 fun HTML.squitDetailBody(result: SquitResult) {
     body {
-        div(classes = "container") {
-            div(classes = "row mt-4 mb-2") {
-                div(classes = "col-12") {
-                    h1 {
-                        id = "title"
-                    }
-
-                    h4 {
-                        id = "subtitle"
-                    }
-                }
-            }
+        div(classes = "container-fluid") {
+            squitTitle()
 
             if (result.description != null) {
-                div(classes = "row") {
-                    div(classes = "col-12") {
-                        div(classes = "card card-body") {
-                            a(classes = "link-unstyled", href = "#description-container") {
-                                id = "description-toggle"
-
-                                attributes["data-toggle"] = "collapse"
-
-                                i(classes = "fas fa-fw fa-chevron-right mr-2") {}
-
-                                +"Description"
-                            }
-
-                            div(classes = "collapse") {
-                                id = "description-container"
-
-                                div(classes = "mt-4") {
-                                    id = "description"
-                                }
-                            }
-                        }
-                    }
-                }
+                squitDescription()
             }
 
-            div(classes = "row mt-2") {
-                div(classes = "col-12") {
-                    a(href = "../../main.html", classes = "btn btn-primary") {
-                        attributes += "role" to "button"
-
-                        i(classes = "fas fa-fw fa-arrow-left align-middle") {}
-                        span(classes = "align-middle") {
-                            +" Back"
-                        }
-                    }
-
-                    button(classes = "btn btn-primary float-right") {
-                        id = "output-toggle"
-                        type = ButtonType.button
-
-                        span(classes = "align-middle") {
-                            +"Show side by side"
-                        }
-                    }
-                }
-            }
-
-            div(classes = "row mt-2 mb-2") {
-                div(classes = "col-12") {
-                    id = "diff-view"
-                }
-            }
+            squitControls()
+            squitDiff()
         }
 
         script(src = "../../js/jquery.js") {}
@@ -97,5 +41,77 @@ fun HTML.squitDetailBody(result: SquitResult) {
         script(src = "../../js/diff2html-ui.js") {}
         script(src = "../../js/fontawesome.js") {}
         script(src = "detail.js") {}
+    }
+}
+
+private fun DIV.squitTitle() {
+    div(classes = "row mt-4 mb-2") {
+        div(classes = "offset-lg-1 col-12 col-lg-10") {
+            h1 {
+                id = "title"
+            }
+
+            h4 {
+                id = "subtitle"
+            }
+        }
+    }
+}
+
+private fun DIV.squitDescription() {
+    div(classes = "row") {
+        div(classes = "offset-lg-1 col-12 col-lg-10") {
+            div(classes = "card card-body") {
+                a(classes = "link-unstyled", href = "#description-container") {
+                    id = "description-toggle"
+
+                    attributes["data-toggle"] = "collapse"
+
+                    i(classes = "fas fa-fw fa-chevron-right mr-2") {}
+
+                    +"Description"
+                }
+
+                div(classes = "collapse") {
+                    id = "description-container"
+
+                    div(classes = "mt-4") {
+                        id = "description"
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun DIV.squitControls() {
+    div(classes = "row mt-2") {
+        div(classes = "offset-lg-1 col-12 col-lg-10") {
+            a(href = "../../main.html", classes = "btn btn-primary") {
+                attributes += "role" to "button"
+
+                i(classes = "fas fa-fw fa-arrow-left align-middle") {}
+                span(classes = "align-middle") {
+                    +" Back"
+                }
+            }
+
+            button(classes = "btn btn-primary float-right") {
+                id = "output-toggle"
+                type = ButtonType.button
+
+                span(classes = "align-middle") {
+                    +"Show side by side"
+                }
+            }
+        }
+    }
+}
+
+private fun DIV.squitDiff() {
+    div(classes = "row mt-2 mb-2") {
+        div(classes = "offset-lg-1 col-12 col-lg-10") {
+            id = "diff-view"
+        }
     }
 }

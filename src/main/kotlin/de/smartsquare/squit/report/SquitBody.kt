@@ -36,110 +36,18 @@ private object IdHolder {
     var currentId = 0L
 }
 
+private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+
 /**
  * Extension function for generating the html body of the Squit report with the given [results].
  */
 fun HTML.squitBody(results: List<SquitResult>) {
-    val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-
-    val totalFailedTests = results.count { !it.isSuccess }
-    val firstTest = results.minBy { it.metaInfo.date }
-    val duration = results.fold(0L) { acc, next -> acc + next.metaInfo.duration }
-    val averageTime = results.map { it.metaInfo.duration }.average().let { if (it.isNaN()) 0L else it.toLong() }
-    val slowestTest = results.maxBy { it.metaInfo.duration }
-
     body {
-        div(classes = "container") {
-            div(classes = "row mt-4") {
-                div(classes = "col-12") {
-                    h1 { +"Squit Results" }
-                    h4 {
-                        +when {
-                            results.isEmpty() -> "No tests run."
-                            totalFailedTests <= 0 -> "${results.size} tests run. All passed!"
-                            results.size == 1 -> "One test run. $totalFailedTests failed."
-                            else -> "${results.size} tests run. $totalFailedTests failed."
-                        }
-                    }
-                }
-            }
-
-            div(classes = "row") {
-                div(classes = "col-12") {
-                    div(classes = "table-responsive") {
-                        table(classes = "table table-striped table-bordered") {
-                            tbody {
-                                tr {
-                                    td { +"Started at" }
-                                    td { +dateTimeFormatter.format(firstTest?.metaInfo?.date ?: LocalDateTime.now()) }
-                                }
-                                tr {
-                                    td { +"Total time" }
-                                    td { +durationToString(duration) }
-                                }
-                                tr {
-                                    td { +"Average time per test" }
-                                    td { +durationToString(averageTime) }
-                                }
-                                tr {
-                                    td { +"Slowest test" }
-                                    td {
-                                        code {
-                                            +(slowestTest?.simpleName ?: "None")
-                                        }
-
-                                        +" (${durationToString(slowestTest?.metaInfo?.duration ?: 0)})"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            div(classes = "row") {
-                div(classes = "col-6 d-flex align-items-center") {
-                    form {
-                        role = "form"
-
-                        div(classes = "custom-control custom-checkbox") {
-                            input(type = InputType.checkBox, classes = "custom-control-input") {
-                                id = "failed-only"
-                            }
-
-                            label(classes = "custom-control-label") {
-                                attributes += "for" to "failed-only"
-
-                                +"Show only failed tests"
-                            }
-                        }
-                    }
-                }
-
-                div(classes = "col-6") {
-                    button(classes = "btn btn-primary float-right") {
-                        type = ButtonType.button
-                        id = "collapse-all"
-
-                        +"Collapse all"
-                    }
-
-                    button(classes = "btn btn-primary float-right mr-2") {
-                        type = ButtonType.button
-                        id = "expand-all"
-
-                        +"Expand all"
-                    }
-                }
-            }
-
-            div(classes = "row mt-3 mb-2") {
-                id = "result-tree"
-
-                div(classes = "col-12") {
-                    squitItemContainers(SquitResultTree.fromList(results), 1)
-                }
-            }
+        div(classes = "container-fluid") {
+            squitTitle(results)
+            squitOverviewTable(results)
+            squitControls()
+            squitItems(results)
         }
 
         script(src = "js/jquery.js") {}
@@ -150,10 +58,113 @@ fun HTML.squitBody(results: List<SquitResult>) {
     }
 }
 
-/**
- * Helper extension function for generating a list of item containers with the given [resultTrees].
- */
-fun DIV.squitItemContainers(resultTrees: List<SquitResultTree>, level: Int) {
+private fun DIV.squitTitle(results: List<SquitResult>) {
+    val totalFailedTests = results.count { !it.isSuccess }
+
+    div(classes = "row mt-4") {
+        div(classes = "offset-lg-1 col-12 col-lg-10") {
+            h1 { +"Squit Results" }
+            h4 {
+                +when {
+                    results.isEmpty() -> "No tests run."
+                    totalFailedTests <= 0 -> "${results.size} tests run. All passed!"
+                    results.size == 1 -> "One test run. $totalFailedTests failed."
+                    else -> "${results.size} tests run. $totalFailedTests failed."
+                }
+            }
+        }
+    }
+}
+
+private fun DIV.squitOverviewTable(results: List<SquitResult>) {
+    val firstTest = results.minBy { it.metaInfo.date }
+    val duration = results.fold(0L) { acc, next -> acc + next.metaInfo.duration }
+    val averageTime = results.map { it.metaInfo.duration }.average().let { if (it.isNaN()) 0L else it.toLong() }
+    val slowestTest = results.maxBy { it.metaInfo.duration }
+
+    div(classes = "row") {
+        div(classes = "offset-lg-1 col-12 col-lg-10") {
+            div(classes = "table-responsive") {
+                table(classes = "table table-striped table-bordered") {
+                    tbody {
+                        tr {
+                            td { +"Started at" }
+                            td { +dateTimeFormatter.format(firstTest?.metaInfo?.date ?: LocalDateTime.now()) }
+                        }
+                        tr {
+                            td { +"Total time" }
+                            td { +durationToString(duration) }
+                        }
+                        tr {
+                            td { +"Average time per test" }
+                            td { +durationToString(averageTime) }
+                        }
+                        tr {
+                            td { +"Slowest test" }
+                            td {
+                                code {
+                                    +(slowestTest?.simpleName ?: "None")
+                                }
+
+                                +" (${durationToString(slowestTest?.metaInfo?.duration ?: 0)})"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun DIV.squitControls() {
+    div(classes = "row") {
+        div(classes = "offset-lg-1 col-6 col-lg-5 d-flex align-items-center") {
+            form {
+                role = "form"
+
+                div(classes = "custom-control custom-checkbox") {
+                    input(type = InputType.checkBox, classes = "custom-control-input") {
+                        id = "failed-only"
+                    }
+
+                    label(classes = "custom-control-label") {
+                        attributes += "for" to "failed-only"
+
+                        +"Show only failed tests"
+                    }
+                }
+            }
+        }
+
+        div(classes = "col-6 col-lg-5") {
+            button(classes = "btn btn-primary float-right") {
+                type = ButtonType.button
+                id = "collapse-all"
+
+                +"Collapse all"
+            }
+
+            button(classes = "btn btn-primary float-right mr-2") {
+                type = ButtonType.button
+                id = "expand-all"
+
+                +"Expand all"
+            }
+        }
+    }
+}
+
+private fun DIV.squitItems(results: List<SquitResult>) {
+    div(classes = "row mt-3 mb-2") {
+        id = "result-tree"
+
+        div(classes = "offset-lg-1 col-12 col-lg-10") {
+            squitItemContainers(SquitResultTree.fromList(results), 1)
+        }
+    }
+}
+
+private fun DIV.squitItemContainers(resultTrees: List<SquitResultTree>, level: Int) {
     resultTrees.forEach {
         if (it.children.isEmpty()) {
             squitLeafItem(it, level)
@@ -163,38 +174,7 @@ fun DIV.squitItemContainers(resultTrees: List<SquitResultTree>, level: Int) {
     }
 }
 
-/**
- * Helper function for generating a single leaf item with the given [resultTree] and [level] for indentation.
- */
-fun DIV.squitLeafItem(resultTree: SquitResultTree, level: Int) {
-    a(href = "detail/${resultTree.id}/detail.html", classes = "list-group-item list-group-item-action") {
-        attributes["data-success"] = if (resultTree.isSuccess) "true" else "false"
-        attributes["style"] = "padding-left: ${12 * level}px"
-
-        +resultTree.name
-
-        val badgeType = when {
-            resultTree.isIgnored -> "badge-secondary"
-            resultTree.isSuccess -> "badge-success"
-            else -> "badge-danger"
-        }
-
-        val text = when {
-            resultTree.isIgnored -> "Ignored"
-            resultTree.isSuccess -> "Passed"
-            else -> "Failed"
-        }
-
-        span(classes = "badge $badgeType float-right") {
-            +text
-        }
-    }
-}
-
-/**
- * Helper function for generating a single item with the given [resultTree] and [level] for indentation.
- */
-fun DIV.squitContainerItem(resultTree: SquitResultTree, level: Int) {
+private fun DIV.squitContainerItem(resultTree: SquitResultTree, level: Int) {
     val currentId = IdHolder.currentId++
 
     a(href = "#item-$currentId", classes = "list-group-item list-group-item-action") {
@@ -221,6 +201,31 @@ fun DIV.squitContainerItem(resultTree: SquitResultTree, level: Int) {
         id = "item-$currentId"
 
         squitItemContainers(resultTree.children, level + 1)
+    }
+}
+
+private fun DIV.squitLeafItem(resultTree: SquitResultTree, level: Int) {
+    a(href = "detail/${resultTree.id}/detail.html", classes = "list-group-item list-group-item-action") {
+        attributes["data-success"] = if (resultTree.isSuccess) "true" else "false"
+        attributes["style"] = "padding-left: ${12 * level}px"
+
+        +resultTree.name
+
+        val badgeType = when {
+            resultTree.isIgnored -> "badge-secondary"
+            resultTree.isSuccess -> "badge-success"
+            else -> "badge-danger"
+        }
+
+        val text = when {
+            resultTree.isIgnored -> "Ignored"
+            resultTree.isSuccess -> "Passed"
+            else -> "Failed"
+        }
+
+        span(classes = "badge $badgeType float-right") {
+            +text
+        }
     }
 }
 

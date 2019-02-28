@@ -18,14 +18,14 @@ import java.nio.file.Path
 object HtmlReportWriter {
 
     private const val DIFF_FILE_NAME = "Result"
-    private const val DIFF_CONTEXT_SIZE = 1000000
+    private const val DIFF_CONTEXT_SIZE = 1_000_000
 
-    private const val bootstrapPath = "META-INF/resources/webjars/bootstrap/4.1.3/dist"
-    private const val fontAwesomePath = "META-INF/resources/webjars/font-awesome/5.5.0"
+    private const val bootstrapPath = "META-INF/resources/webjars/bootstrap/4.3.1/dist"
+    private const val fontAwesomePath = "META-INF/resources/webjars/font-awesome/5.7.2"
     private const val jqueryPath = "META-INF/resources/webjars/jquery/3.3.1/dist"
-    private const val popperJsPath = "META-INF/resources/webjars/popper.js/1.14.5/dist/umd"
-    private const val markedPath = "META-INF/resources/webjars/marked/0.5.1"
-    private const val diff2htmlPath = "META-INF/resources/webjars/diff2html/2.3.2"
+    private const val popperJsPath = "META-INF/resources/webjars/popper.js/1.14.7/dist/umd"
+    private const val markedPath = "META-INF/resources/webjars/marked/0.6.1"
+    private const val diff2htmlPath = "META-INF/resources/webjars/diff2html/2.7.0"
 
     private val resources = arrayOf(
         "$bootstrapPath/css/bootstrap.min.css" to "css/bootstrap.css",

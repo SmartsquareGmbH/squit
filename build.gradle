@@ -52,12 +52,13 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-html-jvm:$kotlinHtmlVersion"
 
+    api "org.dom4j:dom4j:$dom4jVersion"
+    api "com.google.code.gson:gson:$gsonVersion"
+    api "com.typesafe:config:$typesafeConfigVersion"
+
     implementation "jaxen:jaxen:$jaxenVersion"
-    implementation "org.dom4j:dom4j:$dom4jVersion"
-    implementation "com.google.code.gson:gson:$gsonVersion"
     implementation "org.xmlunit:xmlunit-core:$xmlUnitVersion"
     implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
-    implementation "com.typesafe:config:$typesafeConfigVersion"
     implementation "se.sawano.java:alphanumeric-comparator:$alphanumericComparatorVersion"
     implementation("com.github.wumpz:diffutils:$diffUtilsVersion") {
         exclude group: "org.eclipse.jgit", module: "*"
@@ -106,7 +107,6 @@ jacoco {
 }
 
 ktlint {
-    version = ktlintVersion
     reporters = [ReporterType.CHECKSTYLE]
 }
 
@@ -126,15 +126,19 @@ dokka {
     jdkVersion = 8
     outputDirectory = javadoc.destinationDir
 
+    externalDocumentationLink { url = new URL("https://dom4j.github.io/javadoc/$dom4jVersion/") }
+    externalDocumentationLink { url = new URL("https://lightbend.github.io/config/latest/api/index.html") }
+
     externalDocumentationLink {
-        url = new URL("https://dom4j.github.io/javadoc/$dom4jVersion/")
+        url = new URL("https://www.javadoc.io/doc/com.google.code.gson/gson/$gsonVersion")
+        packageListUrl = new URL("https://raw.githubusercontent.com/google/gson/master/gson/docs/javadocs/package-list")
     }
 }
 
 pluginBundle {
     website = "https://github.com/SmartsquareGmbH/squit"
     vcsUrl = "https://github.com/SmartsquareGmbH/squit"
-    description = "Gradle plugin for simple testing of json/xml/soap/... APIs."
+    description = "Gradle plugin for simple testing of JSON/XML/SOAP/etc APIs."
     tags = ["testing", "json", "xml", "soap", "automation"]
 
     plugins {

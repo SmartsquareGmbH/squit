@@ -44,7 +44,7 @@ class SquitPlugin : Plugin<Project> {
                 it.dependsOn("squitPostProcess")
             }
         } catch (error: MissingMethodException) {
-            throw GradleException("Your Gradle version is too old.")
+            throw GradleException("Your Gradle version is too old.", error)
         }
     }
 }

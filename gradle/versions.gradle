@@ -1,15 +1,15 @@
 ext {
-    gradleVersion = '4.10.2'
-    squitVersion = '2.4.0'
+    gradleVersion = '5.1.1'
+    squitVersion = '2.5.0'
 
-    gradlePublishVersion = '0.10.0'
+    gradlePublishVersion = '0.10.1'
 
-    kotlinVersion = '1.3.10'
+    kotlinVersion = '1.3.21'
     dokkaVersion = '0.9.17'
 
-    jacocoVersion = '0.8.2'
+    jacocoVersion = '0.8.3'
     jacocoTestkitVersion = '1.0.3'
-    gradleVersionsVersion = '0.20.0'
+    gradleVersionsVersion = '0.21.0'
     gradleTestIdeaFixVersion = '0.1.0'
 
     jaxenVersion = '1.1.6'
@@ -17,24 +17,23 @@ ext {
     gsonVersion = '2.8.5'
     xmlUnitVersion = '2.6.2'
     typesafeConfigVersion = '1.3.3'
-    okhttpVersion = '3.12.0'
-    kotlinHtmlVersion = '0.6.11'
+    okhttpVersion = '3.13.1'
+    kotlinHtmlVersion = '0.6.12'
     diffUtilsVersion = '3.0'
     alphanumericComparatorVersion = "1.4.1"
 
-    bootstrapVersion = '4.1.3'
+    bootstrapVersion = '4.3.1'
     jqueryVersion = '3.3.1'
-    popperVersion = '1.14.5'
-    fontAwesomeVersion = '5.5.0'
-    diff2htmlVersion = '2.3.2'
-    markedVersion = '0.5.1'
+    popperVersion = '1.14.7'
+    fontAwesomeVersion = '5.7.2'
+    diff2htmlVersion = '2.7.0'
+    markedVersion = '0.6.1'
 
-    detektVersion = '1.0.0-RC10'
-    ktlintVersion = '0.29.0'
-    ktlintPluginVersion = '6.3.0'
+    detektVersion = '1.0.0-RC14'
+    ktlintPluginVersion = '7.0.0'
 
-    junitPlatformVersion = '1.3.1'
+    junitPlatformVersion = '1.4.0'
     spekVersion = '1.2.1'
-    kluentVersion = '1.42'
-    h2Version = '1.4.197'
+    kluentVersion = '1.48'
+    h2Version = '1.4.198'
 }
