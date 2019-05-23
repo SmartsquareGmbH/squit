@@ -87,7 +87,7 @@ object HtmlReportWriter {
             FilesUtils.copyResource(name, reportDirectoryPath.resolve(target))
         }
 
-        Files.write(reportDirectoryPath.resolve("main.html"), document.toString().toByteArray())
+        Files.write(reportDirectoryPath.resolve("index.html"), document.toString().toByteArray())
     }
 
     private fun generateDiff(result: SquitResult): List<String> {

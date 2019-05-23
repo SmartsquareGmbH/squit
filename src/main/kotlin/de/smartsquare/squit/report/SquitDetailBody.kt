@@ -87,7 +87,7 @@ private fun DIV.squitDescription() {
 private fun DIV.squitControls() {
     div(classes = "row mt-2") {
         div(classes = "offset-lg-1 col-12 col-lg-10") {
-            a(href = "../../main.html", classes = "btn btn-primary") {
+            a(href = "../../index.html", classes = "btn btn-primary") {
                 attributes += "role" to "button"
 
                 i(classes = "fas fa-fw fa-arrow-left align-middle") {}

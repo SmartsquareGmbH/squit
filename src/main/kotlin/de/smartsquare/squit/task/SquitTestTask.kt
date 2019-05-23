@@ -89,7 +89,7 @@ open class SquitTestTask : DefaultTask() {
     @Suppress("MemberVisibilityCanBePrivate")
     @get:OutputFile
     val xmlReportFilePath: Path by lazy {
-        extension.reportsPath.resolve("xml").resolve("main.xml")
+        extension.reportsPath.resolve("xml").resolve("index.xml")
     }
 
     /**

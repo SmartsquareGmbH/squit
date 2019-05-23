@@ -57,11 +57,11 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
 
     val xmlReportPath = reportsDirectory
         .resolve("xml")
-        .resolve("main.xml")
+        .resolve("index.xml")
 
     val htmlReportPath = reportsDirectory
         .resolve("html")
-        .resolve("main.html")
+        .resolve("index.html")
 
     val failuresDirectory = reportsDirectory
         .resolve("failures")
