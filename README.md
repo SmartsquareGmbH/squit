@@ -151,8 +151,11 @@ endpoint = "http://localhost:"${port}"/someEndpoint"
 `port` could then be replaced when invoking `Squit` like this:
 
 ```bash
-./gradlew squitTest -Pport=1234
+./gradlew squitTest -Psquit.port=1234
 ```
+
+> This mechanism can also be used to create global configuration properties, which are then used in configuration files
+deeper in the hierarchy.
 
 ### Database modifications
 
