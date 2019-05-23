@@ -144,7 +144,7 @@ open class SquitTestTask : DefaultTask() {
 
         println("$totalText\n$successfulAmount successful and $failedAmount failed$ignoredText.")
 
-        if (failedAmount > 0) throw GradleException("Failing tests.")
+        if (failedAmount > 0 && !extension.ignoreFailures) throw GradleException("Failing tests.")
     }
 
     private fun runTests(): List<SquitResult> {

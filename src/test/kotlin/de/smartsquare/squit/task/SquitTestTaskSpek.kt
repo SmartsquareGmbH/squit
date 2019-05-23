@@ -35,7 +35,11 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
     subject { Paths.get(this.javaClass.classLoader.getResource("test-project").toURI()) }
 
     val subjectInvalid3 = File(this.javaClass.classLoader.getResource("invalid-test-project-3").toURI()).toPath()
+
     val subjectJson = File(this.javaClass.classLoader.getResource("test-project-json").toURI()).toPath()
+
+    val subjectIgnoreFailures =
+        File(this.javaClass.classLoader.getResource("test-project-ignore-failures").toURI()).toPath()
 
     val subjectNonStrictXml =
         File(this.javaClass.classLoader.getResource("test-project-xml-not-strict").toURI()).toPath()
@@ -267,6 +271,39 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             it("should create an error file in the failures directory") {
                 Files.readAllBytes(invalid3Call1Error).toString(Charset.defaultCharset()) shouldStartWith
                     "org.dom4j.DocumentException: Error on line 4 of document"
+            }
+        }
+    }
+
+    given("a test project with ignoreFailures set to true") {
+        beforeEachTest {
+            server = MockWebServer()
+        }
+
+        afterEachTest {
+            server.shutdown()
+
+            TestUtils.deleteDatabaseFiles(subject)
+        }
+
+        on("running the test task") {
+            server.enqueue(MockResponse().setBody("<failure/>"))
+
+            val arguments = listOf(
+                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subjectIgnoreFailures"
+            )
+
+            val result = GradleRunner.create()
+                .withProjectDir(subjectIgnoreFailures.toFile())
+                .withExtendedPluginClasspath()
+                .withArguments(arguments)
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
+
+            it("should be able to complete without errors") {
+                result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
             }
         }
     }

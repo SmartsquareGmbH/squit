@@ -38,6 +38,12 @@ open class SquitExtension(project: Project) {
     var timeout = 10L
 
     /**
+     * If failures should be ignored.
+     * In that case the task passes, even if tests have failed.
+     */
+    var ignoreFailures = false
+
+    /**
      * Configures the xml dsl.
      */
     fun xml(closure: Closure<*>) {
