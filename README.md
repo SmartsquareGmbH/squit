@@ -31,7 +31,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "de.smartsquare:squit:2.4.0"
+        classpath "de.smartsquare:squit:2.6.0"
     }
 }
 ```
@@ -247,7 +247,7 @@ repositories {
 }
 
 dependencies {
-    compile 'de.smartsquare:squit:2.4.0'
+    compile 'de.smartsquare:squit:2.6.0'
 }
 ```
 

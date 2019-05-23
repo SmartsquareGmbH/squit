@@ -191,8 +191,7 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
             }
 
             it("should print an appropriate message") {
-                result.output shouldContain "Invalid test.conf file on path of test: project${File.separator}call1 " +
-                    "(No configuration setting found for key 'endpoint')"
+                result.output shouldContain "Invalid test.conf file on path of test: project${File.separator}call1"
             }
         }
     }
