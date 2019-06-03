@@ -75,6 +75,7 @@ A simple example looks like this:
 ------- test1 (folder)
 --------- request.xml
 --------- response.xml
+--------- response_info.json
 --------- test.conf
 --------- description.md
 ------- test2 (folder)
@@ -315,6 +316,14 @@ As of the current version, Squit supports these request formats:
 | `application/xml`  | `.xml`      | [Dom4J Documents](http://static.javadoc.io/org.dom4j/dom4j/2.1.0/org/dom4j/Document.html)   |
 | `application/json` | `.json`     | [Gson JsonElements](https://google.github.io/gson/apidocs/com/google/gson/JsonElement.html) |
 | All others         | `.txt`      | :x:                                                                                         |
+
+### Check HTTP response codes
+
+A `response_info.json` file can be provided for each test case. An HTTP response code can be set which must match. E.g.
+
+```json
+{ "responseCode": 400 } 
+```
 
 ### Squit Dsl
 
