@@ -35,6 +35,7 @@ private const val DATABASE_CONFIGURATION_JDBC_ADDRESS = "jdbc"
 private const val DATABASE_CONFIGURATION_USERNAME = "username"
 private const val DATABASE_CONFIGURATION_PASSWORD = "password"
 private const val HEADERS = "headers"
+private const val RESPONSE_CODE = "responseCode"
 
 /**
  * The alternative title of the test.
@@ -141,6 +142,11 @@ val Config.headers
         .map { it.toPair() }
         .map { (key, value) -> key to value.unwrapped().toString() }
         .toMap()
+
+/**
+ * The http status response code that is expected in the response.
+ */
+val Config.responseCode get() = getSafeString(RESPONSE_CODE)
 
 /**
  * Merges the given [tag] into the existing List of tags or creates a new one with it.

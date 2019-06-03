@@ -203,7 +203,7 @@ open class SquitRequestTask : DefaultTask() {
 
             Files.write(resultResponseFilePath, apiBody.toByteArray())
 
-            val responseInfo = SquitResponseInfo(apiResponse.code())
+            val responseInfo = SquitResponseInfo(apiResponse.code().toString())
             val resultResponseInfoFilePath = resultResponsePath.resolve(MediaTypeFactory.actualResponseInfo)
             Files.write(resultResponseInfoFilePath, responseInfo.toJson().toByteArray())
 

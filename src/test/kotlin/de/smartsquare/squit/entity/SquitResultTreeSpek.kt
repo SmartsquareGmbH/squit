@@ -27,7 +27,7 @@ object SquitResultTreeSpek : Spek({
             isIgnored: Boolean = false
         ): SquitResult {
             return SquitResult(
-                0, result, "", isIgnored, mediaType, "",
+                0, result, SquitResponseInfo(), isIgnored, mediaType, "",
                 contextPath, suitePath, testDirectoryPath, Paths.get("")
             )
         }
