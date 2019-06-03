@@ -34,6 +34,7 @@ import java.nio.file.Paths
 data class SquitResult(
     val id: Long,
     val result: String,
+    val infoResult: String,
     val isIgnored: Boolean,
     val mediaType: MediaType,
     val alternativeName: String,
@@ -46,7 +47,7 @@ data class SquitResult(
     /**
      * Convenience property being true if the test was successful.
      */
-    val isSuccess = result.isBlank()
+    val isSuccess = result.isBlank() && infoResult.isBlank()
 
     /**
      * Convenience property being true if this result is an error.
@@ -113,6 +114,35 @@ data class SquitResult(
             Files.readAllLines(errorPath)
         } else {
             Files.readAllLines(actualResponsePath)
+        }
+    }
+
+    /**
+     * [List] of lines of the expected info response.
+     */
+    val expectedInfoLines: List<String> by lazy {
+        val resolvedSourcesPath = sourcesPath
+            .resolve(MediaTypeFactory.sourceResponseInfo)
+        if (Files.exists(resolvedSourcesPath)) {
+            Files.readAllLines(resolvedSourcesPath)
+        } else {
+            emptyList()
+        }
+    }
+
+    /**
+     * [List] of lines of the actual info response.
+     */
+    val actualInfoLines: List<String> by lazy {
+        val resolvedActualResponseInfoPath = squitBuildDirectoryPath
+            .resolve(RESPONSES_DIRECTORY)
+            .resolve(PROCESSED_DIRECTORY)
+            .resolve(fullPath)
+            .resolve(MediaTypeFactory.actualResponseInfo)
+        if (Files.exists(resolvedActualResponseInfoPath)) {
+            Files.readAllLines(resolvedActualResponseInfoPath)
+        } else {
+            emptyList()
         }
     }
 

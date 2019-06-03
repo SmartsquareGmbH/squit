@@ -18,7 +18,9 @@ import java.nio.file.Path
 object HtmlReportWriter {
 
     private const val DIFF_FILE_NAME = "Result"
+    private const val DIFF_INFO_FILE_NAME = "ResultInfo"
     private const val DIFF_CONTEXT_SIZE = 1_000_000
+    private const val HTML_LINE_ENDING = "\\n\\\n"
 
     private const val bootstrapPath = "META-INF/resources/webjars/bootstrap/4.3.1/dist"
     private const val fontAwesomePath = "META-INF/resources/webjars/font-awesome/5.8.2"
@@ -62,12 +64,14 @@ object HtmlReportWriter {
             val detailCssPath = detailPath.resolve("detail.css")
             val detailJsPath = detailPath.resolve("detail.js")
 
-            val unifiedDiffForJs = generateDiff(result).joinToString("\\n\\\n")
-                .replace("'", "\\'")
-                .replace("\"", "\\\"")
+            val infoDiff = generateInfoDiff(result)
+            val bodyDiff = generateDiff(result)
 
+            val unifiedDiffForJs = prepareForJs(bodyDiff)
+
+            val unifiedInfoDiffForJs = prepareForJs(infoDiff)
             val descriptionForReplacement = if (result.description == null) "null" else "\"${result.description}\""
-                .replace("\n", "\\n\\\n")
+                .replace("\n", HTML_LINE_ENDING)
 
             Files.createDirectories(detailPath)
             Files.write(detailHtmlPath, detailDocument.toString().toByteArray())
@@ -75,6 +79,7 @@ object HtmlReportWriter {
             FilesUtils.copyResource("squit-detail.css", detailCssPath)
             FilesUtils.copyResource("squit-detail.js", detailJsPath) {
                 it.toString(Charset.defaultCharset())
+                    .replace("infoDiffPlaceholder", unifiedInfoDiffForJs)
                     .replace("diffPlaceholder", unifiedDiffForJs)
                     .replace("namePlaceholder", result.simpleName)
                     .replace("alternativeNamePlaceholder", result.alternativeName)
@@ -90,6 +95,14 @@ object HtmlReportWriter {
         Files.write(reportDirectoryPath.resolve("index.html"), document.toString().toByteArray())
     }
 
+    private fun prepareForJs(bodyDiff: List<String>): String {
+        val unifiedDiffForJs = bodyDiff
+            .joinToString(HTML_LINE_ENDING)
+            .replace("'", "\\'")
+            .replace("\"", "\\\"")
+        return unifiedDiffForJs
+    }
+
     private fun generateDiff(result: SquitResult): List<String> {
         val diff = DiffUtils.diff(result.expectedLines, result.actualLines)
         val unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(
@@ -102,6 +115,22 @@ object HtmlReportWriter {
 
         return when (unifiedDiff.isEmpty()) {
             true -> emptyDiffHeader.plus(result.actualLines.map { " $it" })
+            false -> unifiedDiff
+        }
+    }
+
+    private fun generateInfoDiff(result: SquitResult): List<String> {
+        val diff = DiffUtils.diff(result.expectedInfoLines, result.actualInfoLines)
+        val unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(
+            DIFF_INFO_FILE_NAME,
+            DIFF_INFO_FILE_NAME,
+            result.expectedInfoLines,
+            diff,
+            DIFF_CONTEXT_SIZE
+        )
+
+        return when (unifiedDiff.isEmpty()) {
+            true -> emptyDiffHeader.plus(result.actualInfoLines.map { " $it" })
             false -> unifiedDiff
         }
     }

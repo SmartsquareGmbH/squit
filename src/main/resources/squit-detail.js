@@ -1,4 +1,5 @@
 var diff = "diffPlaceholder";
+var infodiff = "infoDiffPlaceholder";
 
 var name = "namePlaceholder";
 var alternativeName = "alternativeNamePlaceholder";
@@ -62,6 +63,15 @@ function drawDiff(outputFormat) {
         showFiles: false,
         matching: "lines"
     });
+
+    var infoDiffView = document.getElementById("info-diff-view");
+    if (infoDiffView) {
+        var diffHtml = Diff2Html.getPrettyHtml(
+            infodiff,
+            {inputFormat: 'diff', showFiles: false, matching: 'lines', outputFormat: outputFormat}
+        );
+        infoDiffView.innerHTML = diffHtml;
+    }
 
     $(".d2h-file-header").remove();
 }

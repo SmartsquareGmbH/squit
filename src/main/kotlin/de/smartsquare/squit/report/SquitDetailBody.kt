@@ -30,6 +30,9 @@ fun HTML.squitDetailBody(result: SquitResult) {
             }
 
             squitControls()
+            if (result.expectedInfoLines.size > 0) {
+                squitInfoDiff()
+            }
             squitDiff()
         }
 
@@ -111,7 +114,25 @@ private fun DIV.squitControls() {
 private fun DIV.squitDiff() {
     div(classes = "row mt-2 mb-2") {
         div(classes = "offset-lg-1 col-12 col-lg-10") {
+            +"Content"
+        }
+    }
+    div(classes = "row mt-2 mb-2") {
+        div(classes = "offset-lg-1 col-12 col-lg-10") {
             id = "diff-view"
+        }
+    }
+}
+
+private fun DIV.squitInfoDiff() {
+    div(classes = "row mt-2 mb-2") {
+        div(classes = "offset-lg-1 col-12 col-lg-10") {
+            +"HTTP Status Code"
+        }
+    }
+    div(classes = "row mt-2 mb-2") {
+        div(classes = "offset-lg-1 col-12 col-lg-10") {
+            id = "info-diff-view"
         }
     }
 }
