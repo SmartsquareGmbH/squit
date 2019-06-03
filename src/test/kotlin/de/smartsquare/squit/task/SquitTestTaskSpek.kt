@@ -44,6 +44,9 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
     val subjectNonStrictXml =
         File(this.javaClass.classLoader.getResource("test-project-xml-not-strict").toURI()).toPath()
 
+    val subjectResponseCode =
+        File(this.javaClass.classLoader.getResource("test-project-response-code").toURI()).toPath()
+
     var server by Delegates.notNull<MockWebServer>()
 
     val call4Directory = subject
@@ -358,6 +361,37 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectJson.toFile())
+                .withExtendedPluginClasspath()
+                .withArguments(arguments)
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
+
+            it("should be able to complete without errors") {
+                result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
+            }
+        }
+    }
+
+    given("a test project with an error response code") {
+        beforeEachTest {
+            server = MockWebServer()
+        }
+
+        afterEachTest {
+            server.shutdown()
+        }
+
+        on("running the test task") {
+            server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}").setResponseCode(400))
+
+            val arguments = listOf(
+                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subjectResponseCode", "--stacktrace"
+            )
+
+            val result = GradleRunner.create()
+                .withProjectDir(subjectResponseCode.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()

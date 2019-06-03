@@ -19,7 +19,8 @@ import java.nio.file.Paths
  *
  * @property id A unique id to use for further processing.
  * @property result The result of the test. An empty String means the test was successful, otherwise it contains the
- * XMLUnit diff.
+ * response diff.
+ * @property expectedResponseInfo The response info object, which is expected in this test.
  * @property isIgnored If this result is ignored.
  * @property mediaType The media type of the associated request and response.
  * @param contextPath The path of the context the test has been run in. This means the test path without the suite
@@ -34,7 +35,7 @@ import java.nio.file.Paths
 data class SquitResult(
     val id: Long,
     val result: String,
-    val infoResult: String,
+    val expectedResponseInfo: SquitResponseInfo,
     val isIgnored: Boolean,
     val mediaType: MediaType,
     val alternativeName: String,
@@ -47,7 +48,7 @@ data class SquitResult(
     /**
      * Convenience property being true if the test was successful.
      */
-    val isSuccess = result.isBlank() && infoResult.isBlank()
+    val isSuccess = result.isBlank()
 
     /**
      * Convenience property being true if this result is an error.
@@ -114,19 +115,6 @@ data class SquitResult(
             Files.readAllLines(errorPath)
         } else {
             Files.readAllLines(actualResponsePath)
-        }
-    }
-
-    /**
-     * [List] of lines of the expected info response.
-     */
-    val expectedInfoLines: List<String> by lazy {
-        val resolvedSourcesPath = sourcesPath
-            .resolve(MediaTypeFactory.sourceResponseInfo)
-        if (Files.exists(resolvedSourcesPath)) {
-            Files.readAllLines(resolvedSourcesPath)
-        } else {
-            emptyList()
         }
     }
 

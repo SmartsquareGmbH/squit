@@ -2,6 +2,7 @@
 
 package de.smartsquare.squit.report
 
+import de.smartsquare.squit.entity.SquitResponseInfo
 import de.smartsquare.squit.entity.SquitResult
 import kotlinx.html.ButtonType
 import kotlinx.html.DIV
@@ -30,7 +31,7 @@ fun HTML.squitDetailBody(result: SquitResult) {
             }
 
             squitControls()
-            if (result.expectedInfoLines.size > 0) {
+            if (!SquitResponseInfo.isDefault(result.expectedResponseInfo)) {
                 squitInfoDiff()
             }
             squitDiff()

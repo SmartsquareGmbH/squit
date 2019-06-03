@@ -2,6 +2,7 @@ package de.smartsquare.squit.report
 
 import com.github.difflib.DiffUtils
 import com.github.difflib.UnifiedDiffUtils
+import de.smartsquare.squit.entity.SquitResponseInfo
 import de.smartsquare.squit.entity.SquitResult
 import de.smartsquare.squit.io.FilesUtils
 import kotlinx.html.html
@@ -64,12 +65,15 @@ object HtmlReportWriter {
             val detailCssPath = detailPath.resolve("detail.css")
             val detailJsPath = detailPath.resolve("detail.js")
 
-            val infoDiff = generateInfoDiff(result)
             val bodyDiff = generateDiff(result)
-
             val unifiedDiffForJs = prepareForJs(bodyDiff)
 
-            val unifiedInfoDiffForJs = prepareForJs(infoDiff)
+            val unifiedInfoDiffForJs = if (!SquitResponseInfo.isDefault(result.expectedResponseInfo)) {
+                prepareForJs(generateInfoDiff(result))
+            } else {
+                ""
+            }
+
             val descriptionForReplacement = if (result.description == null) "null" else "\"${result.description}\""
                 .replace("\n", HTML_LINE_ENDING)
 
@@ -120,11 +124,14 @@ object HtmlReportWriter {
     }
 
     private fun generateInfoDiff(result: SquitResult): List<String> {
-        val diff = DiffUtils.diff(result.expectedInfoLines, result.actualInfoLines)
+        val expectedInfoLines = result.expectedResponseInfo.toJson().lines()
+        val actualInfo = result.actualInfoLines.joinToString(separator = "\n")
+        val actualInfoLines = SquitResponseInfo.fromJson(actualInfo).toJson().lines()
+        val diff = DiffUtils.diff(expectedInfoLines, actualInfoLines)
         val unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(
             DIFF_INFO_FILE_NAME,
             DIFF_INFO_FILE_NAME,
-            result.expectedInfoLines,
+            expectedInfoLines,
             diff,
             DIFF_CONTEXT_SIZE
         )

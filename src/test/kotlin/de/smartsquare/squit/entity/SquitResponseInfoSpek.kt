@@ -12,7 +12,7 @@ import org.jetbrains.spek.api.dsl.on
 object SquitResponseInfoSpek : Spek({
 
     given("a response info with only a response code") {
-        val subject = SquitResponseInfo(200)
+        val subject = SquitResponseInfo("200")
 
         on("converting to json and back") {
             val subjectAsJson = subject.toJson()

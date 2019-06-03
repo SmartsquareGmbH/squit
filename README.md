@@ -75,7 +75,6 @@ A simple example looks like this:
 ------- test1 (folder)
 --------- request.xml
 --------- response.xml
---------- response_info.json
 --------- test.conf
 --------- description.md
 ------- test2 (folder)
@@ -136,6 +135,7 @@ As of the current version, these are the supported properties:
 | postRunnerScripts      | An array of paths to groovy post runner scripts to use.                                                                                            | `postRunnerScripts = [./scripts/post_runner.groovy]`       |
 | headers                | A map of headers to use for requests.                                                                                                              | `headers = { "some-header": "value" }`                     |
 | title                  | An optional alternative title for the test.                                                                                                        | `title = "Something"`                                      |
+| responseCode           | An optional expected HTTP response code. Default is the 200-range.                                                                                 | `responseCode = 400`                                       |
 
 > The parameter `endpoint` is required and the build will fail if it is missing for a test.
 
@@ -317,13 +317,6 @@ As of the current version, Squit supports these request formats:
 | `application/json` | `.json`     | [Gson JsonElements](https://google.github.io/gson/apidocs/com/google/gson/JsonElement.html) |
 | All others         | `.txt`      | :x:                                                                                         |
 
-### Check HTTP response codes
-
-A `response_info.json` file can be provided for each test case. An HTTP response code can be set which must match. E.g.
-
-```json
-{ "responseCode": 400 } 
-```
 
 ### Squit Dsl
 

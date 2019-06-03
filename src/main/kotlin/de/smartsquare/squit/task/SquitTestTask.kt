@@ -4,10 +4,10 @@ import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.Optional
 import de.smartsquare.squit.SquitExtension
+import de.smartsquare.squit.entity.SquitResponseInfo
 import de.smartsquare.squit.entity.SquitResult
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeFactory
-import de.smartsquare.squit.mediatype.generic.GenericDiffer
 import de.smartsquare.squit.report.HtmlReportWriter
 import de.smartsquare.squit.report.XmlReportWriter
 import de.smartsquare.squit.util.Constants.CONFIG
@@ -158,6 +158,7 @@ open class SquitTestTask : DefaultTask() {
             )
 
             val config = ConfigFactory.parseFile(configPath.toFile())
+            val expectedResponseInfo = SquitResponseInfo.fromConfig(config)
 
             if (shouldReportTest(config)) {
                 val errorFile = actualResponsePath.resolve(ERROR)
@@ -165,35 +166,33 @@ open class SquitTestTask : DefaultTask() {
                 if (Files.exists(errorFile)) {
                     resultList += constructResult(
                         Files.readAllBytes(errorFile).toString(Charset.defaultCharset()),
-                        "", actualResponsePath, config
+                        expectedResponseInfo, actualResponsePath, config
                     )
                 } else {
-                    val diff = createBodyDifference(actualResponsePath, config)
-                    val infoDiff = createResponseInfoDifference(actualResponsePath)
-                    resultList += constructResult(diff, infoDiff, actualResponsePath, config)
+                    val bodyDiff = createBodyDifference(actualResponsePath, config)
+                    val infoDiff = createResponseInfoDifference(actualResponsePath, expectedResponseInfo)
+                    val diff = "$infoDiff$bodyDiff"
+                    resultList += constructResult(diff, expectedResponseInfo, actualResponsePath, config)
                 }
             } else {
-                resultList += constructResult("", "", actualResponsePath, config, true)
+                resultList += constructResult("", expectedResponseInfo, actualResponsePath, config, true)
             }
         }
 
         return resultList
     }
 
-    private fun createResponseInfoDifference(actualResponsePath: Path): String {
-        val expectedResponseInfoFilePath = processedSourcesPath
-                .resolve(actualResponsePath.cut(processedResponsesPath))
-                .resolve(MediaTypeFactory.sourceResponseInfo)
-
-        if (Files.exists(expectedResponseInfoFilePath)) {
+    private fun createResponseInfoDifference(
+        actualResponsePath: Path,
+        expectedResponseInfo: SquitResponseInfo
+    ): String {
+        if (!expectedResponseInfo.responseCode.isBlank()) {
             val actualResponseInfoPath = FilesUtils.validateExistence(
                 actualResponsePath.resolve(MediaTypeFactory.actualResponseInfo)
             )
-            val sourceResponseInfo = Files.readAllBytes(expectedResponseInfoFilePath)
-            val actualResponseInfo = Files.readAllBytes(actualResponseInfoPath)
-
-            val diff = GenericDiffer().diff(sourceResponseInfo, actualResponseInfo)
-            return diff
+            val actualResponse = Files.readAllBytes(actualResponseInfoPath).toString(Charset.defaultCharset())
+            val responseInfo = SquitResponseInfo.fromJson(actualResponse)
+            return SquitResponseInfo.diff(expectedResponseInfo, responseInfo)
         }
         return ""
     }
@@ -203,19 +202,16 @@ open class SquitTestTask : DefaultTask() {
             actualResponsePath
                 .resolve(MediaTypeFactory.actualResponse(config.mediaType))
         )
-
         val expectedResponseFilePath = FilesUtils.validateExistence(
             processedSourcesPath
                 .resolve(actualResponsePath.cut(processedResponsesPath))
                 .resolve(MediaTypeFactory.expectedResponse(config.mediaType))
         )
-
         val expectedResponse = Files.readAllBytes(expectedResponseFilePath)
         val actualResponse = Files.readAllBytes(actualResponseFilePath)
 
-        val diff = MediaTypeFactory.differ(config.mediaType, extension)
+        return MediaTypeFactory.differ(config.mediaType, extension)
             .diff(expectedResponse, actualResponse)
-        return diff
     }
 
     private fun writeXmlReport(result: List<SquitResult>) {
@@ -243,16 +239,13 @@ open class SquitTestTask : DefaultTask() {
 
             FilesUtils.copyFilesFromDirectory(testProcessedSourcesPath, resultDirectoryPath)
             FilesUtils.copyFilesFromDirectory(testActualResponsesPath, resultDirectoryPath)
-            val responseCodeDifference = it.infoResult
-            val bodyDifference = it.result
-            val difference = "$responseCodeDifference\n$bodyDifference"
-            Files.write(testDifferenceFile, difference.toByteArray())
+            Files.write(testDifferenceFile, it.result.toByteArray())
         }
     }
 
     private fun constructResult(
         differences: String,
-        responseInfoDifferences: String,
+        responseInfo: SquitResponseInfo,
         actualResponsePath: Path,
         config: Config,
         isIgnored: Boolean = false
@@ -263,15 +256,15 @@ open class SquitTestTask : DefaultTask() {
         val testDirectoryPath = actualResponsePath.fileName
         val id = nextResultId++
 
-        return when (differences.isNotBlank() || responseInfoDifferences.isNotBlank()) {
+        return when (differences.isNotBlank()) {
             true -> SquitResult(
-                id, differences, responseInfoDifferences, isIgnored, config.mediaType, config.title,
+                id, differences, responseInfo, isIgnored, config.mediaType, config.title,
                 contextPath, suitePath,
                 testDirectoryPath, squitBuildDirectoryPath
             )
 
             false -> SquitResult(
-                id, "", responseInfoDifferences, isIgnored, config.mediaType, config.title,
+                id, "", responseInfo, isIgnored, config.mediaType, config.title,
                 contextPath, suitePath,
                 testDirectoryPath, squitBuildDirectoryPath
             )

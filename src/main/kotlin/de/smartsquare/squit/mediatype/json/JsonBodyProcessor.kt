@@ -37,12 +37,6 @@ class JsonBodyProcessor : BodyProcessor {
 
         request?.write(resultRequestPath)
         response.write(resultResponsePath)
-
-        val infoResponsePath = responsePath.resolveSibling(MediaTypeFactory.sourceResponseInfo)
-        if (Files.exists(infoResponsePath)) {
-            val resultInfoResponsePath = resultResponsePath.resolveSibling(MediaTypeFactory.sourceResponseInfo)
-            JsonParser().read(infoResponsePath).write(resultInfoResponsePath)
-        }
     }
 
     override fun postProcess(
