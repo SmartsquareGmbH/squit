@@ -11,6 +11,7 @@ import de.smartsquare.squit.interfaces.SquitPostRunner
 import de.smartsquare.squit.interfaces.SquitPreRunner
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeFactory
+import de.smartsquare.squit.util.Constants.ACTUAL_RESPONSE_INFO
 import de.smartsquare.squit.util.Constants.CONFIG
 import de.smartsquare.squit.util.Constants.ERROR
 import de.smartsquare.squit.util.Constants.META
@@ -203,8 +204,8 @@ open class SquitRequestTask : DefaultTask() {
 
             Files.write(resultResponseFilePath, apiBody.toByteArray())
 
-            val responseInfo = SquitResponseInfo(apiResponse.code().toString())
-            val resultResponseInfoFilePath = resultResponsePath.resolve(MediaTypeFactory.actualResponseInfo)
+            val responseInfo = SquitResponseInfo(apiResponse.code())
+            val resultResponseInfoFilePath = resultResponsePath.resolve(ACTUAL_RESPONSE_INFO)
             Files.write(resultResponseInfoFilePath, responseInfo.toJson().toByteArray())
 
             if (!apiResponse.isSuccessful) {

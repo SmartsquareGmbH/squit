@@ -10,6 +10,7 @@ import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.report.HtmlReportWriter
 import de.smartsquare.squit.report.XmlReportWriter
+import de.smartsquare.squit.util.Constants.ACTUAL_RESPONSE_INFO
 import de.smartsquare.squit.util.Constants.CONFIG
 import de.smartsquare.squit.util.Constants.DIFF
 import de.smartsquare.squit.util.Constants.ERROR
@@ -186,13 +187,24 @@ open class SquitTestTask : DefaultTask() {
         actualResponsePath: Path,
         expectedResponseInfo: SquitResponseInfo
     ): String {
-        if (!expectedResponseInfo.responseCode.isBlank()) {
+        if (!expectedResponseInfo.isDefault) {
+            val contextPath = actualResponsePath.parent.parent.cut(processedResponsesPath)
+            val suitePath = actualResponsePath.parent.fileName
+            val path: Path = contextPath.resolve(suitePath)
+            val squitBuildDirectoryPath = Paths.get(project.buildDir.path, SQUIT_DIRECTORY)
+            val testDirectoryPath = actualResponsePath.fileName
+            val fullPath = path.resolve(testDirectoryPath)
+            val resolvedPath = squitBuildDirectoryPath
+                .resolve(RESPONSES_DIRECTORY)
+                .resolve(RAW_DIRECTORY)
+                .resolve(fullPath)
+
             val actualResponseInfoPath = FilesUtils.validateExistence(
-                actualResponsePath.resolve(MediaTypeFactory.actualResponseInfo)
+                resolvedPath.resolve(ACTUAL_RESPONSE_INFO)
             )
             val actualResponse = Files.readAllBytes(actualResponseInfoPath).toString(Charset.defaultCharset())
             val responseInfo = SquitResponseInfo.fromJson(actualResponse)
-            return SquitResponseInfo.diff(expectedResponseInfo, responseInfo)
+            return expectedResponseInfo.diff(responseInfo)
         }
         return ""
     }

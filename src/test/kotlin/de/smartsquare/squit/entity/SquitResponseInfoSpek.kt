@@ -12,7 +12,7 @@ import org.jetbrains.spek.api.dsl.on
 object SquitResponseInfoSpek : Spek({
 
     given("a response info with only a response code") {
-        val subject = SquitResponseInfo("200")
+        val subject = SquitResponseInfo(200)
 
         on("converting to json and back") {
             val subjectAsJson = subject.toJson()
@@ -20,6 +20,31 @@ object SquitResponseInfoSpek : Spek({
 
             it("should equal the expected result") {
                 subjectFromJson shouldEqual subject
+            }
+        }
+
+        on("checking the default") {
+            it("should not be a default") {
+                false shouldEqual subject.isDefault
+            }
+        }
+    }
+
+    given("a response info with the default response code") {
+        val subject = SquitResponseInfo()
+
+        on("converting to json and back") {
+            val subjectAsJson = subject.toJson()
+            val subjectFromJson = SquitResponseInfo.fromJson(subjectAsJson)
+
+            it("should equal the expected result") {
+                subjectFromJson shouldEqual subject
+            }
+        }
+
+        on("checking the default") {
+            it("should be a default") {
+                true shouldEqual subject.isDefault
             }
         }
     }

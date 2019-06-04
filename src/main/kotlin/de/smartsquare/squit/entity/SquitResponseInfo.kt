@@ -2,8 +2,7 @@ package de.smartsquare.squit.entity
 
 import com.google.gson.Gson
 import com.typesafe.config.Config
-import com.typesafe.config.ConfigFactory
-import de.smartsquare.squit.util.responseCode
+import de.smartsquare.squit.util.expectedResponseCode
 
 /**
  * Data class holding further response information concerning a single [SquitResult].
@@ -12,7 +11,7 @@ import de.smartsquare.squit.util.responseCode
  *
  * @author Sascha Koch
  */
-data class SquitResponseInfo(val responseCode: String = "") {
+data class SquitResponseInfo(val responseCode: Int = 0) {
 
     companion object {
 
@@ -21,32 +20,14 @@ data class SquitResponseInfo(val responseCode: String = "") {
         /**
          * Constructs a [SquitResponseInfo] instance from the given [json] String.
          */
-        fun fromJson(json: String): SquitResponseInfo {
-            val config = ConfigFactory.parseString(json)
-            return SquitResponseInfo(
-                config.getString(RESPONSECODE)
-            )
-        }
+        fun fromJson(json: String): SquitResponseInfo =
+            Gson().fromJson(json, SquitResponseInfo::class.java)
+
         /**
          * Constructs a [SquitResponseInfo] instance from the given [config] Config.
          */
         fun fromConfig(config: Config): SquitResponseInfo =
-            SquitResponseInfo(config.responseCode)
-
-        /**
-         * String diff between the SquitResponseInfo objects [me] and [other].
-         */
-        fun diff(me: SquitResponseInfo, other: SquitResponseInfo): String =
-            if (me.responseCode == other.responseCode) {
-                ""
-            } else {
-                "Response differs (response code ${me.responseCode} != ${other.responseCode})."
-            }
-
-        /**
-         * Returns true if no response code is set.
-         */
-        fun isDefault(me: SquitResponseInfo): Boolean = me.responseCode.isBlank()
+            SquitResponseInfo(config.expectedResponseCode)
     }
 
     /**
@@ -57,4 +38,19 @@ data class SquitResponseInfo(val responseCode: String = "") {
             RESPONSECODE to responseCode
         )
     )
+
+    /**
+     * String diff between the this and [other].
+     */
+    fun diff(other: SquitResponseInfo): String =
+        if (this.responseCode == other.responseCode) {
+            ""
+        } else {
+            "Response differs (response code ${this.responseCode} != ${other.responseCode})."
+        }
+
+    /**
+     * Returns true if responseCode is default.
+     */
+    val isDefault = responseCode == 0
 }

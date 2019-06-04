@@ -2,6 +2,7 @@ package de.smartsquare.squit.task
 
 import de.smartsquare.squit.TestUtils
 import de.smartsquare.squit.entity.SquitMetaInfo
+import de.smartsquare.squit.entity.SquitResponseInfo
 import de.smartsquare.squit.withExtendedPluginClasspath
 import de.smartsquare.squit.withJaCoCo
 import okhttp3.mockwebserver.MockResponse
@@ -69,6 +70,10 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
     val call1Error = rawResponsesDirectory
         .resolve("call1")
         .resolve("error.txt")
+
+    val call1ActualResponseInfo = rawResponsesDirectory
+        .resolve("call1")
+        .resolve("actual_response_info.json")
 
     val call2Response = rawResponsesDirectory
         .resolve("call2")
@@ -439,6 +444,14 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
                 server.takeRequest().let {
                     it.headers.get("Content-Type") shouldEqual "application/json"
                 }
+            }
+
+            it("should write a valid actual_response_info.json file") {
+                val (expectedResponseCode) = SquitResponseInfo.fromJson(
+                    Files.readAllBytes(call1ActualResponseInfo)
+                        .toString(Charset.defaultCharset())
+                )
+                expectedResponseCode shouldBeInRange 200..599
             }
         }
     }

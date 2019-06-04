@@ -57,11 +57,6 @@ object MediaTypeFactory {
     }
 
     /**
-     * Returns the actual response info file name.
-     */
-    const val actualResponseInfo = "actual_response_info.json"
-
-    /**
      * Returns the [BodyProcessor] to use based on the given [mediaType].
      */
     fun processor(mediaType: MediaType) = when (mediaType) {

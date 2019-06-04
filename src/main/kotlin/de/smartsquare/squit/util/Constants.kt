@@ -33,6 +33,11 @@ object Constants {
     const val DESCRIPTION = "description.md"
 
     /**
+     * Filename of the actual response info file.
+     */
+    const val ACTUAL_RESPONSE_INFO = "actual_response_info.json"
+
+    /**
      * The root directory name of everything generated.
      */
     const val SQUIT_DIRECTORY = "squit"

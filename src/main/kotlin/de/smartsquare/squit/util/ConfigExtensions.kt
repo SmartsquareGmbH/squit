@@ -35,7 +35,7 @@ private const val DATABASE_CONFIGURATION_JDBC_ADDRESS = "jdbc"
 private const val DATABASE_CONFIGURATION_USERNAME = "username"
 private const val DATABASE_CONFIGURATION_PASSWORD = "password"
 private const val HEADERS = "headers"
-private const val RESPONSE_CODE = "responseCode"
+private const val EXPECTED_RESPONSE_CODE = "expectedResponseCode"
 
 /**
  * The alternative title of the test.
@@ -146,7 +146,7 @@ val Config.headers
 /**
  * The http status response code that is expected in the response.
  */
-val Config.responseCode get() = getSafeString(RESPONSE_CODE)
+val Config.expectedResponseCode get() = getSafeInt(EXPECTED_RESPONSE_CODE)
 
 /**
  * Merges the given [tag] into the existing List of tags or creates a new one with it.
@@ -175,6 +175,9 @@ fun Config.validate() = this.apply {
         if (jdbcAddress.isEmpty()) throw IllegalStateException("jdbc of a databaseConfiguration cannot be empty.")
         if (username.isEmpty()) throw IllegalStateException("username of a databaseConfiguration cannot be empty.")
         if (password.isEmpty()) throw IllegalStateException("password of a databaseConfiguration cannot be empty.")
+    }
+    if (expectedResponseCode != 0 && expectedResponseCode !in 100..599) {
+        throw IllegalStateException("expectedResponseCode not in HTTP status code range.")
     }
 }
 
@@ -219,5 +222,10 @@ private fun Config.getSafeConfigList(path: String, fallback: List<Config> = empt
 
 private fun Config.getSafePathList(path: String, fallback: List<Path> = emptyList()) = when (hasPath(path)) {
     true -> getStringList(path).map { Paths.get(it) }
+    false -> fallback
+}
+
+private fun Config.getSafeInt(path: String, fallback: Int = 0) = when (hasPath(path)) {
+    true -> getInt(path)
     false -> fallback
 }
