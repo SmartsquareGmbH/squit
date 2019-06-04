@@ -12,8 +12,6 @@ var descriptionContainerElement = $("#description-container");
 var outputToggleElement = $("#output-toggle");
 var descriptionToggleElement = $("#description-toggle");
 
-var diff2html = new Diff2HtmlUI({diff: diff});
-
 $(document).ready(function () {
     outputToggleElement.click(function () {
         if (outputToggleElement.text().indexOf("side by side") !== -1) {
@@ -57,20 +55,25 @@ function drawHeader() {
 }
 
 function drawDiff(outputFormat) {
-    diff2html.draw("#diff-view", {
-        inputFormat: "diff",
-        outputFormat: outputFormat,
-        showFiles: false,
-        matching: "lines"
-    });
+    {
+        var diff2html = new Diff2HtmlUI({diff: diff});
+        diff2html.draw("#diff-view", {
+            inputFormat: "diff",
+            outputFormat: outputFormat,
+            showFiles: false,
+            matching: "lines"
+        });
+    }
 
     var infoDiffView = document.getElementById("info-diff-view");
     if (infoDiffView) {
-        var diffHtml = Diff2Html.getPrettyHtml(
-            infodiff,
-            {inputFormat: 'diff', showFiles: false, matching: 'lines', outputFormat: outputFormat}
-        );
-        infoDiffView.innerHTML = diffHtml;
+        var infodiff2html = new Diff2HtmlUI({diff: infodiff});
+        infodiff2html.draw("#info-diff-view", {
+            inputFormat: "diff",
+            outputFormat: outputFormat,
+            showFiles: false,
+            matching: "lines"
+        });
     }
 
     $(".d2h-file-header").remove();
