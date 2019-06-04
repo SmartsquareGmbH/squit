@@ -65,11 +65,15 @@ object HtmlReportWriter {
             val detailCssPath = detailPath.resolve("detail.css")
             val detailJsPath = detailPath.resolve("detail.js")
 
-            val bodyDiff = generateDiff(result)
+            val bodyDiff = generateDiff(result.expectedLines, result.actualLines, DIFF_FILE_NAME)
             val unifiedDiffForJs = prepareForJs(bodyDiff)
 
-            val unifiedInfoDiffForJs = if (!SquitResponseInfo.isDefault(result.expectedResponseInfo)) {
-                prepareForJs(generateInfoDiff(result))
+            val unifiedInfoDiffForJs = if (!result.expectedResponseInfo.isDefault) {
+                val expectedInfoLines = result.expectedResponseInfo.toJson().lines()
+                val actualInfo = result.actualInfoLines.joinToString(separator = "\n")
+                val actualInfoLines = SquitResponseInfo.fromJson(actualInfo).toJson().lines()
+                val infoDiff = generateDiff(expectedInfoLines, actualInfoLines, DIFF_INFO_FILE_NAME)
+                prepareForJs(infoDiff)
             } else {
                 ""
             }
@@ -100,44 +104,24 @@ object HtmlReportWriter {
     }
 
     private fun prepareForJs(bodyDiff: List<String>): String {
-        val unifiedDiffForJs = bodyDiff
+        return bodyDiff
             .joinToString(HTML_LINE_ENDING)
             .replace("'", "\\'")
             .replace("\"", "\\\"")
-        return unifiedDiffForJs
     }
 
-    private fun generateDiff(result: SquitResult): List<String> {
-        val diff = DiffUtils.diff(result.expectedLines, result.actualLines)
+    private fun generateDiff(expectedLines: List<String>, actualLines: List<String>, filename: String): List<String> {
+        val diff = DiffUtils.diff(expectedLines, actualLines)
         val unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(
-            DIFF_FILE_NAME,
-            DIFF_FILE_NAME,
-            result.expectedLines,
+            filename,
+            filename,
+            expectedLines,
             diff,
             DIFF_CONTEXT_SIZE
         )
 
         return when (unifiedDiff.isEmpty()) {
-            true -> emptyDiffHeader.plus(result.actualLines.map { " $it" })
-            false -> unifiedDiff
-        }
-    }
-
-    private fun generateInfoDiff(result: SquitResult): List<String> {
-        val expectedInfoLines = result.expectedResponseInfo.toJson().lines()
-        val actualInfo = result.actualInfoLines.joinToString(separator = "\n")
-        val actualInfoLines = SquitResponseInfo.fromJson(actualInfo).toJson().lines()
-        val diff = DiffUtils.diff(expectedInfoLines, actualInfoLines)
-        val unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(
-            DIFF_INFO_FILE_NAME,
-            DIFF_INFO_FILE_NAME,
-            expectedInfoLines,
-            diff,
-            DIFF_CONTEXT_SIZE
-        )
-
-        return when (unifiedDiff.isEmpty()) {
-            true -> emptyDiffHeader.plus(result.actualInfoLines.map { " $it" })
+            true -> emptyDiffHeader.plus(actualLines.map { " $it" })
             false -> unifiedDiff
         }
     }

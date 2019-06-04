@@ -1,6 +1,7 @@
 package de.smartsquare.squit.entity
 
 import de.smartsquare.squit.mediatype.MediaTypeFactory
+import de.smartsquare.squit.util.Constants.ACTUAL_RESPONSE_INFO
 import de.smartsquare.squit.util.Constants.DESCRIPTION
 import de.smartsquare.squit.util.Constants.ERROR
 import de.smartsquare.squit.util.Constants.META
@@ -124,9 +125,9 @@ data class SquitResult(
     val actualInfoLines: List<String> by lazy {
         val resolvedActualResponseInfoPath = squitBuildDirectoryPath
             .resolve(RESPONSES_DIRECTORY)
-            .resolve(PROCESSED_DIRECTORY)
+            .resolve(RAW_DIRECTORY)
             .resolve(fullPath)
-            .resolve(MediaTypeFactory.actualResponseInfo)
+            .resolve(ACTUAL_RESPONSE_INFO)
         if (Files.exists(resolvedActualResponseInfoPath)) {
             Files.readAllLines(resolvedActualResponseInfoPath)
         } else {

@@ -6,7 +6,6 @@ import com.typesafe.config.Config
 import de.smartsquare.squit.interfaces.SquitJsonPostProcessor
 import de.smartsquare.squit.interfaces.SquitJsonPreProcessor
 import de.smartsquare.squit.mediatype.BodyProcessor
-import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.util.postProcessorScripts
 import de.smartsquare.squit.util.postProcessors
 import de.smartsquare.squit.util.preProcessorScripts
@@ -47,13 +46,10 @@ class JsonBodyProcessor : BodyProcessor {
     ) {
         val actualResponse = JsonParser().read(actualResponsePath)
         val expectedResponse = JsonParser().read(expectedResponsePath)
-        val actualInfoResponsePath = actualResponsePath.resolveSibling(MediaTypeFactory.actualResponseInfo)
-        val expectedInfoResponsePath = resultActualResponseFilePath.resolveSibling(MediaTypeFactory.actualResponseInfo)
 
         runPostProcessors(config, actualResponse, expectedResponse)
 
         actualResponse.write(resultActualResponseFilePath)
-        JsonParser().read(actualInfoResponsePath).write(expectedInfoResponsePath)
     }
 
     private fun runPreProcessors(config: Config, request: JsonElement?, response: JsonElement) {

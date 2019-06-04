@@ -382,12 +382,12 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
             server.shutdown()
         }
 
-        on("running the test task") {
+        on("running the test task with expected response code") {
             server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}").setResponseCode(400))
 
             val arguments = listOf(
                 "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subjectResponseCode", "--stacktrace"
+                "-Psquit.rootDir=$subjectResponseCode"
             )
 
             val result = GradleRunner.create()
@@ -400,6 +400,27 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
 
             it("should be able to complete without errors") {
                 result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
+            }
+        }
+
+        on("running the test task with unexpected response code") {
+            server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}").setResponseCode(200))
+
+            val arguments = listOf(
+                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subjectResponseCode", "--stacktrace"
+            )
+
+            val result = GradleRunner.create()
+                .withProjectDir(subjectResponseCode.toFile())
+                .withExtendedPluginClasspath()
+                .withArguments(arguments)
+                .forwardOutput()
+                .withJaCoCo()
+                .buildAndFail()
+
+            it("should fail the build") {
+                result.task(":squitTest")?.outcome shouldBe TaskOutcome.FAILED
             }
         }
     }

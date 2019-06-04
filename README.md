@@ -135,7 +135,7 @@ As of the current version, these are the supported properties:
 | postRunnerScripts      | An array of paths to groovy post runner scripts to use.                                                                                            | `postRunnerScripts = [./scripts/post_runner.groovy]`       |
 | headers                | A map of headers to use for requests.                                                                                                              | `headers = { "some-header": "value" }`                     |
 | title                  | An optional alternative title for the test.                                                                                                        | `title = "Something"`                                      |
-| responseCode           | An optional expected HTTP response code. Default is the 200-range.                                                                                 | `responseCode = 400`                                       |
+| expectedResponseCode   | An optional expected HTTP response code. Default is the 200-range.                                                                                 | `expectedResponseCode = 400`                               |
 
 > The parameter `endpoint` is required and the build will fail if it is missing for a test.
 

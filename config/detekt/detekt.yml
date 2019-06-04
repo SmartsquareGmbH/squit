@@ -19,3 +19,5 @@ style:
     minimumVariableNameLength: 2
   VariableMaxLength:
     active: false
+  DataClassContainsFunctions:
+    active: false
