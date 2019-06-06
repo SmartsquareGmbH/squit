@@ -67,16 +67,7 @@ object HtmlReportWriter {
 
             val bodyDiff = generateDiff(result.expectedLines, result.actualLines, DIFF_FILE_NAME)
             val unifiedDiffForJs = prepareForJs(bodyDiff)
-
-            val unifiedInfoDiffForJs = if (!result.expectedResponseInfo.isDefault) {
-                val expectedInfoLines = result.expectedResponseInfo.toJson().lines()
-                val actualInfo = result.actualInfoLines.joinToString(separator = "\n")
-                val actualInfoLines = SquitResponseInfo.fromJson(actualInfo).toJson().lines()
-                val infoDiff = generateDiff(expectedInfoLines, actualInfoLines, DIFF_INFO_FILE_NAME)
-                prepareForJs(infoDiff)
-            } else {
-                ""
-            }
+            val unifiedInfoDiffForJs = prepareInfoForJs(result)
 
             val descriptionForReplacement = if (result.description == null) "null" else "\"${result.description}\""
                 .replace("\n", HTML_LINE_ENDING)
@@ -101,6 +92,22 @@ object HtmlReportWriter {
         }
 
         Files.write(reportDirectoryPath.resolve("index.html"), document.toString().toByteArray())
+    }
+
+    internal fun prepareInfoForJs(result: SquitResult): String {
+        return if (!result.expectedResponseInfo.isDefault) {
+            val expectedInfoLines = result.expectedResponseInfo.toJson().lines()
+            val actualInfo = result.actualInfoLines.joinToString(separator = "\n")
+            val actualInfoLines = if (actualInfo.isEmpty()) {
+                emptyList()
+            } else {
+                SquitResponseInfo.fromJson(actualInfo).toJson().lines()
+            }
+            val infoDiff = generateDiff(expectedInfoLines, actualInfoLines, DIFF_INFO_FILE_NAME)
+            prepareForJs(infoDiff)
+        } else {
+            ""
+        }
     }
 
     private fun prepareForJs(bodyDiff: List<String>): String {
