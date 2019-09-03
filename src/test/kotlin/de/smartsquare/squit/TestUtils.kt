@@ -38,7 +38,7 @@ fun GradleRunner.withExtendedPluginClasspath(): GradleRunner {
  * Helper method for using the Gradle testkit with Jacoco.
  */
 fun GradleRunner.withJaCoCo(): GradleRunner {
-    val testkitProperties = javaClass.classLoader.getResourceAsStream("testkit-gradle.properties").readBytes()
+    val testkitProperties = javaClass.classLoader.getResourceAsStream("testkit-gradle.properties")!!.readBytes()
     val fixedProperties = testkitProperties.toString(Charset.defaultCharset())
         .replace("/", File.separator)
         .replace("\\", "\\\\")

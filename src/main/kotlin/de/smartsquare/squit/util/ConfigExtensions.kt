@@ -7,7 +7,8 @@ import com.typesafe.config.ConfigValueFactory
 import de.smartsquare.squit.entity.SquitDatabaseConfiguration
 import de.smartsquare.squit.io.FilesUtils
 import okhttp3.HttpUrl
-import okhttp3.MediaType
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -48,7 +49,7 @@ val Config.title: String
  */
 val Config.endpoint: HttpUrl
     get() = getString(ENDPOINT).let { endpoint ->
-        HttpUrl.parse(endpoint) ?: throw IllegalStateException("Invalid $ENDPOINT: $endpoint")
+        endpoint.toHttpUrlOrNull() ?: error("Invalid $ENDPOINT: $endpoint")
     }
 
 /**
@@ -56,7 +57,7 @@ val Config.endpoint: HttpUrl
  */
 val Config.mediaType
     get() = getSafeString(MEDIA_TYPE, MEDIA_TYPE_FALLBACK).let { mediaType ->
-        MediaType.parse(mediaType) ?: throw IllegalStateException("Invalid $MEDIA_TYPE: $mediaType")
+        mediaType.toMediaTypeOrNull() ?: error("Invalid $MEDIA_TYPE: $mediaType")
     }
 
 /**
@@ -169,15 +170,15 @@ fun Config.validate() = this.apply {
     postProcessorScripts.forEach { FilesUtils.validateExistence(it) }
     postRunnerScripts.forEach { FilesUtils.validateExistence(it) }
     postRunners.forEach { Class.forName(it) }
-    tags.forEach { if (it.isEmpty()) throw IllegalStateException("tags cannot be empty.") }
+    tags.forEach { if (it.isEmpty()) error("tags cannot be empty.") }
     databaseConfigurations.forEach { (name, jdbcAddress, username, password) ->
-        if (name.isEmpty()) throw IllegalStateException("name of a databaseConfiguration cannot be empty.")
-        if (jdbcAddress.isEmpty()) throw IllegalStateException("jdbc of a databaseConfiguration cannot be empty.")
-        if (username.isEmpty()) throw IllegalStateException("username of a databaseConfiguration cannot be empty.")
-        if (password.isEmpty()) throw IllegalStateException("password of a databaseConfiguration cannot be empty.")
+        if (name.isEmpty()) error("name of a databaseConfiguration cannot be empty.")
+        if (jdbcAddress.isEmpty()) error("jdbc of a databaseConfiguration cannot be empty.")
+        if (username.isEmpty()) error("username of a databaseConfiguration cannot be empty.")
+        if (password.isEmpty()) error("password of a databaseConfiguration cannot be empty.")
     }
     if (expectedResponseCode != 0 && expectedResponseCode !in 100..599) {
-        throw IllegalStateException("expectedResponseCode not in HTTP status code range.")
+        error("expectedResponseCode not in HTTP status code range.")
     }
 }
 

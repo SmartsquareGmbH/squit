@@ -7,6 +7,7 @@ import de.smartsquare.squit.mediatype.json.JsonBodyProcessor
 import de.smartsquare.squit.mediatype.xml.XmlBodyProcessor
 import de.smartsquare.squit.mediatype.xml.XmlDiffer
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 
 /**
  * Object for retrieving media type specific values.
@@ -15,10 +16,10 @@ import okhttp3.MediaType
  */
 object MediaTypeFactory {
 
-    private val xmlMediaType = MediaType.parse("text/xml")
-    private val applicationXmlMediaType = MediaType.parse("application/xml")
-    private val soapMediaType = MediaType.parse("application/soap+xml")
-    private val jsonMediaType = MediaType.parse("application/json")
+    private val xmlMediaType = "text/xml".toMediaTypeOrNull()
+    private val applicationXmlMediaType = "application/xml".toMediaTypeOrNull()
+    private val soapMediaType = "application/soap+xml".toMediaTypeOrNull()
+    private val jsonMediaType = "application/json".toMediaTypeOrNull()
 
     /**
      * Returns the request name based on the given [mediaType].

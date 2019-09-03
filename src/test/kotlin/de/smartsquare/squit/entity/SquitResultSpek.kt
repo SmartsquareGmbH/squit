@@ -1,6 +1,6 @@
 package de.smartsquare.squit.entity
 
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.amshove.kluent.shouldEqual
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
@@ -13,7 +13,7 @@ import java.nio.file.Paths
  */
 object SquitResultSpek : Spek({
 
-    val mediaType = MediaType.parse("application/xml") ?: throw NullPointerException()
+    val mediaType = "application/xml".toMediaTypeOrNull() ?: throw NullPointerException()
 
     given("a result with a full path") {
         val subject = SquitResult(

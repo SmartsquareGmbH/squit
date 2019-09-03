@@ -6,6 +6,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonParseException
 import com.google.gson.JsonParser
 import de.smartsquare.squit.entity.SquitOutputFormat
+import de.smartsquare.squit.entity.SquitResult
 import org.dom4j.io.OutputFormat
 import org.dom4j.io.SAXReader
 import org.dom4j.io.XMLWriter
@@ -103,10 +104,18 @@ fun String.cleanSqlString() = this
     .replace("\uFEFF", "") // This is a weird unicode blank character, present in some sql files.
     .trim()
 
+fun List<SquitResult>.countTestResults(): Triple<Int, Int, Int> {
+    val successfulTests = count { !it.isIgnored && it.isSuccess }
+    val failedTests = count { !it.isIgnored && !it.isSuccess }
+    val ignoredTests = count { it.isIgnored }
+
+    return Triple(successfulTests, failedTests, ignoredTests)
+}
+
 /**
  * Prints the given [message] to the standard output stream and flushes it afterwards.
  */
 fun printAndFlush(message: Any?) {
-    System.out.print(message)
+    print(message)
     System.out.flush()
 }

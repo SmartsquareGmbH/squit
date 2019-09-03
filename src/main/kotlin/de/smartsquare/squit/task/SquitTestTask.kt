@@ -20,6 +20,7 @@ import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
 import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
+import de.smartsquare.squit.util.countTestResults
 import de.smartsquare.squit.util.cut
 import de.smartsquare.squit.util.mediaType
 import de.smartsquare.squit.util.shouldIgnore
@@ -137,16 +138,14 @@ open class SquitTestTask : DefaultTask() {
         writeHtmlReport(results)
         copyFailures(results)
 
-        val successfulAmount = results.count { !it.isIgnored && it.isSuccess }
-        val failedAmount = results.count { !it.isIgnored && !it.isSuccess }
-        val ignoredAmount = results.count { it.isIgnored }
+        val (successfulTests, failedTests, ignoredTests) = results.countTestResults()
 
         val totalText = if (results.size == 1) "One test ran." else "${results.size} tests ran."
-        val ignoredText = if (ignoredAmount > 0) " ($ignoredAmount ignored)" else ""
+        val ignoredText = if (ignoredTests > 0) " ($ignoredTests ignored)" else ""
 
-        println("$totalText\n$successfulAmount successful and $failedAmount failed$ignoredText.")
+        println("$totalText\n$successfulTests successful and $failedTests failed$ignoredText.")
 
-        if (failedAmount > 0 && !extension.ignoreFailures) throw GradleException("Failing tests.")
+        if (failedTests > 0 && !extension.ignoreFailures) throw GradleException("Failing tests.")
     }
 
     private fun runTests(): List<SquitResult> {
@@ -164,8 +163,8 @@ open class SquitTestTask : DefaultTask() {
             if (shouldReportTest(config)) {
                 val errorFile = actualResponsePath.resolve(ERROR)
 
-                if (Files.exists(errorFile)) {
-                    resultList += constructResult(
+                resultList += if (Files.exists(errorFile)) {
+                    constructResult(
                         Files.readAllBytes(errorFile).toString(Charset.defaultCharset()),
                         expectedResponseInfo, actualResponsePath, config
                     )
@@ -173,7 +172,7 @@ open class SquitTestTask : DefaultTask() {
                     val bodyDiff = createBodyDifference(actualResponsePath, config)
                     val infoDiff = createResponseInfoDifference(actualResponsePath, expectedResponseInfo)
                     val diff = "$infoDiff$bodyDiff"
-                    resultList += constructResult(diff, expectedResponseInfo, actualResponsePath, config)
+                    constructResult(diff, expectedResponseInfo, actualResponsePath, config)
                 }
             } else {
                 resultList += constructResult("", expectedResponseInfo, actualResponsePath, config, true)

@@ -22,7 +22,7 @@ object XmlReportWriter {
         val document = DocumentHelper.createDocument()
         val root = document.addElement("testsuites")
 
-        result.groupBy { it.path }.forEach { suite, tests ->
+        result.groupBy { it.path }.forEach { (suite, tests) ->
             val suiteElement = root.addElement("testsuite").apply {
                 addAttribute("name", suite.toString())
                 addAttribute("timestamp", tests.firstOrNull()?.metaInfo?.date?.toString() ?: "")

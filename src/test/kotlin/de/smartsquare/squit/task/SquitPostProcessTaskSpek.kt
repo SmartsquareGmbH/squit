@@ -25,10 +25,10 @@ import kotlin.properties.Delegates
  */
 object SquitPostProcessTaskSpek : SubjectSpek<Path>({
 
-    subject { File(this.javaClass.classLoader.getResource("test-project").toURI()).toPath() }
+    subject { File(this.javaClass.classLoader.getResource("test-project")!!.toURI()).toPath() }
 
-    val subjectInvalid3 = File(this.javaClass.classLoader.getResource("invalid-test-project-3").toURI()).toPath()
-    val subjectJson = File(this.javaClass.classLoader.getResource("test-project-json").toURI()).toPath()
+    val subjectInvalid3 = File(this.javaClass.classLoader.getResource("invalid-test-project-3")!!.toURI()).toPath()
+    val subjectJson = File(this.javaClass.classLoader.getResource("test-project-json")!!.toURI()).toPath()
 
     var server by Delegates.notNull<MockWebServer>()
 

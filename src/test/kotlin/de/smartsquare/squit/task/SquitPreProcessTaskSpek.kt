@@ -3,10 +3,10 @@ package de.smartsquare.squit.task
 import de.smartsquare.squit.withExtendedPluginClasspath
 import de.smartsquare.squit.withJaCoCo
 import org.amshove.kluent.shouldBe
-import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeFalse
 import org.amshove.kluent.shouldBeTrue
 import org.amshove.kluent.shouldContain
+import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldNotContain
 import org.amshove.kluent.shouldStartWith
 import org.gradle.testkit.runner.GradleRunner
@@ -26,14 +26,14 @@ import java.nio.file.Paths
  */
 object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
-    subject { Paths.get(this.javaClass.classLoader.getResource("test-project").toURI()) }
+    subject { Paths.get(this.javaClass.classLoader.getResource("test-project")!!.toURI()) }
 
-    val subjectInvalid = Paths.get(this.javaClass.classLoader.getResource("invalid-test-project").toURI())
-    val subjectInvalid3 = Paths.get(this.javaClass.classLoader.getResource("invalid-test-project-3").toURI())
-    val subjectInvalid4 = Paths.get(this.javaClass.classLoader.getResource("invalid-test-project-4").toURI())
-    val subjectGet = Paths.get(this.javaClass.classLoader.getResource("test-project-get").toURI())
-    val subjectOptions = Paths.get(this.javaClass.classLoader.getResource("test-project-options").toURI())
-    val subjectJson = Paths.get(this.javaClass.classLoader.getResource("test-project-json").toURI())
+    val subjectInvalid = Paths.get(this.javaClass.classLoader.getResource("invalid-test-project")!!.toURI())
+    val subjectInvalid3 = Paths.get(this.javaClass.classLoader.getResource("invalid-test-project-3")!!.toURI())
+    val subjectInvalid4 = Paths.get(this.javaClass.classLoader.getResource("invalid-test-project-4")!!.toURI())
+    val subjectGet = Paths.get(this.javaClass.classLoader.getResource("test-project-get")!!.toURI())
+    val subjectOptions = Paths.get(this.javaClass.classLoader.getResource("test-project-options")!!.toURI())
+    val subjectJson = Paths.get(this.javaClass.classLoader.getResource("test-project-json")!!.toURI())
 
     val buildPath = subject
         .resolve("build")
@@ -139,7 +139,7 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
                 """.trimIndent()
 
-                Files.readAllBytes(call1Description).toString(Charsets.UTF_8) shouldBeEqualTo expected
+                Files.readAllBytes(call1Description).toString(Charsets.UTF_8) shouldEqual expected
             }
 
             it("should respect the passed tags") {

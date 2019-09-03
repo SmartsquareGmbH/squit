@@ -112,12 +112,7 @@ private fun DIV.squitControls() {
 }
 
 private fun DIV.squitDiff() {
-    div(classes = "row mt-2 mb-2") {
-        div(classes = "offset-lg-1 col-12 col-lg-10") {
-            +"Content"
-        }
-    }
-    div(classes = "row mt-2 mb-2") {
+    div(classes = "row mt-4 mb-2") {
         div(classes = "offset-lg-1 col-12 col-lg-10") {
             id = "diff-view"
         }

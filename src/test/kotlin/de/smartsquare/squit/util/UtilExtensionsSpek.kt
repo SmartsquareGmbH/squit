@@ -18,8 +18,8 @@ import java.nio.file.Paths
  */
 object UtilExtensionsSpek : Spek({
 
-    val testProject = Paths.get(this.javaClass.classLoader.getResource("test-project").toURI())
-    val jsonTestProject = Paths.get(this.javaClass.classLoader.getResource("test-project-json").toURI())
+    val testProject = Paths.get(this.javaClass.classLoader.getResource("test-project")!!.toURI())
+    val jsonTestProject = Paths.get(this.javaClass.classLoader.getResource("test-project-json")!!.toURI())
 
     val sampleXmlPath = testProject
         .resolve("src")

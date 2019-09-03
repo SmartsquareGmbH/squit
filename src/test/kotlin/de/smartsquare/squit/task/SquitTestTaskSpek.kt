@@ -32,20 +32,20 @@ import kotlin.streams.toList
  */
 object SquitTestTaskSpek : SubjectSpek<Path>({
 
-    subject { Paths.get(this.javaClass.classLoader.getResource("test-project").toURI()) }
+    subject { Paths.get(this.javaClass.classLoader.getResource("test-project")!!.toURI()) }
 
-    val subjectInvalid3 = File(this.javaClass.classLoader.getResource("invalid-test-project-3").toURI()).toPath()
+    val subjectInvalid3 = File(this.javaClass.classLoader.getResource("invalid-test-project-3")!!.toURI()).toPath()
 
-    val subjectJson = File(this.javaClass.classLoader.getResource("test-project-json").toURI()).toPath()
+    val subjectJson = File(this.javaClass.classLoader.getResource("test-project-json")!!.toURI()).toPath()
 
     val subjectIgnoreFailures =
-        File(this.javaClass.classLoader.getResource("test-project-ignore-failures").toURI()).toPath()
+        File(this.javaClass.classLoader.getResource("test-project-ignore-failures")!!.toURI()).toPath()
 
     val subjectNonStrictXml =
-        File(this.javaClass.classLoader.getResource("test-project-xml-not-strict").toURI()).toPath()
+        File(this.javaClass.classLoader.getResource("test-project-xml-not-strict")!!.toURI()).toPath()
 
     val subjectResponseCode =
-        File(this.javaClass.classLoader.getResource("test-project-response-code").toURI()).toPath()
+        File(this.javaClass.classLoader.getResource("test-project-response-code")!!.toURI()).toPath()
 
     var server by Delegates.notNull<MockWebServer>()
 

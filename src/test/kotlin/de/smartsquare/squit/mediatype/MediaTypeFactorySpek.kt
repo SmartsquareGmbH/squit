@@ -6,7 +6,7 @@ import de.smartsquare.squit.mediatype.generic.GenericDiffer
 import de.smartsquare.squit.mediatype.json.JsonBodyProcessor
 import de.smartsquare.squit.mediatype.xml.XmlBodyProcessor
 import de.smartsquare.squit.mediatype.xml.XmlDiffer
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.amshove.kluent.shouldBeInstanceOf
 import org.amshove.kluent.shouldEqual
 import org.gradle.testfixtures.ProjectBuilder
@@ -21,7 +21,7 @@ import org.jetbrains.spek.api.dsl.on
 object MediaTypeFactorySpek : Spek({
 
     given("a xml mediaType") {
-        val mediaType = MediaType.parse("application/xml") ?: throw NullPointerException()
+        val mediaType = "application/xml".toMediaTypeOrNull() ?: throw NullPointerException()
 
         on("getting the request") {
             it("should return a correct name") {
@@ -63,7 +63,7 @@ object MediaTypeFactorySpek : Spek({
     }
 
     given("a json mediaType") {
-        val mediaType = MediaType.parse("application/json") ?: throw NullPointerException()
+        val mediaType = "application/json".toMediaTypeOrNull() ?: throw NullPointerException()
 
         on("getting the request") {
             it("should return a correct name") {
@@ -105,7 +105,7 @@ object MediaTypeFactorySpek : Spek({
     }
 
     given("a different mediaType") {
-        val mediaType = MediaType.parse("plain/text") ?: throw NullPointerException()
+        val mediaType = "plain/text".toMediaTypeOrNull() ?: throw NullPointerException()
 
         on("getting the request") {
             it("should return a correct name") {

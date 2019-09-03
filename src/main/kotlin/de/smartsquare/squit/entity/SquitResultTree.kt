@@ -1,5 +1,7 @@
 package de.smartsquare.squit.entity
 
+import de.smartsquare.squit.util.countTestResults
+
 /**
  * Data structure for representing the results in a tree.
  *
@@ -32,9 +34,7 @@ data class SquitResultTree(
 
             return groupedResultList.map { (_, group) ->
                 val path = group.first().fullPath
-                val successfulTests = group.count { !it.isIgnored && it.isSuccess }
-                val failedTests = group.count { !it.isIgnored && !it.isSuccess }
-                val ignoredTests = group.count { it.isIgnored }
+                val (successfulTests, failedTests, ignoredTests) = group.countTestResults()
 
                 if (group.size == 1 && path.toList().size == 1) {
                     SquitResultTree(

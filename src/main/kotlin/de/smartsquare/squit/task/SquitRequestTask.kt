@@ -34,10 +34,10 @@ import de.smartsquare.squit.util.preRunners
 import groovy.lang.Binding
 import groovy.lang.GroovyShell
 import okhttp3.Call
-import okhttp3.Headers
+import okhttp3.Headers.Companion.toHeaders
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.internal.http.HttpMethod
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
@@ -199,12 +199,12 @@ open class SquitRequestTask : DefaultTask() {
 
         try {
             val apiResponse = constructApiCall(requestPath, config).execute()
-            val apiBody = apiResponse.body()?.string() ?: throw IOException("Subject did not answer with a body")
-            val mediaType = apiResponse.body()?.contentType()
+            val apiBody = apiResponse.body?.string() ?: throw IOException("Subject did not answer with a body")
+            val mediaType = apiResponse.body?.contentType()
 
             Files.write(resultResponseFilePath, apiBody.toByteArray())
 
-            val responseInfo = SquitResponseInfo(apiResponse.code())
+            val responseInfo = SquitResponseInfo(apiResponse.code)
             val resultResponseInfoFilePath = resultResponsePath.resolve(ACTUAL_RESPONSE_INFO)
             Files.write(resultResponseInfoFilePath, responseInfo.toJson().toByteArray())
 
@@ -212,11 +212,11 @@ open class SquitRequestTask : DefaultTask() {
                 logger.newLineIfNeeded()
                 logger.info(
                     "Unsuccessful request for test ${testDirectoryPath.cut(processedSourcesPath)} " +
-                        "(status code: ${apiResponse.code()})"
+                        "(status code: ${apiResponse.code})"
                 )
             } else if (
-                mediaType?.type() != config.mediaType.type() ||
-                mediaType?.subtype() != config.mediaType.subtype()
+                mediaType?.type != config.mediaType.type ||
+                mediaType.subtype != config.mediaType.subtype
             ) {
                 logger.newLineIfNeeded()
                 logger.info(
@@ -272,11 +272,11 @@ open class SquitRequestTask : DefaultTask() {
     }
 
     private fun constructApiCall(requestPath: Path?, config: Config): Call {
-        val requestBody = requestPath?.let { RequestBody.create(config.mediaType, Files.readAllBytes(requestPath)) }
+        val requestBody = requestPath?.toFile()?.asRequestBody(config.mediaType)
 
         return okHttpClient.newCall(
             Request.Builder()
-                .headers(Headers.of(config.headers))
+                .headers(config.headers.toHeaders())
                 .method(config.method, requestBody)
                 .url(config.endpoint)
                 .build()

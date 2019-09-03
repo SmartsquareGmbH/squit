@@ -1,8 +1,8 @@
 package de.smartsquare.squit.util
 
 import com.typesafe.config.ConfigFactory
-import okhttp3.HttpUrl
-import okhttp3.MediaType
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.amshove.kluent.AnyException
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldEqual
@@ -21,7 +21,7 @@ import java.io.File
  */
 object ConfigExtensionsSpek : Spek({
 
-    val testProject = File(this.javaClass.classLoader.getResource("test-project").toURI()).toPath()
+    val testProject = File(this.javaClass.classLoader.getResource("test-project")!!.toURI()).toPath()
 
     given("a config object with an endpoint") {
         val config = ConfigFactory.parseMap(mapOf("endpoint" to "https://example.com"))
@@ -30,7 +30,7 @@ object ConfigExtensionsSpek : Spek({
             val endpoint = config.endpoint
 
             it("should be parsed correctly") {
-                endpoint shouldEqual HttpUrl.parse("https://example.com")
+                endpoint shouldEqual "https://example.com".toHttpUrlOrNull()
             }
         }
     }
@@ -54,7 +54,7 @@ object ConfigExtensionsSpek : Spek({
             val mediaType = config.mediaType
 
             it("should be parsed correctly") {
-                mediaType shouldEqual MediaType.parse("application/xml")
+                mediaType shouldEqual "application/xml".toMediaTypeOrNull()
             }
         }
     }

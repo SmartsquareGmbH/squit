@@ -79,7 +79,9 @@ private fun DIV.squitTitle(results: List<SquitResult>) {
 private fun DIV.squitOverviewTable(results: List<SquitResult>) {
     val firstTest = results.minBy { it.metaInfo.date }
     val duration = results.fold(0L) { acc, next -> acc + next.metaInfo.duration }
-    val averageTime = results.map { it.metaInfo.duration }.average().let { if (it.isNaN()) 0L else it.toLong() }
+
+    @Suppress("ConvertNaNEquality") // Bug in Kotlin 1.3.50?
+    val averageTime = results.map { it.metaInfo.duration }.average().let { if (it == Double.NaN) 0L else it.toLong() }
     val slowestTest = results.maxBy { it.metaInfo.duration }
 
     div(classes = "row") {
