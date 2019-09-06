@@ -38,6 +38,9 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
 
     val subjectJson = File(this.javaClass.classLoader.getResource("test-project-json")!!.toURI()).toPath()
 
+    val subjectJsonDifferentOrder =
+        File(this.javaClass.classLoader.getResource("test-project-json-different-order")!!.toURI()).toPath()
+
     val subjectIgnoreFailures =
         File(this.javaClass.classLoader.getResource("test-project-ignore-failures")!!.toURI()).toPath()
 
@@ -361,6 +364,48 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
 
             val result = GradleRunner.create()
                 .withProjectDir(subjectJson.toFile())
+                .withExtendedPluginClasspath()
+                .withArguments(arguments)
+                .forwardOutput()
+                .withJaCoCo()
+                .build()
+
+            it("should be able to complete without errors") {
+                result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
+            }
+        }
+    }
+
+    given("a test project with json requests with different order") {
+        beforeEachTest {
+            server = MockWebServer()
+        }
+
+        afterEachTest {
+            server.shutdown()
+        }
+
+        on("running the test task") {
+            server.enqueue(
+                MockResponse().setBody(
+                    """
+                    {
+                        "abc": false,
+                        "cool": true,
+                        "olleh": 321,
+                        "hello": "123"
+                    }
+                    """.trimIndent()
+                )
+            )
+
+            val arguments = listOf(
+                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$subjectJsonDifferentOrder"
+            )
+
+            val result = GradleRunner.create()
+                .withProjectDir(subjectJsonDifferentOrder.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()

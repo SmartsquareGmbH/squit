@@ -12,12 +12,12 @@ import java.io.ByteArrayInputStream
 class XmlDiffer(private val extension: SquitExtension) : Differ {
 
     override fun diff(expectedResponse: ByteArray, actualResponse: ByteArray): String {
-        val diffBuilder = DiffBuilder.compare(Input.fromStream(ByteArrayInputStream(expectedResponse)))
+        val differ = DiffBuilder.compare(Input.fromStream(ByteArrayInputStream(expectedResponse)))
             .withTest(Input.fromStream(ByteArrayInputStream(actualResponse)))
             .ignoreWhitespace()
             .apply { if (!extension.xml.strict) checkForSimilar() }
             .build()
 
-        return diffBuilder.differences.joinToString("\n")
+        return differ.differences.joinToString("\n")
     }
 }

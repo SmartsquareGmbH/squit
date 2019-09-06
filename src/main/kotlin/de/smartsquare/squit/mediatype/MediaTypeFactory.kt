@@ -4,6 +4,7 @@ import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.mediatype.generic.GenericBodyProcessor
 import de.smartsquare.squit.mediatype.generic.GenericDiffer
 import de.smartsquare.squit.mediatype.json.JsonBodyProcessor
+import de.smartsquare.squit.mediatype.json.JsonDiffer
 import de.smartsquare.squit.mediatype.xml.XmlBodyProcessor
 import de.smartsquare.squit.mediatype.xml.XmlDiffer
 import okhttp3.MediaType
@@ -71,6 +72,7 @@ object MediaTypeFactory {
      */
     fun differ(mediaType: MediaType, extension: SquitExtension) = when (mediaType) {
         xmlMediaType, applicationXmlMediaType, soapMediaType -> XmlDiffer(extension)
+        jsonMediaType -> JsonDiffer()
         else -> GenericDiffer()
     }
 }

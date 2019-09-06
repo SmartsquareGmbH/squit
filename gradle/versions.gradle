@@ -16,6 +16,7 @@ ext {
     dom4jVersion = '2.1.1'
     gsonVersion = '2.8.5'
     xmlUnitVersion = '2.6.3'
+    jsonUnitVersion = '2.8.0'
     typesafeConfigVersion = '1.3.4'
     okhttpVersion = '4.1.0'
     kotlinHtmlVersion = '0.6.12'

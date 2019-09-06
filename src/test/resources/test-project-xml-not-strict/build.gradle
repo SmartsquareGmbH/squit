@@ -4,8 +4,6 @@ plugins {
 }
 
 squit {
-    jdbcDrivers = ["org.h2.Driver"]
-
     xml {
         strict = false
     }

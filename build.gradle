@@ -58,6 +58,7 @@ dependencies {
 
     implementation "jaxen:jaxen:$jaxenVersion"
     implementation "org.xmlunit:xmlunit-core:$xmlUnitVersion"
+    implementation "net.javacrumbs.json-unit:json-unit:$jsonUnitVersion"
     implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
     implementation "se.sawano.java:alphanumeric-comparator:$alphanumericComparatorVersion"
     implementation("com.github.wumpz:diffutils:$diffUtilsVersion") {
@@ -81,7 +82,7 @@ dependencies {
     testImplementation "com.squareup.okhttp3:mockwebserver:$okhttpVersion"
     testImplementation "com.h2database:h2:$h2Version"
     testImplementation "io.mockk:mockk:$mockkVersion"
-    
+
     testRuntime "org.jetbrains.spek:spek-junit-platform-engine:$spekVersion"
 }
 

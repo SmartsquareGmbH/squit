@@ -4,6 +4,7 @@ import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.mediatype.generic.GenericBodyProcessor
 import de.smartsquare.squit.mediatype.generic.GenericDiffer
 import de.smartsquare.squit.mediatype.json.JsonBodyProcessor
+import de.smartsquare.squit.mediatype.json.JsonDiffer
 import de.smartsquare.squit.mediatype.xml.XmlBodyProcessor
 import de.smartsquare.squit.mediatype.xml.XmlDiffer
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -99,7 +100,7 @@ object MediaTypeFactorySpek : Spek({
             it("should return the generic differ") {
                 val differ = MediaTypeFactory.differ(mediaType, SquitExtension(ProjectBuilder.builder().build()))
 
-                differ shouldBeInstanceOf GenericDiffer::class.java
+                differ shouldBeInstanceOf JsonDiffer::class.java
             }
         }
     }
@@ -134,6 +135,14 @@ object MediaTypeFactorySpek : Spek({
         on("getting the processor") {
             it("should return the generic processor") {
                 MediaTypeFactory.processor(mediaType) shouldBeInstanceOf GenericBodyProcessor::class.java
+            }
+        }
+
+        on("getting the differ") {
+            it("should return the generic differ") {
+                val differ = MediaTypeFactory.differ(mediaType, SquitExtension(ProjectBuilder.builder().build()))
+
+                differ shouldBeInstanceOf GenericDiffer::class.java
             }
         }
     }
