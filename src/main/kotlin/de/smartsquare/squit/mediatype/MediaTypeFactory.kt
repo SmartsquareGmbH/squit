@@ -2,13 +2,15 @@ package de.smartsquare.squit.mediatype
 
 import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.mediatype.generic.GenericBodyProcessor
+import de.smartsquare.squit.mediatype.generic.GenericCanonicalizer
 import de.smartsquare.squit.mediatype.generic.GenericDiffer
 import de.smartsquare.squit.mediatype.json.JsonBodyProcessor
+import de.smartsquare.squit.mediatype.json.JsonCanonicalizer
 import de.smartsquare.squit.mediatype.json.JsonDiffer
 import de.smartsquare.squit.mediatype.xml.XmlBodyProcessor
 import de.smartsquare.squit.mediatype.xml.XmlDiffer
 import okhttp3.MediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MediaType.Companion.toMediaType
 
 /**
  * Object for retrieving media type specific values.
@@ -17,10 +19,10 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
  */
 object MediaTypeFactory {
 
-    private val xmlMediaType = "text/xml".toMediaTypeOrNull()
-    private val applicationXmlMediaType = "application/xml".toMediaTypeOrNull()
-    private val soapMediaType = "application/soap+xml".toMediaTypeOrNull()
-    private val jsonMediaType = "application/json".toMediaTypeOrNull()
+    val xmlMediaType = "text/xml".toMediaType()
+    val applicationXmlMediaType = "application/xml".toMediaType()
+    val soapMediaType = "application/soap+xml".toMediaType()
+    val jsonMediaType = "application/json".toMediaType()
 
     /**
      * Returns the request name based on the given [mediaType].
@@ -74,5 +76,13 @@ object MediaTypeFactory {
         xmlMediaType, applicationXmlMediaType, soapMediaType -> XmlDiffer(extension)
         jsonMediaType -> JsonDiffer()
         else -> GenericDiffer()
+    }
+
+    /**
+     * Returns the [Canonicalizer] to use based on the given [mediaType].
+     */
+    fun canonicalizer(mediaType: MediaType) = when (mediaType) {
+        jsonMediaType -> JsonCanonicalizer()
+        else -> GenericCanonicalizer()
     }
 }

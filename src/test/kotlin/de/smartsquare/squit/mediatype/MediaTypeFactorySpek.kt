@@ -2,8 +2,10 @@ package de.smartsquare.squit.mediatype
 
 import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.mediatype.generic.GenericBodyProcessor
+import de.smartsquare.squit.mediatype.generic.GenericCanonicalizer
 import de.smartsquare.squit.mediatype.generic.GenericDiffer
 import de.smartsquare.squit.mediatype.json.JsonBodyProcessor
+import de.smartsquare.squit.mediatype.json.JsonCanonicalizer
 import de.smartsquare.squit.mediatype.json.JsonDiffer
 import de.smartsquare.squit.mediatype.xml.XmlBodyProcessor
 import de.smartsquare.squit.mediatype.xml.XmlDiffer
@@ -61,6 +63,14 @@ object MediaTypeFactorySpek : Spek({
                 differ shouldBeInstanceOf XmlDiffer::class.java
             }
         }
+
+        on("getting the canonicalizer") {
+            it("should return the generic canonicalizer") {
+                val differ = MediaTypeFactory.canonicalizer(mediaType)
+
+                differ shouldBeInstanceOf GenericCanonicalizer::class.java
+            }
+        }
     }
 
     given("a json mediaType") {
@@ -103,6 +113,14 @@ object MediaTypeFactorySpek : Spek({
                 differ shouldBeInstanceOf JsonDiffer::class.java
             }
         }
+
+        on("getting the canonicalizer") {
+            it("should return the generic canonicalizer") {
+                val differ = MediaTypeFactory.canonicalizer(mediaType)
+
+                differ shouldBeInstanceOf JsonCanonicalizer::class.java
+            }
+        }
     }
 
     given("a different mediaType") {
@@ -143,6 +161,14 @@ object MediaTypeFactorySpek : Spek({
                 val differ = MediaTypeFactory.differ(mediaType, SquitExtension(ProjectBuilder.builder().build()))
 
                 differ shouldBeInstanceOf GenericDiffer::class.java
+            }
+        }
+
+        on("getting the canonicalizer") {
+            it("should return the generic canonicalizer") {
+                val differ = MediaTypeFactory.canonicalizer(mediaType)
+
+                differ shouldBeInstanceOf GenericCanonicalizer::class.java
             }
         }
     }

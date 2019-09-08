@@ -2,11 +2,12 @@ package de.smartsquare.squit.report
 
 import com.github.difflib.DiffUtils
 import com.github.difflib.UnifiedDiffUtils
-import de.smartsquare.squit.entity.SquitResponseInfo
 import de.smartsquare.squit.entity.SquitResult
 import de.smartsquare.squit.io.FilesUtils
+import de.smartsquare.squit.mediatype.MediaTypeFactory
 import kotlinx.html.html
 import kotlinx.html.stream.appendHTML
+import okhttp3.MediaType
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
@@ -65,7 +66,7 @@ object HtmlReportWriter {
             val detailCssPath = detailPath.resolve("detail.css")
             val detailJsPath = detailPath.resolve("detail.js")
 
-            val bodyDiff = generateDiff(result.expectedLines, result.actualLines, DIFF_FILE_NAME)
+            val bodyDiff = generateDiff(result.expectedLines, result.actualLines, result.mediaType, DIFF_FILE_NAME)
             val unifiedDiffForJs = prepareForJs(bodyDiff)
             val unifiedInfoDiffForJs = prepareInfoForJs(result)
 
@@ -94,16 +95,23 @@ object HtmlReportWriter {
         Files.write(reportDirectoryPath.resolve("index.html"), document.toString().toByteArray())
     }
 
-    internal fun prepareInfoForJs(result: SquitResult): String {
+    fun prepareInfoForJs(result: SquitResult): String {
         return if (!result.expectedResponseInfo.isDefault) {
             val expectedInfoLines = result.expectedResponseInfo.toJson().lines()
+
             val actualInfo = result.actualInfoLines.joinToString(separator = "\n")
-            val actualInfoLines = if (actualInfo.isEmpty()) {
-                emptyList()
-            } else {
-                SquitResponseInfo.fromJson(actualInfo).toJson().lines()
+            val actualInfoLines = when {
+                actualInfo.isEmpty() -> emptyList()
+                else -> actualInfo.lines()
             }
-            val infoDiff = generateDiff(expectedInfoLines, actualInfoLines, DIFF_INFO_FILE_NAME)
+
+            val infoDiff = generateDiff(
+                expectedInfoLines,
+                actualInfoLines,
+                MediaTypeFactory.jsonMediaType,
+                DIFF_INFO_FILE_NAME
+            )
+
             prepareForJs(infoDiff)
         } else {
             ""
@@ -117,18 +125,33 @@ object HtmlReportWriter {
             .replace("\"", "\\\"")
     }
 
-    private fun generateDiff(expectedLines: List<String>, actualLines: List<String>, filename: String): List<String> {
-        val diff = DiffUtils.diff(expectedLines, actualLines)
+    private fun generateDiff(
+        expectedLines: List<String>,
+        actualLines: List<String>,
+        mediaType: MediaType,
+        filename: String
+    ): List<String> {
+        val canonicalizedExpected = when {
+            expectedLines.isEmpty() -> expectedLines
+            else -> MediaTypeFactory.canonicalizer(mediaType).canonicalize(expectedLines.joinToString("")).lines()
+        }
+
+        val canonicalizedActual = when {
+            actualLines.isEmpty() -> actualLines
+            else -> MediaTypeFactory.canonicalizer(mediaType).canonicalize(actualLines.joinToString("")).lines()
+        }
+
+        val diff = DiffUtils.diff(canonicalizedExpected, canonicalizedActual)
         val unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(
             filename,
             filename,
-            expectedLines,
+            canonicalizedExpected,
             diff,
             DIFF_CONTEXT_SIZE
         )
 
         return when (unifiedDiff.isEmpty()) {
-            true -> emptyDiffHeader.plus(actualLines.map { " $it" })
+            true -> emptyDiffHeader.plus(canonicalizedActual.map { " $it" })
             false -> unifiedDiff
         }
     }
