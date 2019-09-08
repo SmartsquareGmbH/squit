@@ -8,6 +8,7 @@ import de.smartsquare.squit.mediatype.json.JsonBodyProcessor
 import de.smartsquare.squit.mediatype.json.JsonCanonicalizer
 import de.smartsquare.squit.mediatype.json.JsonDiffer
 import de.smartsquare.squit.mediatype.xml.XmlBodyProcessor
+import de.smartsquare.squit.mediatype.xml.XmlCanonicalizer
 import de.smartsquare.squit.mediatype.xml.XmlDiffer
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
@@ -82,6 +83,7 @@ object MediaTypeFactory {
      * Returns the [Canonicalizer] to use based on the given [mediaType].
      */
     fun canonicalizer(mediaType: MediaType) = when (mediaType) {
+        xmlMediaType, applicationXmlMediaType, soapMediaType -> XmlCanonicalizer()
         jsonMediaType -> JsonCanonicalizer()
         else -> GenericCanonicalizer()
     }

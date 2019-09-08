@@ -8,6 +8,7 @@ import de.smartsquare.squit.mediatype.json.JsonBodyProcessor
 import de.smartsquare.squit.mediatype.json.JsonCanonicalizer
 import de.smartsquare.squit.mediatype.json.JsonDiffer
 import de.smartsquare.squit.mediatype.xml.XmlBodyProcessor
+import de.smartsquare.squit.mediatype.xml.XmlCanonicalizer
 import de.smartsquare.squit.mediatype.xml.XmlDiffer
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.amshove.kluent.shouldBeInstanceOf
@@ -68,7 +69,7 @@ object MediaTypeFactorySpek : Spek({
             it("should return the generic canonicalizer") {
                 val differ = MediaTypeFactory.canonicalizer(mediaType)
 
-                differ shouldBeInstanceOf GenericCanonicalizer::class.java
+                differ shouldBeInstanceOf XmlCanonicalizer::class.java
             }
         }
     }

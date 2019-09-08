@@ -13,19 +13,19 @@ object JsonCanonicalizerTest : Spek({
         on("canonicalizing a json structure") {
             // language=json
             val structure = """
-            {
-              "B": {
-                "Test": {
-                "Test3": "Hello3",
-                "Test2":   "Hello2",
-                "Test4":4
+                {
+                  "B": {
+                    "Test": {
+                    "Test3": "Hello3",
+                    "Test2":   "Hello2",
+                    "Test4":4
+                    }
+                  },
+                  "Abc": {
+                    "Cba": [ 1,3,5,   2 ]
+                  },
+                  "Y": "Y"
                 }
-              },
-              "Abc": {
-                "Cba": [ 1,3,5,   2 ]
-              },
-              "Y": "Y"
-            }
             """.trimIndent()
 
             it("should produce a sorted, formatted and valid result") {
@@ -33,24 +33,24 @@ object JsonCanonicalizerTest : Spek({
 
                 // language=json
                 val expected = """
-                {
-                  "Abc": {
-                    "Cba": [
-                      1,
-                      3,
-                      5,
-                      2
-                    ]
-                  },
-                  "B": {
-                    "Test": {
-                      "Test2": "Hello2",
-                      "Test3": "Hello3",
-                      "Test4": 4
+                    {
+                      "Abc": {
+                        "Cba": [
+                          1,
+                          3,
+                          5,
+                          2
+                        ]
+                      },
+                      "B": {
+                        "Test": {
+                          "Test2": "Hello2",
+                          "Test3": "Hello3",
+                          "Test4": 4
+                        }
+                      },
+                      "Y": "Y"
                     }
-                  },
-                  "Y": "Y"
-                }
                 """.trimIndent()
 
                 result shouldEqual expected
@@ -60,31 +60,10 @@ object JsonCanonicalizerTest : Spek({
         on("canonicalizing a json structure with nesting in arrays") {
             // language=json
             val structure = """
-            [
-              {
-                "B": "B",
-                "A": "A",
-                "C": "C"
-              },
-              {
-                "A": "A"
-              },
-              {
-                "Y": "Y",
-                "Z": "Z"
-              }
-            ]            
-            """.trimIndent()
-
-            it("should produce a sorted, formatted and valid result") {
-                val result = canonicalizer.canonicalize(structure)
-
-                // language=json
-                val expected = """
                 [
                   {
-                    "A": "A",
                     "B": "B",
+                    "A": "A",
                     "C": "C"
                   },
                   {
@@ -94,7 +73,28 @@ object JsonCanonicalizerTest : Spek({
                     "Y": "Y",
                     "Z": "Z"
                   }
-                ]
+                ]            
+            """.trimIndent()
+
+            it("should produce a sorted, formatted and valid result") {
+                val result = canonicalizer.canonicalize(structure)
+
+                // language=json
+                val expected = """
+                    [
+                      {
+                        "A": "A",
+                        "B": "B",
+                        "C": "C"
+                      },
+                      {
+                        "A": "A"
+                      },
+                      {
+                        "Y": "Y",
+                        "Z": "Z"
+                      }
+                    ]
                 """.trimIndent()
 
                 result shouldEqual expected
@@ -104,12 +104,12 @@ object JsonCanonicalizerTest : Spek({
         on("canonicalizing a json structure with different number formats") {
             // language=json
             val structure = """
-            {
-              "A": 12,
-              "B": 0.0,
-              "C": 12.0,
-              "D": 12.5
-            }      
+                {
+                  "A": 12,
+                  "B": 0.0,
+                  "C": 12.0,
+                  "D": 12.5
+                }      
             """.trimIndent()
 
             it("should produce a sorted, formatted and valid result") {
@@ -117,12 +117,12 @@ object JsonCanonicalizerTest : Spek({
 
                 // language=json
                 val expected = """
-                {
-                  "A": 12,
-                  "B": 0,
-                  "C": 12,
-                  "D": 12.5
-                }
+                    {
+                      "A": 12,
+                      "B": 0,
+                      "C": 12,
+                      "D": 12.5
+                    }
                 """.trimIndent()
 
                 result shouldEqual expected

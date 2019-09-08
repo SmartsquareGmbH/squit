@@ -57,6 +57,7 @@ dependencies {
     api "com.typesafe:config:$typesafeConfigVersion"
 
     implementation "jaxen:jaxen:$jaxenVersion"
+    implementation "org.apache.santuario:xmlsec:$xmlSecVersion"
     implementation "org.xmlunit:xmlunit-core:$xmlUnitVersion"
     implementation "net.javacrumbs.json-unit:json-unit:$jsonUnitVersion"
     implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"

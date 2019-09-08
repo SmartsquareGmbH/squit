@@ -133,12 +133,20 @@ object HtmlReportWriter {
     ): List<String> {
         val canonicalizedExpected = when {
             expectedLines.isEmpty() -> expectedLines
-            else -> MediaTypeFactory.canonicalizer(mediaType).canonicalize(expectedLines.joinToString("")).lines()
+            else -> try {
+                MediaTypeFactory.canonicalizer(mediaType).canonicalize(expectedLines.joinToString("")).lines()
+            } catch (error: Throwable) {
+                expectedLines
+            }
         }
 
         val canonicalizedActual = when {
             actualLines.isEmpty() -> actualLines
-            else -> MediaTypeFactory.canonicalizer(mediaType).canonicalize(actualLines.joinToString("")).lines()
+            else -> try {
+                MediaTypeFactory.canonicalizer(mediaType).canonicalize(actualLines.joinToString("")).lines()
+            } catch (error: Throwable) {
+                actualLines
+            }
         }
 
         val diff = DiffUtils.diff(canonicalizedExpected, canonicalizedActual)
