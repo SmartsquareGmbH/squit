@@ -234,7 +234,7 @@ open class SquitTestTask : DefaultTask() {
     private fun writeHtmlReport(result: List<SquitResult>) {
         Files.createDirectories(htmlReportDirectoryPath)
 
-        HtmlReportWriter.writeReport(result, htmlReportDirectoryPath)
+        HtmlReportWriter.writeReport(result, htmlReportDirectoryPath, extension)
     }
 
     private fun copyFailures(result: List<SquitResult>) {

@@ -15,6 +15,7 @@ import java.nio.file.Paths
 open class SquitExtension(project: Project) {
 
     val xml = XmlExtension()
+    val json = JsonExtension()
 
     /**
      * The jdbc driver classes to use.
@@ -66,5 +67,18 @@ open class SquitExtension(project: Project) {
          * If the xml diffing should use strict (e.g. identic) comparison.
          */
         var strict = true
+
+        /**
+         * If the html report should be canonicalized for xml tests.
+         */
+        var canonicalize = true
+    }
+
+    open class JsonExtension {
+
+        /**
+         * If the html report should be canonicalized for json tests.
+         */
+        var canonicalize = true
     }
 }

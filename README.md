@@ -343,6 +343,16 @@ squit {
         // If the xml diffing should be strict.
         // If not, differences like namespace prefixes are not reported as differences.
         strict = true
+
+        // If xml should be canonicalized for the html report.
+        // This means that both expected and actual response are transposed into a common format.
+        canonicalize = true
+    }
+
+    json {
+        // If json should be canonicalized for the html report.
+        // This means that both expected and actual response are transposed into a common format.
+        canonicalize = true
     }
 }
 ```

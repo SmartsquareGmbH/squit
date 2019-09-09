@@ -1,5 +1,8 @@
 package de.smartsquare.squit.mediatype.json
 
+import de.smartsquare.squit.SquitExtension
+import io.mockk.every
+import io.mockk.mockk
 import org.amshove.kluent.shouldEqual
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
@@ -29,7 +32,11 @@ object JsonCanonicalizerTest : Spek({
             """.trimIndent()
 
             it("should produce a sorted, formatted and valid result") {
-                val result = canonicalizer.canonicalize(structure)
+                val extension = mockk<SquitExtension> {
+                    every { json } returns SquitExtension.JsonExtension()
+                }
+
+                val result = canonicalizer.canonicalize(structure, extension)
 
                 // language=json
                 val expected = """
@@ -77,7 +84,11 @@ object JsonCanonicalizerTest : Spek({
             """.trimIndent()
 
             it("should produce a sorted, formatted and valid result") {
-                val result = canonicalizer.canonicalize(structure)
+                val extension = mockk<SquitExtension> {
+                    every { json } returns SquitExtension.JsonExtension()
+                }
+
+                val result = canonicalizer.canonicalize(structure, extension)
 
                 // language=json
                 val expected = """
@@ -113,7 +124,11 @@ object JsonCanonicalizerTest : Spek({
             """.trimIndent()
 
             it("should produce a sorted, formatted and valid result") {
-                val result = canonicalizer.canonicalize(structure)
+                val extension = mockk<SquitExtension> {
+                    every { json } returns SquitExtension.JsonExtension()
+                }
+
+                val result = canonicalizer.canonicalize(structure, extension)
 
                 // language=json
                 val expected = """
@@ -126,6 +141,30 @@ object JsonCanonicalizerTest : Spek({
                 """.trimIndent()
 
                 result shouldEqual expected
+            }
+        }
+
+        on("canonicalizing a json structure when canonicalization is disabled") {
+            // language=json
+            val structure = """
+                {
+                  "A": 12,
+                  "B": 0.0,
+                  "C": 12.0,
+                  "D": 12.5
+                }      
+            """.trimIndent()
+
+            it("should return the input") {
+                val extension = mockk<SquitExtension> {
+                    every { json } returns SquitExtension.JsonExtension().apply {
+                        canonicalize = false
+                    }
+                }
+
+                val result = canonicalizer.canonicalize(structure, extension)
+
+                result shouldEqual structure
             }
         }
     }

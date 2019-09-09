@@ -2,6 +2,7 @@ package de.smartsquare.squit.report
 
 import com.github.difflib.DiffUtils
 import com.github.difflib.UnifiedDiffUtils
+import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.entity.SquitResult
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeFactory
@@ -49,7 +50,11 @@ object HtmlReportWriter {
     /**
      * Generates and writes the Squit html report, given the [results] list and [reportDirectoryPath].
      */
-    fun writeReport(results: List<SquitResult>, reportDirectoryPath: Path) {
+    fun writeReport(
+        results: List<SquitResult>,
+        reportDirectoryPath: Path,
+        extension: SquitExtension
+    ) {
         val document = StringBuilder("<!DOCTYPE html>").appendHTML().html {
             squitHead()
             squitBody(results)
@@ -66,9 +71,12 @@ object HtmlReportWriter {
             val detailCssPath = detailPath.resolve("detail.css")
             val detailJsPath = detailPath.resolve("detail.js")
 
-            val bodyDiff = generateDiff(result.expectedLines, result.actualLines, result.mediaType, DIFF_FILE_NAME)
+            val bodyDiff = generateDiff(
+                result.expectedLines, result.actualLines, result.mediaType, DIFF_FILE_NAME, extension
+            )
+
             val unifiedDiffForJs = prepareForJs(bodyDiff)
-            val unifiedInfoDiffForJs = prepareInfoForJs(result)
+            val unifiedInfoDiffForJs = prepareInfoForJs(result, extension)
 
             val descriptionForReplacement = if (result.description == null) "null" else "\"${result.description}\""
                 .replace("\n", HTML_LINE_ENDING)
@@ -95,7 +103,10 @@ object HtmlReportWriter {
         Files.write(reportDirectoryPath.resolve("index.html"), document.toString().toByteArray())
     }
 
-    fun prepareInfoForJs(result: SquitResult): String {
+    fun prepareInfoForJs(
+        result: SquitResult,
+        extension: SquitExtension
+    ): String {
         return if (!result.expectedResponseInfo.isDefault) {
             val expectedInfoLines = result.expectedResponseInfo.toJson().lines()
 
@@ -109,7 +120,8 @@ object HtmlReportWriter {
                 expectedInfoLines,
                 actualInfoLines,
                 MediaTypeFactory.jsonMediaType,
-                DIFF_INFO_FILE_NAME
+                DIFF_INFO_FILE_NAME,
+                extension
             )
 
             prepareForJs(infoDiff)
@@ -129,12 +141,15 @@ object HtmlReportWriter {
         expectedLines: List<String>,
         actualLines: List<String>,
         mediaType: MediaType,
-        filename: String
+        filename: String,
+        extension: SquitExtension
     ): List<String> {
         val canonicalizedExpected = when {
             expectedLines.isEmpty() -> expectedLines
             else -> try {
-                MediaTypeFactory.canonicalizer(mediaType).canonicalize(expectedLines.joinToString("")).lines()
+                MediaTypeFactory.canonicalizer(mediaType)
+                    .canonicalize(expectedLines.joinToString(""), extension)
+                    .lines()
             } catch (error: Throwable) {
                 expectedLines
             }
@@ -143,7 +158,9 @@ object HtmlReportWriter {
         val canonicalizedActual = when {
             actualLines.isEmpty() -> actualLines
             else -> try {
-                MediaTypeFactory.canonicalizer(mediaType).canonicalize(actualLines.joinToString("")).lines()
+                MediaTypeFactory.canonicalizer(mediaType)
+                    .canonicalize(actualLines.joinToString(""), extension)
+                    .lines()
             } catch (error: Throwable) {
                 actualLines
             }

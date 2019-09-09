@@ -1,5 +1,6 @@
 package de.smartsquare.squit.mediatype.xml
 
+import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.entity.SquitOutputFormat
 import de.smartsquare.squit.mediatype.Canonicalizer
 import org.dom4j.Document
@@ -21,11 +22,15 @@ class XmlCanonicalizer : Canonicalizer {
         ApacheInit.init()
     }
 
-    override fun canonicalize(input: String): String {
-        val canonicalizer = ApacheCanonicalizer.getInstance(ApacheCanonicalizer.ALGO_ID_C14N11_OMIT_COMMENTS)
-        val output = canonicalizer.canonicalize(input.toByteArray())
+    override fun canonicalize(input: String, extension: SquitExtension): String {
+        return if (extension.xml.canonicalize) {
+            val canonicalizer = ApacheCanonicalizer.getInstance(ApacheCanonicalizer.ALGO_ID_C14N11_OMIT_COMMENTS)
+            val output = canonicalizer.canonicalize(input.toByteArray())
 
-        return SAXReader().read(output.inputStream()).asString(OutputFormat.createPrettyPrint())
+            SAXReader().read(output.inputStream()).asString(OutputFormat.createPrettyPrint())
+        } else {
+            input
+        }
     }
 
     private fun Document.asString(outputFormat: OutputFormat = SquitOutputFormat): String {

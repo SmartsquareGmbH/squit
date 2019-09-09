@@ -1,5 +1,8 @@
 package de.smartsquare.squit.mediatype.xml
 
+import de.smartsquare.squit.SquitExtension
+import io.mockk.every
+import io.mockk.mockk
 import org.amshove.kluent.shouldEqual
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
@@ -20,7 +23,11 @@ object XmlCanonicalizerTest : Spek({
             """.trimIndent()
 
             it("should produce a valid result") {
-                val result = canonicalizer.canonicalize(structure)
+                val extension = mockk<SquitExtension> {
+                    every { xml } returns SquitExtension.XmlExtension()
+                }
+
+                val result = canonicalizer.canonicalize(structure, extension)
 
                 // language=xml
                 val expected = """
@@ -33,6 +40,28 @@ object XmlCanonicalizerTest : Spek({
                 """.trimIndent()
 
                 result shouldEqual expected
+            }
+        }
+
+        on("canonicalizing an xml structure when canonicalization is disabled") {
+            // language=xml
+            val structure = """
+                <test>
+                    <hello b="b" a="a">Abc</hello>
+                    <!-- Test -->
+                </test>
+            """.trimIndent()
+
+            it("should return the input") {
+                val extension = mockk<SquitExtension> {
+                    every { xml } returns SquitExtension.XmlExtension().apply {
+                        canonicalize = false
+                    }
+                }
+
+                val result = canonicalizer.canonicalize(structure, extension)
+
+                result shouldEqual structure
             }
         }
     }

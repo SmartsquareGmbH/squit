@@ -1,5 +1,6 @@
 package de.smartsquare.squit.mediatype.generic
 
+import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.mediatype.Canonicalizer
 
 /**
@@ -7,7 +8,7 @@ import de.smartsquare.squit.mediatype.Canonicalizer
  */
 class GenericCanonicalizer : Canonicalizer {
 
-    override fun canonicalize(input: String): String {
+    override fun canonicalize(input: String, extension: SquitExtension): String {
         return input
     }
 }

@@ -5,6 +5,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
+import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.mediatype.Canonicalizer
 
 /**
@@ -16,10 +17,14 @@ class JsonCanonicalizer : Canonicalizer {
 
     private val gson = GsonBuilder().setPrettyPrinting().create()
 
-    override fun canonicalize(input: String): String {
-        val element = gson.fromJson(input, JsonElement::class.java)
+    override fun canonicalize(input: String, extension: SquitExtension): String {
+        return if (extension.json.canonicalize) {
+            val element = gson.fromJson(input, JsonElement::class.java)
 
-        return gson.toJson(element.canonicalize())
+            gson.toJson(element.canonicalize())
+        } else {
+            input
+        }
     }
 
     private fun JsonElement.canonicalize(): JsonElement {
