@@ -49,15 +49,7 @@ class JsonCanonicalizer : Canonicalizer {
             }
             is JsonPrimitive -> {
                 if (this.isNumber) {
-                    val number = this.asBigDecimal
-
-                    val normalizedNumber: Number = try {
-                        number.toBigIntegerExact()
-                    } catch (error: ArithmeticException) {
-                        number
-                    }
-
-                    JsonPrimitive(normalizedNumber)
+                    JsonPrimitive(this.asBigDecimal.stripTrailingZeros())
                 } else {
                     this
                 }

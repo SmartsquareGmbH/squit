@@ -119,7 +119,8 @@ object JsonCanonicalizerTest : Spek({
                   "A": 12,
                   "B": 0.0,
                   "C": 12.0,
-                  "D": 12.5
+                  "D": 12.5,
+                  "E": 12.30
                 }      
             """.trimIndent()
 
@@ -136,7 +137,8 @@ object JsonCanonicalizerTest : Spek({
                       "A": 12,
                       "B": 0,
                       "C": 12,
-                      "D": 12.5
+                      "D": 12.5,
+                      "E": 12.3
                     }
                 """.trimIndent()
 
@@ -151,7 +153,8 @@ object JsonCanonicalizerTest : Spek({
                   "A": 12,
                   "B": 0.0,
                   "C": 12.0,
-                  "D": 12.5
+                  "D": 12.5,
+                  "E": 12.30
                 }      
             """.trimIndent()
 
