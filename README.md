@@ -31,7 +31,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "de.smartsquare:squit:2.7.0"
+        classpath "de.smartsquare:squit:2.8.0"
     }
 }
 ```
@@ -171,8 +171,8 @@ A simple example would look like this:
 
 databaseConfigurations = [
   {name = "mydb", jdbc = "jdbc:oracle:thin:@localhost:1521:xe", username = "someusername", password = "thepassword"}
-  // More are possible
-]
+  //=More are possible
+]=
 ```
 
 ```groovy
@@ -248,7 +248,7 @@ repositories {
 }
 
 dependencies {
-    compile 'de.smartsquare:squit:2.7.0'
+    compile 'de.smartsquare:squit:2.8.0'
 }
 ```
 
