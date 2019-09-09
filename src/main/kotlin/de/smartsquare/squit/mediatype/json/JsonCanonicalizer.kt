@@ -49,7 +49,7 @@ class JsonCanonicalizer : Canonicalizer {
             }
             is JsonPrimitive -> {
                 if (this.isNumber) {
-                    JsonPrimitive(this.asBigDecimal.stripTrailingZeros())
+                    JsonPrimitive(this.asBigDecimal.stripTrailingZeros().toPlainString().toBigDecimal())
                 } else {
                     this
                 }
