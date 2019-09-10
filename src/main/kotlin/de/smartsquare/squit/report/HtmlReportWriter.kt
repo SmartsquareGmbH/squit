@@ -132,9 +132,9 @@ object HtmlReportWriter {
 
     private fun prepareForJs(bodyDiff: List<String>): String {
         return bodyDiff
+            .map { it.replace(Regex("(?<!\\\\)'"), Regex.escapeReplacement("\\'")) }
+            .map { it.replace(Regex("(?<!\\\\)\""), Regex.escapeReplacement("\\\"")) }
             .joinToString(HTML_LINE_ENDING)
-            .replace("'", "\\'")
-            .replace("\"", "\\\"")
     }
 
     private fun generateDiff(
