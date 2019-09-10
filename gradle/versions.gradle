@@ -1,6 +1,6 @@
 ext {
     gradleVersion = '5.6.2'
-    squitVersion = '2.8.1'
+    squitVersion = '2.8.2'
 
     gradlePublishVersion = '0.10.1'
 
