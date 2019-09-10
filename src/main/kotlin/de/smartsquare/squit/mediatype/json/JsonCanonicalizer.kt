@@ -4,7 +4,6 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import com.google.gson.JsonPrimitive
 import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.mediatype.Canonicalizer
 
@@ -45,13 +44,6 @@ class JsonCanonicalizer : Canonicalizer {
                     newEntries.forEach {
                         newArray.add(it)
                     }
-                }
-            }
-            is JsonPrimitive -> {
-                if (this.isNumber) {
-                    JsonPrimitive(this.asBigDecimal.stripTrailingZeros().toPlainString().toBigDecimal())
-                } else {
-                    this
                 }
             }
             else -> this

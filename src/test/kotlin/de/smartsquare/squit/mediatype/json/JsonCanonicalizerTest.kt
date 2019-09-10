@@ -112,50 +112,22 @@ object JsonCanonicalizerTest : Spek({
             }
         }
 
-        on("canonicalizing a json structure with different number formats") {
-            // language=json
-            val structure = """
-                {
-                  "A": 12,
-                  "B": 0.0,
-                  "C": 12.0,
-                  "D": 12.5,
-                  "E": 12.30
-                }      
-            """.trimIndent()
-
-            it("should produce a sorted, formatted and valid result") {
-                val extension = mockk<SquitExtension> {
-                    every { json } returns SquitExtension.JsonExtension()
-                }
-
-                val result = canonicalizer.canonicalize(structure, extension)
-
-                // language=json
-                val expected = """
-                    {
-                      "A": 12,
-                      "B": 0,
-                      "C": 12,
-                      "D": 12.5,
-                      "E": 12.3
-                    }
-                """.trimIndent()
-
-                result shouldEqual expected
-            }
-        }
-
         on("canonicalizing a json structure when canonicalization is disabled") {
             // language=json
             val structure = """
                 {
-                  "A": 12,
-                  "B": 0.0,
-                  "C": 12.0,
-                  "D": 12.5,
-                  "E": 12.30
-                }      
+                  "B": {
+                    "Test": {
+                    "Test3": "Hello3",
+                    "Test2":   "Hello2",
+                    "Test4":4
+                    }
+                  },
+                  "Abc": {
+                    "Cba": [ 1,3,5,   2 ]
+                  },
+                  "Y": "Y"
+                }
             """.trimIndent()
 
             it("should return the input") {
