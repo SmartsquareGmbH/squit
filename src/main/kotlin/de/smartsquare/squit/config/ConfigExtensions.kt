@@ -1,4 +1,4 @@
-package de.smartsquare.squit.util
+package de.smartsquare.squit.config
 
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
@@ -170,15 +170,15 @@ fun Config.validate() = this.apply {
     postProcessorScripts.forEach { FilesUtils.validateExistence(it) }
     postRunnerScripts.forEach { FilesUtils.validateExistence(it) }
     postRunners.forEach { Class.forName(it) }
-    tags.forEach { if (it.isEmpty()) error("tags cannot be empty.") }
+    tags.forEach { require(it.isNotEmpty()) { "tags cannot be empty." } }
     databaseConfigurations.forEach { (name, jdbcAddress, username, password) ->
-        if (name.isEmpty()) error("name of a databaseConfiguration cannot be empty.")
-        if (jdbcAddress.isEmpty()) error("jdbc of a databaseConfiguration cannot be empty.")
-        if (username.isEmpty()) error("username of a databaseConfiguration cannot be empty.")
-        if (password.isEmpty()) error("password of a databaseConfiguration cannot be empty.")
+        require(name.isNotEmpty()) { "name of a databaseConfiguration cannot be empty." }
+        require(jdbcAddress.isNotEmpty()) { "jdbc of a databaseConfiguration cannot be empty." }
+        require(username.isNotEmpty()) { "username of a databaseConfiguration cannot be empty." }
+        require(password.isNotEmpty()) { "password of a databaseConfiguration cannot be empty." }
     }
-    if (expectedResponseCode != 0 && expectedResponseCode !in 100..599) {
-        error("expectedResponseCode not in HTTP status code range.")
+    require(expectedResponseCode == 0 || expectedResponseCode in 100..599) {
+        "expectedResponseCode not in HTTP status code range."
     }
 }
 

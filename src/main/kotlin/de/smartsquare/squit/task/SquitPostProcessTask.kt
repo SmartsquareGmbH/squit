@@ -2,6 +2,7 @@ package de.smartsquare.squit.task
 
 import com.typesafe.config.ConfigFactory
 import de.smartsquare.squit.SquitExtension
+import de.smartsquare.squit.config.mediaType
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.util.Constants.CONFIG
@@ -12,7 +13,6 @@ import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.cut
-import de.smartsquare.squit.util.mediaType
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
@@ -33,7 +33,6 @@ open class SquitPostProcessTask : DefaultTask() {
     /**
      * The directory of the test sources.
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     @InputDirectory
     val processedSourcesPath: Path = Paths.get(
         project.buildDir.path,

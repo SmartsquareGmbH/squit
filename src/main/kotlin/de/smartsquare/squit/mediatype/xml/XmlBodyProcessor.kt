@@ -1,13 +1,13 @@
 package de.smartsquare.squit.mediatype.xml
 
 import com.typesafe.config.Config
+import de.smartsquare.squit.config.postProcessorScripts
+import de.smartsquare.squit.config.postProcessors
+import de.smartsquare.squit.config.preProcessorScripts
+import de.smartsquare.squit.config.preProcessors
 import de.smartsquare.squit.interfaces.SquitXmlPostProcessor
 import de.smartsquare.squit.interfaces.SquitXmlPreProcessor
 import de.smartsquare.squit.mediatype.BodyProcessor
-import de.smartsquare.squit.util.postProcessorScripts
-import de.smartsquare.squit.util.postProcessors
-import de.smartsquare.squit.util.preProcessorScripts
-import de.smartsquare.squit.util.preProcessors
 import de.smartsquare.squit.util.read
 import de.smartsquare.squit.util.write
 import groovy.lang.Binding

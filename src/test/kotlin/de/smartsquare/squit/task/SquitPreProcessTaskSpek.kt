@@ -54,11 +54,13 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
         .resolve("project")
         .resolve("call4")
 
+    val call1Config = call1Directory.resolve("test.conf")
     val call1Request = call1Directory.resolve("request.xml")
     val call1PreSqlScript = call1Directory.resolve("test_pre.sql")
     val call1PostSqlScript = call1Directory.resolve("test_post.sql")
     val call1Description = call1Directory.resolve("description.md")
 
+    val call2Config = call2Directory.resolve("test.conf")
     val call2PreSqlScript = call2Directory.resolve("test_pre.sql")
     val call2PostSqlScript = call2Directory.resolve("test_post.sql")
 
@@ -148,6 +150,11 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
                 Files.exists(buildPath.resolve("sources").resolve("project").resolve("call3")).shouldBeFalse()
                 Files.exists(buildPath.resolve("sources").resolve("project").resolve("call4")).shouldBeTrue()
             }
+
+            it("should merge configs in the correct order") {
+                Files.readAllBytes(call1Config).toString(Charsets.UTF_8) shouldContain "some=\"local header\""
+                Files.readAllBytes(call2Config).toString(Charsets.UTF_8) shouldContain "some=header"
+            }
         }
 
         on("running the pre-process task with the unignore flag") {
@@ -191,7 +198,8 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
             }
 
             it("should print an appropriate message") {
-                result.output shouldContain "Invalid test.conf file on path of test: project${File.separator}call1"
+                result.output shouldContain "Invalid test.conf or local.conf file on path of test: " +
+                    "project${File.separator}call1"
             }
         }
     }

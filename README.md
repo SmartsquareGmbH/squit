@@ -113,7 +113,7 @@ The following table lists all tasks and their purpose:
 
 ### Configuration
 
-The plugin features a variety of configuration possibilities. As aforementioned, these are collected in `test.conf` files.
+The plugin features a variety of configuration possibilities. As aforementioned, these are collected in `test.conf` (or `local.conf`) files.
 `test.conf` files are in the [HOCON](https://github.com/lightbend/config/blob/master/HOCON.md) format and support all of its features.
 As of the current version, these are the supported properties:
 
@@ -157,6 +157,12 @@ endpoint = "http://localhost:"${port}"/someEndpoint"
 
 > This mechanism can also be used to create global configuration properties, which are then used in configuration files
 deeper in the hierarchy.
+
+#### Local configuration
+
+Squit also allows for configuration to be stored in a `local.conf` file. `local.conf` files have a higher priority than
+`test.conf` file and thus override `test.conf` files. This can be useful for overriding values of a versioned
+`test.conf` without having to check that change into a VCS for every collaborator on the project. 
 
 ### Database modifications
 

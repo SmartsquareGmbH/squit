@@ -3,6 +3,15 @@ package de.smartsquare.squit.task
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import de.smartsquare.squit.SquitExtension
+import de.smartsquare.squit.config.databaseConfigurations
+import de.smartsquare.squit.config.endpoint
+import de.smartsquare.squit.config.headers
+import de.smartsquare.squit.config.mediaType
+import de.smartsquare.squit.config.method
+import de.smartsquare.squit.config.postRunnerScripts
+import de.smartsquare.squit.config.postRunners
+import de.smartsquare.squit.config.preRunnerScripts
+import de.smartsquare.squit.config.preRunners
 import de.smartsquare.squit.db.ConnectionCollection
 import de.smartsquare.squit.db.executeScript
 import de.smartsquare.squit.entity.SquitMetaInfo
@@ -20,17 +29,8 @@ import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.cut
-import de.smartsquare.squit.util.databaseConfigurations
-import de.smartsquare.squit.util.endpoint
-import de.smartsquare.squit.util.headers
 import de.smartsquare.squit.util.lifecycleOnSameLine
-import de.smartsquare.squit.util.mediaType
-import de.smartsquare.squit.util.method
 import de.smartsquare.squit.util.newLineIfNeeded
-import de.smartsquare.squit.util.postRunnerScripts
-import de.smartsquare.squit.util.postRunners
-import de.smartsquare.squit.util.preRunnerScripts
-import de.smartsquare.squit.util.preRunners
 import groovy.lang.Binding
 import groovy.lang.GroovyShell
 import okhttp3.Call
@@ -67,7 +67,6 @@ open class SquitRequestTask : DefaultTask() {
     /**
      * The class name of the jdbc [Driver] to use.
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     @get:Input
     val jdbcDriverClassNames by lazy {
         extension.jdbcDrivers
@@ -83,7 +82,6 @@ open class SquitRequestTask : DefaultTask() {
     /**
      * The directory of the test sources.
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     @get:InputDirectory
     val processedSourcesPath: Path = Paths.get(
         project.buildDir.path,
@@ -94,7 +92,6 @@ open class SquitRequestTask : DefaultTask() {
     /**
      * The directory to save the results in.
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     @get:OutputDirectory
     val actualResponsesPath: Path = Paths.get(
         project.buildDir.path,

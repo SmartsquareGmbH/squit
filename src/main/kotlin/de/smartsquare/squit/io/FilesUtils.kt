@@ -15,6 +15,18 @@ import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 object FilesUtils {
 
     /**
+     * Returns a sequence yielding every path starting with the passed [path] until the given [until] condition is met.
+     * The default is when parent is null.
+     */
+    fun walkUpwards(path: Path, until: (Path) -> Boolean = { path.parent == null }): Sequence<Path> = when {
+        until(path) -> emptySequence()
+        else -> sequence {
+            yield(path)
+            yieldAll(walkUpwards(path.parent, until))
+        }
+    }
+
+    /**
      * Returns all leaf directories of the given [path], sorted by alphanumeric order.
      */
     fun getSortedLeafDirectories(path: Path): List<Path> = getChildDirectories(path)

@@ -2,7 +2,7 @@ package de.smartsquare.squit.entity
 
 import com.google.gson.Gson
 import com.typesafe.config.Config
-import de.smartsquare.squit.util.expectedResponseCode
+import de.smartsquare.squit.config.expectedResponseCode
 
 /**
  * Data class holding further response information concerning a single [SquitResult].

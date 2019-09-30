@@ -1,9 +1,15 @@
 package de.smartsquare.squit.task
 
 import com.typesafe.config.Config
-import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
 import de.smartsquare.squit.SquitExtension
+import de.smartsquare.squit.config.ConfigResolver
+import de.smartsquare.squit.config.databaseConfigurations
+import de.smartsquare.squit.config.mediaType
+import de.smartsquare.squit.config.method
+import de.smartsquare.squit.config.shouldExclude
+import de.smartsquare.squit.config.tags
+import de.smartsquare.squit.config.writeTo
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.util.Constants.CONFIG
@@ -12,14 +18,6 @@ import de.smartsquare.squit.util.Constants.ERROR
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.cut
-import de.smartsquare.squit.util.databaseConfigurations
-import de.smartsquare.squit.util.mediaType
-import de.smartsquare.squit.util.mergeTag
-import de.smartsquare.squit.util.method
-import de.smartsquare.squit.util.shouldExclude
-import de.smartsquare.squit.util.tags
-import de.smartsquare.squit.util.validate
-import de.smartsquare.squit.util.writeTo
 import okhttp3.internal.http.HttpMethod
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -42,9 +40,20 @@ import kotlin.properties.Delegates
 open class SquitPreProcessTask : DefaultTask() {
 
     /**
+     * The directory of the test sources.
+     */
+    @get:InputDirectory
+    val sourcesPath by lazy { extension.sourcesPath }
+
+    /**
+     * The directory to save the results in.
+     */
+    @get:OutputDirectory
+    val processedSourcesPath: Path = Paths.get(project.buildDir.path, SQUIT_DIRECTORY, SOURCES_DIRECTORY)
+
+    /**
      * The tags to filter by.
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     @get:Input
     val tags = when (project.hasProperty("tags")) {
         true -> project.property("tags") as String?
@@ -54,35 +63,22 @@ open class SquitPreProcessTask : DefaultTask() {
     /**
      * If all excluded or ignored tests should be run nevertheless.
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     @get:Input
     val shouldUnexclude by lazy { project.properties.containsKey("unexclude") }
 
     /**
      * The properties of the project parsed into a [Config] object.
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     @get:Input
     val projectConfig: Config by lazy {
-        ConfigValueFactory.fromMap(project.properties
-            .filterKeys { it is String && it.startsWith("squit.") }
-            .mapKeys { (key, _) -> key.replaceFirst("squit.", "") })
+        ConfigValueFactory
+            .fromMap(
+                project.properties
+                    .filterKeys { it is String && it.startsWith("squit.") }
+                    .mapKeys { (key, _) -> key.replaceFirst("squit.", "") }
+            )
             .toConfig()
     }
-
-    /**
-     * The directory of the test sources.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
-    @get:InputDirectory
-    val sourcesPath by lazy { extension.sourcesPath }
-
-    /**
-     * The directory to save the results in.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
-    @get:OutputDirectory
-    val processedSourcesPath: Path = Paths.get(project.buildDir.path, SQUIT_DIRECTORY, SOURCES_DIRECTORY)
 
     @get:Internal
     internal var extension by Delegates.notNull<SquitExtension>()
@@ -90,7 +86,7 @@ open class SquitPreProcessTask : DefaultTask() {
     private val leafDirectoriesWithConfig by lazy {
         FilesUtils.getSortedLeafDirectories(sourcesPath)
             .filter { Files.newDirectoryStream(it).use { directories -> directories.any() } }
-            .map { it to resolveConfig(it) }
+            .map { it to configResolver.resolveConfig(it) }
             .filter { (testPath, resolvedProperties) ->
                 when {
                     isTestExcluded(resolvedProperties) -> {
@@ -104,8 +100,9 @@ open class SquitPreProcessTask : DefaultTask() {
             }
     }
 
-    private val configCache = mutableMapOf<Path, Config>()
     private val pathCache = mutableMapOf<Path, List<Path>>()
+
+    private val configResolver by lazy { ConfigResolver(projectConfig, sourcesPath) }
 
     init {
         group = "Build"
@@ -165,32 +162,6 @@ open class SquitPreProcessTask : DefaultTask() {
             }
 
             resolvedConfig.writeTo(processedConfigPath)
-        }
-    }
-
-    @Suppress("SwallowedException")
-    private fun resolveConfig(testPath: Path): Config {
-        var currentDirectoryPath = testPath
-        var result = ConfigFactory.empty()
-
-        while (!currentDirectoryPath.endsWith(sourcesPath.parent)) {
-            currentDirectoryPath.resolve(CONFIG).also { configPath ->
-                val newConfig = configCache.getOrPut(configPath) {
-                    ConfigFactory.parseFile(configPath.toFile())
-                }
-
-                result = result.withFallback(newConfig).mergeTag(configPath.parent.fileName.toString())
-            }
-
-            currentDirectoryPath = currentDirectoryPath.parent
-        }
-
-        return try {
-            projectConfig.withFallback(result).resolve().validate()
-        } catch (error: Throwable) {
-            throw GradleException(
-                "Invalid test.conf file on path of test: ${testPath.cut(sourcesPath)} (${error.message})"
-            )
         }
     }
 

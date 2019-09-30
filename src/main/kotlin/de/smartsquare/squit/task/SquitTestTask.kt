@@ -4,6 +4,9 @@ import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.Optional
 import de.smartsquare.squit.SquitExtension
+import de.smartsquare.squit.config.mediaType
+import de.smartsquare.squit.config.shouldIgnore
+import de.smartsquare.squit.config.title
 import de.smartsquare.squit.entity.SquitResponseInfo
 import de.smartsquare.squit.entity.SquitResult
 import de.smartsquare.squit.io.FilesUtils
@@ -22,9 +25,6 @@ import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.countTestResults
 import de.smartsquare.squit.util.cut
-import de.smartsquare.squit.util.mediaType
-import de.smartsquare.squit.util.shouldIgnore
-import de.smartsquare.squit.util.title
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputDirectory
@@ -51,7 +51,6 @@ open class SquitTestTask : DefaultTask() {
     /**
      * The directory of the test sources.
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     @get:InputDirectory
     val processedSourcesPath: Path = Paths.get(
         project.buildDir.path,
@@ -61,7 +60,6 @@ open class SquitTestTask : DefaultTask() {
     /**
      * The directory of the previously (processed) requested responses.
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     @get:InputDirectory
     val processedResponsesPath: Path = Paths.get(
         project.buildDir.path,
@@ -71,7 +69,6 @@ open class SquitTestTask : DefaultTask() {
     /**
      * Collection of meta.json files for up-to-date checking.
      */
-    @Suppress("MemberVisibilityCanBePrivate", "unused")
     @get:InputFiles
     @get:Optional
     val metaPaths: List<Path> by lazy {
@@ -89,7 +86,6 @@ open class SquitTestTask : DefaultTask() {
     /**
      * The directory to generate the xml report file into.
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     @get:OutputFile
     val xmlReportFilePath: Path by lazy {
         extension.reportsPath.resolve("xml").resolve("index.xml")
@@ -98,7 +94,6 @@ open class SquitTestTask : DefaultTask() {
     /**
      * The directory to generate the xml report file into.
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     @get:OutputDirectory
     val htmlReportDirectoryPath: Path by lazy {
         extension.reportsPath.resolve("html")
@@ -107,7 +102,6 @@ open class SquitTestTask : DefaultTask() {
     /**
      * The directory to copy failed tests into.
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     @get:OutputDirectory
     val failureResultDirectory by lazy {
         extension.reportsPath.resolve("failures") ?: throw IllegalArgumentException("reportPath cannot be null")

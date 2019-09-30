@@ -148,7 +148,7 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
                 server.takeRequest().let {
                     it.method shouldEqual "POST"
                     it.headers["Content-Type"] shouldEqual "application/xml"
-                    it.headers["some"] shouldEqual "header"
+                    it.headers["some"] shouldEqual "local header"
                 }
 
                 server.takeRequest().let {

@@ -1,4 +1,4 @@
-package de.smartsquare.squit.util
+package de.smartsquare.squit.config
 
 import com.typesafe.config.ConfigFactory
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -42,7 +42,7 @@ object ConfigExtensionsSpek : Spek({
             val call = { config.endpoint }
 
             it("should throw a proper exception") {
-                call shouldThrow IllegalStateException::class withMessage "Invalid endpoint: invalid"
+                call shouldThrow AnyException withMessage "Invalid endpoint: invalid"
             }
         }
     }
@@ -66,7 +66,7 @@ object ConfigExtensionsSpek : Spek({
             val call = { config.mediaType }
 
             it("should throw a proper exception") {
-                call shouldThrow IllegalStateException::class withMessage "Invalid mediaType: invalid"
+                call shouldThrow AnyException withMessage "Invalid mediaType: invalid"
             }
         }
     }
@@ -463,7 +463,7 @@ object ConfigExtensionsSpek : Spek({
             val call = { config.validate() }
 
             it("should throw a proper exception") {
-                call shouldThrow IllegalStateException::class withMessage "tags cannot be empty."
+                call shouldThrow AnyException withMessage "tags cannot be empty."
             }
         }
     }
@@ -511,7 +511,7 @@ object ConfigExtensionsSpek : Spek({
             val call = { config.validate() }
 
             it("should throw a proper exception") {
-                call shouldThrow IllegalStateException::class withMessage
+                call shouldThrow AnyException withMessage
                     "name of a databaseConfiguration cannot be empty."
             }
         }
@@ -536,7 +536,7 @@ object ConfigExtensionsSpek : Spek({
             val call = { config.validate() }
 
             it("should throw a proper exception") {
-                call shouldThrow IllegalStateException::class withMessage
+                call shouldThrow AnyException withMessage
                     "jdbc of a databaseConfiguration cannot be empty."
             }
         }
@@ -561,7 +561,7 @@ object ConfigExtensionsSpek : Spek({
             val call = { config.validate() }
 
             it("should throw a proper exception") {
-                call shouldThrow IllegalStateException::class withMessage
+                call shouldThrow AnyException withMessage
                     "username of a databaseConfiguration cannot be empty."
             }
         }
@@ -586,7 +586,7 @@ object ConfigExtensionsSpek : Spek({
             val call = { config.validate() }
 
             it("should throw a proper exception") {
-                call shouldThrow IllegalStateException::class withMessage
+                call shouldThrow AnyException withMessage
                     "password of a databaseConfiguration cannot be empty."
             }
         }
