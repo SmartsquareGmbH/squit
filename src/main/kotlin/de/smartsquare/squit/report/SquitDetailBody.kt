@@ -23,7 +23,7 @@ import kotlinx.html.span
 fun HTML.squitDetailBody(result: SquitResult) {
     body {
         div(classes = "container-fluid") {
-            squitTitle()
+            squitTitle(result)
             squitControls()
 
             if (result.description != null) squitDescription()
@@ -43,15 +43,35 @@ fun HTML.squitDetailBody(result: SquitResult) {
     }
 }
 
-private fun DIV.squitTitle() {
+private fun DIV.squitTitle(result: SquitResult) {
     div(classes = "row mt-4 mb-2") {
-        div(classes = "offset-lg-1 col-12 col-lg-10") {
-            h1 {
-                id = "title"
+        div(classes = "row offset-lg-1 col-12 col-lg-10") {
+            div(classes = "d-inline-flex") {
+                h1(classes = "d-inline-flex") {
+                    id = "title"
+                }
+
+                h4(classes = "d-inline-flex") {
+                    id = "subtitle"
+                }
             }
 
-            h4 {
-                id = "subtitle"
+            div(classes = "ml-2 d-inline-flex align-self-baseline") {
+                val badgeType = when {
+                    result.isIgnored -> "badge-secondary"
+                    result.isSuccess -> "badge-success"
+                    else -> "badge-danger"
+                }
+
+                val text = when {
+                    result.isIgnored -> "Ignored"
+                    result.isSuccess -> "Passed"
+                    else -> "Failed"
+                }
+
+                span(classes = "badge $badgeType float-right") {
+                    +text
+                }
             }
         }
     }
