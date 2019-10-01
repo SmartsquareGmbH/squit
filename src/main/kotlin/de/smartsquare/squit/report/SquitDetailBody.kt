@@ -24,15 +24,11 @@ fun HTML.squitDetailBody(result: SquitResult) {
     body {
         div(classes = "container-fluid") {
             squitTitle()
-
-            if (result.description != null) {
-                squitDescription()
-            }
-
             squitControls()
-            if (!result.expectedResponseInfo.isDefault) {
-                squitInfoDiff()
-            }
+
+            if (result.description != null) squitDescription()
+            if (!result.expectedResponseInfo.isDefault) squitInfoDiff()
+
             squitDiff()
         }
 
@@ -61,8 +57,32 @@ private fun DIV.squitTitle() {
     }
 }
 
+private fun DIV.squitControls() {
+    div(classes = "row mt-2 mb-2") {
+        div(classes = "offset-lg-1 col-12 col-lg-10") {
+            a(href = "../../index.html", classes = "btn btn-primary") {
+                attributes += "role" to "button"
+
+                i(classes = "fas fa-fw fa-arrow-left align-middle") {}
+                span(classes = "align-middle") {
+                    +" Back"
+                }
+            }
+
+            button(classes = "btn btn-primary float-right") {
+                id = "output-toggle"
+                type = ButtonType.button
+
+                span(classes = "align-middle") {
+                    +"Show side by side"
+                }
+            }
+        }
+    }
+}
+
 private fun DIV.squitDescription() {
-    div(classes = "row") {
+    div(classes = "row mt-4 mb-2") {
         div(classes = "offset-lg-1 col-12 col-lg-10") {
             div(classes = "card card-body") {
                 a(classes = "link-unstyled", href = "#description-container") {
@@ -87,30 +107,6 @@ private fun DIV.squitDescription() {
     }
 }
 
-private fun DIV.squitControls() {
-    div(classes = "row mt-2") {
-        div(classes = "offset-lg-1 col-12 col-lg-10") {
-            a(href = "../../index.html", classes = "btn btn-primary") {
-                attributes += "role" to "button"
-
-                i(classes = "fas fa-fw fa-arrow-left align-middle") {}
-                span(classes = "align-middle") {
-                    +" Back"
-                }
-            }
-
-            button(classes = "btn btn-primary float-right") {
-                id = "output-toggle"
-                type = ButtonType.button
-
-                span(classes = "align-middle") {
-                    +"Show side by side"
-                }
-            }
-        }
-    }
-}
-
 private fun DIV.squitDiff() {
     div(classes = "row mt-4 mb-2") {
         div(classes = "offset-lg-1 col-12 col-lg-10") {
@@ -120,7 +116,7 @@ private fun DIV.squitDiff() {
 }
 
 private fun DIV.squitInfoDiff() {
-    div(classes = "row mt-2 mb-2") {
+    div(classes = "row mt-4 mb-2") {
         div(classes = "offset-lg-1 col-12 col-lg-10") {
             +"HTTP Status Code"
         }
