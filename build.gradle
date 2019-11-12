@@ -84,7 +84,7 @@ dependencies {
     testImplementation "com.h2database:h2:$h2Version"
     testImplementation "io.mockk:mockk:$mockkVersion"
 
-    testRuntime "org.jetbrains.spek:spek-junit-platform-engine:$spekVersion"
+    testRuntimeOnly "org.jetbrains.spek:spek-junit-platform-engine:$spekVersion"
 }
 
 tasks.withType(KotlinCompile).all {
@@ -110,7 +110,11 @@ jacoco {
 }
 
 ktlint {
-    reporters = [ReporterType.CHECKSTYLE]
+    disabledRules = ["import-ordering"]
+
+    reporters {
+        reporter "checkstyle"
+    }
 }
 
 detekt {
@@ -126,15 +130,18 @@ detekt {
 }
 
 dokka {
-    jdkVersion = 8
     outputDirectory = javadoc.destinationDir
 
-    externalDocumentationLink { url = new URL("https://dom4j.github.io/javadoc/$dom4jVersion/") }
-    externalDocumentationLink { url = new URL("https://lightbend.github.io/config/latest/api/index.html") }
+    configuration {
+        jdkVersion = 8
 
-    externalDocumentationLink {
-        url = new URL("https://www.javadoc.io/doc/com.google.code.gson/gson/$gsonVersion")
-        packageListUrl = new URL("https://raw.githubusercontent.com/google/gson/master/gson/docs/javadocs/package-list")
+        externalDocumentationLink { url = new URL("https://dom4j.github.io/javadoc/$dom4jVersion/") }
+        externalDocumentationLink { url = new URL("https://lightbend.github.io/config/latest/api/index.html") }
+
+        externalDocumentationLink {
+            url = new URL("https://www.javadoc.io/doc/com.google.code.gson/gson/$gsonVersion")
+            packageListUrl = new URL("https://raw.githubusercontent.com/google/gson/master/gson/docs/javadocs/package-list")
+        }
     }
 }
 

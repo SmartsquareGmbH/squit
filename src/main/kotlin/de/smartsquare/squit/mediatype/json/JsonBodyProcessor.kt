@@ -1,7 +1,6 @@
 package de.smartsquare.squit.mediatype.json
 
 import com.google.gson.JsonElement
-import com.google.gson.JsonParser
 import com.typesafe.config.Config
 import de.smartsquare.squit.config.postProcessorScripts
 import de.smartsquare.squit.config.postProcessors
@@ -9,8 +8,8 @@ import de.smartsquare.squit.config.preProcessorScripts
 import de.smartsquare.squit.config.preProcessors
 import de.smartsquare.squit.interfaces.SquitJsonPostProcessor
 import de.smartsquare.squit.interfaces.SquitJsonPreProcessor
+import de.smartsquare.squit.io.JsonParserSupport
 import de.smartsquare.squit.mediatype.BodyProcessor
-import de.smartsquare.squit.util.read
 import de.smartsquare.squit.util.write
 import groovy.lang.Binding
 import groovy.lang.GroovyShell
@@ -29,8 +28,8 @@ class JsonBodyProcessor : BodyProcessor {
         resultResponsePath: Path,
         config: Config
     ) {
-        val request = requestPath?.let { JsonParser().read(it) }
-        val response = JsonParser().read(responsePath)
+        val request = requestPath?.let { JsonParserSupport.read(it) }
+        val response = JsonParserSupport.read(responsePath)
 
         runPreProcessors(config, request, response)
 
@@ -44,8 +43,8 @@ class JsonBodyProcessor : BodyProcessor {
         resultActualResponseFilePath: Path,
         config: Config
     ) {
-        val actualResponse = JsonParser().read(actualResponsePath)
-        val expectedResponse = JsonParser().read(expectedResponsePath)
+        val actualResponse = JsonParserSupport.read(actualResponsePath)
+        val expectedResponse = JsonParserSupport.read(expectedResponsePath)
 
         runPostProcessors(config, actualResponse, expectedResponse)
 
