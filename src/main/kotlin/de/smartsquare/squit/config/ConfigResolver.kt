@@ -41,7 +41,8 @@ class ConfigResolver(private val projectConfig: Config, private val sourcesPath:
             result.withFallback(projectConfig).resolve().validate()
         } catch (error: Throwable) {
             throw GradleException(
-                "Invalid test.conf or local.conf file on path of test: ${testPath.cut(sourcesPath)} (${error.message})"
+                "Invalid test.conf or local.conf file on path of test: ${testPath.cut(sourcesPath)}",
+                error
             )
         }
     }
