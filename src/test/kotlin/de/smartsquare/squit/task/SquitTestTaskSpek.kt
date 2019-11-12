@@ -2,7 +2,6 @@ package de.smartsquare.squit.task
 
 import de.smartsquare.squit.TestUtils
 import de.smartsquare.squit.withExtendedPluginClasspath
-import de.smartsquare.squit.withJaCoCo
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
@@ -123,7 +122,6 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
-                .withJaCoCo()
                 .build()
 
             it("should be able to complete without errors") {
@@ -172,7 +170,6 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
-                .withJaCoCo()
                 .buildAndFail()
 
             it("should fail the build") {
@@ -209,7 +206,6 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
-                .withJaCoCo()
                 .buildAndFail()
 
             it("should fail the build") {
@@ -241,7 +237,6 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
-                .withJaCoCo()
                 .buildAndFail()
 
             it("should fail the build") {
@@ -267,7 +262,6 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
-                .withJaCoCo()
                 .buildAndFail()
 
             it("should fail the build") {
@@ -305,7 +299,6 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
-                .withJaCoCo()
                 .build()
 
             it("should be able to complete without errors") {
@@ -336,7 +329,6 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
-                .withJaCoCo()
                 .build()
 
             it("should be able to complete without errors") {
@@ -367,7 +359,6 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
-                .withJaCoCo()
                 .build()
 
             it("should be able to complete without errors") {
@@ -409,7 +400,6 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
-                .withJaCoCo()
                 .build()
 
             it("should be able to complete without errors") {
@@ -440,7 +430,6 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
-                .withJaCoCo()
                 .build()
 
             it("should be able to complete without errors") {
@@ -461,7 +450,6 @@ object SquitTestTaskSpek : SubjectSpek<Path>({
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
-                .withJaCoCo()
                 .buildAndFail()
 
             it("should fail the build") {

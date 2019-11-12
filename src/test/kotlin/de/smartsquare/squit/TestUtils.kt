@@ -3,7 +3,6 @@ package de.smartsquare.squit
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.internal.PluginUnderTestMetadataReading
 import java.io.File
-import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -32,18 +31,4 @@ fun GradleRunner.withExtendedPluginClasspath(): GradleRunner {
         .plus(File(org.h2.Driver::class.java.protectionDomain.codeSource.location.toURI()))
 
     return withPluginClasspath(classpath)
-}
-
-/**
- * Helper method for using the Gradle testkit with Jacoco.
- */
-fun GradleRunner.withJaCoCo(): GradleRunner {
-    val testkitProperties = javaClass.classLoader.getResourceAsStream("testkit-gradle.properties")!!.readBytes()
-    val fixedProperties = testkitProperties.toString(Charset.defaultCharset())
-        .replace("/", File.separator)
-        .replace("\\", "\\\\")
-
-    File(projectDir, "gradle.properties").writeText(fixedProperties)
-
-    return this
 }

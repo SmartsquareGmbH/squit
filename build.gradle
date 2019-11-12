@@ -18,7 +18,6 @@ buildscript {
 
         classpath "org.jlleitschuh.gradle:ktlint-gradle:$ktlintPluginVersion"
         classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detektVersion"
-        classpath "gradle.plugin.pl.droidsonroids.gradle.jacoco:jacoco-testkit-plugin:$jacocoTestkitVersion"
     }
 }
 
@@ -36,7 +35,6 @@ apply plugin: "org.jetbrains.dokka"
 
 apply plugin: "io.gitlab.arturbosch.detekt"
 apply plugin: "org.jlleitschuh.gradle.ktlint"
-apply plugin: "pl.droidsonroids.jacoco.testkit"
 
 group = "de.smartsquare"
 version = squitVersion
@@ -113,7 +111,7 @@ ktlint {
     disabledRules = ["import-ordering"]
 
     reporters {
-        reporter "checkstyle"
+        reporter ReporterType.CHECKSTYLE
     }
 }
 

@@ -8,7 +8,6 @@ ext {
     dokkaVersion = '0.10.0'
 
     jacocoVersion = '0.8.5'
-    jacocoTestkitVersion = '1.0.3'
     gradleVersionsVersion = '0.27.0'
     gradleTestIdeaFixVersion = '0.1.0'
 
