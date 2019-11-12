@@ -9,12 +9,16 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 /**
+ * Object extending the [JsonParser] with utility methods.
+ *
  * @author Ruben Gees
  */
 object JsonParserSupport {
 
     /**
      * Reads the file at the given [path] and returns a [JsonElement].
+     *
+     * This is a safe operation, as such the file is correctly closed.
      */
     fun read(path: Path): JsonElement = try {
         val jsonElement = Files.newBufferedReader(path).use {
@@ -25,6 +29,6 @@ object JsonParserSupport {
     } catch (error: IOException) {
         throw GradleException("Could not read json file: $path", error)
     } catch (error: JsonParseException) {
-        throw GradleException("Could not read json file: $path ($error)", error)
+        throw GradleException("Could not read json file: $path", error)
     }
 }

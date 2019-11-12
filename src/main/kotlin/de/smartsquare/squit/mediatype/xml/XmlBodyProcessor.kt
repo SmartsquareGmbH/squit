@@ -7,13 +7,12 @@ import de.smartsquare.squit.config.preProcessorScripts
 import de.smartsquare.squit.config.preProcessors
 import de.smartsquare.squit.interfaces.SquitXmlPostProcessor
 import de.smartsquare.squit.interfaces.SquitXmlPreProcessor
+import de.smartsquare.squit.io.SAXReaderSupport
 import de.smartsquare.squit.mediatype.BodyProcessor
-import de.smartsquare.squit.util.read
 import de.smartsquare.squit.util.write
 import groovy.lang.Binding
 import groovy.lang.GroovyShell
 import org.dom4j.Document
-import org.dom4j.io.SAXReader
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -32,8 +31,8 @@ class XmlBodyProcessor : BodyProcessor {
         resultResponsePath: Path,
         config: Config
     ) {
-        val request = requestPath?.let { SAXReader().read(requestPath) }
-        val response = SAXReader().read(responsePath)
+        val request = requestPath?.let { SAXReaderSupport.read(requestPath) }
+        val response = SAXReaderSupport.read(responsePath)
 
         runPreProcessors(config, request, response)
 
@@ -47,8 +46,8 @@ class XmlBodyProcessor : BodyProcessor {
         resultActualResponseFilePath: Path,
         config: Config
     ) {
-        val actualResponse = SAXReader().read(actualResponsePath)
-        val expectedResponse = SAXReader().read(expectedResponsePath)
+        val actualResponse = SAXReaderSupport.read(actualResponsePath)
+        val expectedResponse = SAXReaderSupport.read(expectedResponsePath)
 
         runPostProcessors(config, actualResponse, expectedResponse)
 

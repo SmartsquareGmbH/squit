@@ -6,10 +6,7 @@ import com.google.gson.JsonElement
 import de.smartsquare.squit.entity.SquitOutputFormat
 import de.smartsquare.squit.entity.SquitResult
 import org.dom4j.io.OutputFormat
-import org.dom4j.io.SAXReader
 import org.dom4j.io.XMLWriter
-import org.gradle.api.GradleException
-import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -36,19 +33,6 @@ fun Path.cut(other: Path): Path {
             isSame
         }
         .fold(Paths.get("")) { acc, path -> acc.resolve(path) }
-}
-
-/**
- * Reads and returns a [org.dom4j.Document] at the given [path].
- *
- * This is a safe operation, as such the file is correctly closed.
- */
-fun SAXReader.read(path: Path): XmlDocument = try {
-    Files.newBufferedReader(path).use {
-        read(it)
-    }
-} catch (error: IOException) {
-    throw GradleException("Could not read xml file: $path ($error)")
 }
 
 /**
