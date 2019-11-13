@@ -91,7 +91,7 @@ open class SquitPreProcessTask : DefaultTask() {
             .filter { (testPath, config) ->
                 when {
                     isTestExcluded(config) -> {
-                        logger.warn("Excluding test ${testPath.cut(sourcesPath)}")
+                        logger.info("Excluding test ${testPath.cut(sourcesPath)}")
 
                         false
                     }
