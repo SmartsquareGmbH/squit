@@ -33,6 +33,7 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
     val subjectGet = Paths.get(this.javaClass.classLoader.getResource("test-project-get")!!.toURI())
     val subjectOptions = Paths.get(this.javaClass.classLoader.getResource("test-project-options")!!.toURI())
     val subjectJson = Paths.get(this.javaClass.classLoader.getResource("test-project-json")!!.toURI())
+    val subjectPlaceholders = Paths.get(this.javaClass.classLoader.getResource("test-project-placeholders")!!.toURI())
 
     val buildPath = subject
         .resolve("build")
@@ -320,6 +321,26 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
             it("should copy the request file") {
                 Files.exists(jsonCall1Directory.resolve("request.json")).shouldBeTrue()
+            }
+        }
+    }
+
+    given("a test project with multiple placeholders") {
+        on("running the pre-process task with only placeholders of tests to run set") {
+            val arguments = listOf(
+                "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com", "-Ptags=call2",
+                "-Psquit.rootDir=$subjectPlaceholders", "-Psquit.placeholder2=test", "--stacktrace"
+            )
+
+            val result = GradleRunner.create()
+                .withProjectDir(subjectPlaceholders.toFile())
+                .withExtendedPluginClasspath()
+                .withArguments(arguments)
+                .forwardOutput()
+                .build()
+
+            it("should be able to complete without error") {
+                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
             }
         }
     }

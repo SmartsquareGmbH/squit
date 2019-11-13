@@ -19,7 +19,7 @@ import java.io.File
 /**
  * @author Ruben Gees
  */
-object ConfigExtensionsSpek : Spek({
+object ConfigWalkerSpek : Spek({
 
     val testProject = File(this.javaClass.classLoader.getResource("test-project")!!.toURI()).toPath()
 

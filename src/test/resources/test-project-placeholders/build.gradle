@@ -1,0 +1,8 @@
+plugins {
+    id 'base'
+    id 'de.smartsquare.squit'
+}
+
+squit {
+    jdbcDrivers = ["org.h2.Driver"]
+}

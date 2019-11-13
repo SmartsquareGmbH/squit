@@ -3,12 +3,13 @@ package de.smartsquare.squit.task
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigValueFactory
 import de.smartsquare.squit.SquitExtension
-import de.smartsquare.squit.config.ConfigResolver
+import de.smartsquare.squit.config.ConfigWalker
 import de.smartsquare.squit.config.databaseConfigurations
 import de.smartsquare.squit.config.mediaType
 import de.smartsquare.squit.config.method
 import de.smartsquare.squit.config.shouldExclude
 import de.smartsquare.squit.config.tags
+import de.smartsquare.squit.config.validate
 import de.smartsquare.squit.config.writeTo
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeFactory
@@ -86,23 +87,33 @@ open class SquitPreProcessTask : DefaultTask() {
     private val leafDirectoriesWithConfig by lazy {
         FilesUtils.getSortedLeafDirectories(sourcesPath)
             .filter { Files.newDirectoryStream(it).use { directories -> directories.any() } }
-            .map { it to configResolver.resolveConfig(it) }
-            .filter { (testPath, resolvedProperties) ->
+            .map { it to configResolver.walk(it) }
+            .filter { (testPath, config) ->
                 when {
-                    isTestExcluded(resolvedProperties) -> {
+                    isTestExcluded(config) -> {
                         logger.warn("Excluding test ${testPath.cut(sourcesPath)}")
 
                         false
                     }
-                    !isTestCoveredByTags(resolvedProperties) -> false
+                    !isTestCoveredByTags(config) -> false
                     else -> true
+                }
+            }
+            .map { (path, config) ->
+                try {
+                    path to config.resolve().validate()
+                } catch (error: Throwable) {
+                    throw GradleException(
+                        "Invalid test.conf or local.conf file on path of test: ${path.cut(sourcesPath)}",
+                        error
+                    )
                 }
             }
     }
 
     private val pathCache = mutableMapOf<Path, List<Path>>()
 
-    private val configResolver by lazy { ConfigResolver(projectConfig, sourcesPath) }
+    private val configResolver by lazy { ConfigWalker(projectConfig, sourcesPath) }
 
     init {
         group = "Build"
