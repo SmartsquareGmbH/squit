@@ -34,8 +34,6 @@ import kotlin.properties.Delegates
 
 /**
  * Task for pre-processing the available sources like requests, responses, sql scripts and properties.
- *
- * @author Ruben Gees
  */
 @Suppress("LargeClass")
 open class SquitPreProcessTask : DefaultTask() {

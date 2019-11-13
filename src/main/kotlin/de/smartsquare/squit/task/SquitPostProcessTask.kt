@@ -25,8 +25,6 @@ import kotlin.properties.Delegates
 
 /**
  * Task for post-processing the responses.
- *
- * @author Ruben Gees
  */
 open class SquitPostProcessTask : DefaultTask() {
 

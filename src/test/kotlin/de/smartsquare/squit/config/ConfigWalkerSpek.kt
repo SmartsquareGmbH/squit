@@ -16,9 +16,6 @@ import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import java.io.File
 
-/**
- * @author Ruben Gees
- */
 object ConfigWalkerSpek : Spek({
 
     val testProject = File(this.javaClass.classLoader.getResource("test-project")!!.toURI()).toPath()

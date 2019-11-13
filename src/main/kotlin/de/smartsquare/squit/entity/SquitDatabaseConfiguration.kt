@@ -7,8 +7,6 @@ package de.smartsquare.squit.entity
  * @property jdbcAddress The jdbc address, used to connect.
  * @property username The username to use when connecting.
  * @property password The password to use when connecting.
- *
- * @author Ruben Gees
  */
 data class SquitDatabaseConfiguration(
     val name: String,

@@ -7,8 +7,6 @@ import java.nio.file.Path
 
 /**
  * Generic [BodyProcessor] implementation which simply copies over the request and responses.
- *
- * @author Ruben Gees
  */
 class GenericBodyProcessor : BodyProcessor {
 

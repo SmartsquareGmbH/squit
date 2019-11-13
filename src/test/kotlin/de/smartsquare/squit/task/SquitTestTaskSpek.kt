@@ -26,9 +26,6 @@ import java.nio.file.Paths
 import kotlin.properties.Delegates
 import kotlin.streams.toList
 
-/**
- * @author Ruben Gees
- */
 object SquitTestTaskSpek : SubjectSpek<Path>({
 
     subject { Paths.get(this.javaClass.classLoader.getResource("test-project")!!.toURI()) }

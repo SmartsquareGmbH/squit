@@ -7,9 +7,6 @@ import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import java.nio.file.Paths
 
-/**
- * @author Ruben Gees
- */
 object UtilExtensionsSpek : Spek({
 
     given("two paths") {

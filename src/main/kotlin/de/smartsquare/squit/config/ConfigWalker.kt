@@ -16,7 +16,7 @@ class ConfigWalker(private val projectConfig: Config, private val sourcesPath: P
     private val configCache = ConcurrentHashMap<Path, Config>()
 
     /**
-     * Walks the configs found on the given [testPath] up to (including) the [sourcesPath].
+     * Walks the configs found on the given [testPath] up to (including) the sourcesPath.
      *
      * The configs are merged, starting with the config the most deep in the file tree.
      * In each directory, this method scans for a "local.conf" and "test.conf" file and the "local.conf" file

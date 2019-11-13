@@ -30,8 +30,6 @@ import java.nio.file.Paths
  * @param testDirectoryPath The path of the directory, the test files are contained in.
  * @param squitBuildDirectoryPath The directory of Squit's build files. Used to resolve the [metaInfo],
  * [expectedLines] and [actualLines] properties.
- *
- * @author Ruben Gees
  */
 data class SquitResult(
     val id: Long,

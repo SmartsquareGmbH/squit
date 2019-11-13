@@ -9,8 +9,6 @@ import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
 /**
  * Object with io related utility methods in the style of [java.nio.file.Files].
- *
- * @author Ruben Gees
  */
 object FilesUtils {
 

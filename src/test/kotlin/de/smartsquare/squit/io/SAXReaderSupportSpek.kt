@@ -12,9 +12,6 @@ import org.jetbrains.spek.api.dsl.on
 import java.io.IOException
 import java.nio.file.Paths
 
-/**
- * @author Ruben Gees
- */
 object SAXReaderSupportSpek : Spek({
 
     val testProject = Paths.get(this.javaClass.classLoader.getResource("test-project")!!.toURI())

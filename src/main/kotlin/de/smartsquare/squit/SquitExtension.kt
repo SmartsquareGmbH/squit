@@ -9,8 +9,6 @@ import java.nio.file.Paths
 
 /**
  * Class containing the available extensions for the squit dsl.
- *
- * @author Ruben Gees
  */
 open class SquitExtension(project: Project) {
 

@@ -15,8 +15,6 @@ import java.nio.file.Path
 
 /**
  * Object for writing the Squit html report.
- *
- * @author Ruben Gees
  */
 object HtmlReportWriter {
 

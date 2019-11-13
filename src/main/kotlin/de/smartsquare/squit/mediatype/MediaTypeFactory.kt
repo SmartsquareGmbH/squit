@@ -15,8 +15,6 @@ import okhttp3.MediaType.Companion.toMediaType
 
 /**
  * Object for retrieving media type specific values.
- *
- * @author Ruben Gees
  */
 object MediaTypeFactory {
 

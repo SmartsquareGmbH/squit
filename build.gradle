@@ -133,8 +133,15 @@ dokka {
     configuration {
         jdkVersion = 8
 
-        externalDocumentationLink { url = new URL("https://dom4j.github.io/javadoc/$dom4jVersion/") }
-        externalDocumentationLink { url = new URL("https://lightbend.github.io/config/latest/api/index.html") }
+        externalDocumentationLink {
+            url = new URL("https://dom4j.github.io/javadoc/$dom4jVersion/")
+            packageListUrl = new URL("https://dom4j.github.io/javadoc/2.1.1/package-list")
+        }
+
+        externalDocumentationLink {
+            url = new URL("https://lightbend.github.io/config/latest/api/index.html")
+            packageListUrl = new URL("https://lightbend.github.io/config/latest/api/package-list")
+        }
 
         externalDocumentationLink {
             url = new URL("https://www.javadoc.io/doc/com.google.code.gson/gson/$gsonVersion")

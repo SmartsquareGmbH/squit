@@ -7,9 +7,6 @@ import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 
-/**
- * @author Ruben Gees
- */
 object FilesUtilsSpek : Spek({
     given("a directory structure") {
         on("getting sorted leaf directories") {

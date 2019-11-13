@@ -19,9 +19,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.properties.Delegates
 
-/**
- * @author Ruben Gees
- */
 object SquitPostProcessTaskSpek : SubjectSpek<Path>({
 
     subject { File(this.javaClass.classLoader.getResource("test-project")!!.toURI()).toPath() }

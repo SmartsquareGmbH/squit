@@ -2,8 +2,6 @@ package de.smartsquare.squit.util
 
 /**
  * Object which acts as a collection of various constants.
- *
- * @author Ruben Gees
  */
 object Constants {
 

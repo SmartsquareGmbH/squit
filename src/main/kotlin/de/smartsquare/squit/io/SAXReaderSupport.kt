@@ -9,8 +9,6 @@ import java.nio.file.Path
 
 /**
  * Object extending the [SAXReader] with utility methods.
- *
- * @author Ruben Gees
  */
 object SAXReaderSupport {
 

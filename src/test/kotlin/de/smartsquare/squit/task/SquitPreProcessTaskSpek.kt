@@ -20,9 +20,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
-/**
- * @author Ruben Gees
- */
 object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
     subject { Paths.get(this.javaClass.classLoader.getResource("test-project")!!.toURI()) }

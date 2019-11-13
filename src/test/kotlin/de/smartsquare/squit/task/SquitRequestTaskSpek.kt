@@ -29,9 +29,6 @@ import java.sql.DriverManager
 import java.time.LocalDateTime
 import kotlin.properties.Delegates
 
-/**
- * @author Ruben Gees
- */
 object SquitRequestTaskSpek : SubjectSpek<Path>({
 
     subject { File(this.javaClass.classLoader.getResource("test-project")!!.toURI()).toPath() }

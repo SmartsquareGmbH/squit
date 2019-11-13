@@ -13,9 +13,6 @@ import org.jetbrains.spek.api.dsl.on
 import java.nio.file.Path
 import java.nio.file.Paths
 
-/**
- * @author Ruben Gees
- */
 object SquitResultTreeSpek : Spek({
 
     given("a list of SquitResults") {

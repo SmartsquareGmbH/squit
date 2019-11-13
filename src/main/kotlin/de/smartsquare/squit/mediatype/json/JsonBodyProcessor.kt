@@ -15,10 +15,6 @@ import groovy.lang.Binding
 import groovy.lang.GroovyShell
 import java.nio.file.Files
 import java.nio.file.Path
-
-/**
- * @author Ruben Gees
- */
 class JsonBodyProcessor : BodyProcessor {
 
     override fun preProcess(

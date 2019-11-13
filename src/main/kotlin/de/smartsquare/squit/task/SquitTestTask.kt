@@ -42,8 +42,6 @@ import kotlin.streams.toList
 
 /**
  * Task for comparing the actual responses to the expected responses and generating a report.
- *
- * @author Ruben Gees
  */
 @Suppress("StringLiteralDuplication")
 open class SquitTestTask : DefaultTask() {

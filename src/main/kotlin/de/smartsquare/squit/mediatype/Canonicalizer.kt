@@ -4,8 +4,6 @@ import de.smartsquare.squit.SquitExtension
 
 /**
  * Interface for canonicalizing structures to make them easier to diff.
- *
- * @author Ruben Gees
  */
 interface Canonicalizer {
 

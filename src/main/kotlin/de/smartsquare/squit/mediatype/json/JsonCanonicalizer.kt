@@ -9,8 +9,6 @@ import de.smartsquare.squit.mediatype.Canonicalizer
 
 /**
  * [Canonicalizer] for Json.
- *
- * @author Ruben Gees
  */
 class JsonCanonicalizer : Canonicalizer {
 

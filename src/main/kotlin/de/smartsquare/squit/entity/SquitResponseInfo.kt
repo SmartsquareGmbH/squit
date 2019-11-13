@@ -8,8 +8,6 @@ import de.smartsquare.squit.config.expectedResponseCode
  * Data class holding further response information concerning a single [SquitResult].
  *
  * @property responseCode The http status code of the response
- *
- * @author Sascha Koch
  */
 data class SquitResponseInfo(val responseCode: Int = 0) {
 

@@ -12,9 +12,6 @@ import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 
-/**
- * @author Sascha Koch
- */
 object HtmlReportWriterSpek : Spek({
 
     val writer = HtmlReportWriter

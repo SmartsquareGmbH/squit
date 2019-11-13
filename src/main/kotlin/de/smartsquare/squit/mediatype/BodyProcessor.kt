@@ -5,8 +5,6 @@ import java.nio.file.Path
 
 /**
  * Interface for processing request bodies before and after sending/receiving.
- *
- * @author Ruben Gees
  */
 interface BodyProcessor {
 

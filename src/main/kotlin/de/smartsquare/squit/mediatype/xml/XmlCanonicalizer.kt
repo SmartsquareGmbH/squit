@@ -13,8 +13,6 @@ import org.apache.xml.security.c14n.Canonicalizer as ApacheCanonicalizer
 
 /**
  * [Canonicalizer] for Xml.
- *
- * @author Ruben Gees
  */
 class XmlCanonicalizer : Canonicalizer {
 

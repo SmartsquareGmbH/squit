@@ -10,8 +10,6 @@ import java.nio.file.Path
 
 /**
  * Object extending the [JsonParser] with utility methods.
- *
- * @author Ruben Gees
  */
 object JsonParserSupport {
 

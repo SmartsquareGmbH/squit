@@ -59,8 +59,6 @@ import kotlin.properties.Delegates
 /**
  * Task for running requests against the given api. Also capable of running existing sql scripts before and after the
  * request.
- *
- * @author Ruben Gees
  */
 open class SquitRequestTask : DefaultTask() {
 

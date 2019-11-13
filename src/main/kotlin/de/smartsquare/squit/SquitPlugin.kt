@@ -11,8 +11,6 @@ import org.gradle.api.Project
 
 /**
  * The main plugin class.
- *
- * @author Ruben Gees
  */
 @Suppress("unused")
 class SquitPlugin : Plugin<Project> {

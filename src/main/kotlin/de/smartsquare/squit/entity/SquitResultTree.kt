@@ -12,8 +12,6 @@ import de.smartsquare.squit.util.countTestResults
  * @property failedTests The amount of failed tests. If this is a leaf, this may be at most one.
  * @property totalTests The total amount of tests. If this is a leaf, this is one.
  * @property ignoredTests The amount of ignored tests. If this is a leaf, this may be at most one.
- *
- * @author Ruben Gees
  */
 data class SquitResultTree(
     val id: Long,
