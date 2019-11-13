@@ -15,34 +15,35 @@ import java.nio.file.Paths
 /**
  * @author Ruben Gees
  */
-object JsonParserSupportTest : Spek({
-    val jsonTestProject = Paths.get(this.javaClass.classLoader.getResource("test-project-json")!!.toURI())
+object SAXReaderSupportSpek : Spek({
 
-    val sampleJsonPath = jsonTestProject
+    val testProject = Paths.get(this.javaClass.classLoader.getResource("test-project")!!.toURI())
+
+    val sampleXmlPath = testProject
         .resolve("src")
         .resolve("test")
         .resolve("project")
         .resolve("call1")
-        .resolve("request.json")
+        .resolve("request.xml")
 
-    given("a path to a valid json file") {
+    given("a path to a valid xml file") {
         on("reading it") {
-            val element = JsonParserSupport.read(sampleJsonPath)
+            val document = SAXReaderSupport.read(sampleXmlPath)
 
             it("should be read correctly") {
-                element.asJsonObject["test"].asInt shouldBe 123
+                document.selectNodes("//animal").size shouldBe 2
             }
         }
     }
 
-    given("a path to a non-existing json file") {
-        val nonExisting = jsonTestProject.resolve("non-existing")
+    given("a path to a non-existing xml file") {
+        val nonExisting = testProject.resolve("non-existing")
 
         on("reading it") {
-            val readCall = { JsonParserSupport.read(nonExisting) }
+            val readCall = { SAXReaderSupport.read(nonExisting) }
 
             it("should throw a proper exception") {
-                val expectedMessage = "Could not read json file: $nonExisting"
+                val expectedMessage = "Could not read xml file: $nonExisting"
 
                 readCall shouldThrow GradleException::class withMessage expectedMessage withCause IOException::class
             }

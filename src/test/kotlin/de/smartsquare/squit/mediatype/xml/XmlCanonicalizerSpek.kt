@@ -9,7 +9,7 @@ import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 
-object XmlCanonicalizerTest : Spek({
+object XmlCanonicalizerSpek : Spek({
     given("an xml canonicalizer") {
         val canonicalizer = XmlCanonicalizer()
 

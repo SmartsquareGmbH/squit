@@ -9,7 +9,7 @@ import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 
-object JsonCanonicalizerTest : Spek({
+object JsonCanonicalizerSpek : Spek({
     given("a json canonicalizer") {
         val canonicalizer = JsonCanonicalizer()
 
