@@ -156,7 +156,7 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
         on("running the pre-process task with the unignore flag") {
             val arguments = listOf(
                 "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                "-Psquit.rootDir=$subject", "-Punignore"
+                "-Psquit.rootDir=$subject", "-Psquit.titlePlaceholder=newTitle"
             )
 
             val result = GradleRunner.create()
@@ -172,6 +172,28 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
             it("should also pre-process the ignored test") {
                 Files.exists(buildPath.resolve("sources").resolve("project").resolve("call4")).shouldBeTrue()
+            }
+
+            it("should merge configs in the correct order") {
+                Files.readAllBytes(call2Config).toString(Charsets.UTF_8) shouldContain "title=newTitle"
+            }
+        }
+
+        on("running the pre-process task with overriding config") {
+            val arguments = listOf(
+                "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
+                "-Psquit.rootDir=$subject", "-Punignore"
+            )
+
+            val result = GradleRunner.create()
+                .withProjectDir(subject.toFile())
+                .withExtendedPluginClasspath()
+                .withArguments(arguments)
+                .forwardOutput()
+                .build()
+
+            it("should be able to complete without error") {
+                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
             }
         }
     }

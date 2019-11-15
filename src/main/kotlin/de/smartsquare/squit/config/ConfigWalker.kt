@@ -31,7 +31,7 @@ class ConfigWalker(private val projectConfig: Config, private val sourcesPath: P
                 acc.withFallback(config).mergeTag(path.fileName.toString())
             })
 
-        return result.withFallback(projectConfig)
+        return projectConfig.withFallback(result)
     }
 
     private fun resolve(path: Path): Config {
