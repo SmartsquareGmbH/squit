@@ -21,6 +21,11 @@ object TestUtils {
     fun deleteDatabaseFiles(path: Path) = Files.newDirectoryStream(path, DB_FILTER).use { files ->
         files.forEach { Files.delete(it) }
     }
+
+    /**
+     * Returns the [Path] of the resource with the given [name]…
+     */
+    fun getResourcePath(name: String): Path = File(this.javaClass.classLoader.getResource(name)!!.toURI()).toPath()
 }
 
 /**

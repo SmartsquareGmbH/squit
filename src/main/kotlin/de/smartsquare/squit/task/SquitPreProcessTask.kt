@@ -3,13 +3,11 @@ package de.smartsquare.squit.task
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigValueFactory
 import de.smartsquare.squit.SquitExtension
+import de.smartsquare.squit.config.ConfigResolver
 import de.smartsquare.squit.config.ConfigWalker
 import de.smartsquare.squit.config.databaseConfigurations
 import de.smartsquare.squit.config.mediaType
 import de.smartsquare.squit.config.method
-import de.smartsquare.squit.config.shouldExclude
-import de.smartsquare.squit.config.tags
-import de.smartsquare.squit.config.validate
 import de.smartsquare.squit.config.writeTo
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeFactory
@@ -83,35 +81,14 @@ open class SquitPreProcessTask : DefaultTask() {
     internal var extension by Delegates.notNull<SquitExtension>()
 
     private val leafDirectoriesWithConfig by lazy {
-        FilesUtils.getSortedLeafDirectories(sourcesPath)
-            .filter { Files.newDirectoryStream(it).use { directories -> directories.any() } }
-            .map { it to configResolver.walk(it) }
-            .filter { (testPath, config) ->
-                when {
-                    isTestExcluded(config) -> {
-                        logger.info("Excluding test ${testPath.cut(sourcesPath)}")
-
-                        false
-                    }
-                    !isTestCoveredByTags(config) -> false
-                    else -> true
-                }
-            }
-            .map { (path, config) ->
-                try {
-                    path to config.resolve().validate()
-                } catch (error: Throwable) {
-                    throw GradleException(
-                        "Invalid test.conf or local.conf file on path of test: ${path.cut(sourcesPath)}",
-                        error
-                    )
-                }
-            }
+        configResolver.resolveWithLeafDirectories(tags, shouldUnexclude)
     }
 
     private val pathCache = mutableMapOf<Path, List<Path>>()
 
-    private val configResolver by lazy { ConfigWalker(projectConfig, sourcesPath) }
+    private val configResolver by lazy {
+        ConfigResolver(ConfigWalker(projectConfig, sourcesPath), sourcesPath, logger)
+    }
 
     init {
         group = "Build"
@@ -256,7 +233,4 @@ open class SquitPreProcessTask : DefaultTask() {
 
         return result.filter { it.isNotBlank() }
     }
-
-    private fun isTestExcluded(config: Config) = config.shouldExclude && !shouldUnexclude
-    private fun isTestCoveredByTags(config: Config) = tags.isEmpty() || tags.any { it in config.tags }
 }
