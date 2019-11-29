@@ -15,6 +15,11 @@ import groovy.lang.Binding
 import groovy.lang.GroovyShell
 import java.nio.file.Files
 import java.nio.file.Path
+
+/**
+ * Json-specific [BodyProcessor] implementation. It allows for user-supplied pre- and post-processor implementations
+ * to run on the generated [JsonElement] instances and saves the results.
+ */
 class JsonBodyProcessor : BodyProcessor {
 
     override fun preProcess(

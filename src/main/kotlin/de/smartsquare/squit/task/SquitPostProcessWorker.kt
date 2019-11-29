@@ -63,6 +63,7 @@ abstract class SquitPostProcessWorker : WorkAction<SquitPostProcessWorker.PostPr
         }
     }
 
+    @Suppress("UndocumentedPublicClass", "UndocumentedPublicProperty")
     interface PostProcessParameters : WorkParameters {
         val processedSourcesPath: DirectoryProperty
         val actualResponsesPath: DirectoryProperty

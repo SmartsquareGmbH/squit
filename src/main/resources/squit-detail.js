@@ -43,8 +43,8 @@ $(document).ready(function () {
 
 function drawHeader() {
     if (alternativeName.length > 0) {
-        titleElement.text(alternativeName);
-        subtitleElement.text(name);
+        titleElement.text(alternativeName)
+        subtitleElement.text("(" + name + ")")
     } else {
         titleElement.text(name);
     }

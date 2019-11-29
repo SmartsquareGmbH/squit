@@ -12,7 +12,14 @@ import java.nio.file.Paths
  */
 open class SquitExtension(project: Project) {
 
+    /**
+     * Extension for xml configuration.
+     */
     val xml = XmlExtension()
+
+    /**
+     * Extension for json configuration.
+     */
     val json = JsonExtension()
 
     /**
@@ -72,6 +79,9 @@ open class SquitExtension(project: Project) {
         var canonicalize = true
     }
 
+    /**
+     * Class containing the available extensions for the json dsl.
+     */
     open class JsonExtension {
 
         /**

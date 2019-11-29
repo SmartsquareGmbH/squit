@@ -10,7 +10,7 @@ import java.nio.file.Path
 /**
  * Object for writing the Squit html report.
  */
-object XmlReportWriter {
+class XmlReportWriter {
 
     /**
      * Generates and writes the Squit html report, given the [result] list and [reportFilePath].

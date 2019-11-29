@@ -121,6 +121,8 @@ detekt {
     config = files("${rootProject.projectDir}/config/detekt/detekt.yml")
     input = files("$projectDir/src/main/kotlin")
 
+    failFast = true
+
     reports {
         xml.destination = file("$buildDir/reports/detekt/detekt.xml")
         html.destination = file("$buildDir/reports/detekt/detekt.html")

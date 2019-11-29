@@ -9,6 +9,7 @@ import de.smartsquare.squit.mediatype.MediaTypeFactory
 import kotlinx.html.html
 import kotlinx.html.stream.appendHTML
 import okhttp3.MediaType
+import org.gradle.api.logging.Logger
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
@@ -16,34 +17,36 @@ import java.nio.file.Path
 /**
  * Object for writing the Squit html report.
  */
-object HtmlReportWriter {
+class HtmlReportWriter(private val logger: Logger) {
 
-    private const val DIFF_FILE_NAME = "Result"
-    private const val DIFF_INFO_FILE_NAME = "ResultInfo"
-    private const val DIFF_CONTEXT_SIZE = 1_000_000
-    private const val HTML_LINE_ENDING = "\\n\\\n"
+    private companion object {
+        private const val DIFF_FILE_NAME = "Result"
+        private const val DIFF_INFO_FILE_NAME = "ResultInfo"
+        private const val DIFF_CONTEXT_SIZE = 1_000_000
+        private const val HTML_LINE_ENDING = "\\n\\\n"
 
-    private const val bootstrapPath = "META-INF/resources/webjars/bootstrap/4.4.1/dist"
-    private const val fontAwesomePath = "META-INF/resources/webjars/font-awesome/5.11.2"
-    private const val jqueryPath = "META-INF/resources/webjars/jquery/3.4.1/dist"
-    private const val popperJsPath = "META-INF/resources/webjars/popper.js/1.16.0/dist/umd"
-    private const val markedPath = "META-INF/resources/webjars/marked/0.7.0"
-    private const val diff2htmlPath = "META-INF/resources/webjars/diff2html/2.11.2"
+        private const val bootstrapPath = "META-INF/resources/webjars/bootstrap/4.4.1/dist"
+        private const val fontAwesomePath = "META-INF/resources/webjars/font-awesome/5.11.2"
+        private const val jqueryPath = "META-INF/resources/webjars/jquery/3.4.1/dist"
+        private const val popperJsPath = "META-INF/resources/webjars/popper.js/1.16.0/dist/umd"
+        private const val markedPath = "META-INF/resources/webjars/marked/0.7.0"
+        private const val diff2htmlPath = "META-INF/resources/webjars/diff2html/2.11.2"
 
-    private val resources = arrayOf(
-        "$bootstrapPath/css/bootstrap.min.css" to "css/bootstrap.css",
-        "$bootstrapPath/js/bootstrap.min.js" to "js/bootstrap.js",
-        "$fontAwesomePath/js/all.min.js" to "js/fontawesome.js",
-        "$jqueryPath/jquery.slim.min.js" to "js/jquery.js",
-        "$popperJsPath/popper.min.js" to "js/popper.js",
-        "$markedPath/marked.min.js" to "js/marked.js",
-        "$diff2htmlPath/dist/diff2html.min.css" to "css/diff2html.css",
-        "$diff2htmlPath/dist/diff2html.min.js" to "js/diff2html.js",
-        "$diff2htmlPath/dist/diff2html-ui.min.js" to "js/diff2html-ui.js",
-        "squit.js" to "js/squit.js"
-    )
+        private val resources = arrayOf(
+            "$bootstrapPath/css/bootstrap.min.css" to "css/bootstrap.css",
+            "$bootstrapPath/js/bootstrap.min.js" to "js/bootstrap.js",
+            "$fontAwesomePath/js/all.min.js" to "js/fontawesome.js",
+            "$jqueryPath/jquery.slim.min.js" to "js/jquery.js",
+            "$popperJsPath/popper.min.js" to "js/popper.js",
+            "$markedPath/marked.min.js" to "js/marked.js",
+            "$diff2htmlPath/dist/diff2html.min.css" to "css/diff2html.css",
+            "$diff2htmlPath/dist/diff2html.min.js" to "js/diff2html.js",
+            "$diff2htmlPath/dist/diff2html-ui.min.js" to "js/diff2html-ui.js",
+            "squit.js" to "js/squit.js"
+        )
 
-    private val emptyDiffHeader = listOf("--- $DIFF_FILE_NAME", "+++ $DIFF_FILE_NAME", "@@ -1 +1 @@")
+        private val emptyDiffHeader = listOf("--- $DIFF_FILE_NAME", "+++ $DIFF_FILE_NAME", "@@ -1 +1 @@")
+    }
 
     /**
      * Generates and writes the Squit html report, given the [results] list and [reportDirectoryPath].
@@ -101,7 +104,8 @@ object HtmlReportWriter {
         Files.write(reportDirectoryPath.resolve("index.html"), document.toString().toByteArray())
     }
 
-    fun prepareInfoForJs(
+    // Visible for testing.
+    internal fun prepareInfoForJs(
         result: SquitResult,
         extension: SquitExtension
     ): String {
@@ -149,6 +153,8 @@ object HtmlReportWriter {
                     .canonicalize(expectedLines.joinToString(""), extension)
                     .lines()
             } catch (error: Throwable) {
+                logger.warn("Could not canonicalize expected response", error)
+
                 expectedLines
             }
         }
@@ -160,6 +166,8 @@ object HtmlReportWriter {
                     .canonicalize(actualLines.joinToString(""), extension)
                     .lines()
             } catch (error: Throwable) {
+                logger.warn("Could not canonicalize actual response", error)
+
                 actualLines
             }
         }

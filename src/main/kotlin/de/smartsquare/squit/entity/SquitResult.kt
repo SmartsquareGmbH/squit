@@ -63,6 +63,11 @@ data class SquitResult(
      */
     val simpleName = testDirectoryPath.fileName.toString()
 
+    /**
+     * Convenience property with the combined name of this test.
+     *
+     * This is the [simpleName] with the [alternativeName] if present.
+     */
     val combinedName = simpleName + if (alternativeName.isNotBlank()) " ($alternativeName)" else ""
 
     /**

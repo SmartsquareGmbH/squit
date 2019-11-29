@@ -7,13 +7,12 @@ import de.smartsquare.squit.config.expectedResponseCode
 /**
  * Data class holding further response information concerning a single [SquitResult].
  *
- * @property responseCode The http status code of the response
+ * @property responseCode The http status code of the response.
  */
 data class SquitResponseInfo(val responseCode: Int = 0) {
 
     companion object {
-
-        private const val RESPONSECODE = "responseCode"
+        private const val RESPONSE_CODE = "responseCode"
 
         /**
          * Constructs a [SquitResponseInfo] instance from the given [json] String.
@@ -33,7 +32,7 @@ data class SquitResponseInfo(val responseCode: Int = 0) {
      */
     fun toJson(): String = Gson().toJson(
         mapOf(
-            RESPONSECODE to responseCode
+            RESPONSE_CODE to responseCode
         )
     )
 

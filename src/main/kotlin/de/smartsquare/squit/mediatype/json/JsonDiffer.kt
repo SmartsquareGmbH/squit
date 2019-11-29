@@ -3,6 +3,9 @@ package de.smartsquare.squit.mediatype.json
 import de.smartsquare.squit.mediatype.Differ
 import net.javacrumbs.jsonunit.JsonAssert
 
+/**
+ * [Differ] for json.
+ */
 class JsonDiffer : Differ {
 
     override fun diff(expectedResponse: ByteArray, actualResponse: ByteArray): String {

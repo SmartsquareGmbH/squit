@@ -6,6 +6,9 @@ import org.xmlunit.builder.DiffBuilder
 import org.xmlunit.builder.Input
 import java.io.ByteArrayInputStream
 
+/**
+ * [Differ] for xml.
+ */
 class XmlDiffer(private val extension: SquitExtension) : Differ {
 
     override fun diff(expectedResponse: ByteArray, actualResponse: ByteArray): String {

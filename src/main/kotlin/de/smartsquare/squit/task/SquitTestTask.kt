@@ -220,13 +220,13 @@ open class SquitTestTask : DefaultTask() {
     private fun writeXmlReport(result: List<SquitResult>) {
         Files.createDirectories(xmlReportFilePath.parent)
 
-        XmlReportWriter.writeReport(result, xmlReportFilePath)
+        XmlReportWriter().writeReport(result, xmlReportFilePath)
     }
 
     private fun writeHtmlReport(result: List<SquitResult>) {
         Files.createDirectories(htmlReportDirectoryPath)
 
-        HtmlReportWriter.writeReport(result, htmlReportDirectoryPath, extension)
+        HtmlReportWriter(logger).writeReport(result, htmlReportDirectoryPath, extension)
     }
 
     private fun copyFailures(result: List<SquitResult>) {

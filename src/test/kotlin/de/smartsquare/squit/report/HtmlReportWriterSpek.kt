@@ -14,7 +14,7 @@ import org.jetbrains.spek.api.dsl.on
 
 object HtmlReportWriterSpek : Spek({
 
-    val writer = HtmlReportWriter
+    val writer = HtmlReportWriter(mockk(relaxUnitFun = true))
 
     given("a squit result with default expected response code") {
         val result = mockk<SquitResult>()

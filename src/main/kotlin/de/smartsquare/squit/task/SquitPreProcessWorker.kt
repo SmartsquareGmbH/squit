@@ -158,6 +158,7 @@ abstract class SquitPreProcessWorker : WorkAction<SquitPreProcessWorker.PreProce
         return result.filter { it.isNotBlank() }
     }
 
+    @Suppress("UndocumentedPublicClass", "UndocumentedPublicProperty")
     interface PreProcessParameters : WorkParameters {
         val sourcesPath: DirectoryProperty
         val processedSourcesPath: DirectoryProperty

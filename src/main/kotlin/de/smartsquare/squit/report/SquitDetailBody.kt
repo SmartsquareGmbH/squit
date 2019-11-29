@@ -56,7 +56,7 @@ private fun DIV.squitTitle(result: SquitResult) {
                 }
             }
 
-            div(classes = "ml-2 d-inline-flex align-self-baseline") {
+            div(classes = "ml-2 d-inline-flex align-self-center") {
                 val badgeType = when {
                     result.isIgnored -> "badge-secondary"
                     result.isSuccess -> "badge-success"
