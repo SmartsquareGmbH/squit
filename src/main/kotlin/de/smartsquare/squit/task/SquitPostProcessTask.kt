@@ -8,9 +8,12 @@ import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.WorkerExecutor
 import java.nio.file.Files
@@ -22,12 +25,14 @@ import kotlin.properties.Delegates
 /**
  * Task for post-processing the responses.
  */
+@CacheableTask
 open class SquitPostProcessTask @Inject constructor(private val workerExecutor: WorkerExecutor) : DefaultTask() {
 
     /**
      * The directory of the test sources.
      */
     @InputDirectory
+    @PathSensitive(PathSensitivity.RELATIVE)
     val processedSourcesPath: Path = Paths.get(
         project.buildDir.path,
         SQUIT_DIRECTORY,
@@ -39,6 +44,7 @@ open class SquitPostProcessTask @Inject constructor(private val workerExecutor: 
      */
     @Suppress("MemberVisibilityCanBePrivate")
     @InputDirectory
+    @PathSensitive(PathSensitivity.RELATIVE)
     val actualResponsesPath: Path = Paths.get(
         project.buildDir.path,
         SQUIT_DIRECTORY,
@@ -58,7 +64,7 @@ open class SquitPostProcessTask @Inject constructor(private val workerExecutor: 
         PROCESSED_DIRECTORY
     )
 
-    @get:Internal
+    @get:Nested
     internal var extension by Delegates.notNull<SquitExtension>()
 
     init {

@@ -42,7 +42,7 @@ import okhttp3.internal.http.HttpMethod
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.IOException
@@ -98,7 +98,7 @@ open class SquitRequestTask : DefaultTask() {
         RAW_DIRECTORY
     )
 
-    @get:Internal
+    @get:Nested
     internal var extension by Delegates.notNull<SquitExtension>()
 
     private val okHttpClient by lazy {

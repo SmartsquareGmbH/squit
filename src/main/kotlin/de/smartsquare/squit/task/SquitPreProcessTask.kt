@@ -11,10 +11,13 @@ import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.cut
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.WorkerExecutor
 import java.nio.file.Files
@@ -27,12 +30,14 @@ import kotlin.properties.Delegates
  * Task for pre-processing the available sources like requests, responses, sql scripts and properties.
  */
 @Suppress("LargeClass")
+@CacheableTask
 open class SquitPreProcessTask @Inject constructor(private val workerExecutor: WorkerExecutor) : DefaultTask() {
 
     /**
      * The directory of the test sources.
      */
     @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     val sourcesPath by lazy { extension.sourcesPath }
 
     /**
@@ -70,7 +75,7 @@ open class SquitPreProcessTask @Inject constructor(private val workerExecutor: W
             .toConfig()
     }
 
-    @get:Internal
+    @get:Nested
     internal var extension by Delegates.notNull<SquitExtension>()
 
     init {

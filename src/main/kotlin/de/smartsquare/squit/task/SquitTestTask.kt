@@ -27,11 +27,14 @@ import de.smartsquare.squit.util.countTestResults
 import de.smartsquare.squit.util.cut
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import java.nio.charset.Charset
 import java.nio.file.Files
@@ -44,12 +47,14 @@ import kotlin.streams.toList
  * Task for comparing the actual responses to the expected responses and generating a report.
  */
 @Suppress("StringLiteralDuplication")
+@CacheableTask
 open class SquitTestTask : DefaultTask() {
 
     /**
      * The directory of the test sources.
      */
     @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     val processedSourcesPath: Path = Paths.get(
         project.buildDir.path,
         SQUIT_DIRECTORY, SOURCES_DIRECTORY
@@ -59,6 +64,7 @@ open class SquitTestTask : DefaultTask() {
      * The directory of the previously (processed) requested responses.
      */
     @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     val processedResponsesPath: Path = Paths.get(
         project.buildDir.path,
         SQUIT_DIRECTORY, RESPONSES_DIRECTORY, PROCESSED_DIRECTORY
@@ -67,8 +73,9 @@ open class SquitTestTask : DefaultTask() {
     /**
      * Collection of meta.json files for up-to-date checking.
      */
-    @get:InputFiles
     @get:Optional
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     val metaPaths: List<Path> by lazy {
         val rawDirectoryPath = Paths.get(project.buildDir.path, SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)
 
@@ -105,7 +112,7 @@ open class SquitTestTask : DefaultTask() {
         extension.reportsPath.resolve("failures") ?: throw IllegalArgumentException("reportPath cannot be null")
     }
 
-    @get:Internal
+    @get:Nested
     internal var extension by Delegates.notNull<SquitExtension>()
 
     private var nextResultId = 0L
