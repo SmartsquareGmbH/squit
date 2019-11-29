@@ -7,6 +7,7 @@ import de.smartsquare.squit.entity.SquitOutputFormat
 import de.smartsquare.squit.entity.SquitResult
 import org.dom4j.io.OutputFormat
 import org.dom4j.io.XMLWriter
+import org.gradle.api.file.DirectoryProperty
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -69,6 +70,14 @@ fun String.cleanSqlString() = this
     .replace("\uFEFF", "") // This is a weird unicode blank character, present in some sql files.
     .trim()
 
+/**
+ * Returns this as a [Path].
+ */
+val DirectoryProperty.asPath get() = asFile.get().toPath()
+
+/**
+ * Iterate the list of [SquitResult]s and returns a [Triple] of successful, failed and ignored tests.
+ */
 fun List<SquitResult>.countTestResults(): Triple<Int, Int, Int> {
     val successfulTests = count { !it.isIgnored && it.isSuccess }
     val failedTests = count { !it.isIgnored && !it.isSuccess }

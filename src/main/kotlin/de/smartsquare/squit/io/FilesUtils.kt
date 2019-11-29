@@ -25,14 +25,20 @@ object FilesUtils {
     }
 
     /**
-     * Returns all leaf directories of the given [path], sorted by alphanumeric order.
+     * Returns all leaf directories of the given [path], optionally sorted by alphanumeric order
+     * (if [sort] is set to true, which is the default).
      */
-    fun getSortedLeafDirectories(path: Path): List<Path> = getChildDirectories(path)
-        .sortedWith(compareBy(AlphanumericComparator()) { it.fileName.toString() })
-        .fold(listOf()) { current, next ->
+    fun getLeafDirectories(path: Path, sort: Boolean = true): Sequence<Path> = getChildDirectories(path)
+        .let { directories ->
+            when (sort) {
+                true -> directories.sortedWith(compareBy(AlphanumericComparator()) { it.fileName.toString() })
+                false -> directories
+            }
+        }
+        .fold(sequenceOf()) { current, next ->
             current + when (containsDirectories(next)) {
-                true -> getSortedLeafDirectories(next)
-                false -> listOf(next)
+                true -> getLeafDirectories(next, sort)
+                false -> sequenceOf(next)
             }
         }
 

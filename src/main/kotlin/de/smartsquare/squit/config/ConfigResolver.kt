@@ -18,11 +18,11 @@ class ConfigResolver(
 ) {
 
     /**
-     * Walks the project structure and resolve the conf files with the leaf directories (containing the actual tests).
+     * Walks the project structure and resolves the conf files with the leaf directories (containing the actual tests).
      * Filters the tests by the given [tags] and the exclude flag in the conf file, if [shouldUnexclude] is not set.
      */
     fun resolveWithLeafDirectories(tags: List<String>, shouldUnexclude: Boolean): List<Pair<Path, Config>> {
-        return FilesUtils.getSortedLeafDirectories(sourcesPath)
+        return FilesUtils.getLeafDirectories(sourcesPath, sort = false)
             .filter { Files.newDirectoryStream(it).use { directories -> directories.any() } }
             .map { it to configWalker.walk(it) }
             .filter { (testPath, config) ->
@@ -46,6 +46,7 @@ class ConfigResolver(
                     )
                 }
             }
+            .toList()
     }
 
     private fun isTestExcluded(config: Config, shouldUnexclude: Boolean): Boolean {

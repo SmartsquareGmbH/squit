@@ -143,7 +143,7 @@ open class SquitTestTask : DefaultTask() {
     private fun runTests(): List<SquitResult> {
         val resultList = arrayListOf<SquitResult>()
 
-        FilesUtils.getSortedLeafDirectories(processedResponsesPath).forEach { actualResponsePath ->
+        FilesUtils.getLeafDirectories(processedResponsesPath).forEach { actualResponsePath ->
             val configPath = FilesUtils.validateExistence(
                 processedSourcesPath
                     .resolve(actualResponsePath.cut(processedResponsesPath)).resolve(CONFIG)

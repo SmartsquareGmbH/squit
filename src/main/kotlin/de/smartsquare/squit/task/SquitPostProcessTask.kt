@@ -1,32 +1,28 @@
 package de.smartsquare.squit.task
 
-import com.typesafe.config.ConfigFactory
 import de.smartsquare.squit.SquitExtension
-import de.smartsquare.squit.config.mediaType
 import de.smartsquare.squit.io.FilesUtils
-import de.smartsquare.squit.mediatype.MediaTypeFactory
-import de.smartsquare.squit.util.Constants.CONFIG
-import de.smartsquare.squit.util.Constants.ERROR
 import de.smartsquare.squit.util.Constants.PROCESSED_DIRECTORY
 import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
 import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
-import de.smartsquare.squit.util.cut
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.workers.WorkerExecutor
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import javax.inject.Inject
 import kotlin.properties.Delegates
 
 /**
  * Task for post-processing the responses.
  */
-open class SquitPostProcessTask : DefaultTask() {
+open class SquitPostProcessTask @Inject constructor(private val workerExecutor: WorkerExecutor) : DefaultTask() {
 
     /**
      * The directory of the test sources.
@@ -73,48 +69,20 @@ open class SquitPostProcessTask : DefaultTask() {
     /**
      * Runs the task.
      */
-    @Suppress("unused")
+    @Suppress("UnstableApiUsage")
     @TaskAction
     fun run() {
+        val workerQueue = workerExecutor.noIsolation()
+
         FilesUtils.deleteRecursivelyIfExisting(processedActualResponsesPath)
         Files.createDirectories(processedActualResponsesPath)
 
-        FilesUtils.getSortedLeafDirectories(actualResponsesPath).forEach { testDir ->
-            val resultActualResponsePath = Files.createDirectories(
-                processedActualResponsesPath.resolve(testDir.cut(actualResponsesPath))
-            )
-
-            val errorFile = testDir.resolve(ERROR)
-
-            if (Files.exists(errorFile)) {
-                Files.copy(errorFile, resultActualResponsePath.resolve(ERROR))
-            } else {
-                val configPath = FilesUtils.validateExistence(
-                    processedSourcesPath.resolve(testDir.cut(actualResponsesPath))
-                )
-                    .resolve(CONFIG)
-
-                val config = ConfigFactory.parseFile(configPath.toFile())
-
-                val actualResponsePath = FilesUtils.validateExistence(
-                    testDir.resolve(MediaTypeFactory.actualResponse(config.mediaType))
-                )
-
-                val expectedResponsePath = FilesUtils.validateExistence(
-                    processedSourcesPath
-                        .resolve(testDir.cut(actualResponsesPath))
-                        .resolve(MediaTypeFactory.expectedResponse(config.mediaType))
-                )
-
-                val resultActualResponseFilePath = resultActualResponsePath
-                    .resolve(MediaTypeFactory.actualResponse(config.mediaType))
-
-                try {
-                    MediaTypeFactory.processor(config.mediaType)
-                        .postProcess(actualResponsePath, expectedResponsePath, resultActualResponseFilePath, config)
-                } catch (error: Throwable) {
-                    Files.write(resultActualResponsePath.resolve(ERROR), error.toString().toByteArray())
-                }
+        FilesUtils.getLeafDirectories(actualResponsesPath, sort = false).forEach { testPath ->
+            workerQueue.submit(SquitPostProcessWorker::class.java) {
+                it.processedSourcesPath.set(processedSourcesPath.toFile())
+                it.actualResponsesPath.set(actualResponsesPath.toFile())
+                it.processedActualResponsesPath.set(processedActualResponsesPath.toFile())
+                it.testPath.set(testPath.toFile())
             }
         }
     }

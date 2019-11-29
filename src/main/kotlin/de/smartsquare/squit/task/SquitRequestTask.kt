@@ -133,7 +133,7 @@ open class SquitRequestTask : DefaultTask() {
         Files.createDirectories(actualResponsesPath)
 
         dbConnections.use {
-            FilesUtils.getSortedLeafDirectories(processedSourcesPath).forEachIndexed { index, testDirectoryPath ->
+            FilesUtils.getLeafDirectories(processedSourcesPath).forEachIndexed { index, testDirectoryPath ->
                 logger.lifecycleOnSameLine(
                     "Running test ${index + 1}",
                     project.gradle.startParameter.consoleOutput

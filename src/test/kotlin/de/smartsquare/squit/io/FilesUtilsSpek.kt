@@ -17,7 +17,7 @@ object FilesUtilsSpek : Spek({
             val grandChild21 = createTempDir(prefix = "grandChild21", directory = child2.toFile()).toPath()
 
             it("should return a correct list") {
-                FilesUtils.getSortedLeafDirectories(root) shouldEqual listOf(child3, child1, grandChild21)
+                FilesUtils.getLeafDirectories(root).toList() shouldEqual listOf(child3, child1, grandChild21)
             }
         }
 

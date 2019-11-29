@@ -5,8 +5,8 @@ import de.smartsquare.squit.TestUtils
 import io.mockk.every
 import io.mockk.mockk
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import org.amshove.kluent.shouldEndWith
 import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldMatchAtLeastOneOf
 import org.amshove.kluent.shouldThrow
 import org.gradle.api.GradleException
 import org.jetbrains.spek.api.Spek
@@ -31,11 +31,11 @@ object ConfigResolverSpek : Spek({
 
             it("should return a correct list") {
                 leafDirectories.size shouldEqual 4
-                leafDirectories[0].first.toString() shouldEndWith "call1"
-                leafDirectories[0].second.endpoint shouldEqual "https://example.com".toHttpUrl()
-                leafDirectories[1].first.toString() shouldEndWith "call2"
-                leafDirectories[2].first.toString() shouldEndWith "call3"
-                leafDirectories[3].first.toString() shouldEndWith "call4"
+                leafDirectories.shouldMatchAtLeastOneOf { it.first.toString().endsWith("call1") }
+                leafDirectories.shouldMatchAtLeastOneOf { it.second.endpoint == "https://example.com".toHttpUrl() }
+                leafDirectories.shouldMatchAtLeastOneOf { it.first.toString().endsWith("call2") }
+                leafDirectories.shouldMatchAtLeastOneOf { it.first.toString().endsWith("call3") }
+                leafDirectories.shouldMatchAtLeastOneOf { it.first.toString().endsWith("call4") }
             }
         }
 
@@ -55,8 +55,8 @@ object ConfigResolverSpek : Spek({
 
             it("should return a correct list") {
                 leafDirectories.size shouldEqual 2
-                leafDirectories[0].first.toString() shouldEndWith "call1"
-                leafDirectories[1].first.toString() shouldEndWith "call3"
+                leafDirectories.shouldMatchAtLeastOneOf { it.first.toString().endsWith("call1") }
+                leafDirectories.shouldMatchAtLeastOneOf { it.first.toString().endsWith("call3") }
             }
         }
 
@@ -76,9 +76,9 @@ object ConfigResolverSpek : Spek({
 
             it("should return a correct list") {
                 leafDirectories.size shouldEqual 3
-                leafDirectories[0].first.toString() shouldEndWith "call2"
-                leafDirectories[1].first.toString() shouldEndWith "call3"
-                leafDirectories[2].first.toString() shouldEndWith "call4"
+                leafDirectories.shouldMatchAtLeastOneOf { it.first.toString().endsWith("call2") }
+                leafDirectories.shouldMatchAtLeastOneOf { it.first.toString().endsWith("call3") }
+                leafDirectories.shouldMatchAtLeastOneOf { it.first.toString().endsWith("call4") }
             }
         }
 
@@ -98,10 +98,10 @@ object ConfigResolverSpek : Spek({
 
             it("should return a correct list") {
                 leafDirectories.size shouldEqual 4
-                leafDirectories[0].first.toString() shouldEndWith "call1"
-                leafDirectories[1].first.toString() shouldEndWith "call2"
-                leafDirectories[2].first.toString() shouldEndWith "call3"
-                leafDirectories[3].first.toString() shouldEndWith "call4"
+                leafDirectories.shouldMatchAtLeastOneOf { it.first.toString().endsWith("call1") }
+                leafDirectories.shouldMatchAtLeastOneOf { it.first.toString().endsWith("call2") }
+                leafDirectories.shouldMatchAtLeastOneOf { it.first.toString().endsWith("call3") }
+                leafDirectories.shouldMatchAtLeastOneOf { it.first.toString().endsWith("call4") }
             }
         }
 
