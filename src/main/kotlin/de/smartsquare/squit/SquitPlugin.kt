@@ -19,24 +19,24 @@ class SquitPlugin : Plugin<Project> {
         try {
             val extension = project.extensions.create("squit", SquitExtension::class.java, project)
 
-            project.tasks.create("squitPreProcess", SquitPreProcessTask::class.java) {
+            project.tasks.register("squitPreProcess", SquitPreProcessTask::class.java) {
                 it.extension = extension
             }
 
-            project.tasks.create("squitRunRequests", SquitRequestTask::class.java) {
+            project.tasks.register("squitRunRequests", SquitRequestTask::class.java) {
                 it.extension = extension
 
                 it.dependsOn("squitPreProcess")
                 it.outputs.upToDateWhen { false }
             }
 
-            project.tasks.create("squitPostProcess", SquitPostProcessTask::class.java) {
+            project.tasks.register("squitPostProcess", SquitPostProcessTask::class.java) {
                 it.extension = extension
 
                 it.dependsOn("squitRunRequests")
             }
 
-            project.tasks.create("squitTest", SquitTestTask::class.java) {
+            project.tasks.register("squitTest", SquitTestTask::class.java) {
                 it.extension = extension
 
                 it.dependsOn("squitPostProcess")
