@@ -39,9 +39,9 @@ class XmlReportWriter {
                 }
 
                 when {
-                    it.isIgnored -> testElement.addElement("skipped").addText(it.result)
-                    it.isError -> testElement.addElement("error").addText(it.result)
-                    !it.isSuccess -> testElement.addElement("failure").addText(it.result)
+                    it.isIgnored -> testElement.addElement("skipped").addText(it.difference)
+                    it.isError -> testElement.addElement("error").addText(it.difference)
+                    !it.isSuccess -> testElement.addElement("failure").addText(it.difference)
                 }
             }
         }

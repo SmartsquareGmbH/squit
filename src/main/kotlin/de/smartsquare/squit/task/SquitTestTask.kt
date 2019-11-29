@@ -249,7 +249,7 @@ open class SquitTestTask : DefaultTask() {
 
             FilesUtils.copyFilesFromDirectory(testProcessedSourcesPath, resultDirectoryPath)
             FilesUtils.copyFilesFromDirectory(testActualResponsesPath, resultDirectoryPath)
-            Files.write(testDifferenceFile, it.result.toByteArray())
+            Files.write(testDifferenceFile, it.difference.toByteArray())
         }
     }
 

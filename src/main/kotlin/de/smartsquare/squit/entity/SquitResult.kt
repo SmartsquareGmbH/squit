@@ -19,8 +19,7 @@ import java.nio.file.Paths
  * Intermediate data class for storing test results.
  *
  * @property id A unique id to use for further processing.
- * @property result The result of the test. An empty String means the test was successful, otherwise it contains the
- * response diff.
+ * @property difference The difference of the expected and actual responses. If empty, the test was successful.
  * @property expectedResponseInfo The response info object, which is expected in this test.
  * @property isIgnored If this result is ignored.
  * @property mediaType The media type of the associated request and response.
@@ -33,7 +32,7 @@ import java.nio.file.Paths
  */
 data class SquitResult(
     val id: Long,
-    val result: String,
+    val difference: String,
     val expectedResponseInfo: SquitResponseInfo,
     val isIgnored: Boolean,
     val mediaType: MediaType,
@@ -47,7 +46,7 @@ data class SquitResult(
     /**
      * Convenience property being true if the test was successful.
      */
-    val isSuccess = result.isBlank()
+    val isSuccess = difference.isBlank()
 
     /**
      * Convenience property being true if this result is an error.
