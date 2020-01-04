@@ -11,6 +11,8 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
+import java.io.Reader
+import java.io.Writer
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
@@ -20,6 +22,10 @@ import java.nio.file.StandardOpenOption
  */
 @Suppress("UnstableApiUsage")
 abstract class SquitPreProcessWorker : WorkAction<SquitPreProcessWorker.PreProcessParameters> {
+
+    private companion object {
+        private const val TRANSFER_BUFFER_SIZE = 8192
+    }
 
     private val sourcesPath get() = parameters.sourcesPath.asPath
     private val processedSourcesPath get() = parameters.processedSourcesPath.asPath
@@ -62,7 +68,7 @@ abstract class SquitPreProcessWorker : WorkAction<SquitPreProcessWorker.PreProce
             .use { writer ->
                 inputs.forEachIndexed { index, path ->
                     Files.newBufferedReader(path).use { reader ->
-                        reader.transferTo(writer)
+                        reader.transferToCompat(writer)
 
                         if (index < inputs.lastIndex && separator.isNotEmpty()) {
                             writer.write(separator)
@@ -70,6 +76,21 @@ abstract class SquitPreProcessWorker : WorkAction<SquitPreProcessWorker.PreProce
                     }
                 }
             }
+    }
+
+    // This method is only available since Java 10.
+    private fun Reader.transferToCompat(out: Writer): Long {
+        val buffer = CharArray(TRANSFER_BUFFER_SIZE)
+
+        var transferred: Long = 0
+        var nRead: Int
+
+        while (read(buffer, 0, TRANSFER_BUFFER_SIZE).also { nRead = it } >= 0) {
+            out.write(buffer, 0, nRead)
+            transferred += nRead.toLong()
+        }
+
+        return transferred
     }
 
     @Suppress("UndocumentedPublicClass", "UndocumentedPublicProperty")
