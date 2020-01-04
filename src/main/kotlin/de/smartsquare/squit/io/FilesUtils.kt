@@ -25,6 +25,11 @@ object FilesUtils {
     }
 
     /**
+     * Returns a sequence yielding every path starting with the passed [path] until the given [until] is reached.
+     */
+    fun walkUpwards(path: Path, until: Path) = walkUpwards(path) { it.endsWith(until.parent) }
+
+    /**
      * Returns all leaf directories of the given [path], optionally sorted by alphanumeric order
      * (if [sort] is set to true, which is the default).
      */
@@ -63,6 +68,14 @@ object FilesUtils {
                 Files.copy(file, dest.resolve(file.cut(source)), REPLACE_EXISTING)
             }
         }
+    }
+
+    /**
+     * Returns the given [path] if it exists or null otherwise.
+     */
+    fun ifExists(path: Path) = when (Files.exists(path)) {
+        true -> path
+        false -> null
     }
 
     /**
