@@ -34,9 +34,8 @@ abstract class SquitPostProcessWorker : WorkAction<SquitPostProcessWorker.PostPr
         if (Files.exists(errorFile)) {
             Files.copy(errorFile, resultActualResponsePath.resolve(Constants.ERROR))
         } else {
-            val configPath = FilesUtils.validateExistence(
-                processedSourcesPath.resolve(testPath.cut(actualResponsesPath))
-            )
+            val configPath = FilesUtils
+                .validateExistence(processedSourcesPath.resolve(testPath.cut(actualResponsesPath)))
                 .resolve(Constants.CONFIG)
 
             val config = ConfigFactory.parseFile(configPath.toFile())
