@@ -26,7 +26,7 @@ class HtmlReportWriter(private val logger: Logger) {
         private const val HTML_LINE_ENDING = "\\n\\\n"
 
         private const val bootstrapPath = "META-INF/resources/webjars/bootstrap/4.4.1/dist"
-        private const val fontAwesomePath = "META-INF/resources/webjars/font-awesome/5.11.2"
+        private const val fontAwesomePath = "META-INF/resources/webjars/font-awesome/5.12.0"
         private const val jqueryPath = "META-INF/resources/webjars/jquery/3.4.1/dist"
         private const val popperJsPath = "META-INF/resources/webjars/popper.js/1.16.0/dist/umd"
         private const val markedPath = "META-INF/resources/webjars/marked/0.7.0"

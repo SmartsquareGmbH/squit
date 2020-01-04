@@ -1,0 +1,7 @@
+exceptions:
+  TooGenericExceptionCaught:
+    active: false
+
+style:
+  MagicNumber:
+    active: false

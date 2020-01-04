@@ -116,12 +116,9 @@ ktlint {
 }
 
 detekt {
-    toolVersion = detektVersion
-
-    config = files("${rootProject.projectDir}/config/detekt/detekt.yml")
+    config = files("${rootProject.projectDir}/detekt.yml")
     input = files("$projectDir/src/main/kotlin")
-
-    failFast = true
+    buildUponDefaultConfig = true
 
     reports {
         xml.destination = file("$buildDir/reports/detekt/detekt.xml")
@@ -137,7 +134,7 @@ dokka {
 
         externalDocumentationLink {
             url = new URL("https://dom4j.github.io/javadoc/$dom4jVersion/")
-            packageListUrl = new URL("https://dom4j.github.io/javadoc/2.1.1/package-list")
+            packageListUrl = new URL("https://dom4j.github.io/javadoc/$dom4jVersion/package-list")
         }
 
         externalDocumentationLink {
@@ -147,7 +144,7 @@ dokka {
 
         externalDocumentationLink {
             url = new URL("https://www.javadoc.io/doc/com.google.code.gson/gson/$gsonVersion")
-            packageListUrl = new URL("https://raw.githubusercontent.com/google/gson/master/gson/docs/javadocs/package-list")
+            packageListUrl = new URL("https://raw.githubusercontent.com/google/gson/gson-parent-$gsonVersion/gson/docs/javadocs/package-list")
         }
     }
 }

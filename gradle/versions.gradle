@@ -18,7 +18,7 @@ ext {
     xmlUnitVersion = '2.6.3'
     jsonUnitVersion = '2.11.1'
     typesafeConfigVersion = '1.4.0'
-    okhttpVersion = '4.2.2'
+    okhttpVersion = '4.3.0'
     kotlinHtmlVersion = '0.6.12'
     diffUtilsVersion = '3.0'
     alphanumericComparatorVersion = "1.4.1"
@@ -26,16 +26,16 @@ ext {
     bootstrapVersion = '4.4.1'
     jqueryVersion = '3.4.1'
     popperVersion = '1.16.0'
-    fontAwesomeVersion = '5.11.2'
+    fontAwesomeVersion = '5.12.0'
     diff2htmlVersion = '2.11.2'
     markedVersion = '0.7.0'
 
-    detektVersion = '1.2.0'
+    detektVersion = '1.3.1'
     ktlintPluginVersion = '9.1.1'
 
     junitPlatformVersion = '1.5.2'
     spekVersion = '1.2.1'
     kluentVersion = '1.58'
-    h2Version = '1.4.199'
+    h2Version = '1.4.200'
     mockkVersion = '1.9.3'
 }
