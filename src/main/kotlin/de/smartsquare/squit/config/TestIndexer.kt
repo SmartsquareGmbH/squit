@@ -68,11 +68,12 @@ class TestIndexer(private val projectConfig: Config) {
         sourcesPath: Path
     ): List<SquitTest> {
         return leafDirectoriesWithConfig
+            .filterNot { (path, _) -> FilesUtils.isDirectoryEmpty(path) }
             .mapNotNull { (leafDirectory, config) ->
                 val request = resolveRequest(leafDirectory, config)
                 val response = resolveResponse(leafDirectory, config)
 
-                val testParts = FilesUtils.walkUpwards(leafDirectory, sourcesPath.parent)
+                val testParts = FilesUtils.walkUpwards(leafDirectory, sourcesPath)
                     .map { path ->
                         val leafsFromHere = leafCache.getOrPut(path) {
                             leafDirectoriesWithConfig
@@ -107,10 +108,17 @@ class TestIndexer(private val projectConfig: Config) {
     }
 
     private fun resolveConfigs(path: Path, sourcesPath: Path): Config {
-        return FilesUtils.walkUpwards(path, sourcesPath.parent)
-            .map { resolveConfig(it) }
-            .fold(ConfigFactory.empty()) { acc, config ->
-                acc.withFallback(config).mergeTag(path.fileName.toString())
+        return FilesUtils.walkUpwards(path, sourcesPath)
+            .map { it to resolveConfig(it) }
+            .fold(ConfigFactory.empty()) { acc, currentPathToConfig ->
+                val (currentPath, config) = currentPathToConfig
+
+                // Do not add tag for the last part since it is part of the sourcesPath.
+                if (currentPath.endsWith(sourcesPath)) {
+                    acc.withFallback(config)
+                } else {
+                    acc.withFallback(config).mergeTag(currentPath.fileName.toString())
+                }
             }
             .let { projectConfig.withFallback(it) }
     }

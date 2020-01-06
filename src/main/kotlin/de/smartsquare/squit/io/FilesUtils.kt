@@ -10,6 +10,7 @@ import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 /**
  * Object with io related utility methods in the style of [java.nio.file.Files].
  */
+@Suppress("TooManyFunctions")
 object FilesUtils {
 
     /**
@@ -25,7 +26,8 @@ object FilesUtils {
     }
 
     /**
-     * Returns a sequence yielding every path starting with the passed [path] until the given [until] is reached.
+     * Returns a sequence yielding every path starting with the passed [path] until the given
+     * [until] (inclusive) is reached.
      */
     fun walkUpwards(path: Path, until: Path) = walkUpwards(path) { it.endsWith(until.parent) }
 
@@ -68,6 +70,13 @@ object FilesUtils {
                 Files.copy(file, dest.resolve(file.cut(source)), REPLACE_EXISTING)
             }
         }
+    }
+
+    /**
+     * Checks whether the directory at the given [path] is empty.
+     */
+    fun isDirectoryEmpty(path: Path): Boolean {
+        return Files.newDirectoryStream(path).use { dirStream -> !dirStream.iterator().hasNext() }
     }
 
     /**

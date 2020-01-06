@@ -3,6 +3,7 @@ package de.smartsquare.squit.config
 import com.typesafe.config.ConfigFactory
 import de.smartsquare.squit.TestUtils
 import org.amshove.kluent.shouldBeTrue
+import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldEndWith
 import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldHaveKey
@@ -34,6 +35,9 @@ object TestIndexerSpek : Spek({
                 index.size shouldEqual 4
                 index[0].path.toString() shouldEndWith "call1"
                 index[0].config.hasPath("headers").shouldBeTrue()
+                index[0].config.getStringList("tags").size shouldEqual 2
+                index[0].config.getStringList("tags") shouldContain "call1"
+                index[0].config.getStringList("tags") shouldContain "project"
                 index[0].preSqlScripts.size shouldEqual 1
                 index[0].preSqlScripts shouldHaveKey "test"
                 index[0].preSqlScripts.getValue("test").size shouldEqual 2
