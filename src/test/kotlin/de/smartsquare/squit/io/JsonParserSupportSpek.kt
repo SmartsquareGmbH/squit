@@ -17,7 +17,7 @@ object JsonParserSupportSpek : Spek({
 
     val sampleJsonPath = jsonTestProject
         .resolve("src")
-        .resolve("test")
+        .resolve("squit")
         .resolve("project")
         .resolve("call1")
         .resolve("request.json")

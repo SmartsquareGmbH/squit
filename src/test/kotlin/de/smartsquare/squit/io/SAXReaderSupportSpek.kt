@@ -18,7 +18,7 @@ object SAXReaderSupportSpek : Spek({
 
     val sampleXmlPath = testProject
         .resolve("src")
-        .resolve("test")
+        .resolve("squit")
         .resolve("project")
         .resolve("call1")
         .resolve("request.xml")

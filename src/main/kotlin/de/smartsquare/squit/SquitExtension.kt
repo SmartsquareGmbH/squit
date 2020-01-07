@@ -38,11 +38,11 @@ open class SquitExtension(project: Project) {
     var jdbcDrivers: List<String> = emptyList()
 
     /**
-     * The path the sources lie in. Defaults to src/test.
+     * The path the sources lie in. Defaults to src/squit.
      */
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.ABSOLUTE)
-    var sourcesPath: Path = Paths.get(project.projectDir.path, "src", "test")
+    var sourcesPath: Path = Paths.get(project.projectDir.path, "src", "squit")
 
     /**
      * The path to save reports and possible failures in.

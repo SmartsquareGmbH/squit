@@ -259,7 +259,7 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
 
             it("should print an appropriate message") {
                 result.output shouldContain "Invalid project structure. " +
-                    "Please add a project directory to the src/test directory."
+                    "Please add a project directory to the src/squit directory."
             }
         }
     }

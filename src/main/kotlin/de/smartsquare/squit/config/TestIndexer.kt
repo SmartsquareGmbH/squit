@@ -44,7 +44,7 @@ class TestIndexer(private val projectConfig: Config) {
             .onEach { path ->
                 if (path.cut(sourcesPath).toList().size < 2) {
                     throw GradleException(
-                        "Invalid project structure. Please add a project directory to the src/test directory."
+                        "Invalid project structure. Please add a project directory to the src/squit directory."
                     )
                 }
             }

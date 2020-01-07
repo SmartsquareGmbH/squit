@@ -26,7 +26,7 @@ object TestIndexerSpek : Spek({
     )
 
     given("a test project") {
-        val testProject = testProjectRoot.resolve("src/test")
+        val testProject = testProjectRoot.resolve("src/squit")
 
         on("indexing") {
             val index = testIndexer.index(testProject) { true }

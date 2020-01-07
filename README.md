@@ -46,7 +46,7 @@ The minimum supported Gradle version is `5.1.1`.
 
 ## Project structure
 
-Projects are structured in arbitrarily deep folders. The plugin expects the root to be in the `src/test` folder per default.
+Projects are structured in arbitrarily deep folders. The plugin expects the root to be in the `src/squit` folder per default.
 
 A single test is represented by one leaf folder. That folder **must** contain:
 
@@ -88,7 +88,7 @@ A simple example looks like this:
 This shows a valid project structure for `Squit`. `my_suite` contains all our tests (in this case only two: `test1` and `test2`).
 
 > You _can_ have more directories beneath `my_suite` (e.g. `another_suite`) and as aforementioned can also nest more deeply.
-> At least one suite folder is required though, you can't have your tests directly in the `src/test` folder.
+> At least one suite folder is required though, you can't have your tests directly in the `src/squit` folder.
 
 `my_suite` also contains a `test.conf` file, which could look like this:
 
@@ -335,8 +335,8 @@ squit {
     // The jdbc drivers to use. Must be on the classpath.
     jdbcDrivers = ['oracle.jdbc.driver.OracleDriver']
 
-    // The path of your test sources. src/test is the default.
-    sourcesPath = projectDir.toPath().resolve("src").resolve("test")
+    // The path of your test sources. src/squit is the default.
+    sourcesPath = projectDir.toPath().resolve("src").resolve("squit")
 
     // The path to save reports in. build/squit/reports is the default.
     reportsPath = buildDir.toPath().resolve("squit").resolve("reports")
