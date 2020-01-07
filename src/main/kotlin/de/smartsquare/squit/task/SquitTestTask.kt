@@ -144,6 +144,7 @@ open class SquitTestTask : DefaultTask() {
         val ignoredText = if (ignoredTests > 0) " ($ignoredTests ignored)" else ""
 
         println("$totalText\n$successfulTests successful and $failedTests failed$ignoredText.")
+        println()
         println("XML report: file://$xmlReportFilePath")
         println("HTML report: file://${htmlReportDirectoryPath.resolve("index.html")}")
 
