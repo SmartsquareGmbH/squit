@@ -73,6 +73,7 @@ open class SquitTestTask : DefaultTask() {
     /**
      * Collection of meta.json files for up-to-date checking.
      */
+    @Suppress("unused")
     @get:Optional
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -131,7 +132,7 @@ open class SquitTestTask : DefaultTask() {
         FilesUtils.deleteRecursivelyIfExisting(extension.reportsPath)
         Files.createDirectories(processedSourcesPath)
 
-        val results = runTests()
+        val results = processTests()
 
         writeXmlReport(results)
         writeHtmlReport(results)
@@ -143,17 +144,18 @@ open class SquitTestTask : DefaultTask() {
         val ignoredText = if (ignoredTests > 0) " ($ignoredTests ignored)" else ""
 
         println("$totalText\n$successfulTests successful and $failedTests failed$ignoredText.")
+        println("XML report: file://$xmlReportFilePath")
+        println("HTML report: file://${htmlReportDirectoryPath.resolve("index.html")}")
 
         if (failedTests > 0 && !extension.ignoreFailures) throw GradleException("Failing tests.")
     }
 
-    private fun runTests(): List<SquitResult> {
+    private fun processTests(): List<SquitResult> {
         val resultList = arrayListOf<SquitResult>()
 
         FilesUtils.getLeafDirectories(processedResponsesPath).forEach { actualResponsePath ->
             val configPath = FilesUtils.validateExistence(
-                processedSourcesPath
-                    .resolve(actualResponsePath.cut(processedResponsesPath)).resolve(CONFIG)
+                processedSourcesPath.resolve(actualResponsePath.cut(processedResponsesPath)).resolve(CONFIG)
             )
 
             val config = ConfigFactory.parseFile(configPath.toFile())
@@ -171,6 +173,7 @@ open class SquitTestTask : DefaultTask() {
                     val bodyDiff = createBodyDifference(actualResponsePath, config)
                     val infoDiff = createResponseInfoDifference(actualResponsePath, expectedResponseInfo)
                     val diff = "$infoDiff$bodyDiff"
+
                     constructResult(diff, expectedResponseInfo, actualResponsePath, config)
                 }
             } else {
@@ -200,23 +203,26 @@ open class SquitTestTask : DefaultTask() {
             val actualResponseInfoPath = FilesUtils.validateExistence(
                 resolvedPath.resolve(ACTUAL_RESPONSE_INFO)
             )
+
             val actualResponse = Files.readAllBytes(actualResponseInfoPath).toString(Charset.defaultCharset())
             val responseInfo = SquitResponseInfo.fromJson(actualResponse)
             return expectedResponseInfo.diff(responseInfo)
         }
+
         return ""
     }
 
     private fun createBodyDifference(actualResponsePath: Path, config: Config): String {
         val actualResponseFilePath = FilesUtils.validateExistence(
-            actualResponsePath
-                .resolve(MediaTypeFactory.actualResponse(config.mediaType))
+            actualResponsePath.resolve(MediaTypeFactory.actualResponse(config.mediaType))
         )
+
         val expectedResponseFilePath = FilesUtils.validateExistence(
             processedSourcesPath
                 .resolve(actualResponsePath.cut(processedResponsesPath))
                 .resolve(MediaTypeFactory.expectedResponse(config.mediaType))
         )
+
         val expectedResponse = Files.readAllBytes(expectedResponseFilePath)
         val actualResponse = Files.readAllBytes(actualResponseFilePath)
 
