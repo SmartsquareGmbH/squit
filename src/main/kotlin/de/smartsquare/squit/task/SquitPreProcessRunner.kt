@@ -5,12 +5,7 @@ import de.smartsquare.squit.config.writeTo
 import de.smartsquare.squit.entity.SquitTest
 import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.util.Constants
-import de.smartsquare.squit.util.asPath
 import de.smartsquare.squit.util.cut
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.provider.Property
-import org.gradle.workers.WorkAction
-import org.gradle.workers.WorkParameters
 import java.io.Reader
 import java.io.Writer
 import java.nio.file.Files
@@ -18,20 +13,16 @@ import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 
 /**
- * Worker processing each file of the [SquitPreProcessTask].
+ * Helper object for the [SquitPreProcessTask].
  */
-@Suppress("UnstableApiUsage")
-abstract class SquitPreProcessWorker : WorkAction<SquitPreProcessWorker.PreProcessParameters> {
+object SquitPreProcessRunner {
 
-    private companion object {
-        private const val TRANSFER_BUFFER_SIZE = 8192
-    }
+    private const val TRANSFER_BUFFER_SIZE = 8192
 
-    private val sourcesPath get() = parameters.sourcesPath.asPath
-    private val processedSourcesPath get() = parameters.processedSourcesPath.asPath
-    private val test get() = parameters.test.get()
-
-    override fun execute() {
+    /**
+     * Runs the pre processing.
+     */
+    fun run(sourcesPath: Path, processedSourcesPath: Path, test: SquitTest) {
         val mediaType = test.config.mediaType
 
         val processedResultPath = Files.createDirectories(processedSourcesPath.resolve(test.path.cut(sourcesPath)))
@@ -91,12 +82,5 @@ abstract class SquitPreProcessWorker : WorkAction<SquitPreProcessWorker.PreProce
         }
 
         return transferred
-    }
-
-    @Suppress("UndocumentedPublicClass", "UndocumentedPublicProperty")
-    interface PreProcessParameters : WorkParameters {
-        val sourcesPath: DirectoryProperty
-        val processedSourcesPath: DirectoryProperty
-        val test: Property<SquitTest>
     }
 }

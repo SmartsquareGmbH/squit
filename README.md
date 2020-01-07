@@ -42,6 +42,8 @@ and apply it:
 apply plugin: "de.smartsquare.squit"
 ```
 
+The minimum supported Gradle version is `5.1.1`.
+
 ## Project structure
 
 Projects are structured in arbitrarily deep folders. The plugin expects the root to be in the `src/test` folder per default.

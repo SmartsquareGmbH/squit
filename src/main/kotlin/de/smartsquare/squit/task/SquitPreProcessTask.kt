@@ -6,11 +6,15 @@ import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.config.TestIndexer
 import de.smartsquare.squit.config.shouldExclude
 import de.smartsquare.squit.config.tags
+import de.smartsquare.squit.entity.SquitTest
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
+import de.smartsquare.squit.util.asPath
 import de.smartsquare.squit.util.cut
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
@@ -19,6 +23,9 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.util.GradleVersion
+import org.gradle.workers.WorkAction
+import org.gradle.workers.WorkParameters
 import org.gradle.workers.WorkerExecutor
 import java.nio.file.Files
 import java.nio.file.Path
@@ -89,17 +96,24 @@ open class SquitPreProcessTask @Inject constructor(private val workerExecutor: W
     @Suppress("UnstableApiUsage")
     @TaskAction
     fun run() {
-        val workerQueue = workerExecutor.noIsolation()
         val index = TestIndexer(projectConfig).index(sourcesPath, ::filterIndex)
 
         FilesUtils.deleteRecursivelyIfExisting(processedSourcesPath)
         Files.createDirectories(processedSourcesPath)
 
-        index.forEach { test ->
-            workerQueue.submit(SquitPreProcessWorker::class.java) {
-                it.sourcesPath.set(sourcesPath.toFile())
-                it.processedSourcesPath.set(processedSourcesPath.toFile())
-                it.test.set(test)
+        if (GradleVersion.current() >= GradleVersion.version("5.6")) {
+            val workerQueue = workerExecutor.noIsolation()
+
+            index.forEach { test ->
+                workerQueue.submit(Worker::class.java) {
+                    it.sourcesPath.set(sourcesPath.toFile())
+                    it.processedSourcesPath.set(processedSourcesPath.toFile())
+                    it.test.set(test)
+                }
+            }
+        } else {
+            index.forEach { test ->
+                SquitPreProcessRunner.run(sourcesPath, processedSourcesPath, test)
             }
         }
     }
@@ -124,5 +138,24 @@ open class SquitPreProcessTask @Inject constructor(private val workerExecutor: W
 
     private fun isTestCoveredByTags(config: Config, tags: List<String>): Boolean {
         return tags.isEmpty() || tags.any { it in config.tags }
+    }
+
+    @Suppress("UnstableApiUsage")
+    internal abstract class Worker : WorkAction<WorkerParameters> {
+
+        private val sourcesPath get() = parameters.sourcesPath.asPath
+        private val processedSourcesPath get() = parameters.processedSourcesPath.asPath
+        private val test get() = parameters.test.get()
+
+        override fun execute() {
+            SquitPreProcessRunner.run(sourcesPath, processedSourcesPath, test)
+        }
+    }
+
+    @Suppress("UnstableApiUsage")
+    internal interface WorkerParameters : WorkParameters {
+        val sourcesPath: DirectoryProperty
+        val processedSourcesPath: DirectoryProperty
+        val test: Property<SquitTest>
     }
 }

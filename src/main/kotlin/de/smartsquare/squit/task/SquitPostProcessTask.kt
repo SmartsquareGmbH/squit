@@ -7,7 +7,9 @@ import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
 import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
+import de.smartsquare.squit.util.asPath
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Nested
@@ -15,6 +17,9 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.util.GradleVersion
+import org.gradle.workers.WorkAction
+import org.gradle.workers.WorkParameters
 import org.gradle.workers.WorkerExecutor
 import java.nio.file.Files
 import java.nio.file.Path
@@ -78,18 +83,49 @@ open class SquitPostProcessTask @Inject constructor(private val workerExecutor: 
     @Suppress("UnstableApiUsage")
     @TaskAction
     fun run() {
-        val workerQueue = workerExecutor.noIsolation()
-
         FilesUtils.deleteRecursivelyIfExisting(processedActualResponsesPath)
         Files.createDirectories(processedActualResponsesPath)
 
-        FilesUtils.getLeafDirectories(actualResponsesPath, sort = false).forEach { testPath ->
-            workerQueue.submit(SquitPostProcessWorker::class.java) {
-                it.processedSourcesPath.set(processedSourcesPath.toFile())
-                it.actualResponsesPath.set(actualResponsesPath.toFile())
-                it.processedActualResponsesPath.set(processedActualResponsesPath.toFile())
-                it.testPath.set(testPath.toFile())
+        if (GradleVersion.current() >= GradleVersion.version("5.6")) {
+            val workerQueue = workerExecutor.noIsolation()
+
+            FilesUtils.getLeafDirectories(actualResponsesPath, sort = false).forEach { testPath ->
+                workerQueue.submit(Worker::class.java) {
+                    it.processedSourcesPath.set(processedSourcesPath.toFile())
+                    it.actualResponsesPath.set(actualResponsesPath.toFile())
+                    it.processedActualResponsesPath.set(processedActualResponsesPath.toFile())
+                    it.testPath.set(testPath.toFile())
+                }
+            }
+        } else {
+            FilesUtils.getLeafDirectories(actualResponsesPath, sort = false).forEach { testPath ->
+                SquitPostProcessRunner.run(
+                    processedSourcesPath, actualResponsesPath, processedActualResponsesPath, testPath
+                )
             }
         }
+    }
+
+    @Suppress("UnstableApiUsage")
+    internal abstract class Worker : WorkAction<WorkerParameters> {
+
+        private val processedSourcesPath get() = parameters.processedSourcesPath.asPath
+        private val actualResponsesPath get() = parameters.actualResponsesPath.asPath
+        private val processedActualResponsesPath get() = parameters.processedActualResponsesPath.asPath
+        private val testPath get() = parameters.testPath.asPath
+
+        override fun execute() {
+            SquitPostProcessRunner.run(
+                processedSourcesPath, actualResponsesPath, processedActualResponsesPath, testPath
+            )
+        }
+    }
+
+    @Suppress("UnstableApiUsage")
+    internal interface WorkerParameters : WorkParameters {
+        val processedSourcesPath: DirectoryProperty
+        val actualResponsesPath: DirectoryProperty
+        val processedActualResponsesPath: DirectoryProperty
+        val testPath: DirectoryProperty
     }
 }

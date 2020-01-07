@@ -5,26 +5,24 @@ import de.smartsquare.squit.config.mediaType
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.util.Constants
-import de.smartsquare.squit.util.asPath
 import de.smartsquare.squit.util.cut
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.workers.WorkAction
-import org.gradle.workers.WorkParameters
 import java.nio.file.Files
+import java.nio.file.Path
 
 /**
- * Worker processing each file of the [SquitPostProcessTask].
+ * Helper object for the [SquitPostProcessTask].
  */
-@Suppress("UnstableApiUsage")
-abstract class SquitPostProcessWorker : WorkAction<SquitPostProcessWorker.PostProcessParameters> {
+object SquitPostProcessRunner {
 
-    private val processedSourcesPath get() = parameters.processedSourcesPath.asPath
-    private val actualResponsesPath get() = parameters.actualResponsesPath.asPath
-    private val processedActualResponsesPath get() = parameters.processedActualResponsesPath.asPath
-
-    private val testPath get() = parameters.testPath.asPath
-
-    override fun execute() {
+    /**
+     * Runs the post processing.
+     */
+    fun run(
+        processedSourcesPath: Path,
+        actualResponsesPath: Path,
+        processedActualResponsesPath: Path,
+        testPath: Path
+    ) {
         val resultActualResponsePath = Files.createDirectories(
             processedActualResponsesPath.resolve(testPath.cut(actualResponsesPath))
         )
@@ -60,13 +58,5 @@ abstract class SquitPostProcessWorker : WorkAction<SquitPostProcessWorker.PostPr
                 Files.write(resultActualResponsePath.resolve(Constants.ERROR), error.toString().toByteArray())
             }
         }
-    }
-
-    @Suppress("UndocumentedPublicClass", "UndocumentedPublicProperty")
-    interface PostProcessParameters : WorkParameters {
-        val processedSourcesPath: DirectoryProperty
-        val actualResponsesPath: DirectoryProperty
-        val processedActualResponsesPath: DirectoryProperty
-        val testPath: DirectoryProperty
     }
 }
