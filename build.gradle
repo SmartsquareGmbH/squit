@@ -24,7 +24,6 @@ buildscript {
 apply plugin: "com.github.ben-manes.versions"
 
 apply plugin: "com.gradle.plugin-publish"
-
 apply plugin: "java-gradle-plugin"
 apply plugin: "java-library"
 apply plugin: "maven-publish"
@@ -85,18 +84,15 @@ dependencies {
     testRuntimeOnly "org.jetbrains.spek:spek-junit-platform-engine:$spekVersion"
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 tasks.withType(KotlinCompile).all {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-}
-
-task sourceJar(type: Jar, dependsOn: classes) {
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: dokka) {
-    from javadoc.destinationDir
 }
 
 test {
@@ -149,6 +145,10 @@ dokka {
     }
 }
 
+tasks.withType(Javadoc).all {
+    it.dependsOn dokka
+}
+
 pluginBundle {
     website = "https://github.com/SmartsquareGmbH/squit"
     vcsUrl = "https://github.com/SmartsquareGmbH/squit"
@@ -168,24 +168,6 @@ gradlePlugin {
         squit {
             id = "de.smartsquare.squit"
             implementationClass = "de.smartsquare.squit.SquitPlugin"
-        }
-    }
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId "squit"
-
-            from components.java
-
-            artifact sourceJar {
-                classifier "sources"
-            }
-
-            artifact javadocJar {
-                classifier "javadoc"
-            }
         }
     }
 }

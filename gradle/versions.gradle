@@ -18,7 +18,7 @@ ext {
     xmlUnitVersion = '2.6.3'
     jsonUnitVersion = '2.11.1'
     typesafeConfigVersion = '1.4.0'
-    okhttpVersion = '4.3.0'
+    okhttpVersion = '4.3.1'
     kotlinHtmlVersion = '0.6.12'
     diffUtilsVersion = '3.0'
     alphanumericComparatorVersion = "1.4.1"
@@ -35,7 +35,7 @@ ext {
 
     junitPlatformVersion = '1.5.2'
     spekVersion = '1.2.1'
-    kluentVersion = '1.58'
+    kluentVersion = '1.59'
     h2Version = '1.4.200'
     mockkVersion = '1.9.3'
 }
