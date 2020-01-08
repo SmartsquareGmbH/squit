@@ -1,5 +1,6 @@
 package de.smartsquare.squit.task
 
+import de.smartsquare.squit.TestUtils
 import de.smartsquare.squit.withExtendedPluginClasspath
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeFalse
@@ -10,97 +11,59 @@ import org.amshove.kluent.shouldNotContain
 import org.amshove.kluent.shouldStartWith
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
-import org.jetbrains.spek.subject.SubjectSpek
 import java.io.File
 import java.nio.charset.Charset
 import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
 
-object SquitPreProcessTaskSpek : SubjectSpek<Path>({
-
-    subject { Paths.get(this.javaClass.classLoader.getResource("test-project")!!.toURI()) }
-
-    val subjectInvalid = Paths.get(this.javaClass.classLoader.getResource("invalid-test-project")!!.toURI())
-    val subjectInvalid3 = Paths.get(this.javaClass.classLoader.getResource("invalid-test-project-3")!!.toURI())
-    val subjectInvalid4 = Paths.get(this.javaClass.classLoader.getResource("invalid-test-project-4")!!.toURI())
-    val subjectGet = Paths.get(this.javaClass.classLoader.getResource("test-project-get")!!.toURI())
-    val subjectOptions = Paths.get(this.javaClass.classLoader.getResource("test-project-options")!!.toURI())
-    val subjectJson = Paths.get(this.javaClass.classLoader.getResource("test-project-json")!!.toURI())
-    val subjectPlaceholders = Paths.get(this.javaClass.classLoader.getResource("test-project-placeholders")!!.toURI())
-
-    val buildPath = subject
-        .resolve("build")
-        .resolve("squit")
-
-    val call1Directory = buildPath
-        .resolve("sources")
-        .resolve("project")
-        .resolve("call1")
-
-    val call2Directory = buildPath
-        .resolve("sources")
-        .resolve("project")
-        .resolve("call2")
-
-    val call4Directory = buildPath
-        .resolve("sources")
-        .resolve("project")
-        .resolve("call4")
-
-    val call1Config = call1Directory.resolve("test.conf")
-    val call1Request = call1Directory.resolve("request.xml")
-    val call1PreSqlScript = call1Directory.resolve("test_pre.sql")
-    val call1PostSqlScript = call1Directory.resolve("test_post.sql")
-    val call1Description = call1Directory.resolve("description.md")
-
-    val call2Config = call2Directory.resolve("test.conf")
-    val call2PreSqlScript = call2Directory.resolve("test_pre.sql")
-    val call2PostSqlScript = call2Directory.resolve("test_post.sql")
-
-    val call4PreSqlScript = call4Directory.resolve("test_pre.sql")
-    val call4PostSqlScript = call4Directory.resolve("test_post.sql")
-
-    val getCall1Directory = subjectGet
-        .resolve("build")
-        .resolve("squit")
-        .resolve("sources")
-        .resolve("project")
-        .resolve("call1")
-
-    val optionsSourcesPath = subjectOptions
-        .resolve("build")
-        .resolve("squit")
-        .resolve("sources")
-        .resolve("project")
-
-    val invalid3Call1Error = subjectInvalid3
-        .resolve("build")
-        .resolve("squit")
-        .resolve("sources")
-        .resolve("project")
-        .resolve("call1")
-        .resolve("error.txt")
-
-    val jsonCall1Directory = subjectJson
-        .resolve("build")
-        .resolve("squit")
-        .resolve("sources")
-        .resolve("project")
-        .resolve("call1")
+object SquitPreProcessTaskSpek : Spek({
 
     given("a test project") {
+        val project = TestUtils.getResourcePath("test-project")
+
+        val buildPath = project
+            .resolve("build")
+            .resolve("squit")
+
+        val call1Directory = buildPath
+            .resolve("sources")
+            .resolve("project")
+            .resolve("call1")
+
+        val call2Directory = buildPath
+            .resolve("sources")
+            .resolve("project")
+            .resolve("call2")
+
+        val call4Directory = buildPath
+            .resolve("sources")
+            .resolve("project")
+            .resolve("call4")
+
+        val call1Config = call1Directory.resolve("test.conf")
+        val call1Request = call1Directory.resolve("request.xml")
+        val call1PreSqlScript = call1Directory.resolve("test_pre.sql")
+        val call1PostSqlScript = call1Directory.resolve("test_post.sql")
+        val call1Description = call1Directory.resolve("description.md")
+
+        val call2Config = call2Directory.resolve("test.conf")
+        val call2PreSqlScript = call2Directory.resolve("test_pre.sql")
+        val call2PostSqlScript = call2Directory.resolve("test_post.sql")
+
+        val call4PreSqlScript = call4Directory.resolve("test_pre.sql")
+        val call4PostSqlScript = call4Directory.resolve("test_post.sql")
+
         on("running the pre-process task") {
             val arguments = listOf(
                 "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                "-Psquit.rootDir=$subject", "-Ptags=call1,call2,call4"
+                "-Psquit.rootDir=$project", "-Ptags=call1,call2,call4"
             )
 
             val result = GradleRunner.create()
-                .withProjectDir(subject.toFile())
+                .withProjectDir(project.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -156,11 +119,11 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
         on("running the pre-process task with the unignore flag") {
             val arguments = listOf(
                 "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                "-Psquit.rootDir=$subject", "-Psquit.titlePlaceholder=newTitle"
+                "-Psquit.rootDir=$project", "-Psquit.titlePlaceholder=newTitle"
             )
 
             val result = GradleRunner.create()
-                .withProjectDir(subject.toFile())
+                .withProjectDir(project.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -182,11 +145,11 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
         on("running the pre-process task with overriding config") {
             val arguments = listOf(
                 "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                "-Psquit.rootDir=$subject", "-Punignore"
+                "-Psquit.rootDir=$project", "-Punignore"
             )
 
             val result = GradleRunner.create()
-                .withProjectDir(subject.toFile())
+                .withProjectDir(project.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -199,11 +162,13 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
     }
 
     given("an invalid test project (invalid test.conf)") {
+        val invalidProject = TestUtils.getResourcePath("invalid-test-project")
+
         on("running the pre-process task") {
             val arguments = listOf("clean", "squitPreProcess")
 
             val result = GradleRunner.create()
-                .withProjectDir(subjectInvalid.toFile())
+                .withProjectDir(invalidProject.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -221,11 +186,21 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
     }
 
     given("an invalid test project (invalid response.xml)") {
+        val invalidProject3 = TestUtils.getResourcePath("invalid-test-project-3")
+
+        val invalid3Call1Error = invalidProject3
+            .resolve("build")
+            .resolve("squit")
+            .resolve("sources")
+            .resolve("project")
+            .resolve("call1")
+            .resolve("error.txt")
+
         on("running the pre-process task") {
             val arguments = listOf("clean", "squitPreProcess")
 
             val result = GradleRunner.create()
-                .withProjectDir(subjectInvalid3.toFile())
+                .withProjectDir(invalidProject3.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -243,11 +218,13 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
     }
 
     given("an invalid test project (invalid structure)") {
+        val invalidProject4 = TestUtils.getResourcePath("invalid-test-project-4")
+
         on("running the pre-process task") {
             val arguments = listOf("clean", "squitPreProcess")
 
             val result = GradleRunner.create()
-                .withProjectDir(subjectInvalid4.toFile())
+                .withProjectDir(invalidProject4.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -265,14 +242,23 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
     }
 
     given("a test project containing a test with method GET set") {
+        val getProject = TestUtils.getResourcePath("test-project-get")
+
+        val getCall1Directory = getProject
+            .resolve("build")
+            .resolve("squit")
+            .resolve("sources")
+            .resolve("project")
+            .resolve("call1")
+
         on("running the pre-process task") {
             val arguments = listOf(
                 "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                "-Psquit.rootDir=$subject"
+                "-Psquit.rootDir=$getProject"
             )
 
             val result = GradleRunner.create()
-                .withProjectDir(subjectGet.toFile())
+                .withProjectDir(getProject.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -293,14 +279,22 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
     }
 
     given("a test project containing tests with method OPTIONS set") {
+        val optionsProject = TestUtils.getResourcePath("test-project-options")
+
+        val optionsSourcesPath = optionsProject
+            .resolve("build")
+            .resolve("squit")
+            .resolve("sources")
+            .resolve("project")
+
         on("running the pre-process task") {
             val arguments = listOf(
                 "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                "-Psquit.rootDir=$subject"
+                "-Psquit.rootDir=$optionsProject"
             )
 
             val result = GradleRunner.create()
-                .withProjectDir(subjectOptions.toFile())
+                .withProjectDir(optionsProject.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -321,14 +315,23 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
     }
 
     given("a test project with json requests") {
+        val jsonProject = TestUtils.getResourcePath("test-project-json")
+
+        val jsonCall1Directory = jsonProject
+            .resolve("build")
+            .resolve("squit")
+            .resolve("sources")
+            .resolve("project")
+            .resolve("call1")
+
         on("running the pre-process task") {
             val arguments = listOf(
                 "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                "-Psquit.rootDir=$subjectJson"
+                "-Psquit.rootDir=$jsonProject"
             )
 
             val result = GradleRunner.create()
-                .withProjectDir(subjectJson.toFile())
+                .withProjectDir(jsonProject.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -345,14 +348,16 @@ object SquitPreProcessTaskSpek : SubjectSpek<Path>({
     }
 
     given("a test project with multiple placeholders") {
+        val projectWithPlaceholders = TestUtils.getResourcePath("test-project-placeholders")
+
         on("running the pre-process task with only placeholders of tests to run set") {
             val arguments = listOf(
                 "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com", "-Ptags=call2",
-                "-Psquit.rootDir=$subjectPlaceholders", "-Psquit.placeholder2=test", "--stacktrace"
+                "-Psquit.rootDir=$projectWithPlaceholders", "-Psquit.placeholder2=test", "--stacktrace"
             )
 
             val result = GradleRunner.create()
-                .withProjectDir(subjectPlaceholders.toFile())
+                .withProjectDir(projectWithPlaceholders.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()

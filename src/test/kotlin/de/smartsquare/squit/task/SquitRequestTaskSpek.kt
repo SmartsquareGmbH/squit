@@ -17,82 +17,53 @@ import org.amshove.kluent.shouldNotContain
 import org.amshove.kluent.shouldStartWith
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
-import org.jetbrains.spek.subject.SubjectSpek
 import java.io.File
 import java.nio.charset.Charset
 import java.nio.file.Files
-import java.nio.file.Path
 import java.sql.DriverManager
 import java.time.LocalDateTime
 import kotlin.properties.Delegates
 
-object SquitRequestTaskSpek : SubjectSpek<Path>({
-
-    subject { File(this.javaClass.classLoader.getResource("test-project")!!.toURI()).toPath() }
-
-    val subjectInvalid2 = File(this.javaClass.classLoader.getResource("invalid-test-project-2")!!.toURI()).toPath()
-    val subjectInvalid3 = File(this.javaClass.classLoader.getResource("invalid-test-project-3")!!.toURI()).toPath()
-    val subjectGet = File(this.javaClass.classLoader.getResource("test-project-get")!!.toURI()).toPath()
-    val subjectOptions = File(this.javaClass.classLoader.getResource("test-project-options")!!.toURI()).toPath()
-    val subjectJson = File(this.javaClass.classLoader.getResource("test-project-json")!!.toURI()).toPath()
+object SquitRequestTaskSpek : Spek({
 
     var server by Delegates.notNull<MockWebServer>()
 
-    val jdbc = "jdbc:h2:$subject/testDb;IFEXISTS=TRUE"
-    val username = "test"
-    val password = "test"
-
-    val buildPath = subject
-        .resolve("build")
-        .resolve("squit")
-
-    val rawResponsesDirectory = buildPath
-        .resolve("responses")
-        .resolve("raw")
-        .resolve("project")
-
-    val call1Response = rawResponsesDirectory
-        .resolve("call1")
-        .resolve("actual_response.xml")
-
-    val call1Meta = rawResponsesDirectory
-        .resolve("call1")
-        .resolve("meta.json")
-
-    val call1Error = rawResponsesDirectory
-        .resolve("call1")
-        .resolve("error.txt")
-
-    val call1ActualResponseInfo = rawResponsesDirectory
-        .resolve("call1")
-        .resolve("actual_response_info.json")
-
-    val call2Response = rawResponsesDirectory
-        .resolve("call2")
-        .resolve("actual_response.xml")
-
-    val invalid3Call1Error = subjectInvalid3
-        .resolve("build")
-        .resolve("squit")
-        .resolve("responses")
-        .resolve("raw")
-        .resolve("project")
-        .resolve("call1")
-        .resolve("error.txt")
-
-    val jsonCall1Response = subjectJson
-        .resolve("build")
-        .resolve("squit")
-        .resolve("responses")
-        .resolve("raw")
-        .resolve("project")
-        .resolve("call1")
-        .resolve("actual_response.json")
-
     given("a test project") {
+        val project = TestUtils.getResourcePath("test-project")
+
+        val buildPath = project
+            .resolve("build")
+            .resolve("squit")
+
+        val rawResponsesDirectory = buildPath
+            .resolve("responses")
+            .resolve("raw")
+            .resolve("project")
+
+        val call1Response = rawResponsesDirectory
+            .resolve("call1")
+            .resolve("actual_response.xml")
+
+        val call1Meta = rawResponsesDirectory
+            .resolve("call1")
+            .resolve("meta.json")
+
+        val call1Error = rawResponsesDirectory
+            .resolve("call1")
+            .resolve("error.txt")
+
+        val call2Response = rawResponsesDirectory
+            .resolve("call2")
+            .resolve("actual_response.xml")
+
+        val jdbc = "jdbc:h2:$project/testDb;IFEXISTS=TRUE"
+        val username = "test"
+        val password = "test"
+
         beforeEachTest {
             server = MockWebServer()
         }
@@ -100,7 +71,7 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
         afterEachTest {
             server.shutdown()
 
-            TestUtils.deleteDatabaseFiles(subject)
+            TestUtils.deleteDatabaseFiles(project)
         }
 
         on("running the request task") {
@@ -109,11 +80,11 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             val arguments = listOf(
                 "clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject", "-Ptags=call1,call2"
+                "-Psquit.rootDir=$project", "-Ptags=call1,call2"
             )
 
             val result = GradleRunner.create()
-                .withProjectDir(subject.toFile())
+                .withProjectDir(project.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -170,8 +141,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             it("should properly run pre and post runner scripts") {
                 // Files created by pre- and post runners.
-                subject.resolve("build/pre_run.txt").toFile().shouldExist()
-                subject.resolve("build/post_run.txt").toFile().shouldExist()
+                project.resolve("build/pre_run.txt").toFile().shouldExist()
+                project.resolve("build/post_run.txt").toFile().shouldExist()
             }
         }
 
@@ -180,11 +151,11 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             val arguments = listOf(
                 "clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject", "-Ptags=call1", "--info"
+                "-Psquit.rootDir=$project", "-Ptags=call1", "--info"
             )
 
             val result = GradleRunner.create()
-                .withProjectDir(subject.toFile())
+                .withProjectDir(project.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -209,11 +180,11 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             val arguments = listOf(
                 "clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject", "-Ptags=call1"
+                "-Psquit.rootDir=$project", "-Ptags=call1"
             )
 
             val result = GradleRunner.create()
-                .withProjectDir(subject.toFile())
+                .withProjectDir(project.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -234,11 +205,11 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             val arguments = listOf(
                 "clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject", "-Ptags=call1", "--info"
+                "-Psquit.rootDir=$project", "-Ptags=call1", "--info"
             )
 
             val result = GradleRunner.create()
-                .withProjectDir(subject.toFile())
+                .withProjectDir(project.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -256,6 +227,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
     }
 
     given("a test project with an invalid sql script") {
+        val invalidProject2 = TestUtils.getResourcePath("invalid-test-project-2")
+
         beforeEachTest {
             server = MockWebServer()
         }
@@ -263,7 +236,7 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
         afterEachTest {
             server.shutdown()
 
-            TestUtils.deleteDatabaseFiles(subject)
+            TestUtils.deleteDatabaseFiles(invalidProject2)
         }
 
         on("running the request task") {
@@ -271,11 +244,11 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             val arguments = listOf(
                 "clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject"
+                "-Psquit.rootDir=$invalidProject2"
             )
 
             val result = GradleRunner.create()
-                .withProjectDir(subjectInvalid2.toFile())
+                .withProjectDir(invalidProject2.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -293,11 +266,22 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
     }
 
     given("a test project with an error from a previous task") {
+        val invalidProject3 = TestUtils.getResourcePath("invalid-test-project-3")
+
+        val invalid3Call1Error = invalidProject3
+            .resolve("build")
+            .resolve("squit")
+            .resolve("responses")
+            .resolve("raw")
+            .resolve("project")
+            .resolve("call1")
+            .resolve("error.txt")
+
         on("running the request task") {
             val arguments = listOf("clean", "squitRunRequests")
 
             val result = GradleRunner.create()
-                .withProjectDir(subjectInvalid3.toFile())
+                .withProjectDir(invalidProject3.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -315,6 +299,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
     }
 
     given("a test project with method GET set") {
+        val getProject = TestUtils.getResourcePath("test-project-get")
+
         beforeEachTest {
             server = MockWebServer()
         }
@@ -328,11 +314,11 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             val arguments = listOf(
                 "clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject"
+                "-Psquit.rootDir=$getProject"
             )
 
             val result = GradleRunner.create()
-                .withProjectDir(subjectGet.toFile())
+                .withProjectDir(getProject.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -352,6 +338,8 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
     }
 
     given("a test project with method OPTIONS set") {
+        val optionsProject = TestUtils.getResourcePath("test-project-options")
+
         beforeEachTest {
             server = MockWebServer()
         }
@@ -366,11 +354,11 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             val arguments = listOf(
                 "clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject"
+                "-Psquit.rootDir=$optionsProject"
             )
 
             val result = GradleRunner.create()
-                .withProjectDir(subjectOptions.toFile())
+                .withProjectDir(optionsProject.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -395,6 +383,23 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
     }
 
     given("a test project with json requests") {
+        val jsonProject = TestUtils.getResourcePath("test-project-json")
+
+        val jsonRawProjectDir = jsonProject
+            .resolve("build")
+            .resolve("squit")
+            .resolve("responses")
+            .resolve("raw")
+            .resolve("project")
+
+        val jsonCall1Response = jsonRawProjectDir
+            .resolve("call1")
+            .resolve("actual_response.json")
+
+        val jsonCall1ActualResponseInfo = jsonRawProjectDir
+            .resolve("call1")
+            .resolve("actual_response_info.json")
+
         beforeEachTest {
             server = MockWebServer()
         }
@@ -408,11 +413,11 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             val arguments = listOf(
                 "clean", "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subjectJson"
+                "-Psquit.rootDir=$jsonProject"
             )
 
             val result = GradleRunner.create()
-                .withProjectDir(subjectJson.toFile())
+                .withProjectDir(jsonProject.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -434,8 +439,7 @@ object SquitRequestTaskSpek : SubjectSpek<Path>({
 
             it("should write a valid actual_response_info.json file") {
                 val (expectedResponseCode) = SquitResponseInfo.fromJson(
-                    Files.readAllBytes(call1ActualResponseInfo)
-                        .toString(Charset.defaultCharset())
+                    Files.readString(jsonCall1ActualResponseInfo)
                 )
                 expectedResponseCode shouldBeInRange 200..599
             }

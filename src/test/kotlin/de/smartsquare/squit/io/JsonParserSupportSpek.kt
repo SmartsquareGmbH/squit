@@ -1,5 +1,6 @@
 package de.smartsquare.squit.io
 
+import de.smartsquare.squit.TestUtils
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldThrow
 import org.amshove.kluent.withCause
@@ -10,10 +11,10 @@ import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import java.io.IOException
-import java.nio.file.Paths
 
 object JsonParserSupportSpek : Spek({
-    val jsonTestProject = Paths.get(this.javaClass.classLoader.getResource("test-project-json")!!.toURI())
+
+    val jsonTestProject = TestUtils.getResourcePath("test-project-json")
 
     val sampleJsonPath = jsonTestProject
         .resolve("src")

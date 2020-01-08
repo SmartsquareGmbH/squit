@@ -1,6 +1,7 @@
 package de.smartsquare.squit.config
 
 import com.typesafe.config.ConfigFactory
+import de.smartsquare.squit.TestUtils
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.amshove.kluent.AnyException
@@ -14,11 +15,10 @@ import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
-import java.io.File
 
 object ConfigExtensionsSpek : Spek({
 
-    val testProject = File(this.javaClass.classLoader.getResource("test-project")!!.toURI()).toPath()
+    val testProject = TestUtils.getResourcePath("test-project")
 
     given("a config object with an endpoint") {
         val config = ConfigFactory.parseMap(mapOf("endpoint" to "https://example.com"))

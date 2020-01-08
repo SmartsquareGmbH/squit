@@ -9,60 +9,37 @@ import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldStartWith
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
-import org.jetbrains.spek.subject.SubjectSpek
-import java.io.File
 import java.nio.charset.Charset
 import java.nio.file.Files
-import java.nio.file.Path
 import kotlin.properties.Delegates
 
-object SquitPostProcessTaskSpek : SubjectSpek<Path>({
-
-    subject { File(this.javaClass.classLoader.getResource("test-project")!!.toURI()).toPath() }
-
-    val subjectInvalid3 = File(this.javaClass.classLoader.getResource("invalid-test-project-3")!!.toURI()).toPath()
-    val subjectJson = File(this.javaClass.classLoader.getResource("test-project-json")!!.toURI()).toPath()
+object SquitPostProcessTaskSpek : Spek({
 
     var server by Delegates.notNull<MockWebServer>()
 
-    val buildPath = subject
-        .resolve("build")
-        .resolve("squit")
-
-    val call2Directory = buildPath
-        .resolve("responses")
-        .resolve("processed")
-        .resolve("project")
-        .resolve("call2")
-
-    val call2Response = call2Directory
-        .resolve("actual_response.xml")
-
-    val call2Error = call2Directory
-        .resolve("error.txt")
-
-    val invalid3Call1Error = subjectInvalid3
-        .resolve("build")
-        .resolve("squit")
-        .resolve("responses")
-        .resolve("processed")
-        .resolve("project")
-        .resolve("call1")
-        .resolve("error.txt")
-
-    val jsonCall2Response = subjectJson
-        .resolve("build")
-        .resolve("squit")
-        .resolve("responses")
-        .resolve("processed")
-        .resolve("project")
-        .resolve("call1")
-        .resolve("actual_response.json")
-
     given("a test project") {
+        val project = TestUtils.getResourcePath("test-project")
+
+        val buildPath = project
+            .resolve("build")
+            .resolve("squit")
+
+        val call2Directory = buildPath
+            .resolve("responses")
+            .resolve("processed")
+            .resolve("project")
+            .resolve("call2")
+
+        val call2Response = call2Directory
+            .resolve("actual_response.xml")
+
+        val call2Error = call2Directory
+            .resolve("error.txt")
+
         beforeEachTest {
             server = MockWebServer()
         }
@@ -70,7 +47,7 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
         afterEachTest {
             server.shutdown()
 
-            TestUtils.deleteDatabaseFiles(subject)
+            TestUtils.deleteDatabaseFiles(project)
         }
 
         on("running the post-process task") {
@@ -79,11 +56,11 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
 
             val arguments = listOf(
                 "clean", "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject", "-Ptags=call1,call2"
+                "-Psquit.rootDir=$project", "-Ptags=call1,call2"
             )
 
             val result = GradleRunner.create()
-                .withProjectDir(subject.toFile())
+                .withProjectDir(project.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -104,11 +81,11 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
 
             val arguments = listOf(
                 "clean", "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subject", "-Ptags=call1,call2"
+                "-Psquit.rootDir=$project", "-Ptags=call1,call2"
             )
 
             val result = GradleRunner.create()
-                .withProjectDir(subject.toFile())
+                .withProjectDir(project.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -126,11 +103,22 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
     }
 
     given("a test project with an error from a previous task") {
+        val invalidProject3 = TestUtils.getResourcePath("invalid-test-project-3")
+
+        val invalid3Call1Error = invalidProject3
+            .resolve("build")
+            .resolve("squit")
+            .resolve("responses")
+            .resolve("processed")
+            .resolve("project")
+            .resolve("call1")
+            .resolve("error.txt")
+
         on("running the post-process task") {
             val arguments = listOf("clean", "squitPostProcess")
 
             val result = GradleRunner.create()
-                .withProjectDir(subjectInvalid3.toFile())
+                .withProjectDir(invalidProject3.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
@@ -148,6 +136,17 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
     }
 
     given("a test project with json requests") {
+        val jsonProject = TestUtils.getResourcePath("test-project-json")
+
+        val jsonCall2Response = jsonProject
+            .resolve("build")
+            .resolve("squit")
+            .resolve("responses")
+            .resolve("processed")
+            .resolve("project")
+            .resolve("call1")
+            .resolve("actual_response.json")
+
         beforeEachTest {
             server = MockWebServer()
         }
@@ -161,11 +160,11 @@ object SquitPostProcessTaskSpek : SubjectSpek<Path>({
 
             val arguments = listOf(
                 "clean", "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$subjectJson"
+                "-Psquit.rootDir=$jsonProject"
             )
 
             val result = GradleRunner.create()
-                .withProjectDir(subjectJson.toFile())
+                .withProjectDir(jsonProject.toFile())
                 .withExtendedPluginClasspath()
                 .withArguments(arguments)
                 .forwardOutput()
