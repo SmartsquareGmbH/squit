@@ -9,9 +9,9 @@ import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeAfter
 import org.amshove.kluent.shouldBeBefore
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInRange
 import org.amshove.kluent.shouldContain
-import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldExist
 import org.amshove.kluent.shouldNotContain
 import org.amshove.kluent.shouldStartWith
@@ -95,8 +95,8 @@ object SquitRequestTaskSpek : Spek({
             }
 
             it("should properly receive and save the responses") {
-                Files.readAllBytes(call1Response).toString(Charsets.UTF_8) shouldEqual "<cool/>"
-                Files.readAllBytes(call2Response).toString(Charsets.UTF_8) shouldEqual "<nice/>"
+                Files.readAllBytes(call1Response).toString(Charsets.UTF_8) shouldBeEqualTo "<cool/>"
+                Files.readAllBytes(call2Response).toString(Charsets.UTF_8) shouldBeEqualTo "<nice/>"
             }
 
             it("should write a valid meta.json file") {
@@ -112,15 +112,15 @@ object SquitRequestTaskSpek : Spek({
 
             it("should make correct requests") {
                 server.takeRequest().let {
-                    it.method shouldEqual "POST"
-                    it.headers["Content-Type"] shouldEqual "application/xml"
-                    it.headers["some"] shouldEqual "local header"
+                    it.method shouldBeEqualTo "POST"
+                    it.headers["Content-Type"] shouldBeEqualTo "application/xml"
+                    it.headers["some"] shouldBeEqualTo "local header"
                 }
 
                 server.takeRequest().let {
-                    it.method shouldEqual "POST"
-                    it.headers["Content-Type"] shouldEqual "application/xml"
-                    it.headers["some"] shouldEqual "header"
+                    it.method shouldBeEqualTo "POST"
+                    it.headers["Content-Type"] shouldBeEqualTo "application/xml"
+                    it.headers["some"] shouldBeEqualTo "header"
                 }
             }
 
@@ -131,11 +131,11 @@ object SquitRequestTaskSpek : Spek({
                     val resultSet = connection.createStatement().executeQuery("SELECT * FROM ANIMALS")
 
                     resultSet.next()
-                    resultSet.getString(2) shouldEqual "brown"
-                    resultSet.getString(3) shouldEqual "dog"
+                    resultSet.getString(2) shouldBeEqualTo "brown"
+                    resultSet.getString(3) shouldBeEqualTo "dog"
                     resultSet.next()
-                    resultSet.getString(2) shouldEqual "black"
-                    resultSet.getString(3) shouldEqual "cat"
+                    resultSet.getString(2) shouldBeEqualTo "black"
+                    resultSet.getString(3) shouldBeEqualTo "cat"
                 }
             }
 
@@ -166,7 +166,7 @@ object SquitRequestTaskSpek : Spek({
             }
 
             it("should properly receive and save the error body") {
-                Files.readAllBytes(call1Response).toString(Charsets.UTF_8) shouldEqual "error"
+                Files.readAllBytes(call1Response).toString(Charsets.UTF_8) shouldBeEqualTo "error"
             }
 
             it("should print an appropriate info") {
@@ -330,7 +330,7 @@ object SquitRequestTaskSpek : Spek({
 
             it("should make correct requests") {
                 server.takeRequest().let {
-                    it.method shouldEqual "GET"
+                    it.method shouldBeEqualTo "GET"
                     it.headers["Content-Type"] shouldBe null
                 }
             }
@@ -370,12 +370,12 @@ object SquitRequestTaskSpek : Spek({
 
             it("should make correct requests") {
                 server.takeRequest().let {
-                    it.method shouldEqual "OPTIONS"
-                    it.headers["Content-Type"] shouldEqual "application/xml"
+                    it.method shouldBeEqualTo "OPTIONS"
+                    it.headers["Content-Type"] shouldBeEqualTo "application/xml"
                 }
 
                 server.takeRequest().let {
-                    it.method shouldEqual "OPTIONS"
+                    it.method shouldBeEqualTo "OPTIONS"
                     it.headers["Content-Type"] shouldBe null
                 }
             }
@@ -428,19 +428,20 @@ object SquitRequestTaskSpek : Spek({
             }
 
             it("should properly receive and save the responses") {
-                Files.readAllBytes(jsonCall1Response).toString(Charsets.UTF_8) shouldEqual "{\n  \"cool\": true\n}"
+                Files.readAllBytes(jsonCall1Response).toString(Charsets.UTF_8) shouldBeEqualTo "{\n  \"cool\": true\n}"
             }
 
             it("should make correct requests") {
                 server.takeRequest().let {
-                    it.headers["Content-Type"] shouldEqual "application/json"
+                    it.headers["Content-Type"] shouldBeEqualTo "application/json"
                 }
             }
 
             it("should write a valid actual_response_info.json file") {
                 val (expectedResponseCode) = SquitResponseInfo.fromJson(
-                    Files.readString(jsonCall1ActualResponseInfo)
+                    Files.readAllBytes(jsonCall1ActualResponseInfo).toString(Charsets.UTF_8)
                 )
+
                 expectedResponseCode shouldBeInRange 200..599
             }
         }
