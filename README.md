@@ -336,10 +336,10 @@ squit {
     jdbcDrivers = ['oracle.jdbc.driver.OracleDriver']
 
     // The path of your test sources. src/squit is the default.
-    sourcesPath = projectDir.toPath().resolve("src").resolve("squit")
+    sourceDir = projectDir.toPath().resolve("src").resolve("squit")
 
     // The path to save reports in. build/squit/reports is the default.
-    reportsPath = buildDir.toPath().resolve("squit").resolve("reports")
+    reportDir = buildDir.toPath().resolve("squit").resolve("reports")
 
     // The timeout for requests before squit fails. The default is 10.
     timeout = 60

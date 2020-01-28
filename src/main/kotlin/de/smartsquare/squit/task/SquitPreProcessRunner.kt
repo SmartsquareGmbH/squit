@@ -22,10 +22,10 @@ object SquitPreProcessRunner {
     /**
      * Runs the pre processing.
      */
-    fun run(sourcesPath: Path, processedSourcesPath: Path, test: SquitTest) {
+    fun run(sourceDir: Path, processedSourcesPath: Path, test: SquitTest) {
         val mediaType = test.config.mediaType
 
-        val processedResultPath = Files.createDirectories(processedSourcesPath.resolve(test.path.cut(sourcesPath)))
+        val processedResultPath = Files.createDirectories(processedSourcesPath.resolve(test.path.cut(sourceDir)))
         val processedConfigPath = processedResultPath.resolve(Constants.CONFIG)
 
         val processedRequestPath = processedResultPath.resolve(MediaTypeFactory.request(mediaType))

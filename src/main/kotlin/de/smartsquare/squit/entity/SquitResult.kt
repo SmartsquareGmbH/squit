@@ -73,7 +73,7 @@ data class SquitResult(
      * An optional description of the test.
      */
     val description by lazy {
-        val descriptionPath = sourcesPath.resolve(DESCRIPTION)
+        val descriptionPath = sourceDir.resolve(DESCRIPTION)
 
         if (Files.exists(descriptionPath)) {
             Files.readAllBytes(descriptionPath).toString(Charset.defaultCharset())
@@ -143,11 +143,11 @@ data class SquitResult(
         .resolve(fullPath)
         .resolve(META)
 
-    private val sourcesPath = squitBuildDirectoryPath
+    private val sourceDir = squitBuildDirectoryPath
         .resolve(SOURCES_DIRECTORY)
         .resolve(fullPath)
 
-    private val expectedResponsePath = sourcesPath
+    private val expectedResponsePath = sourceDir
         .resolve(MediaTypeFactory.expectedResponse(mediaType))
 
     private val actualResponsePath = squitBuildDirectoryPath

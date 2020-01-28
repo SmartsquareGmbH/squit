@@ -17,11 +17,9 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.util.GradleVersion
 import org.gradle.workers.WorkAction
@@ -39,13 +37,6 @@ import kotlin.properties.Delegates
 @Suppress("LargeClass")
 @CacheableTask
 open class SquitPreProcessTask @Inject constructor(private val workerExecutor: WorkerExecutor) : DefaultTask() {
-
-    /**
-     * The directory of the test sources.
-     */
-    @get:InputDirectory
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    val sourcesPath by lazy { extension.sourcesPath }
 
     /**
      * The directory to save the results in.
@@ -85,6 +76,9 @@ open class SquitPreProcessTask @Inject constructor(private val workerExecutor: W
     @get:Nested
     internal var extension by Delegates.notNull<SquitExtension>()
 
+    @get:Internal
+    internal val sourceDir by lazy { extension.sourceDir.asPath }
+
     init {
         group = "Build"
         description = "Transforms the sources to be readable and usable for the following tasks."
@@ -96,7 +90,7 @@ open class SquitPreProcessTask @Inject constructor(private val workerExecutor: W
     @Suppress("UnstableApiUsage")
     @TaskAction
     fun run() {
-        val index = TestIndexer(projectConfig).index(sourcesPath, ::filterIndex)
+        val index = TestIndexer(projectConfig).index(sourceDir, ::filterIndex)
 
         FilesUtils.deleteRecursivelyIfExisting(processedSourcesPath)
         Files.createDirectories(processedSourcesPath)
@@ -106,26 +100,26 @@ open class SquitPreProcessTask @Inject constructor(private val workerExecutor: W
 
             index.forEach { test ->
                 workerQueue.submit(Worker::class.java) {
-                    it.sourcesPath.set(sourcesPath.toFile())
+                    it.sourceDir.set(sourceDir.toFile())
                     it.processedSourcesPath.set(processedSourcesPath.toFile())
                     it.test.set(test)
                 }
             }
         } else {
             index.forEach { test ->
-                SquitPreProcessRunner.run(sourcesPath, processedSourcesPath, test)
+                SquitPreProcessRunner.run(sourceDir, processedSourcesPath, test)
             }
         }
     }
 
     private fun filterIndex(input: Pair<Path, Config>) = when {
         isTestExcluded(input.second, shouldUnexclude) -> {
-            logger.info("Excluding test ${input.first.cut(sourcesPath)}")
+            logger.info("Excluding test ${input.first.cut(sourceDir)}")
 
             false
         }
         !isTestCoveredByTags(input.second, tags) -> {
-            logger.info("Ignoring test ${input.first.cut(sourcesPath)}")
+            logger.info("Ignoring test ${input.first.cut(sourceDir)}")
 
             false
         }
@@ -143,18 +137,18 @@ open class SquitPreProcessTask @Inject constructor(private val workerExecutor: W
     @Suppress("UnstableApiUsage")
     internal abstract class Worker : WorkAction<WorkerParameters> {
 
-        private val sourcesPath get() = parameters.sourcesPath.asPath
+        private val sourceDir get() = parameters.sourceDir.asPath
         private val processedSourcesPath get() = parameters.processedSourcesPath.asPath
         private val test get() = parameters.test.get()
 
         override fun execute() {
-            SquitPreProcessRunner.run(sourcesPath, processedSourcesPath, test)
+            SquitPreProcessRunner.run(sourceDir, processedSourcesPath, test)
         }
     }
 
     @Suppress("UnstableApiUsage")
     internal interface WorkerParameters : WorkParameters {
-        val sourcesPath: DirectoryProperty
+        val sourceDir: DirectoryProperty
         val processedSourcesPath: DirectoryProperty
         val test: Property<SquitTest>
     }

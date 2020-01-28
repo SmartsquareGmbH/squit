@@ -3,6 +3,7 @@ package de.smartsquare.squit
 import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
@@ -11,13 +12,12 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.util.ConfigureUtil
-import java.nio.file.Path
-import java.nio.file.Paths
 
 /**
  * Class containing the available extensions for the squit dsl.
  */
-open class SquitExtension(project: Project) {
+@Suppress("UnstableApiUsage")
+open class SquitExtension(private val project: Project) {
 
     /**
      * Extension for xml configuration.
@@ -41,14 +41,16 @@ open class SquitExtension(project: Project) {
      * The path the sources lie in. Defaults to src/squit.
      */
     @get:InputDirectory
-    @get:PathSensitive(PathSensitivity.ABSOLUTE)
-    var sourcesPath: Path = Paths.get(project.projectDir.path, "src", "squit")
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    val sourceDir: DirectoryProperty = project.objects.directoryProperty()
+        .convention(project.layout.projectDirectory.dir("src/squit"))
 
     /**
      * The path to save reports and possible failures in.
      */
     @get:OutputDirectory
-    var reportsPath: Path = Paths.get(project.buildDir.path, "squit", "reports")
+    val reportDir: DirectoryProperty = project.objects.directoryProperty()
+        .convention(project.layout.buildDirectory.dir("squit/reports"))
 
     /**
      * The timeout in seconds to use for requests.
@@ -63,6 +65,20 @@ open class SquitExtension(project: Project) {
      */
     @get:Input
     var ignoreFailures = false
+
+    /**
+     * Helper method to set the sourceDir via String.
+     */
+    fun sourceDir(path: String) = sourceDir.apply {
+        set(project.projectDir.resolve(path))
+    }
+
+    /**
+     * Helper method to set the reportDir via String.
+     */
+    fun reportDir(path: String) = reportDir.apply {
+        set(project.projectDir.resolve(path))
+    }
 
     /**
      * Configures the xml dsl.

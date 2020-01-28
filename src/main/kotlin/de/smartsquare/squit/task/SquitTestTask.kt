@@ -23,6 +23,7 @@ import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
 import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
+import de.smartsquare.squit.util.asPath
 import de.smartsquare.squit.util.countTestResults
 import de.smartsquare.squit.util.cut
 import org.gradle.api.DefaultTask
@@ -94,7 +95,7 @@ open class SquitTestTask : DefaultTask() {
      */
     @get:OutputFile
     val xmlReportFilePath: Path by lazy {
-        extension.reportsPath.resolve("xml").resolve("index.xml")
+        extension.reportDir.asPath.resolve("xml").resolve("index.xml")
     }
 
     /**
@@ -102,7 +103,7 @@ open class SquitTestTask : DefaultTask() {
      */
     @get:OutputDirectory
     val htmlReportDirectoryPath: Path by lazy {
-        extension.reportsPath.resolve("html")
+        extension.reportDir.asPath.resolve("html")
     }
 
     /**
@@ -110,7 +111,7 @@ open class SquitTestTask : DefaultTask() {
      */
     @get:OutputDirectory
     val failureResultDirectory by lazy {
-        extension.reportsPath.resolve("failures") ?: throw IllegalArgumentException("reportPath cannot be null")
+        extension.reportDir.asPath.resolve("failures") ?: throw IllegalArgumentException("reportPath cannot be null")
     }
 
     @get:Nested
@@ -129,7 +130,7 @@ open class SquitTestTask : DefaultTask() {
     @Suppress("unused")
     @TaskAction
     fun run() {
-        FilesUtils.deleteRecursivelyIfExisting(extension.reportsPath)
+        FilesUtils.deleteRecursivelyIfExisting(extension.reportDir.asPath)
         Files.createDirectories(processedSourcesPath)
 
         val results = processTests()

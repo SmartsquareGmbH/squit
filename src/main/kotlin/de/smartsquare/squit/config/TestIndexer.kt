@@ -25,37 +25,37 @@ class TestIndexer(private val projectConfig: Config) {
     private val leafCache = ConcurrentHashMap<Path, List<Path>>()
 
     /**
-     * Indexes the given [sourcesPath] and returns a list of [SquitTest]s. The [filter] can be used to exclude
+     * Indexes the given [sourceDir] and returns a list of [SquitTest]s. The [filter] can be used to exclude
      * individual tests.
      */
-    fun index(sourcesPath: Path, filter: (Pair<Path, Config>) -> Boolean): List<SquitTest> {
-        val leafDirectories = FilesUtils.getLeafDirectories(sourcesPath, sort = true).asSequence()
-        val leafDirectoriesWithConfig = indexConfigs(leafDirectories, sourcesPath, filter)
+    fun index(sourceDir: Path, filter: (Pair<Path, Config>) -> Boolean): List<SquitTest> {
+        val leafDirectories = FilesUtils.getLeafDirectories(sourceDir, sort = true).asSequence()
+        val leafDirectoriesWithConfig = indexConfigs(leafDirectories, sourceDir, filter)
 
-        return indexTests(leafDirectoriesWithConfig, sourcesPath)
+        return indexTests(leafDirectoriesWithConfig, sourceDir)
     }
 
     private fun indexConfigs(
         leafDirectories: Sequence<Path>,
-        sourcesPath: Path,
+        sourceDir: Path,
         filter: (Pair<Path, Config>) -> Boolean
     ): List<Pair<Path, Config>> {
         return leafDirectories
             .onEach { path ->
-                if (path.cut(sourcesPath).toList().size < 2) {
+                if (path.cut(sourceDir).toList().size < 2) {
                     throw GradleException(
                         "Invalid project structure. Please add a project directory to the src/squit directory."
                     )
                 }
             }
-            .map { leafDirectory -> leafDirectory to resolveConfigs(leafDirectory, sourcesPath) }
+            .map { leafDirectory -> leafDirectory to resolveConfigs(leafDirectory, sourceDir) }
             .filter(filter)
             .map { (leafDirectory, config) ->
                 try {
                     leafDirectory to config.resolve().validate()
                 } catch (error: Throwable) {
                     throw GradleException(
-                        "Invalid test.conf or local.conf file on path of test: ${leafDirectory.cut(sourcesPath)}",
+                        "Invalid test.conf or local.conf file on path of test: ${leafDirectory.cut(sourceDir)}",
                         error
                     )
                 }
@@ -65,7 +65,7 @@ class TestIndexer(private val projectConfig: Config) {
 
     private fun indexTests(
         leafDirectoriesWithConfig: List<Pair<Path, Config>>,
-        sourcesPath: Path
+        sourceDir: Path
     ): List<SquitTest> {
         return leafDirectoriesWithConfig
             .filterNot { (path, _) -> FilesUtils.isDirectoryEmpty(path) }
@@ -73,7 +73,7 @@ class TestIndexer(private val projectConfig: Config) {
                 val request = resolveRequest(leafDirectory, config)
                 val response = resolveResponse(leafDirectory, config)
 
-                val testParts = FilesUtils.walkUpwards(leafDirectory, sourcesPath)
+                val testParts = FilesUtils.walkUpwards(leafDirectory, sourceDir)
                     .map { path ->
                         val leafsFromHere = leafCache.getOrPut(path) {
                             leafDirectoriesWithConfig
@@ -107,14 +107,14 @@ class TestIndexer(private val projectConfig: Config) {
             }
     }
 
-    private fun resolveConfigs(path: Path, sourcesPath: Path): Config {
-        return FilesUtils.walkUpwards(path, sourcesPath)
+    private fun resolveConfigs(path: Path, sourceDir: Path): Config {
+        return FilesUtils.walkUpwards(path, sourceDir)
             .map { it to resolveConfig(it) }
             .fold(ConfigFactory.empty()) { acc, currentPathToConfig ->
                 val (currentPath, config) = currentPathToConfig
 
-                // Do not add tag for the last part since it is part of the sourcesPath.
-                if (currentPath.endsWith(sourcesPath)) {
+                // Do not add tag for the last part since it is part of the sourceDir.
+                if (currentPath.endsWith(sourceDir)) {
                     acc.withFallback(config)
                 } else {
                     acc.withFallback(config).mergeTag(currentPath.fileName.toString())
