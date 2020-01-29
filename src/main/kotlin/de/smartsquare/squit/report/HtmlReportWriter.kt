@@ -72,12 +72,30 @@ class HtmlReportWriter(private val logger: Logger) {
             val detailCssPath = detailPath.resolve("detail.css")
             val detailJsPath = detailPath.resolve("detail.js")
 
-            val bodyDiff = generateDiff(
-                result.expectedLines, result.actualLines, result.mediaType, DIFF_FILE_NAME, extension
-            )
+            val canonicalizedExpectedLines = when {
+                !result.isError -> canonicalize(
+                    result.expectedLines,
+                    result.mediaType,
+                    extension,
+                    "Could not canonicalize expected response"
+                )
+                else -> result.expectedLines
+            }
+
+            val canonicalizedActualLines = when {
+                !result.isError -> canonicalize(
+                    result.actualLines,
+                    result.mediaType,
+                    extension,
+                    "Could not canonicalize actual response"
+                )
+                else -> result.actualLines
+            }
+
+            val bodyDiff = generateDiff(canonicalizedExpectedLines, canonicalizedActualLines, DIFF_FILE_NAME)
 
             val unifiedDiffForJs = prepareForJs(bodyDiff)
-            val unifiedInfoDiffForJs = prepareInfoForJs(result, extension)
+            val unifiedInfoDiffForJs = prepareInfoForJs(result)
 
             val descriptionForReplacement = if (result.description == null) "null" else "\"${result.description}\""
                 .replace("\n", HTML_LINE_ENDING)
@@ -105,11 +123,8 @@ class HtmlReportWriter(private val logger: Logger) {
     }
 
     // Visible for testing.
-    internal fun prepareInfoForJs(
-        result: SquitResult,
-        extension: SquitExtension
-    ): String {
-        return if (!result.expectedResponseInfo.isDefault) {
+    internal fun prepareInfoForJs(result: SquitResult): String {
+        return if (!result.expectedResponseInfo.isDefault && !result.isError) {
             val expectedInfoLines = result.expectedResponseInfo.toJson().lines()
 
             val actualInfo = result.actualInfoLines.joinToString(separator = "\n")
@@ -118,13 +133,7 @@ class HtmlReportWriter(private val logger: Logger) {
                 else -> actualInfo.lines()
             }
 
-            val infoDiff = generateDiff(
-                expectedInfoLines,
-                actualInfoLines,
-                MediaTypeFactory.jsonMediaType,
-                DIFF_INFO_FILE_NAME,
-                extension
-            )
+            val infoDiff = generateDiff(expectedInfoLines, actualInfoLines, DIFF_INFO_FILE_NAME)
 
             prepareForJs(infoDiff)
         } else {
@@ -139,50 +148,39 @@ class HtmlReportWriter(private val logger: Logger) {
             .joinToString(HTML_LINE_ENDING)
     }
 
-    private fun generateDiff(
-        expectedLines: List<String>,
-        actualLines: List<String>,
+    private fun canonicalize(
+        lines: List<String>,
         mediaType: MediaType,
-        filename: String,
-        extension: SquitExtension
+        extension: SquitExtension,
+        errorMessage: String
     ): List<String> {
-        val canonicalizedExpected = when {
-            expectedLines.isEmpty() -> expectedLines
+        return when {
+            lines.isEmpty() -> lines
             else -> try {
                 MediaTypeFactory.canonicalizer(mediaType)
-                    .canonicalize(expectedLines.joinToString(""), extension)
+                    .canonicalize(lines.joinToString(""), extension)
                     .lines()
             } catch (error: Throwable) {
-                logger.warn("Could not canonicalize expected response", error)
+                logger.warn(errorMessage, error)
 
-                expectedLines
+                lines
             }
         }
+    }
 
-        val canonicalizedActual = when {
-            actualLines.isEmpty() -> actualLines
-            else -> try {
-                MediaTypeFactory.canonicalizer(mediaType)
-                    .canonicalize(actualLines.joinToString(""), extension)
-                    .lines()
-            } catch (error: Throwable) {
-                logger.warn("Could not canonicalize actual response", error)
+    private fun generateDiff(expectedLines: List<String>, actualLines: List<String>, filename: String): List<String> {
+        val diff = DiffUtils.diff(expectedLines, actualLines)
 
-                actualLines
-            }
-        }
-
-        val diff = DiffUtils.diff(canonicalizedExpected, canonicalizedActual)
         val unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(
             filename,
             filename,
-            canonicalizedExpected,
+            expectedLines,
             diff,
             DIFF_CONTEXT_SIZE
         )
 
         return when (unifiedDiff.isEmpty()) {
-            true -> emptyDiffHeader.plus(canonicalizedActual.map { " $it" })
+            true -> emptyDiffHeader + actualLines.map { " $it" }
             false -> unifiedDiff
         }
     }

@@ -110,8 +110,8 @@ open class SquitTestTask : DefaultTask() {
      * The directory to copy failed tests into.
      */
     @get:OutputDirectory
-    val failureResultDirectory by lazy {
-        extension.reportDir.asPath.resolve("failures") ?: throw IllegalArgumentException("reportPath cannot be null")
+    val failureResultDirectory: Path by lazy {
+        extension.reportDir.asPath.resolve("failures")
     }
 
     @get:Nested
@@ -153,7 +153,7 @@ open class SquitTestTask : DefaultTask() {
     }
 
     private fun processTests(): List<SquitResult> {
-        val resultList = arrayListOf<SquitResult>()
+        val resultList = mutableListOf<SquitResult>()
 
         FilesUtils.getLeafDirectories(processedResponsesPath).forEach { actualResponsePath ->
             val configPath = FilesUtils.validateExistence(

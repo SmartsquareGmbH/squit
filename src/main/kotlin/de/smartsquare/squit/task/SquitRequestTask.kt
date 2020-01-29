@@ -201,6 +201,7 @@ open class SquitRequestTask : DefaultTask() {
 
             val responseInfo = SquitResponseInfo(apiResponse.code)
             val resultResponseInfoFilePath = resultResponsePath.resolve(ACTUAL_RESPONSE_INFO)
+
             Files.write(resultResponseInfoFilePath, responseInfo.toJson().toByteArray())
 
             if (!apiResponse.isSuccessful) {

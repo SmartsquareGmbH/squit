@@ -1,6 +1,7 @@
 package de.smartsquare.squit.entity
 
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.typesafe.config.Config
 import de.smartsquare.squit.config.expectedResponseCode
 
@@ -30,7 +31,7 @@ data class SquitResponseInfo(val responseCode: Int = 0) {
     /**
      * Converts this instance into a Json representation.
      */
-    fun toJson(): String = Gson().toJson(
+    fun toJson(): String = GsonBuilder().setPrettyPrinting().create().toJson(
         mapOf(
             RESPONSE_CODE to responseCode
         )
@@ -39,12 +40,11 @@ data class SquitResponseInfo(val responseCode: Int = 0) {
     /**
      * String diff between the this and [other].
      */
-    fun diff(other: SquitResponseInfo): String =
-        if (this.responseCode == other.responseCode) {
-            ""
-        } else {
-            "Response differs (response code ${this.responseCode} != ${other.responseCode})."
-        }
+    fun diff(other: SquitResponseInfo): String = if (this.responseCode == other.responseCode) {
+        ""
+    } else {
+        "Response differs (response code ${this.responseCode} != ${other.responseCode})."
+    }
 
     /**
      * Returns true if responseCode is default.
