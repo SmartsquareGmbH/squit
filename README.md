@@ -31,7 +31,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "de.smartsquare:squit:2.8.2"
+        classpath "de.smartsquare:squit:3.0.0"
     }
 }
 ```
@@ -256,7 +256,7 @@ repositories {
 }
 
 dependencies {
-    compile 'de.smartsquare:squit:2.8.2'
+    compile 'de.smartsquare:squit:3.0.0'
 }
 ```
 
@@ -336,10 +336,10 @@ squit {
     jdbcDrivers = ['oracle.jdbc.driver.OracleDriver']
 
     // The path of your test sources. src/squit is the default.
-    sourceDir = projectDir.toPath().resolve("src").resolve("squit")
+    sourceDir "src/squit"
 
     // The path to save reports in. build/squit/reports is the default.
-    reportDir = buildDir.toPath().resolve("squit").resolve("reports")
+    reportDir "build/squit/reports"
 
     // The timeout for requests before squit fails. The default is 10.
     timeout = 60
