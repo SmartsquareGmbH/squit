@@ -60,6 +60,12 @@ open class SquitExtension(private val project: Project) {
     var timeout = 10L
 
     /**
+     * If squit should avoid printing anything if all tests pass.
+     */
+    @get:Internal
+    var silent = false
+
+    /**
      * If failures should be ignored.
      * In that case the task passes, even if tests have failed.
      */

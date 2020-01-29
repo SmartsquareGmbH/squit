@@ -141,13 +141,15 @@ open class SquitTestTask : DefaultTask() {
 
         val (successfulTests, failedTests, ignoredTests) = results.countTestResults()
 
-        val totalText = if (results.size == 1) "One test ran." else "${results.size} tests ran."
-        val ignoredText = if (ignoredTests > 0) " ($ignoredTests ignored)" else ""
+        if (!extension.silent) {
+            val totalText = if (results.size == 1) "One test ran." else "${results.size} tests ran."
+            val ignoredText = if (ignoredTests > 0) " ($ignoredTests ignored)" else ""
 
-        println("$totalText\n$successfulTests successful and $failedTests failed$ignoredText.")
-        println()
-        println("XML report: file://$xmlReportFilePath")
-        println("HTML report: file://${htmlReportDirectoryPath.resolve("index.html")}")
+            println("$totalText\n$successfulTests successful and $failedTests failed$ignoredText.")
+            println()
+            println("XML report: file://$xmlReportFilePath")
+            println("HTML report: file://${htmlReportDirectoryPath.resolve("index.html")}")
+        }
 
         if (failedTests > 0 && !extension.ignoreFailures) throw GradleException("Failing tests.")
     }

@@ -134,10 +134,12 @@ open class SquitRequestTask : DefaultTask() {
 
         dbConnections.use {
             FilesUtils.getLeafDirectories(processedSourcesPath).forEachIndexed { index, testDirectoryPath ->
-                logger.lifecycleOnSameLine(
-                    "Running test ${index + 1}",
-                    project.gradle.startParameter.consoleOutput
-                )
+                if (!extension.silent) {
+                    logger.lifecycleOnSameLine(
+                        "Running test ${index + 1}",
+                        project.gradle.startParameter.consoleOutput
+                    )
+                }
 
                 val resultResponsePath = Files.createDirectories(
                     actualResponsesPath.resolve(testDirectoryPath.cut(processedSourcesPath))
@@ -205,7 +207,8 @@ open class SquitRequestTask : DefaultTask() {
             Files.write(resultResponseInfoFilePath, responseInfo.toJson().toByteArray())
 
             if (!apiResponse.isSuccessful) {
-                logger.newLineIfNeeded()
+                if (!extension.silent) logger.newLineIfNeeded()
+
                 logger.info(
                     "Unsuccessful request for test ${testDirectoryPath.cut(processedSourcesPath)} " +
                         "(status code: ${apiResponse.code})"
@@ -214,7 +217,8 @@ open class SquitRequestTask : DefaultTask() {
                 mediaType?.type != config.mediaType.type ||
                 mediaType.subtype != config.mediaType.subtype
             ) {
-                logger.newLineIfNeeded()
+                if (!extension.silent) logger.newLineIfNeeded()
+
                 logger.info(
                     "Unexpected Media type $mediaType for test ${testDirectoryPath.cut(processedSourcesPath)}. " +
                         "Expected ${config.mediaType}"

@@ -343,10 +343,13 @@ squit {
 
     // The timeout for requests before squit fails. The default is 10.
     timeout = 60
-    
+
+    // If Squit should only print if a tests fails.
+    silent = false
+
     // If the task should pass on test failures or not.
     ignoreFailures = false
-    
+
     xml {
         // If the xml diffing should be strict.
         // If not, differences like namespace prefixes are not reported as differences.
