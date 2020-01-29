@@ -3,7 +3,7 @@ package de.smartsquare.squit.mediatype.xml
 import de.smartsquare.squit.SquitExtension
 import io.mockk.every
 import io.mockk.mockk
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -33,13 +33,13 @@ object XmlCanonicalizerSpek : Spek({
                 val expected = """
                     <?xml version="1.0" encoding="UTF-8"?>
 
-                    <test> 
-                      <hello a="a" b="b">Abc</hello> 
+                    <test>
+                      <hello a="a" b="b">Abc</hello>
                     </test>
-                    
+
                 """.trimIndent()
 
-                result shouldEqual expected
+                result shouldBeEqualTo expected
             }
         }
 
@@ -61,7 +61,7 @@ object XmlCanonicalizerSpek : Spek({
 
                 val result = canonicalizer.canonicalize(structure, extension)
 
-                result shouldEqual structure
+                result shouldBeEqualTo structure
             }
         }
     }

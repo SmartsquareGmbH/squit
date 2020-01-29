@@ -1,6 +1,6 @@
 package de.smartsquare.squit.util
 
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -17,7 +17,7 @@ object UtilExtensionsSpek : Spek({
             val result = first.cut(second)
 
             it("should return a correctly mutated path") {
-                result shouldEqual Paths.get("e")
+                result shouldBeEqualTo Paths.get("e")
             }
         }
     }
@@ -29,7 +29,7 @@ object UtilExtensionsSpek : Spek({
             val result = path.cut(path)
 
             it("should not crash and return an empty path") {
-                result shouldEqual Paths.get("")
+                result shouldBeEqualTo Paths.get("")
             }
         }
     }

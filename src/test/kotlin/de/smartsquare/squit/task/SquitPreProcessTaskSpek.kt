@@ -3,10 +3,10 @@ package de.smartsquare.squit.task
 import de.smartsquare.squit.TestUtils
 import de.smartsquare.squit.withExtendedPluginClasspath
 import org.amshove.kluent.shouldBe
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeFalse
 import org.amshove.kluent.shouldBeTrue
 import org.amshove.kluent.shouldContain
-import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldNotContain
 import org.amshove.kluent.shouldStartWith
 import org.gradle.testkit.runner.GradleRunner
@@ -100,7 +100,7 @@ object SquitPreProcessTaskSpek : Spek({
 
                 """.trimIndent()
 
-                Files.readAllBytes(call1Description).toString(Charsets.UTF_8) shouldEqual expected
+                Files.readAllBytes(call1Description).toString(Charsets.UTF_8) shouldBeEqualTo expected
             }
 
             it("should respect the passed tags") {

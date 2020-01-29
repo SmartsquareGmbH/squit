@@ -3,7 +3,7 @@ package de.smartsquare.squit.mediatype.json
 import de.smartsquare.squit.SquitExtension
 import io.mockk.every
 import io.mockk.mockk
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -60,7 +60,7 @@ object JsonCanonicalizerSpek : Spek({
                     }
                 """.trimIndent()
 
-                result shouldEqual expected
+                result shouldBeEqualTo expected
             }
         }
 
@@ -80,7 +80,7 @@ object JsonCanonicalizerSpek : Spek({
                     "Y": "Y",
                     "Z": "Z"
                   }
-                ]            
+                ]
             """.trimIndent()
 
             it("should produce a sorted, formatted and valid result") {
@@ -108,7 +108,7 @@ object JsonCanonicalizerSpek : Spek({
                     ]
                 """.trimIndent()
 
-                result shouldEqual expected
+                result shouldBeEqualTo expected
             }
         }
 
@@ -139,7 +139,7 @@ object JsonCanonicalizerSpek : Spek({
 
                 val result = canonicalizer.canonicalize(structure, extension)
 
-                result shouldEqual structure
+                result shouldBeEqualTo structure
             }
         }
     }

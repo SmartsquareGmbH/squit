@@ -1,5 +1,5 @@
 ext {
-    gradleVersion = '6.0.1'
+    gradleVersion = '6.1.1'
     squitVersion = '3.0.0'
 
     gradlePublishVersion = '0.10.1'
@@ -16,7 +16,7 @@ ext {
     gsonVersion = '2.8.6'
     xmlSecVersion = '2.1.4'
     xmlUnitVersion = '2.6.3'
-    jsonUnitVersion = '2.11.1'
+    jsonUnitVersion = '2.12.0'
     typesafeConfigVersion = '1.4.0'
     okhttpVersion = '4.3.1'
     kotlinHtmlVersion = '0.6.12'
@@ -30,10 +30,10 @@ ext {
     diff2htmlVersion = '2.11.2'
     markedVersion = '0.7.0'
 
-    detektVersion = '1.3.1'
+    detektVersion = '1.5.0'
     ktlintPluginVersion = '9.1.1'
 
-    junitPlatformVersion = '1.5.2'
+    junitPlatformVersion = '1.6.0'
     spekVersion = '1.2.1'
     kluentVersion = '1.59'
     h2Version = '1.4.200'

@@ -1,6 +1,6 @@
 package de.smartsquare.squit.entity
 
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -16,13 +16,13 @@ object SquitResponseInfoSpek : Spek({
             val subjectFromJson = SquitResponseInfo.fromJson(subjectAsJson)
 
             it("should equal the expected result") {
-                subjectFromJson shouldEqual subject
+                subjectFromJson shouldBeEqualTo subject
             }
         }
 
         on("checking the default") {
             it("should not be a default") {
-                false shouldEqual subject.isDefault
+                false shouldBeEqualTo subject.isDefault
             }
         }
     }
@@ -35,13 +35,13 @@ object SquitResponseInfoSpek : Spek({
             val subjectFromJson = SquitResponseInfo.fromJson(subjectAsJson)
 
             it("should equal the expected result") {
-                subjectFromJson shouldEqual subject
+                subjectFromJson shouldBeEqualTo subject
             }
         }
 
         on("checking the default") {
             it("should be a default") {
-                true shouldEqual subject.isDefault
+                true shouldBeEqualTo subject.isDefault
             }
         }
     }

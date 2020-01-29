@@ -1,8 +1,8 @@
 package de.smartsquare.squit.entity
 
 import com.typesafe.config.ConfigFactory
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInstanceOf
-import org.amshove.kluent.shouldEqual
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -59,7 +59,7 @@ object SquitTestSpek : Spek({
             val merged = test1.merge(test2)
 
             it("should return a correct object") {
-                merged shouldEqual expected
+                merged shouldBeEqualTo expected
             }
         }
     }
@@ -93,7 +93,7 @@ object SquitTestSpek : Spek({
             }
 
             deserialized shouldBeInstanceOf SquitTest::class.java
-            deserialized shouldEqual test
+            deserialized shouldBeEqualTo test
         }
     }
 })

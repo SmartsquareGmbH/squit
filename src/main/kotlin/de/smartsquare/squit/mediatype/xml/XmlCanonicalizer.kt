@@ -25,7 +25,7 @@ class XmlCanonicalizer : Canonicalizer {
             val canonicalizer = ApacheCanonicalizer.getInstance(ApacheCanonicalizer.ALGO_ID_C14N11_OMIT_COMMENTS)
             val output = canonicalizer.canonicalize(input.toByteArray())
 
-            SAXReader().read(output.inputStream()).asString(OutputFormat.createPrettyPrint())
+            SAXReader().read(output.inputStream()).asString()
         } else {
             input
         }

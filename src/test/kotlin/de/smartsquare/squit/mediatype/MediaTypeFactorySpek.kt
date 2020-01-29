@@ -11,8 +11,8 @@ import de.smartsquare.squit.mediatype.xml.XmlBodyProcessor
 import de.smartsquare.squit.mediatype.xml.XmlCanonicalizer
 import de.smartsquare.squit.mediatype.xml.XmlDiffer
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInstanceOf
-import org.amshove.kluent.shouldEqual
 import org.gradle.testfixtures.ProjectBuilder
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
@@ -26,25 +26,25 @@ object MediaTypeFactorySpek : Spek({
 
         on("getting the request") {
             it("should return a correct name") {
-                MediaTypeFactory.request(mediaType) shouldEqual "request.xml"
+                MediaTypeFactory.request(mediaType) shouldBeEqualTo "request.xml"
             }
         }
 
         on("getting the source response") {
             it("should return the correct name") {
-                MediaTypeFactory.sourceResponse(mediaType) shouldEqual "response.xml"
+                MediaTypeFactory.sourceResponse(mediaType) shouldBeEqualTo "response.xml"
             }
         }
 
         on("getting the expected response") {
             it("should return the correct name") {
-                MediaTypeFactory.expectedResponse(mediaType) shouldEqual "expected_response.xml"
+                MediaTypeFactory.expectedResponse(mediaType) shouldBeEqualTo "expected_response.xml"
             }
         }
 
         on("getting the actual response") {
             it("should return the correct name") {
-                MediaTypeFactory.actualResponse(mediaType) shouldEqual "actual_response.xml"
+                MediaTypeFactory.actualResponse(mediaType) shouldBeEqualTo "actual_response.xml"
             }
         }
 
@@ -76,25 +76,25 @@ object MediaTypeFactorySpek : Spek({
 
         on("getting the request") {
             it("should return a correct name") {
-                MediaTypeFactory.request(mediaType) shouldEqual "request.json"
+                MediaTypeFactory.request(mediaType) shouldBeEqualTo "request.json"
             }
         }
 
         on("getting the source response") {
             it("should return the correct name") {
-                MediaTypeFactory.sourceResponse(mediaType) shouldEqual "response.json"
+                MediaTypeFactory.sourceResponse(mediaType) shouldBeEqualTo "response.json"
             }
         }
 
         on("getting the expected response") {
             it("should return the correct name") {
-                MediaTypeFactory.expectedResponse(mediaType) shouldEqual "expected_response.json"
+                MediaTypeFactory.expectedResponse(mediaType) shouldBeEqualTo "expected_response.json"
             }
         }
 
         on("getting the actual response") {
             it("should return the correct name") {
-                MediaTypeFactory.actualResponse(mediaType) shouldEqual "actual_response.json"
+                MediaTypeFactory.actualResponse(mediaType) shouldBeEqualTo "actual_response.json"
             }
         }
 
@@ -126,25 +126,25 @@ object MediaTypeFactorySpek : Spek({
 
         on("getting the request") {
             it("should return a correct name") {
-                MediaTypeFactory.request(mediaType) shouldEqual "request.txt"
+                MediaTypeFactory.request(mediaType) shouldBeEqualTo "request.txt"
             }
         }
 
         on("getting the source response") {
             it("should return the correct name") {
-                MediaTypeFactory.sourceResponse(mediaType) shouldEqual "response.txt"
+                MediaTypeFactory.sourceResponse(mediaType) shouldBeEqualTo "response.txt"
             }
         }
 
         on("getting the expected response") {
             it("should return the correct name") {
-                MediaTypeFactory.expectedResponse(mediaType) shouldEqual "expected_response.txt"
+                MediaTypeFactory.expectedResponse(mediaType) shouldBeEqualTo "expected_response.txt"
             }
         }
 
         on("getting the actual response") {
             it("should return the correct name") {
-                MediaTypeFactory.actualResponse(mediaType) shouldEqual "actual_response.txt"
+                MediaTypeFactory.actualResponse(mediaType) shouldBeEqualTo "actual_response.txt"
             }
         }
 

@@ -1,7 +1,7 @@
 package de.smartsquare.squit.entity
 
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -22,7 +22,7 @@ object SquitResultSpek : Spek({
             val result = subject.cutFirstPathElement()
 
             it("should be modified correctly") {
-                result.fullPath shouldEqual Paths.get("b", "c")
+                result.fullPath shouldBeEqualTo Paths.get("b", "c")
             }
         }
     }
@@ -37,7 +37,7 @@ object SquitResultSpek : Spek({
             val result = subject.cutFirstPathElement()
 
             it("should be modified correctly") {
-                result.fullPath shouldEqual Paths.get("c")
+                result.fullPath shouldBeEqualTo Paths.get("c")
             }
         }
     }
@@ -52,7 +52,7 @@ object SquitResultSpek : Spek({
             val result = subject.cutFirstPathElement()
 
             it("should be modified correctly") {
-                result.fullPath shouldEqual Paths.get("")
+                result.fullPath shouldBeEqualTo Paths.get("")
             }
         }
     }
@@ -67,7 +67,7 @@ object SquitResultSpek : Spek({
             val result = subject.cutFirstPathElement()
 
             it("should not be modified") {
-                result.fullPath shouldEqual Paths.get("")
+                result.fullPath shouldBeEqualTo Paths.get("")
             }
         }
     }

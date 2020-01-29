@@ -5,8 +5,8 @@ import de.smartsquare.squit.TestUtils
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.amshove.kluent.AnyException
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldContain
-import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldNotThrow
 import org.amshove.kluent.shouldThrow
 import org.amshove.kluent.withMessage
@@ -27,7 +27,7 @@ object ConfigExtensionsSpek : Spek({
             val endpoint = config.endpoint
 
             it("should be parsed correctly") {
-                endpoint shouldEqual "https://example.com".toHttpUrlOrNull()
+                endpoint shouldBeEqualTo "https://example.com".toHttpUrlOrNull()
             }
         }
     }
@@ -51,7 +51,7 @@ object ConfigExtensionsSpek : Spek({
             val mediaType = config.mediaType
 
             it("should be parsed correctly") {
-                mediaType shouldEqual "application/xml".toMediaTypeOrNull()
+                mediaType shouldBeEqualTo "application/xml".toMediaTypeOrNull()
             }
         }
     }
@@ -75,7 +75,7 @@ object ConfigExtensionsSpek : Spek({
             val result = config.mergeTag("def")
 
             it("should be merged correctly") {
-                result.getStringList("tags") shouldEqual listOf("abc", "def")
+                result.getStringList("tags") shouldBeEqualTo listOf("abc", "def")
             }
         }
     }
@@ -104,7 +104,7 @@ object ConfigExtensionsSpek : Spek({
             val method = config.method
 
             it("should return the given method") {
-                method shouldEqual "GET"
+                method shouldBeEqualTo "GET"
             }
         }
     }
@@ -116,7 +116,7 @@ object ConfigExtensionsSpek : Spek({
             val method = config.method
 
             it("should fallback to the default POST method") {
-                method shouldEqual "POST"
+                method shouldBeEqualTo "POST"
             }
         }
     }

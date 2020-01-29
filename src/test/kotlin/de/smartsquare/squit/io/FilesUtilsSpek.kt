@@ -1,6 +1,6 @@
 package de.smartsquare.squit.io
 
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldNotExist
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
@@ -17,7 +17,7 @@ object FilesUtilsSpek : Spek({
             val grandChild21 = createTempDir(prefix = "grandChild21", directory = child2.toFile()).toPath()
 
             it("should return a correct list") {
-                FilesUtils.getLeafDirectories(root).toList() shouldEqual listOf(child3, child1, grandChild21)
+                FilesUtils.getLeafDirectories(root).toList() shouldBeEqualTo listOf(child3, child1, grandChild21)
             }
         }
 
