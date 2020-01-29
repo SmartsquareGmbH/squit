@@ -447,4 +447,47 @@ object SquitTestTaskSpek : Spek({
             }
         }
     }
+
+    given("a test project with different structure") {
+        val differentStructureProject = TestUtils.getResourcePath("test-project-different-structure")
+
+        val xmlReportsPath = differentStructureProject
+            .resolve("build")
+            .resolve("different")
+            .resolve("reports")
+            .resolve("xml")
+            .resolve("index.xml")
+
+        beforeEachTest {
+            server = MockWebServer()
+        }
+
+        afterEachTest {
+            server.shutdown()
+        }
+
+        on("running the test task") {
+            server.enqueue(MockResponse().setBody("<cool/>"))
+
+            val arguments = listOf(
+                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$differentStructureProject"
+            )
+
+            val result = GradleRunner.create()
+                .withProjectDir(differentStructureProject.toFile())
+                .withExtendedPluginClasspath()
+                .withArguments(arguments)
+                .forwardOutput()
+                .build()
+
+            it("should be able to complete without errors") {
+                result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
+            }
+
+            it("should write reports to correct location") {
+                Files.exists(xmlReportsPath).shouldBeTrue()
+            }
+        }
+    }
 })

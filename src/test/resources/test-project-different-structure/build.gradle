@@ -1,0 +1,9 @@
+plugins {
+    id 'base'
+    id 'de.smartsquare.squit'
+}
+
+squit {
+    sourceDir "src/different"
+    reportDir "build/different/reports"
+}
