@@ -78,7 +78,7 @@ open class SquitTestTask : DefaultTask() {
     @get:Optional
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    val metaPaths: List<Path> by lazy {
+    internal val metaPaths: List<Path> by lazy {
         val rawDirectoryPath = Paths.get(project.buildDir.path, SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)
 
         if (Files.exists(rawDirectoryPath)) {

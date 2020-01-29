@@ -2,6 +2,7 @@ package de.smartsquare.squit.task
 
 import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.io.FilesUtils
+import de.smartsquare.squit.util.Constants.META
 import de.smartsquare.squit.util.Constants.PROCESSED_DIRECTORY
 import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
 import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
@@ -9,9 +10,12 @@ import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.asPath
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
@@ -48,14 +52,22 @@ open class SquitPostProcessTask @Inject constructor(private val workerExecutor: 
      * The directory of the previously requested responses.
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    @InputDirectory
-    @PathSensitive(PathSensitivity.RELATIVE)
+    @Internal
     val actualResponsesPath: Path = Paths.get(
         project.buildDir.path,
         SQUIT_DIRECTORY,
         RESPONSES_DIRECTORY,
         RAW_DIRECTORY
     )
+
+    /**
+     * Collection of actula response files except meta.json files for up-to-date checking.
+     */
+    @Suppress("unused")
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    internal val actualResponsesFiles: ConfigurableFileTree = project
+        .fileTree(actualResponsesPath) { it.exclude("**/$META") }
 
     /**
      * The directory to save the results in.
