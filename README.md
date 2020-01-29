@@ -1,4 +1,4 @@
-# Squit
+# Squit ![CI](https://github.com/SmartsquareGmbH/squit/workflows/CI/badge.svg)
 
 `Squit` is a `Gradle` plugin for file-based, automated testing of `JSON`, `XML`, `SOAP` and other apis.<br>
 It features high customizability and speed.
