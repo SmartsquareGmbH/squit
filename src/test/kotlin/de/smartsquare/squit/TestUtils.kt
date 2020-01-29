@@ -2,9 +2,11 @@ package de.smartsquare.squit
 
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.internal.PluginUnderTestMetadataReading
+import org.gradle.util.GradleVersion
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 
 /**
  * Utility class for methods which cannot be a extension function.
@@ -36,4 +38,36 @@ fun GradleRunner.withExtendedPluginClasspath(): GradleRunner {
         .plus(File(org.h2.Driver::class.java.protectionDomain.codeSource.location.toURI()))
 
     return withPluginClasspath(classpath)
+}
+
+/**
+ * Configures the GradleRunner to run with the jacoco agent.
+ */
+fun GradleRunner.withJacoco(): GradleRunner {
+    val properties = this.javaClass.classLoader.getResource("testkit-gradle.properties")
+
+    if (properties != null) {
+        Files.copy(
+            File(properties.toURI()).toPath(),
+            projectDir.toPath().resolve("gradle.properties"),
+            StandardCopyOption.REPLACE_EXISTING
+        )
+    }
+
+    return this
+}
+
+/**
+ * Creates a [GradleRunner] with the given [project], [arguments] and an optional [version].
+ *
+ * This also applies the following default arguments: "clean --stacktrace".
+ */
+fun gradleRunner(project: Path, arguments: List<String>, version: GradleVersion? = null): GradleRunner {
+    return GradleRunner.create()
+        .withArguments(listOf("clean") + arguments + "--stacktrace")
+        .apply { if (version != null) withGradleVersion(version.version) }
+        .withProjectDir(project.toFile())
+        .withExtendedPluginClasspath()
+        .forwardOutput()
+        .withJacoco()
 }

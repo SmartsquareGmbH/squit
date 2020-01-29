@@ -3,8 +3,8 @@ package de.smartsquare.squit
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
-import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import org.gradle.util.GradleVersion
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
@@ -40,13 +40,7 @@ object GradleCompatibilitySpek : SubjectSpek<Path>({
                     "-Psquit.rootDir=$subject", "--stacktrace"
                 )
 
-                val result = GradleRunner.create()
-                    .withProjectDir(subject.toFile())
-                    .withExtendedPluginClasspath()
-                    .withGradleVersion(version)
-                    .withArguments(arguments)
-                    .forwardOutput()
-                    .build()
+                val result = gradleRunner(subject, arguments, GradleVersion.version(version)).build()
 
                 it("should be able to complete without errors") {
                     result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS

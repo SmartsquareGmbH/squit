@@ -1,7 +1,7 @@
 package de.smartsquare.squit.task
 
 import de.smartsquare.squit.TestUtils
-import de.smartsquare.squit.withExtendedPluginClasspath
+import de.smartsquare.squit.gradleRunner
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
@@ -12,7 +12,6 @@ import org.amshove.kluent.shouldBeFile
 import org.amshove.kluent.shouldBeTrue
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldStartWith
-import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
@@ -82,16 +81,11 @@ object SquitTestTaskSpek : Spek({
             server.enqueue(MockResponse().setBody("<relevant/>"))
 
             val arguments = listOf(
-                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
                 "-Psquit.rootDir=$project"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(project.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(project, arguments).build()
 
             it("should be able to complete without errors") {
                 result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -130,16 +124,11 @@ object SquitTestTaskSpek : Spek({
             server.enqueue(MockResponse().setBody("<nice/>"))
 
             val arguments = listOf(
-                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
                 "-Psquit.rootDir=$project", "-Ptags=call1,call2"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(project.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .buildAndFail()
+            val result = gradleRunner(project, arguments).buildAndFail()
 
             it("should fail the build") {
                 result.task(":squitTest")?.outcome shouldBe TaskOutcome.FAILED
@@ -166,16 +155,11 @@ object SquitTestTaskSpek : Spek({
             server.enqueue(MockResponse().setBody("<relevant/>"))
 
             val arguments = listOf(
-                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
                 "-Psquit.rootDir=$project", "-Punignore"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(project.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .buildAndFail()
+            val result = gradleRunner(project, arguments).buildAndFail()
 
             it("should fail the build") {
                 result.task(":squitTest")?.outcome shouldBe TaskOutcome.FAILED
@@ -197,16 +181,11 @@ object SquitTestTaskSpek : Spek({
             server.enqueue(MockResponse().setBody("<relevant/>"))
 
             val arguments = listOf(
-                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
                 "-Psquit.rootDir=$project", "-Punexclude"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(project.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .buildAndFail()
+            val result = gradleRunner(project, arguments).buildAndFail()
 
             it("should fail the build") {
                 result.task(":squitTest")?.outcome shouldBe TaskOutcome.FAILED
@@ -235,14 +214,9 @@ object SquitTestTaskSpek : Spek({
             .resolve("error.txt")
 
         on("running the test task") {
-            val arguments = listOf("clean", "squitTest")
+            val arguments = listOf("squitTest")
 
-            val result = GradleRunner.create()
-                .withProjectDir(invalidProject3.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .buildAndFail()
+            val result = gradleRunner(invalidProject3, arguments).buildAndFail()
 
             it("should fail the build") {
                 result.task(":squitTest")?.outcome shouldBe TaskOutcome.FAILED
@@ -272,16 +246,11 @@ object SquitTestTaskSpek : Spek({
             server.enqueue(MockResponse().setBody("<failure/>"))
 
             val arguments = listOf(
-                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
                 "-Psquit.rootDir=$projectIgnoreFailures"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(projectIgnoreFailures.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(projectIgnoreFailures, arguments).build()
 
             it("should be able to complete without errors") {
                 result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -304,16 +273,11 @@ object SquitTestTaskSpek : Spek({
             server.enqueue(MockResponse().setBody("<abc:cool xmlns:abc='https://example.com'/>"))
 
             val arguments = listOf(
-                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
                 "-Psquit.rootDir=$projectWithNonStrictXml"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(projectWithNonStrictXml.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(projectWithNonStrictXml, arguments).build()
 
             it("should be able to complete without errors") {
                 result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -336,16 +300,11 @@ object SquitTestTaskSpek : Spek({
             server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}"))
 
             val arguments = listOf(
-                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
                 "-Psquit.rootDir=$jsonProject"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(jsonProject.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(jsonProject, arguments).build()
 
             it("should be able to complete without errors") {
                 result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -379,16 +338,11 @@ object SquitTestTaskSpek : Spek({
             )
 
             val arguments = listOf(
-                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
                 "-Psquit.rootDir=$jsonProjectWithDifferentOrder"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(jsonProjectWithDifferentOrder.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(jsonProjectWithDifferentOrder, arguments).build()
 
             it("should be able to complete without errors") {
                 result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -411,16 +365,11 @@ object SquitTestTaskSpek : Spek({
             server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}").setResponseCode(400))
 
             val arguments = listOf(
-                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
                 "-Psquit.rootDir=$projectWithResponseCode"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(projectWithResponseCode.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(projectWithResponseCode, arguments).build()
 
             it("should be able to complete without errors") {
                 result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -431,16 +380,11 @@ object SquitTestTaskSpek : Spek({
             server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}").setResponseCode(200))
 
             val arguments = listOf(
-                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$projectWithResponseCode", "--stacktrace"
+                "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$projectWithResponseCode"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(projectWithResponseCode.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .buildAndFail()
+            val result = gradleRunner(projectWithResponseCode, arguments).buildAndFail()
 
             it("should fail the build") {
                 result.task(":squitTest")?.outcome shouldBe TaskOutcome.FAILED
@@ -470,16 +414,11 @@ object SquitTestTaskSpek : Spek({
             server.enqueue(MockResponse().setBody("<cool/>"))
 
             val arguments = listOf(
-                "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
                 "-Psquit.rootDir=$differentStructureProject"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(differentStructureProject.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(differentStructureProject, arguments).build()
 
             it("should be able to complete without errors") {
                 result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS

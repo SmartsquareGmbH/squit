@@ -1,7 +1,7 @@
 package de.smartsquare.squit.task
 
 import de.smartsquare.squit.TestUtils
-import de.smartsquare.squit.withExtendedPluginClasspath
+import de.smartsquare.squit.gradleRunner
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeFalse
@@ -9,7 +9,6 @@ import org.amshove.kluent.shouldBeTrue
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldNotContain
 import org.amshove.kluent.shouldStartWith
-import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
@@ -58,16 +57,11 @@ object SquitPreProcessTaskSpek : Spek({
 
         on("running the pre-process task") {
             val arguments = listOf(
-                "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
+                "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
                 "-Psquit.rootDir=$project", "-Ptags=call1,call2,call4"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(project.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(project, arguments).build()
 
             it("should be able to complete without error") {
                 result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -118,16 +112,11 @@ object SquitPreProcessTaskSpek : Spek({
 
         on("running the pre-process task with the unignore flag") {
             val arguments = listOf(
-                "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
+                "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
                 "-Psquit.rootDir=$project", "-Psquit.titlePlaceholder=newTitle"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(project.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(project, arguments).build()
 
             it("should be able to complete without error") {
                 result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -144,16 +133,11 @@ object SquitPreProcessTaskSpek : Spek({
 
         on("running the pre-process task with overriding config") {
             val arguments = listOf(
-                "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
+                "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
                 "-Psquit.rootDir=$project", "-Punignore"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(project.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(project, arguments).build()
 
             it("should be able to complete without error") {
                 result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -165,14 +149,9 @@ object SquitPreProcessTaskSpek : Spek({
         val invalidProject = TestUtils.getResourcePath("invalid-test-project")
 
         on("running the pre-process task") {
-            val arguments = listOf("clean", "squitPreProcess")
+            val arguments = listOf("squitPreProcess")
 
-            val result = GradleRunner.create()
-                .withProjectDir(invalidProject.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .buildAndFail()
+            val result = gradleRunner(invalidProject, arguments).buildAndFail()
 
             it("should fail the build") {
                 result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.FAILED
@@ -197,14 +176,9 @@ object SquitPreProcessTaskSpek : Spek({
             .resolve("error.txt")
 
         on("running the pre-process task") {
-            val arguments = listOf("clean", "squitPreProcess")
+            val arguments = listOf("squitPreProcess")
 
-            val result = GradleRunner.create()
-                .withProjectDir(invalidProject3.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(invalidProject3, arguments).build()
 
             it("should succeed nonetheless") {
                 result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -221,14 +195,9 @@ object SquitPreProcessTaskSpek : Spek({
         val invalidProject4 = TestUtils.getResourcePath("invalid-test-project-4")
 
         on("running the pre-process task") {
-            val arguments = listOf("clean", "squitPreProcess")
+            val arguments = listOf("squitPreProcess")
 
-            val result = GradleRunner.create()
-                .withProjectDir(invalidProject4.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .buildAndFail()
+            val result = gradleRunner(invalidProject4, arguments).buildAndFail()
 
             it("should fail the build") {
                 result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.FAILED
@@ -253,16 +222,10 @@ object SquitPreProcessTaskSpek : Spek({
 
         on("running the pre-process task") {
             val arguments = listOf(
-                "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                "-Psquit.rootDir=$getProject"
+                "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com", "-Psquit.rootDir=$getProject"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(getProject.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(getProject, arguments).build()
 
             it("should be able to complete without error") {
                 result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -289,16 +252,10 @@ object SquitPreProcessTaskSpek : Spek({
 
         on("running the pre-process task") {
             val arguments = listOf(
-                "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                "-Psquit.rootDir=$optionsProject"
+                "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com", "-Psquit.rootDir=$optionsProject"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(optionsProject.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(optionsProject, arguments).build()
 
             it("should be able to complete without error") {
                 result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -326,16 +283,11 @@ object SquitPreProcessTaskSpek : Spek({
 
         on("running the pre-process task") {
             val arguments = listOf(
-                "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
+                "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
                 "-Psquit.rootDir=$jsonProject"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(jsonProject.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(jsonProject, arguments).build()
 
             it("should be able to complete without error") {
                 result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -352,16 +304,11 @@ object SquitPreProcessTaskSpek : Spek({
 
         on("running the pre-process task with only placeholders of tests to run set") {
             val arguments = listOf(
-                "clean", "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com", "-Ptags=call2",
-                "-Psquit.rootDir=$projectWithPlaceholders", "-Psquit.placeholder2=test", "--stacktrace"
+                "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com", "-Ptags=call2",
+                "-Psquit.rootDir=$projectWithPlaceholders", "-Psquit.placeholder2=test"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(projectWithPlaceholders.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(projectWithPlaceholders, arguments).build()
 
             it("should be able to complete without error") {
                 result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS

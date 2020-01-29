@@ -1,13 +1,12 @@
 package de.smartsquare.squit.task
 
 import de.smartsquare.squit.TestUtils
-import de.smartsquare.squit.withExtendedPluginClasspath
+import de.smartsquare.squit.gradleRunner
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldStartWith
-import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
@@ -55,16 +54,11 @@ object SquitPostProcessTaskSpek : Spek({
             server.enqueue(MockResponse().setBody("<test/>"))
 
             val arguments = listOf(
-                "clean", "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
                 "-Psquit.rootDir=$project", "-Ptags=call1,call2"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(project.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(project, arguments).build()
 
             it("should be able to complete without errors") {
                 result.task(":squitPostProcess")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -80,16 +74,11 @@ object SquitPostProcessTaskSpek : Spek({
             server.enqueue(MockResponse().setBody("<unclosed_tag>"))
 
             val arguments = listOf(
-                "clean", "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
                 "-Psquit.rootDir=$project", "-Ptags=call1,call2"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(project.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(project, arguments).build()
 
             it("should be able to complete successfully nonetheless") {
                 result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -115,14 +104,9 @@ object SquitPostProcessTaskSpek : Spek({
             .resolve("error.txt")
 
         on("running the post-process task") {
-            val arguments = listOf("clean", "squitPostProcess")
+            val arguments = listOf("squitPostProcess")
 
-            val result = GradleRunner.create()
-                .withProjectDir(invalidProject3.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(invalidProject3, arguments).build()
 
             it("should succeed nonetheless") {
                 result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -159,16 +143,11 @@ object SquitPostProcessTaskSpek : Spek({
             server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}"))
 
             val arguments = listOf(
-                "clean", "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
                 "-Psquit.rootDir=$jsonProject"
             )
 
-            val result = GradleRunner.create()
-                .withProjectDir(jsonProject.toFile())
-                .withExtendedPluginClasspath()
-                .withArguments(arguments)
-                .forwardOutput()
-                .build()
+            val result = gradleRunner(jsonProject, arguments).build()
 
             it("should be able to complete without errors") {
                 result.task(":squitPostProcess")?.outcome shouldBe TaskOutcome.SUCCESS

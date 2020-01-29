@@ -44,6 +44,10 @@ repositories {
     jcenter()
 }
 
+configurations {
+    jacocoRuntimeOnly
+}
+
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
@@ -82,6 +86,16 @@ dependencies {
     testImplementation "io.mockk:mockk:$mockkVersion"
 
     testRuntimeOnly "org.jetbrains.spek:spek-junit-platform-engine:$spekVersion"
+
+    jacocoRuntimeOnly "org.jacoco:org.jacoco.agent:${jacoco.toolVersion}:runtime"
+}
+
+sourceSets {
+    test {
+        resources {
+            srcDir "$buildDir/testkit"
+        }
+    }
 }
 
 java {
@@ -176,6 +190,23 @@ wrapper {
     gradleVersion = project.ext.gradleVersion
 }
 
+task generateTestkitFiles {
+    def jacocoPath = configurations.jacocoRuntimeOnly.asPath.toString().replace('\\', '/')
+    def jvmArgs = "org.gradle.jvmargs=-javaagent:$jacocoPath=destfile=$buildDir/jacoco/test.exec"
+    def outputDir = file("$buildDir/testkit")
+
+    inputs.files jacocoPath
+    outputs.dir outputDir
+
+    doLast {
+        outputDir.mkdirs()
+        file("$outputDir/testkit-gradle.properties").text = jvmArgs
+    }
+}
+
 gradle.projectsEvaluated {
-    test { finalizedBy jacocoTestReport }
+    test {
+        dependsOn generateTestkitFiles
+        finalizedBy jacocoTestReport
+    }
 }
