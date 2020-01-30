@@ -81,12 +81,35 @@ object SquitPostProcessTaskSpek : Spek({
             val result = gradleRunner(project, arguments).build()
 
             it("should be able to complete successfully nonetheless") {
-                result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitPostProcess")?.outcome shouldBe TaskOutcome.SUCCESS
             }
 
             it("should create an error file") {
                 Files.readAllBytes(call2Error).toString(Charsets.UTF_8) shouldStartWith
                     "org.dom4j.DocumentException: Error on line 1 of document"
+            }
+        }
+
+        on("running the post-process task with build cache twice") {
+            repeat(2) {
+                server.enqueue(MockResponse().setBody("<cool/>"))
+                server.enqueue(MockResponse().setBody("<test/>"))
+            }
+
+            val arguments = listOf(
+                "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                "-Psquit.rootDir=$project", "-Ptags=call1,call2", "--build-cache"
+            )
+
+            val result = gradleRunner(project, arguments).build()
+
+            TestUtils.deleteDatabaseFiles(project)
+
+            val cacheResult = gradleRunner(project, arguments).build()
+
+            it("should cache") {
+                result.task(":squitPostProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+                cacheResult.task(":squitPostProcess")?.outcome shouldBe TaskOutcome.FROM_CACHE
             }
         }
     }

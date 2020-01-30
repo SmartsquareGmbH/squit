@@ -147,6 +147,21 @@ object SquitPreProcessTaskSpek : Spek({
                 result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
             }
         }
+
+        on("running the pre-process task with build cache twice") {
+            val arguments = listOf(
+                "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
+                "-Psquit.rootDir=$project", "-Punignore", "--build-cache"
+            )
+
+            val result = gradleRunner(project, arguments).build()
+            val cacheResult = gradleRunner(project, arguments).build()
+
+            it("should cache") {
+                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+                cacheResult.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.FROM_CACHE
+            }
+        }
     }
 
     given("an invalid test project (invalid test.conf)") {
