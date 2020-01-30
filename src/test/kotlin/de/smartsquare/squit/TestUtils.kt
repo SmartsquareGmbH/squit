@@ -36,6 +36,8 @@ object TestUtils {
 fun GradleRunner.withExtendedPluginClasspath(): GradleRunner {
     val classpath = PluginUnderTestMetadataReading.readImplementationClasspath()
         .plus(File(org.h2.Driver::class.java.protectionDomain.codeSource.location.toURI()))
+        .plus(File(XmlPreProcessor::class.java.protectionDomain.codeSource.location.toURI()))
+        .plus(File(XmlPostProcessor::class.java.protectionDomain.codeSource.location.toURI()))
 
     return withPluginClasspath(classpath)
 }

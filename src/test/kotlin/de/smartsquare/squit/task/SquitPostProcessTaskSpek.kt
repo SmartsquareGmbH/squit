@@ -64,8 +64,8 @@ object SquitPostProcessTaskSpek : Spek({
                 result.task(":squitPostProcess")?.outcome shouldBe TaskOutcome.SUCCESS
             }
 
-            it("should correctly post-process, based on the script") {
-                Files.readAllBytes(call2Response).toString(Charsets.UTF_8) shouldContain "<nice/>"
+            it("should correctly post-process, based on the script and class") {
+                Files.readAllBytes(call2Response).toString(Charsets.UTF_8) shouldContain "<nice post=\"true\"/>"
             }
         }
 

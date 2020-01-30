@@ -71,6 +71,10 @@ object SquitPreProcessTaskSpek : Spek({
                 Files.readAllBytes(call1Request).toString(Charsets.UTF_8) shouldContain "test=\"test\""
             }
 
+            it("should correctly pre-process requests, based on the class") {
+                Files.readAllBytes(call1Request).toString(Charsets.UTF_8) shouldContain "pre=\"true\""
+            }
+
             it("should correctly pre-process sql scripts which are applied only once") {
                 Files.readAllBytes(call1PreSqlScript).toString(Charsets.UTF_8) shouldContain "INSERT INTO CARS"
                 Files.readAllBytes(call1PostSqlScript).toString(Charsets.UTF_8) shouldNotContain "DROP TABLE CARS"
