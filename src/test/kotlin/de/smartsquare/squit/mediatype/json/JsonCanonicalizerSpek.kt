@@ -1,8 +1,6 @@
 package de.smartsquare.squit.mediatype.json
 
-import de.smartsquare.squit.SquitExtension
-import io.mockk.every
-import io.mockk.mockk
+import de.smartsquare.squit.mediatype.MediaTypeConfig
 import org.amshove.kluent.shouldBeEqualTo
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
@@ -32,11 +30,13 @@ object JsonCanonicalizerSpek : Spek({
             """.trimIndent()
 
             it("should produce a sorted, formatted and valid result") {
-                val extension = mockk<SquitExtension> {
-                    every { json } returns SquitExtension.JsonExtension()
-                }
-
-                val result = canonicalizer.canonicalize(structure, extension)
+                val result = canonicalizer.canonicalize(
+                    structure, MediaTypeConfig(
+                        xmlStrict = false,
+                        xmlCanonicalize = false,
+                        jsonCanonicalize = true
+                    )
+                )
 
                 // language=json
                 val expected = """
@@ -84,11 +84,13 @@ object JsonCanonicalizerSpek : Spek({
             """.trimIndent()
 
             it("should produce a sorted, formatted and valid result") {
-                val extension = mockk<SquitExtension> {
-                    every { json } returns SquitExtension.JsonExtension()
-                }
-
-                val result = canonicalizer.canonicalize(structure, extension)
+                val result = canonicalizer.canonicalize(
+                    structure, MediaTypeConfig(
+                        xmlStrict = false,
+                        xmlCanonicalize = false,
+                        jsonCanonicalize = true
+                    )
+                )
 
                 // language=json
                 val expected = """
@@ -131,13 +133,13 @@ object JsonCanonicalizerSpek : Spek({
             """.trimIndent()
 
             it("should return the input") {
-                val extension = mockk<SquitExtension> {
-                    every { json } returns SquitExtension.JsonExtension().apply {
-                        canonicalize = false
-                    }
-                }
-
-                val result = canonicalizer.canonicalize(structure, extension)
+                val result = canonicalizer.canonicalize(
+                    structure, MediaTypeConfig(
+                        xmlStrict = false,
+                        xmlCanonicalize = false,
+                        jsonCanonicalize = false
+                    )
+                )
 
                 result shouldBeEqualTo structure
             }

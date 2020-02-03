@@ -2,7 +2,6 @@ package de.smartsquare.squit.task
 
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigValueFactory
-import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.config.TestIndexer
 import de.smartsquare.squit.config.shouldExclude
 import de.smartsquare.squit.config.tags
@@ -17,9 +16,10 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.util.GradleVersion
 import org.gradle.workers.WorkAction
@@ -29,14 +29,19 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import javax.inject.Inject
-import kotlin.properties.Delegates
 
 /**
  * Task for pre-processing the available sources like requests, responses, sql scripts and properties.
  */
-@Suppress("LargeClass")
 @CacheableTask
 open class SquitPreProcessTask @Inject constructor(private val workerExecutor: WorkerExecutor) : DefaultTask() {
+
+    /**
+     * The path the sources lie in.
+     */
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    lateinit var sourceDir: Path
 
     /**
      * The directory to save the results in.
@@ -72,12 +77,6 @@ open class SquitPreProcessTask @Inject constructor(private val workerExecutor: W
             )
             .toConfig()
     }
-
-    @get:Nested
-    internal var extension by Delegates.notNull<SquitExtension>()
-
-    @get:Internal
-    internal val sourceDir by lazy { extension.sourceDir.asPath }
 
     init {
         group = "Build"

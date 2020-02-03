@@ -2,9 +2,9 @@ package de.smartsquare.squit.report
 
 import com.github.difflib.DiffUtils
 import com.github.difflib.UnifiedDiffUtils
-import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.entity.SquitResult
 import de.smartsquare.squit.io.FilesUtils
+import de.smartsquare.squit.mediatype.MediaTypeConfig
 import de.smartsquare.squit.mediatype.MediaTypeFactory
 import kotlinx.html.html
 import kotlinx.html.stream.appendHTML
@@ -54,7 +54,7 @@ class HtmlReportWriter(private val logger: Logger) {
     fun writeReport(
         results: List<SquitResult>,
         reportDirectoryPath: Path,
-        extension: SquitExtension
+        mediaTypeConfig: MediaTypeConfig
     ) {
         val document = StringBuilder("<!DOCTYPE html>").appendHTML().html {
             squitHead()
@@ -76,7 +76,7 @@ class HtmlReportWriter(private val logger: Logger) {
                 !result.isError -> canonicalize(
                     result.expectedLines,
                     result.mediaType,
-                    extension,
+                    mediaTypeConfig,
                     "Could not canonicalize expected response"
                 )
                 else -> result.expectedLines
@@ -86,7 +86,7 @@ class HtmlReportWriter(private val logger: Logger) {
                 !result.isError -> canonicalize(
                     result.actualLines,
                     result.mediaType,
-                    extension,
+                    mediaTypeConfig,
                     "Could not canonicalize actual response"
                 )
                 else -> result.actualLines
@@ -151,14 +151,14 @@ class HtmlReportWriter(private val logger: Logger) {
     private fun canonicalize(
         lines: List<String>,
         mediaType: MediaType,
-        extension: SquitExtension,
+        mediaTypeConfig: MediaTypeConfig,
         errorMessage: String
     ): List<String> {
         return when {
             lines.isEmpty() -> lines
             else -> try {
                 MediaTypeFactory.canonicalizer(mediaType)
-                    .canonicalize(lines.joinToString(""), extension)
+                    .canonicalize(lines.joinToString(""), mediaTypeConfig)
                     .lines()
             } catch (error: Throwable) {
                 logger.warn(errorMessage, error)

@@ -1,6 +1,5 @@
 package de.smartsquare.squit.mediatype
 
-import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.mediatype.generic.GenericBodyProcessor
 import de.smartsquare.squit.mediatype.generic.GenericCanonicalizer
 import de.smartsquare.squit.mediatype.generic.GenericDiffer
@@ -71,8 +70,8 @@ object MediaTypeFactory {
     /**
      * Returns the [Differ] to use based on the given [mediaType].
      */
-    fun differ(mediaType: MediaType, extension: SquitExtension) = when (mediaType) {
-        xmlMediaType, applicationXmlMediaType, soapMediaType -> XmlDiffer(extension)
+    fun differ(mediaType: MediaType, mediaTypeConfig: MediaTypeConfig) = when (mediaType) {
+        xmlMediaType, applicationXmlMediaType, soapMediaType -> XmlDiffer(mediaTypeConfig)
         jsonMediaType -> JsonDiffer()
         else -> GenericDiffer()
     }

@@ -1,6 +1,5 @@
 package de.smartsquare.squit.mediatype
 
-import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.mediatype.generic.GenericBodyProcessor
 import de.smartsquare.squit.mediatype.generic.GenericCanonicalizer
 import de.smartsquare.squit.mediatype.generic.GenericDiffer
@@ -13,7 +12,6 @@ import de.smartsquare.squit.mediatype.xml.XmlDiffer
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInstanceOf
-import org.gradle.testfixtures.ProjectBuilder
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -56,7 +54,7 @@ object MediaTypeFactorySpek : Spek({
 
         on("getting the differ") {
             it("should return the xml differ") {
-                val differ = MediaTypeFactory.differ(mediaType, SquitExtension(ProjectBuilder.builder().build()))
+                val differ = MediaTypeFactory.differ(mediaType, MediaTypeConfig())
 
                 differ shouldBeInstanceOf XmlDiffer::class.java
             }
@@ -106,7 +104,7 @@ object MediaTypeFactorySpek : Spek({
 
         on("getting the differ") {
             it("should return the generic differ") {
-                val differ = MediaTypeFactory.differ(mediaType, SquitExtension(ProjectBuilder.builder().build()))
+                val differ = MediaTypeFactory.differ(mediaType, MediaTypeConfig())
 
                 differ shouldBeInstanceOf JsonDiffer::class.java
             }
@@ -156,7 +154,7 @@ object MediaTypeFactorySpek : Spek({
 
         on("getting the differ") {
             it("should return the generic differ") {
-                val differ = MediaTypeFactory.differ(mediaType, SquitExtension(ProjectBuilder.builder().build()))
+                val differ = MediaTypeFactory.differ(mediaType, MediaTypeConfig())
 
                 differ shouldBeInstanceOf GenericDiffer::class.java
             }

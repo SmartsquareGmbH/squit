@@ -4,8 +4,8 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.mediatype.Canonicalizer
+import de.smartsquare.squit.mediatype.MediaTypeConfig
 
 /**
  * [Canonicalizer] for Json.
@@ -14,8 +14,8 @@ class JsonCanonicalizer : Canonicalizer {
 
     private val gson = GsonBuilder().setPrettyPrinting().create()
 
-    override fun canonicalize(input: String, extension: SquitExtension): String {
-        return if (extension.json.canonicalize) {
+    override fun canonicalize(input: String, mediaTypeConfig: MediaTypeConfig): String {
+        return if (mediaTypeConfig.jsonCanonicalize) {
             val element = gson.fromJson(input, JsonElement::class.java)
 
             gson.toJson(element.canonicalize())

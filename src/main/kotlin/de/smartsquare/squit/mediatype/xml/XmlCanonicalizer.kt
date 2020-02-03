@@ -1,8 +1,8 @@
 package de.smartsquare.squit.mediatype.xml
 
-import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.entity.SquitOutputFormat
 import de.smartsquare.squit.mediatype.Canonicalizer
+import de.smartsquare.squit.mediatype.MediaTypeConfig
 import org.dom4j.Document
 import org.dom4j.io.OutputFormat
 import org.dom4j.io.SAXReader
@@ -20,8 +20,8 @@ class XmlCanonicalizer : Canonicalizer {
         ApacheInit.init()
     }
 
-    override fun canonicalize(input: String, extension: SquitExtension): String {
-        return if (extension.xml.canonicalize) {
+    override fun canonicalize(input: String, mediaTypeConfig: MediaTypeConfig): String {
+        return if (mediaTypeConfig.xmlCanonicalize) {
             val canonicalizer = ApacheCanonicalizer.getInstance(ApacheCanonicalizer.ALGO_ID_C14N11_OMIT_COMMENTS)
             val output = canonicalizer.canonicalize(input.toByteArray())
 

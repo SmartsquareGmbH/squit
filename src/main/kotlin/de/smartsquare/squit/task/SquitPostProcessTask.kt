@@ -1,6 +1,5 @@
 package de.smartsquare.squit.task
 
-import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.util.Constants.META
 import de.smartsquare.squit.util.Constants.PROCESSED_DIRECTORY
@@ -16,7 +15,6 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -29,7 +27,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import javax.inject.Inject
-import kotlin.properties.Delegates
 
 /**
  * Task for post-processing the responses.
@@ -61,7 +58,7 @@ open class SquitPostProcessTask @Inject constructor(private val workerExecutor: 
     )
 
     /**
-     * Collection of actula response files except meta.json files for up-to-date checking.
+     * Collection of actual response files except meta.json files for up-to-date checking.
      */
     @Suppress("unused")
     @get:InputFiles
@@ -80,9 +77,6 @@ open class SquitPostProcessTask @Inject constructor(private val workerExecutor: 
         RESPONSES_DIRECTORY,
         PROCESSED_DIRECTORY
     )
-
-    @get:Nested
-    internal var extension by Delegates.notNull<SquitExtension>()
 
     init {
         group = "Build"

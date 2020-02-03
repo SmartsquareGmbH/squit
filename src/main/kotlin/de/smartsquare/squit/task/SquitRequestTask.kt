@@ -2,7 +2,6 @@ package de.smartsquare.squit.task
 
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
-import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.config.databaseConfigurations
 import de.smartsquare.squit.config.endpoint
 import de.smartsquare.squit.config.headers
@@ -42,7 +41,7 @@ import okhttp3.internal.http.HttpMethod
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.IOException
@@ -54,7 +53,6 @@ import java.sql.DriverManager
 import java.sql.SQLException
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
-import kotlin.properties.Delegates
 
 /**
  * Task for running requests against the given api. Also capable of running existing sql scripts before and after the
@@ -63,11 +61,30 @@ import kotlin.properties.Delegates
 open class SquitRequestTask : DefaultTask() {
 
     /**
+     * The jdbc driver classes to use.
+     */
+    @get:Input
+    lateinit var jdbcDrivers: List<String>
+
+    /**
+     * The timeout in seconds to use for requests.
+     */
+    @Suppress("MagicNumber")
+    @get:Internal
+    var timeout = 10L
+
+    /**
+     * If squit should avoid printing anything if all tests pass.
+     */
+    @get:Internal
+    var silent = false
+
+    /**
      * The class name of the jdbc [Driver] to use.
      */
     @get:Input
     val jdbcDriverClassNames by lazy {
-        extension.jdbcDrivers
+        jdbcDrivers
             .map { it.trim() }
             .filter { it.isNotBlank() }
             .let {
@@ -98,14 +115,11 @@ open class SquitRequestTask : DefaultTask() {
         RAW_DIRECTORY
     )
 
-    @get:Nested
-    internal var extension by Delegates.notNull<SquitExtension>()
-
     private val okHttpClient by lazy {
         OkHttpClient.Builder()
-            .connectTimeout(extension.timeout, TimeUnit.SECONDS)
-            .writeTimeout(extension.timeout, TimeUnit.SECONDS)
-            .readTimeout(extension.timeout, TimeUnit.SECONDS)
+            .connectTimeout(timeout, TimeUnit.SECONDS)
+            .writeTimeout(timeout, TimeUnit.SECONDS)
+            .readTimeout(timeout, TimeUnit.SECONDS)
             .build()
     }
 
@@ -134,7 +148,7 @@ open class SquitRequestTask : DefaultTask() {
 
         dbConnections.use {
             FilesUtils.getLeafDirectories(processedSourcesPath).forEachIndexed { index, testDirectoryPath ->
-                if (!extension.silent) {
+                if (!silent) {
                     logger.lifecycleOnSameLine(
                         "Running test ${index + 1}",
                         project.gradle.startParameter.consoleOutput
@@ -207,7 +221,7 @@ open class SquitRequestTask : DefaultTask() {
             Files.write(resultResponseInfoFilePath, responseInfo.toJson().toByteArray())
 
             if (!apiResponse.isSuccessful) {
-                if (!extension.silent) logger.newLineIfNeeded()
+                if (!silent) logger.newLineIfNeeded()
 
                 logger.info(
                     "Unsuccessful request for test ${testDirectoryPath.cut(processedSourcesPath)} " +
@@ -217,7 +231,7 @@ open class SquitRequestTask : DefaultTask() {
                 mediaType?.type != config.mediaType.type ||
                 mediaType.subtype != config.mediaType.subtype
             ) {
-                if (!extension.silent) logger.newLineIfNeeded()
+                if (!silent) logger.newLineIfNeeded()
 
                 logger.info(
                     "Unexpected Media type $mediaType for test ${testDirectoryPath.cut(processedSourcesPath)}. " +

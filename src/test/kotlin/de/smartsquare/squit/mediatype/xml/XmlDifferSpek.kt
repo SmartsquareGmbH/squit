@@ -1,9 +1,8 @@
 package de.smartsquare.squit.mediatype.xml
 
-import de.smartsquare.squit.SquitExtension
+import de.smartsquare.squit.mediatype.MediaTypeConfig
 import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldNotBeEmpty
-import org.gradle.testfixtures.ProjectBuilder
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -12,8 +11,7 @@ import org.jetbrains.spek.api.dsl.on
 object XmlDifferSpek : Spek({
 
     given("a strict XmlDiffer") {
-        val extension = SquitExtension(ProjectBuilder.builder().build()).also { it.xml.strict = true }
-        val differ = XmlDiffer(extension)
+        val differ = XmlDiffer(MediaTypeConfig(xmlStrict = true, xmlCanonicalize = false, jsonCanonicalize = false))
 
         on("diffing identic XMLs") {
             it("should return an empty String, signaling no differences") {
@@ -50,8 +48,7 @@ object XmlDifferSpek : Spek({
     }
 
     given("a non strict XmlDiffer") {
-        val extension = SquitExtension(ProjectBuilder.builder().build()).also { it.xml.strict = false }
-        val differ = XmlDiffer(extension)
+        val differ = XmlDiffer(MediaTypeConfig(xmlStrict = false, xmlCanonicalize = false, jsonCanonicalize = false))
 
         on("diffing identic XMLs") {
             it("should return an empty String, signaling no differences") {

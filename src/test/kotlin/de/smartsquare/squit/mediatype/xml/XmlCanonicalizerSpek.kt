@@ -1,8 +1,6 @@
 package de.smartsquare.squit.mediatype.xml
 
-import de.smartsquare.squit.SquitExtension
-import io.mockk.every
-import io.mockk.mockk
+import de.smartsquare.squit.mediatype.MediaTypeConfig
 import org.amshove.kluent.shouldBeEqualTo
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
@@ -23,11 +21,13 @@ object XmlCanonicalizerSpek : Spek({
             """.trimIndent()
 
             it("should produce a valid result") {
-                val extension = mockk<SquitExtension> {
-                    every { xml } returns SquitExtension.XmlExtension()
-                }
-
-                val result = canonicalizer.canonicalize(structure, extension)
+                val result = canonicalizer.canonicalize(
+                    structure, MediaTypeConfig(
+                        xmlStrict = false,
+                        xmlCanonicalize = true,
+                        jsonCanonicalize = false
+                    )
+                )
 
                 // language=xml
                 val expected = """
@@ -53,13 +53,13 @@ object XmlCanonicalizerSpek : Spek({
             """.trimIndent()
 
             it("should return the input") {
-                val extension = mockk<SquitExtension> {
-                    every { xml } returns SquitExtension.XmlExtension().apply {
-                        canonicalize = false
-                    }
-                }
-
-                val result = canonicalizer.canonicalize(structure, extension)
+                val result = canonicalizer.canonicalize(
+                    structure, MediaTypeConfig(
+                        xmlStrict = false,
+                        xmlCanonicalize = false,
+                        jsonCanonicalize = false
+                    )
+                )
 
                 result shouldBeEqualTo structure
             }

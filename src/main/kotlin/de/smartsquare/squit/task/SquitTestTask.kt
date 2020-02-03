@@ -3,13 +3,13 @@ package de.smartsquare.squit.task
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.Optional
-import de.smartsquare.squit.SquitExtension
 import de.smartsquare.squit.config.mediaType
 import de.smartsquare.squit.config.shouldIgnore
 import de.smartsquare.squit.config.title
 import de.smartsquare.squit.entity.SquitResponseInfo
 import de.smartsquare.squit.entity.SquitResult
 import de.smartsquare.squit.io.FilesUtils
+import de.smartsquare.squit.mediatype.MediaTypeConfig
 import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.report.HtmlReportWriter
 import de.smartsquare.squit.report.XmlReportWriter
@@ -23,14 +23,15 @@ import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
 import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
-import de.smartsquare.squit.util.asPath
 import de.smartsquare.squit.util.countTestResults
 import de.smartsquare.squit.util.cut
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
@@ -41,7 +42,6 @@ import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.properties.Delegates
 import kotlin.streams.toList
 
 /**
@@ -95,7 +95,7 @@ open class SquitTestTask : DefaultTask() {
      */
     @get:OutputFile
     val xmlReportFilePath: Path by lazy {
-        extension.reportDir.asPath.resolve("xml").resolve("index.xml")
+        reportDir.resolve("xml").resolve("index.xml")
     }
 
     /**
@@ -103,7 +103,7 @@ open class SquitTestTask : DefaultTask() {
      */
     @get:OutputDirectory
     val htmlReportDirectoryPath: Path by lazy {
-        extension.reportDir.asPath.resolve("html")
+        reportDir.resolve("html")
     }
 
     /**
@@ -111,11 +111,33 @@ open class SquitTestTask : DefaultTask() {
      */
     @get:OutputDirectory
     val failureResultDirectory: Path by lazy {
-        extension.reportDir.asPath.resolve("failures")
+        reportDir.resolve("failures")
     }
 
+    /**
+     * The path to save reports and possible failures in.
+     */
+    @get:OutputDirectory
+    lateinit var reportDir: Path
+
+    /**
+     * If squit should avoid printing anything if all tests pass.
+     */
+    @get:Internal
+    var silent = false
+
+    /**
+     * If failures should be ignored.
+     * In that case the task passes, even if tests have failed.
+     */
+    @get:Input
+    var ignoreFailures = false
+
+    /**
+     * Configuration class for various properties of the media types.
+     */
     @get:Nested
-    internal var extension by Delegates.notNull<SquitExtension>()
+    lateinit var mediaTypeConfig: MediaTypeConfig
 
     private var nextResultId = 0L
 
@@ -130,7 +152,7 @@ open class SquitTestTask : DefaultTask() {
     @Suppress("unused")
     @TaskAction
     fun run() {
-        FilesUtils.deleteRecursivelyIfExisting(extension.reportDir.asPath)
+        FilesUtils.deleteRecursivelyIfExisting(reportDir)
         Files.createDirectories(processedSourcesPath)
 
         val results = processTests()
@@ -141,7 +163,7 @@ open class SquitTestTask : DefaultTask() {
 
         val (successfulTests, failedTests, ignoredTests) = results.countTestResults()
 
-        if (!extension.silent) {
+        if (!silent) {
             val totalText = if (results.size == 1) "One test ran." else "${results.size} tests ran."
             val ignoredText = if (ignoredTests > 0) " ($ignoredTests ignored)" else ""
 
@@ -151,7 +173,7 @@ open class SquitTestTask : DefaultTask() {
             println("HTML report: file://${htmlReportDirectoryPath.resolve("index.html")}")
         }
 
-        if (failedTests > 0 && !extension.ignoreFailures) throw GradleException("Failing tests.")
+        if (failedTests > 0 && !ignoreFailures) throw GradleException("Failing tests.")
     }
 
     private fun processTests(): List<SquitResult> {
@@ -230,7 +252,7 @@ open class SquitTestTask : DefaultTask() {
         val expectedResponse = Files.readAllBytes(expectedResponseFilePath)
         val actualResponse = Files.readAllBytes(actualResponseFilePath)
 
-        return MediaTypeFactory.differ(config.mediaType, extension)
+        return MediaTypeFactory.differ(config.mediaType, mediaTypeConfig)
             .diff(expectedResponse, actualResponse)
     }
 
@@ -243,7 +265,7 @@ open class SquitTestTask : DefaultTask() {
     private fun writeHtmlReport(result: List<SquitResult>) {
         Files.createDirectories(htmlReportDirectoryPath)
 
-        HtmlReportWriter(logger).writeReport(result, htmlReportDirectoryPath, extension)
+        HtmlReportWriter(logger).writeReport(result, htmlReportDirectoryPath, mediaTypeConfig)
     }
 
     private fun copyFailures(result: List<SquitResult>) {
