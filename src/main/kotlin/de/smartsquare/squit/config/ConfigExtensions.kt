@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunctions")
+
 package de.smartsquare.squit.config
 
 import com.typesafe.config.Config
@@ -9,6 +11,7 @@ import de.smartsquare.squit.io.FilesUtils
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import org.gradle.api.GradleException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -157,19 +160,18 @@ fun Config.mergeTag(tag: String): Config = withValue(TAGS, ConfigValueFactory.fr
 /**
  * Validates all properties of this instance and throws if a problem is detected.
  */
-@Suppress("ComplexMethod", "ThrowsCount")
 fun Config.validate() = this.apply {
     // Call getters of properties to check existence and correct declaration.
     endpoint; mediaType; shouldExclude; shouldIgnore; headers
 
-    preProcessors.forEach { Class.forName(it) }
+    preProcessors.forEach { checkClass(it) }
     preProcessorScripts.forEach { FilesUtils.validateExistence(it) }
     preRunnerScripts.forEach { FilesUtils.validateExistence(it) }
-    preRunners.forEach { Class.forName(it) }
-    postProcessors.forEach { Class.forName(it) }
+    preRunners.forEach { checkClass(it) }
+    postProcessors.forEach { checkClass(it) }
     postProcessorScripts.forEach { FilesUtils.validateExistence(it) }
     postRunnerScripts.forEach { FilesUtils.validateExistence(it) }
-    postRunners.forEach { Class.forName(it) }
+    postRunners.forEach { checkClass(it) }
     tags.forEach { require(it.isNotEmpty()) { "tags cannot be empty." } }
     databaseConfigurations.forEach { (name, jdbcAddress, username, password) ->
         require(name.isNotEmpty()) { "name of a databaseConfiguration cannot be empty." }
@@ -229,4 +231,14 @@ private fun Config.getSafePathList(path: String, fallback: List<Path> = emptyLis
 private fun Config.getSafeInt(path: String, fallback: Int = 0) = when (hasPath(path)) {
     true -> getInt(path)
     false -> fallback
+}
+
+private fun checkClass(name: String) {
+    try {
+        Class.forName(name)
+    } catch (error: ClassNotFoundException) {
+        throw GradleException("Missing class: $name", error)
+    } catch (error: Throwable) {
+        throw GradleException("Could not load class: $name", error)
+    }
 }

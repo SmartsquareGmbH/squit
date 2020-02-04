@@ -1,6 +1,7 @@
 package de.smartsquare.squit.config
 
 import com.typesafe.config.Config
+import com.typesafe.config.ConfigException
 import com.typesafe.config.ConfigFactory
 import de.smartsquare.squit.entity.SquitTest
 import de.smartsquare.squit.io.FilesUtils
@@ -20,6 +21,10 @@ import java.util.concurrent.ConcurrentHashMap
  * @param projectConfig The project config used for resolving placeholders in individual test configs.
  */
 class TestIndexer(private val projectConfig: Config) {
+
+    private companion object {
+        private val configExceptionMessageRegex = Regex("\\d: (.*)")
+    }
 
     private val configCache = ConcurrentHashMap<Path, Config>()
     private val leafCache = ConcurrentHashMap<Path, List<Path>>()
@@ -54,8 +59,18 @@ class TestIndexer(private val projectConfig: Config) {
                 try {
                     leafDirectory to config.resolve().validate()
                 } catch (error: Throwable) {
+                    val innerMessage = when (error) {
+                        is ConfigException -> configExceptionMessageRegex
+                            .find(error.message ?: "")
+                            ?.groupValues?.getOrNull(1)
+                        else -> error.message
+                    }
+
                     throw GradleException(
-                        "Invalid test.conf or local.conf file on path of test: ${leafDirectory.cut(sourceDir)}",
+                        """
+                            |Invalid test.conf or local.conf file on path of test:
+                            | ${leafDirectory.cut(sourceDir)} ($innerMessage)
+                        """.trimMargin().replace("\n", ""),
                         error
                     )
                 }

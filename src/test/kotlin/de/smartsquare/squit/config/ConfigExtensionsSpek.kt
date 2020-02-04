@@ -133,7 +133,7 @@ object ConfigExtensionsSpek : Spek({
             val call = { config.validate() }
 
             it("should throw a proper exception") {
-                call shouldThrow ClassNotFoundException::class withMessage "not.existing"
+                call shouldThrow GradleException::class withMessage "Missing class: not.existing"
             }
         }
     }
@@ -167,7 +167,7 @@ object ConfigExtensionsSpek : Spek({
             val call = { config.validate() }
 
             it("should throw a proper exception") {
-                call shouldThrow ClassNotFoundException::class withMessage "not.existing"
+                call shouldThrow GradleException::class withMessage "not.existing"
             }
         }
     }
@@ -236,7 +236,7 @@ object ConfigExtensionsSpek : Spek({
             val call = { config.validate() }
 
             it("should throw a proper exception") {
-                call shouldThrow ClassNotFoundException::class withMessage "not.existing"
+                call shouldThrow GradleException::class withMessage "Missing class: not.existing"
             }
         }
     }
@@ -288,7 +288,7 @@ object ConfigExtensionsSpek : Spek({
             val call = { config.validate() }
 
             it("should throw a proper exception") {
-                call shouldThrow ClassNotFoundException::class withMessage "not.existing"
+                call shouldThrow GradleException::class withMessage "Missing class: not.existing"
             }
         }
     }
@@ -322,7 +322,7 @@ object ConfigExtensionsSpek : Spek({
             val call = { config.validate() }
 
             it("should throw a proper exception") {
-                call shouldThrow ClassNotFoundException::class withMessage "not.existing"
+                call shouldThrow GradleException::class withMessage "Missing class: not.existing"
             }
         }
     }
@@ -391,7 +391,7 @@ object ConfigExtensionsSpek : Spek({
             val call = { config.validate() }
 
             it("should throw a proper exception") {
-                call shouldThrow ClassNotFoundException::class withMessage "not.existing"
+                call shouldThrow GradleException::class withMessage "Missing class: not.existing"
             }
         }
     }
