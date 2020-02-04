@@ -48,7 +48,6 @@ open class SquitPostProcessTask @Inject constructor(private val workerExecutor: 
     /**
      * The directory of the previously requested responses.
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     @Internal
     val actualResponsesPath: Path = Paths.get(
         project.buildDir.path,
@@ -63,13 +62,12 @@ open class SquitPostProcessTask @Inject constructor(private val workerExecutor: 
     @Suppress("unused")
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    internal val actualResponsesFiles: ConfigurableFileTree = project
+    val actualResponsesFiles: ConfigurableFileTree = project
         .fileTree(actualResponsesPath) { it.exclude("**/$META") }
 
     /**
      * The directory to save the results in.
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     @OutputDirectory
     val processedActualResponsesPath: Path = Paths.get(
         project.buildDir.path,

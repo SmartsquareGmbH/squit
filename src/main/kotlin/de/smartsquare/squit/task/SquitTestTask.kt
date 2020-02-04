@@ -52,6 +52,31 @@ import kotlin.streams.toList
 open class SquitTestTask : DefaultTask() {
 
     /**
+     * The path to save reports and possible failures in.
+     */
+    @get:OutputDirectory
+    lateinit var reportDir: Path
+
+    /**
+     * If squit should avoid printing anything if all tests pass.
+     */
+    @get:Internal
+    var silent = false
+
+    /**
+     * If failures should be ignored.
+     * In that case the task passes, even if tests have failed.
+     */
+    @get:Input
+    var ignoreFailures = false
+
+    /**
+     * Configuration class for various properties of the media types.
+     */
+    @get:Nested
+    lateinit var mediaTypeConfig: MediaTypeConfig
+
+    /**
      * The directory of the test sources.
      */
     @get:InputDirectory
@@ -78,7 +103,7 @@ open class SquitTestTask : DefaultTask() {
     @get:Optional
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    internal val metaPaths: List<Path> by lazy {
+    val metaPaths: List<Path> by lazy {
         val rawDirectoryPath = Paths.get(project.buildDir.path, SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)
 
         if (Files.exists(rawDirectoryPath)) {
@@ -113,31 +138,6 @@ open class SquitTestTask : DefaultTask() {
     val failureResultDirectory: Path by lazy {
         reportDir.resolve("failures")
     }
-
-    /**
-     * The path to save reports and possible failures in.
-     */
-    @get:OutputDirectory
-    lateinit var reportDir: Path
-
-    /**
-     * If squit should avoid printing anything if all tests pass.
-     */
-    @get:Internal
-    var silent = false
-
-    /**
-     * If failures should be ignored.
-     * In that case the task passes, even if tests have failed.
-     */
-    @get:Input
-    var ignoreFailures = false
-
-    /**
-     * Configuration class for various properties of the media types.
-     */
-    @get:Nested
-    lateinit var mediaTypeConfig: MediaTypeConfig
 
     private var nextResultId = 0L
 
