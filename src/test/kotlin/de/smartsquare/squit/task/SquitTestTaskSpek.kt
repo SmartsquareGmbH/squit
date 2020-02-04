@@ -12,7 +12,8 @@ import org.amshove.kluent.shouldBeFile
 import org.amshove.kluent.shouldBeTrue
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldStartWith
-import org.gradle.testkit.runner.TaskOutcome
+import org.gradle.testkit.runner.TaskOutcome.FAILED
+import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -88,7 +89,7 @@ object SquitTestTaskSpek : Spek({
             val result = gradleRunner(project, arguments).build()
 
             it("should be able to complete without errors") {
-                result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitTest")?.outcome shouldBe SUCCESS
             }
 
             it("should print the amount of executed tests") {
@@ -131,7 +132,7 @@ object SquitTestTaskSpek : Spek({
             val result = gradleRunner(project, arguments).buildAndFail()
 
             it("should fail the build") {
-                result.task(":squitTest")?.outcome shouldBe TaskOutcome.FAILED
+                result.task(":squitTest")?.outcome shouldBe FAILED
             }
 
             it("should print the amount of successful and failed tests") {
@@ -162,7 +163,7 @@ object SquitTestTaskSpek : Spek({
             val result = gradleRunner(project, arguments).buildAndFail()
 
             it("should fail the build") {
-                result.task(":squitTest")?.outcome shouldBe TaskOutcome.FAILED
+                result.task(":squitTest")?.outcome shouldBe FAILED
             }
 
             it("should also report the ignored test") {
@@ -188,7 +189,7 @@ object SquitTestTaskSpek : Spek({
             val result = gradleRunner(project, arguments).buildAndFail()
 
             it("should fail the build") {
-                result.task(":squitTest")?.outcome shouldBe TaskOutcome.FAILED
+                result.task(":squitTest")?.outcome shouldBe FAILED
             }
 
             it("should also report the ignored test") {
@@ -219,7 +220,7 @@ object SquitTestTaskSpek : Spek({
             val result = gradleRunner(invalidProject3, arguments).buildAndFail()
 
             it("should fail the build") {
-                result.task(":squitTest")?.outcome shouldBe TaskOutcome.FAILED
+                result.task(":squitTest")?.outcome shouldBe FAILED
             }
 
             it("should create an error file in the failures directory") {
@@ -253,7 +254,7 @@ object SquitTestTaskSpek : Spek({
             val result = gradleRunner(projectIgnoreFailures, arguments).build()
 
             it("should be able to complete without errors") {
-                result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitTest")?.outcome shouldBe SUCCESS
             }
         }
     }
@@ -280,7 +281,7 @@ object SquitTestTaskSpek : Spek({
             val result = gradleRunner(projectWithNonStrictXml, arguments).build()
 
             it("should be able to complete without errors") {
-                result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitTest")?.outcome shouldBe SUCCESS
             }
         }
     }
@@ -307,7 +308,7 @@ object SquitTestTaskSpek : Spek({
             val result = gradleRunner(jsonProject, arguments).build()
 
             it("should be able to complete without errors") {
-                result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitTest")?.outcome shouldBe SUCCESS
             }
         }
     }
@@ -345,7 +346,7 @@ object SquitTestTaskSpek : Spek({
             val result = gradleRunner(jsonProjectWithDifferentOrder, arguments).build()
 
             it("should be able to complete without errors") {
-                result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitTest")?.outcome shouldBe SUCCESS
             }
         }
     }
@@ -372,7 +373,7 @@ object SquitTestTaskSpek : Spek({
             val result = gradleRunner(projectWithResponseCode, arguments).build()
 
             it("should be able to complete without errors") {
-                result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitTest")?.outcome shouldBe SUCCESS
             }
         }
 
@@ -387,7 +388,7 @@ object SquitTestTaskSpek : Spek({
             val result = gradleRunner(projectWithResponseCode, arguments).buildAndFail()
 
             it("should fail the build") {
-                result.task(":squitTest")?.outcome shouldBe TaskOutcome.FAILED
+                result.task(":squitTest")?.outcome shouldBe FAILED
             }
         }
     }
@@ -421,7 +422,7 @@ object SquitTestTaskSpek : Spek({
             val result = gradleRunner(differentStructureProject, arguments).build()
 
             it("should be able to complete without errors") {
-                result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitTest")?.outcome shouldBe SUCCESS
             }
 
             it("should write reports to correct location") {

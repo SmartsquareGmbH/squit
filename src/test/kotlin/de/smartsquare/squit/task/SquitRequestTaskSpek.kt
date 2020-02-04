@@ -15,7 +15,7 @@ import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldExist
 import org.amshove.kluent.shouldNotContain
 import org.amshove.kluent.shouldStartWith
-import org.gradle.testkit.runner.TaskOutcome
+import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -85,7 +85,7 @@ object SquitRequestTaskSpek : Spek({
             val result = gradleRunner(project, arguments).build()
 
             it("should be able to complete without errors") {
-                result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitRunRequests")?.outcome shouldBe SUCCESS
             }
 
             it("should properly receive and save the responses") {
@@ -151,7 +151,7 @@ object SquitRequestTaskSpek : Spek({
             val result = gradleRunner(project, arguments).build()
 
             it("should be able to complete successfully nonetheless") {
-                result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitRunRequests")?.outcome shouldBe SUCCESS
             }
 
             it("should properly receive and save the error body") {
@@ -175,7 +175,7 @@ object SquitRequestTaskSpek : Spek({
             val result = gradleRunner(project, arguments).build()
 
             it("should be able to complete successfully nonetheless") {
-                result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitRunRequests")?.outcome shouldBe SUCCESS
             }
 
             it("should generate an error file") {
@@ -195,7 +195,7 @@ object SquitRequestTaskSpek : Spek({
             val result = gradleRunner(project, arguments).build()
 
             it("should be able to complete without errors") {
-                result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitRunRequests")?.outcome shouldBe SUCCESS
             }
 
             it("should print an appropriate info") {
@@ -229,7 +229,7 @@ object SquitRequestTaskSpek : Spek({
             val result = gradleRunner(invalidProject2, arguments).build()
 
             it("should be able to complete successfully nonetheless") {
-                result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitRunRequests")?.outcome shouldBe SUCCESS
             }
 
             it("should print an appropriate warning") {
@@ -257,7 +257,7 @@ object SquitRequestTaskSpek : Spek({
             val result = gradleRunner(invalidProject3, arguments).build()
 
             it("should succeed nonetheless") {
-                result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitRunRequests")?.outcome shouldBe SUCCESS
             }
 
             it("should propagate the error file") {
@@ -289,7 +289,7 @@ object SquitRequestTaskSpek : Spek({
             val result = gradleRunner(getProject, arguments).build()
 
             it("should be able to complete without errors") {
-                result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitRunRequests")?.outcome shouldBe SUCCESS
             }
 
             it("should make correct requests") {
@@ -324,7 +324,7 @@ object SquitRequestTaskSpek : Spek({
             val result = gradleRunner(optionsProject, arguments).build()
 
             it("should be able to complete without errors") {
-                result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitRunRequests")?.outcome shouldBe SUCCESS
             }
 
             it("should make correct requests") {
@@ -378,7 +378,7 @@ object SquitRequestTaskSpek : Spek({
             val result = gradleRunner(jsonProject, arguments).build()
 
             it("should be able to complete without errors") {
-                result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitRunRequests")?.outcome shouldBe SUCCESS
             }
 
             it("should properly receive and save the responses") {

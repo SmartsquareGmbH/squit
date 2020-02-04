@@ -5,9 +5,11 @@ import de.smartsquare.squit.gradleRunner
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
+import org.amshove.kluent.shouldBeIn
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldStartWith
-import org.gradle.testkit.runner.TaskOutcome
+import org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
+import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -61,7 +63,7 @@ object SquitPostProcessTaskSpek : Spek({
             val result = gradleRunner(project, arguments).build()
 
             it("should be able to complete without errors") {
-                result.task(":squitPostProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitPostProcess")?.outcome shouldBe SUCCESS
             }
 
             it("should correctly post-process, based on the script and class") {
@@ -81,7 +83,7 @@ object SquitPostProcessTaskSpek : Spek({
             val result = gradleRunner(project, arguments).build()
 
             it("should be able to complete successfully nonetheless") {
-                result.task(":squitPostProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitPostProcess")?.outcome shouldBe SUCCESS
             }
 
             it("should create an error file") {
@@ -108,8 +110,8 @@ object SquitPostProcessTaskSpek : Spek({
             val cacheResult = gradleRunner(project, arguments).build()
 
             it("should cache") {
-                result.task(":squitPostProcess")?.outcome shouldBe TaskOutcome.SUCCESS
-                cacheResult.task(":squitPostProcess")?.outcome shouldBe TaskOutcome.FROM_CACHE
+                result.task(":squitPostProcess")?.outcome shouldBeIn arrayOf(SUCCESS, FROM_CACHE)
+                cacheResult.task(":squitPostProcess")?.outcome shouldBe FROM_CACHE
             }
         }
     }
@@ -132,7 +134,7 @@ object SquitPostProcessTaskSpek : Spek({
             val result = gradleRunner(invalidProject3, arguments).build()
 
             it("should succeed nonetheless") {
-                result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitRunRequests")?.outcome shouldBe SUCCESS
             }
 
             it("should propagate the error file") {
@@ -173,7 +175,7 @@ object SquitPostProcessTaskSpek : Spek({
             val result = gradleRunner(jsonProject, arguments).build()
 
             it("should be able to complete without errors") {
-                result.task(":squitPostProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitPostProcess")?.outcome shouldBe SUCCESS
             }
 
             it("should correctly post-process") {

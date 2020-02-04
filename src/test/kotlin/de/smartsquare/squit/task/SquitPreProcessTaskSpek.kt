@@ -5,11 +5,14 @@ import de.smartsquare.squit.gradleRunner
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeFalse
+import org.amshove.kluent.shouldBeIn
 import org.amshove.kluent.shouldBeTrue
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldNotContain
 import org.amshove.kluent.shouldStartWith
-import org.gradle.testkit.runner.TaskOutcome
+import org.gradle.testkit.runner.TaskOutcome.FAILED
+import org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
+import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -64,7 +67,7 @@ object SquitPreProcessTaskSpek : Spek({
             val result = gradleRunner(project, arguments).build()
 
             it("should be able to complete without error") {
-                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitPreProcess")?.outcome shouldBe SUCCESS
             }
 
             it("should correctly pre-process requests, based on the script") {
@@ -146,7 +149,7 @@ object SquitPreProcessTaskSpek : Spek({
             val result = gradleRunner(project, arguments).build()
 
             it("should be able to complete without error") {
-                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitPreProcess")?.outcome shouldBe SUCCESS
             }
 
             it("should also pre-process the ignored test") {
@@ -167,7 +170,7 @@ object SquitPreProcessTaskSpek : Spek({
             val result = gradleRunner(project, arguments).build()
 
             it("should be able to complete without error") {
-                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitPreProcess")?.outcome shouldBe SUCCESS
             }
         }
 
@@ -181,8 +184,8 @@ object SquitPreProcessTaskSpek : Spek({
             val cacheResult = gradleRunner(project, arguments).build()
 
             it("should cache") {
-                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
-                cacheResult.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.FROM_CACHE
+                result.task(":squitPreProcess")?.outcome shouldBeIn arrayOf(SUCCESS, FROM_CACHE)
+                cacheResult.task(":squitPreProcess")?.outcome shouldBe FROM_CACHE
             }
         }
     }
@@ -196,7 +199,7 @@ object SquitPreProcessTaskSpek : Spek({
             val result = gradleRunner(invalidProject, arguments).buildAndFail()
 
             it("should fail the build") {
-                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.FAILED
+                result.task(":squitPreProcess")?.outcome shouldBe FAILED
             }
 
             it("should print an appropriate message") {
@@ -223,7 +226,7 @@ object SquitPreProcessTaskSpek : Spek({
             val result = gradleRunner(invalidProject3, arguments).build()
 
             it("should succeed nonetheless") {
-                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitPreProcess")?.outcome shouldBe SUCCESS
             }
 
             it("should generate an error file") {
@@ -242,7 +245,7 @@ object SquitPreProcessTaskSpek : Spek({
             val result = gradleRunner(invalidProject4, arguments).buildAndFail()
 
             it("should fail the build") {
-                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.FAILED
+                result.task(":squitPreProcess")?.outcome shouldBe FAILED
             }
 
             it("should print an appropriate message") {
@@ -270,7 +273,7 @@ object SquitPreProcessTaskSpek : Spek({
             val result = gradleRunner(getProject, arguments).build()
 
             it("should be able to complete without error") {
-                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitPreProcess")?.outcome shouldBe SUCCESS
             }
 
             it("should not require or create a request file") {
@@ -300,7 +303,7 @@ object SquitPreProcessTaskSpek : Spek({
             val result = gradleRunner(optionsProject, arguments).build()
 
             it("should be able to complete without error") {
-                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitPreProcess")?.outcome shouldBe SUCCESS
             }
 
             it("should copy the request file for a test with one") {
@@ -332,7 +335,7 @@ object SquitPreProcessTaskSpek : Spek({
             val result = gradleRunner(jsonProject, arguments).build()
 
             it("should be able to complete without error") {
-                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitPreProcess")?.outcome shouldBe SUCCESS
             }
 
             it("should copy the request file") {
@@ -353,7 +356,7 @@ object SquitPreProcessTaskSpek : Spek({
             val result = gradleRunner(projectWithPlaceholders, arguments).build()
 
             it("should be able to complete without error") {
-                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitPreProcess")?.outcome shouldBe SUCCESS
             }
         }
     }
