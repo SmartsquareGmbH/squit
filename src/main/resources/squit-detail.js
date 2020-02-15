@@ -1,5 +1,5 @@
-var diff = "diffPlaceholder";
-var infodiff = "infoDiffPlaceholder";
+var diff = "diffPlaceholder"
+var infoDiff = "infoDiffPlaceholder"
 
 var name = "namePlaceholder";
 var alternativeName = "alternativeNamePlaceholder";
@@ -55,25 +55,26 @@ function drawHeader() {
 }
 
 function drawDiff(outputFormat) {
-    {
-        var diff2html = new Diff2HtmlUI({diff: diff});
-        diff2html.draw("#diff-view", {
-            inputFormat: "diff",
-            outputFormat: outputFormat,
-            showFiles: false,
-            matching: "lines"
-        });
-    }
+    var diffView = document.getElementById("diff-view")
 
-    var infoDiffView = document.getElementById("info-diff-view");
+    new Diff2HtmlUI(diffView, diff, {
+        synchronisedScroll: true,
+        highlight: false,
+        outputFormat: outputFormat,
+        drawFileList: false,
+        matching: "lines"
+    }).draw()
+
+    var infoDiffView = document.getElementById("info-diff-view")
+
     if (infoDiffView) {
-        var infodiff2html = new Diff2HtmlUI({diff: infodiff});
-        infodiff2html.draw("#info-diff-view", {
-            inputFormat: "diff",
+        new Diff2HtmlUI(infoDiffView, infoDiff, {
+            synchronisedScroll: true,
+            highlight: false,
             outputFormat: outputFormat,
-            showFiles: false,
+            drawFileList: false,
             matching: "lines"
-        });
+        }).draw()
     }
 
     $(".d2h-file-header").remove();

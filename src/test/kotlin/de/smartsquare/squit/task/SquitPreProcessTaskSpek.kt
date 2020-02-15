@@ -129,7 +129,7 @@ object SquitPreProcessTaskSpek : Spek({
             val result = gradleRunner(project, arguments).build()
 
             it("should be able to complete without error") {
-                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+                result.task(":squitPreProcess")?.outcome shouldBe SUCCESS
             }
 
             it("should respect the passed tags") {
