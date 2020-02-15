@@ -58,7 +58,7 @@ object SquitPreProcessTaskSpek : Spek({
         on("running the pre-process task") {
             val arguments = listOf(
                 "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-                "-Psquit.rootDir=$project", "-Ptags=call1,call2,call4"
+                "-Psquit.rootDir=$project", "-PtagsOr=call1,call2,call4"
             )
 
             val result = gradleRunner(project, arguments).build()
@@ -114,6 +114,26 @@ object SquitPreProcessTaskSpek : Spek({
             it("should merge configs in the correct order") {
                 Files.readAllBytes(call1Config).toString(Charsets.UTF_8) shouldContain "some=\"local header\""
                 Files.readAllBytes(call2Config).toString(Charsets.UTF_8) shouldContain "some=header"
+            }
+        }
+
+        on("running the pre-process task with and tags") {
+            val arguments = listOf(
+                "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
+                "-Psquit.rootDir=$project", "-PtagsAnd=project,unique"
+            )
+
+            val result = gradleRunner(project, arguments).build()
+
+            it("should be able to complete without error") {
+                result.task(":squitPreProcess")?.outcome shouldBe TaskOutcome.SUCCESS
+            }
+
+            it("should respect the passed tags") {
+                Files.exists(buildPath.resolve("sources").resolve("project").resolve("call1")).shouldBeTrue()
+                Files.exists(buildPath.resolve("sources").resolve("project").resolve("call2")).shouldBeFalse()
+                Files.exists(buildPath.resolve("sources").resolve("project").resolve("call3")).shouldBeFalse()
+                Files.exists(buildPath.resolve("sources").resolve("project").resolve("call4")).shouldBeFalse()
             }
         }
 

@@ -55,7 +55,7 @@ object SquitPostProcessTaskSpek : Spek({
 
             val arguments = listOf(
                 "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$project", "-Ptags=call1,call2"
+                "-Psquit.rootDir=$project", "-PtagsOr=call1,call2"
             )
 
             val result = gradleRunner(project, arguments).build()
@@ -75,7 +75,7 @@ object SquitPostProcessTaskSpek : Spek({
 
             val arguments = listOf(
                 "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$project", "-Ptags=call1,call2"
+                "-Psquit.rootDir=$project", "-PtagsOr=call1,call2"
             )
 
             val result = gradleRunner(project, arguments).build()
@@ -98,7 +98,7 @@ object SquitPostProcessTaskSpek : Spek({
 
             val arguments = listOf(
                 "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$project", "-Ptags=call1,call2", "--build-cache"
+                "-Psquit.rootDir=$project", "-PtagsOr=call1,call2", "--build-cache"
             )
 
             val result = gradleRunner(project, arguments).build()

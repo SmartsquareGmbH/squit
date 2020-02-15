@@ -36,7 +36,7 @@ object GradleCompatibilitySpek : SubjectSpek<Path>({
                 server.enqueue(MockResponse().setBody("<relevant/>"))
 
                 val arguments = listOf(
-                    "clean", "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                    "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
                     "-Psquit.rootDir=$subject", "--stacktrace"
                 )
 

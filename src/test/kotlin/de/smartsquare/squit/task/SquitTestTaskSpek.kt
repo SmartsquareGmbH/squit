@@ -125,7 +125,7 @@ object SquitTestTaskSpek : Spek({
 
             val arguments = listOf(
                 "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                "-Psquit.rootDir=$project", "-Ptags=call1,call2"
+                "-Psquit.rootDir=$project", "-PtagsOr=call1,call2"
             )
 
             val result = gradleRunner(project, arguments).buildAndFail()

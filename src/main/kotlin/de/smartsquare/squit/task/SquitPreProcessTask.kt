@@ -50,13 +50,16 @@ open class SquitPreProcessTask @Inject constructor(private val workerExecutor: W
     val processedSourcesPath: Path = Paths.get(project.buildDir.path, SQUIT_DIRECTORY, SOURCES_DIRECTORY)
 
     /**
-     * The tags to filter by.
+     * The tags to filter by (and).
      */
     @get:Input
-    val tags = when (project.hasProperty("tags")) {
-        true -> project.property("tags") as String?
-        false -> null
-    }?.split(",")?.map { it.trim() }?.filter { it.isNotBlank() } ?: emptyList()
+    val tagsAnd = getTags("tags") + getTags("tagsAnd")
+
+    /**
+     * The tags to filter by (or).
+     */
+    @get:Input
+    val tagsOr = getTags("tagsOr")
 
     /**
      * If all excluded or ignored tests should be run nevertheless.
@@ -111,13 +114,27 @@ open class SquitPreProcessTask @Inject constructor(private val workerExecutor: W
         }
     }
 
+    private fun getTags(name: String): Set<String> {
+        val tagsString = when (project.hasProperty(name)) {
+            true -> project.property(name) as String?
+            false -> null
+        }
+
+        return tagsString
+            ?.split(",")
+            ?.map { it.trim() }
+            ?.filter { it.isNotBlank() }
+            ?.toSet()
+            ?: emptySet()
+    }
+
     private fun filterIndex(input: Pair<Path, Config>) = when {
-        isTestExcluded(input.second, shouldUnexclude) -> {
+        isTestExcluded(input.second) -> {
             logger.info("Excluding test ${input.first.cut(sourceDir)}")
 
             false
         }
-        !isTestCoveredByTags(input.second, tags) -> {
+        !isTestCoveredByTags(input.second) -> {
             logger.info("Ignoring test ${input.first.cut(sourceDir)}")
 
             false
@@ -125,12 +142,13 @@ open class SquitPreProcessTask @Inject constructor(private val workerExecutor: W
         else -> true
     }
 
-    private fun isTestExcluded(config: Config, shouldUnexclude: Boolean): Boolean {
+    private fun isTestExcluded(config: Config): Boolean {
         return config.shouldExclude && !shouldUnexclude
     }
 
-    private fun isTestCoveredByTags(config: Config, tags: List<String>): Boolean {
-        return tags.isEmpty() || tags.any { it in config.tags }
+    private fun isTestCoveredByTags(config: Config): Boolean {
+        return (tagsAnd.isEmpty() || tagsAnd.all { it in config.tags }) &&
+            (tagsOr.isEmpty() || tagsOr.any { it in config.tags })
     }
 
     @Suppress("UnstableApiUsage")
