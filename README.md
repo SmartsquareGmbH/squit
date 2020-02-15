@@ -311,7 +311,9 @@ To run only tests with the tag `fast`, you would invoke `Squit` like so:
 ./gradlew squitTest -Ptags=fast
 ```
 
-> You can also specify more tags by separating with a `,`.
+You can also specify more tags by separating with a `,`. Tags are then linked like an "and".
+If you specify `-Ptags=fast,mysuite` a test would need to have both tags to be included.
+If you want to have the semantics of an "or", use `-PtagsOr`.
 
 `Squit` also automatically tags your tests named on the folders they reside in. If you have a test in the folder `test1`, it would have the tag `test1` and could be run exclusively by invoking `./gradlew squitTest -Ptags=test1`
 
