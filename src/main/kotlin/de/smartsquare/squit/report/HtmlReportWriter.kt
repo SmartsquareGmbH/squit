@@ -42,7 +42,8 @@ class HtmlReportWriter(private val logger: Logger) {
             "$diff2htmlPath/dist/diff2html.min.css" to "css/diff2html.css",
             "$diff2htmlPath/dist/diff2html.min.js" to "js/diff2html.js",
             "$diff2htmlPath/dist/diff2html-ui.min.js" to "js/diff2html-ui.js",
-            "squit.js" to "js/squit.js"
+            "squit.js" to "js/squit.js",
+            "squit.css" to "css/squit.css"
         )
 
         private val emptyDiffHeader = listOf("--- $DIFF_FILE_NAME", "+++ $DIFF_FILE_NAME", "@@ -1 +1 @@")

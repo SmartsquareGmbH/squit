@@ -11,6 +11,7 @@ import kotlinx.html.InputType
 import kotlinx.html.a
 import kotlinx.html.body
 import kotlinx.html.button
+import kotlinx.html.classes
 import kotlinx.html.code
 import kotlinx.html.div
 import kotlinx.html.form
@@ -131,6 +132,7 @@ private fun DIV.squitControls() {
 
                     label(classes = "custom-control-label") {
                         attributes += "for" to "failed-only"
+                        classes = classes + "unselectable"
 
                         +"Show only failed tests"
                     }
