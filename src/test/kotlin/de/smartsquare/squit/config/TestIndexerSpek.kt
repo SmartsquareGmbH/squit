@@ -11,6 +11,7 @@ import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
+import java.nio.file.Paths
 
 object TestIndexerSpek : Spek({
 
@@ -41,19 +42,19 @@ object TestIndexerSpek : Spek({
                 index[0].preSqlScripts.size shouldBeEqualTo 1
                 index[0].preSqlScripts shouldHaveKey "test"
                 index[0].preSqlScripts.getValue("test").size shouldBeEqualTo 2
-                index[0].preSqlScripts.getValue("test")[0].toString().shouldEndWith("test_pre_once.sql")
-                index[0].preSqlScripts.getValue("test")[1].toString().shouldEndWith("test_pre.sql")
+                index[0].preSqlScripts.getValue("test")[0].toString() shouldEndWith "test_pre_once.sql"
+                index[0].preSqlScripts.getValue("test")[1].toString() shouldEndWith "test_pre.sql"
                 index[0].postSqlScripts.getValue("test").size shouldBeEqualTo 1
-                index[0].postSqlScripts.getValue("test")[0].toString().shouldEndWith("test_post.sql")
+                index[0].postSqlScripts.getValue("test")[0].toString() shouldEndWith "test_post.sql"
                 index[0].descriptions.size shouldBeEqualTo 2
-                index[0].descriptions[0].toString() shouldEndWith "project/description.md"
-                index[0].descriptions[1].toString() shouldEndWith "project/call1/description.md"
+                index[0].descriptions[0].toString() shouldEndWith Paths.get("project/description.md").toString()
+                index[0].descriptions[1].toString() shouldEndWith Paths.get("project/call1/description.md").toString()
                 index[1].preSqlScripts.size shouldBeEqualTo 1
                 index[1].preSqlScripts.getValue("test").size shouldBeEqualTo 0
                 index[1].postSqlScripts.getValue("test").size shouldBeEqualTo 0
                 index[1].descriptions.size shouldBeEqualTo 1
                 index[3].postSqlScripts.getValue("test").size shouldBeEqualTo 1
-                index[3].postSqlScripts.getValue("test")[0].toString().shouldEndWith("test_post_once.sql")
+                index[3].postSqlScripts.getValue("test")[0].toString() shouldEndWith "test_post_once.sql"
             }
         }
 
@@ -62,8 +63,8 @@ object TestIndexerSpek : Spek({
 
             it("should return a correct index") {
                 index.size shouldBeEqualTo 1
-                index[0].request!!.toString() shouldEndWith "call3/request.xml"
-                index[0].response.toString() shouldEndWith "call3/response.xml"
+                index[0].request!!.toString() shouldEndWith Paths.get("call3/request.xml").toString()
+                index[0].response.toString() shouldEndWith Paths.get("call3/response.xml").toString()
             }
         }
     }

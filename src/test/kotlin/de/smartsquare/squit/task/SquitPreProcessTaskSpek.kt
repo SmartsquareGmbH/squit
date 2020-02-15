@@ -98,7 +98,10 @@ object SquitPreProcessTaskSpek : Spek({
 
                 """.trimIndent()
 
-                Files.readAllBytes(call1Description).toString(Charsets.UTF_8) shouldBeEqualTo expected
+                val actualString = Files.readAllBytes(call1Description).toString(Charsets.UTF_8)
+                val actual = actualString.lines().joinToString("\n") { it.trim() }
+
+                actual shouldBeEqualTo expected
             }
 
             it("should respect the passed tags") {
