@@ -37,8 +37,8 @@ $(document).ready(function () {
                 .addClass("fa-chevron-right");
         });
 
-    drawHeader();
-    drawDiff("line-by-line");
+    drawHeader()
+    drawDiff("side-by-side")
 });
 
 function drawHeader() {

@@ -94,7 +94,7 @@ private fun DIV.squitControls() {
                 type = ButtonType.button
 
                 span(classes = "align-middle") {
-                    +"Show side by side"
+                    +"Show inline"
                 }
             }
         }
