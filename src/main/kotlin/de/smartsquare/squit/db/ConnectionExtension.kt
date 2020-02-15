@@ -9,7 +9,6 @@ import java.sql.SQLException
 /**
  * Executes the sql script at the given [path]. The contained statements are split by ";" and cleaned.
  */
-@Suppress("RethrowCaughtException")
 fun Connection.executeScript(path: Path) {
     try {
         createStatement().use { statement ->

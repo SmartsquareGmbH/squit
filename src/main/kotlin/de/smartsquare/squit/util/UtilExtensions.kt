@@ -14,6 +14,8 @@ import java.nio.file.Paths
 import kotlin.text.RegexOption.DOT_MATCHES_ALL
 import org.dom4j.Document as XmlDocument
 
+private val sqlCommentRegex = Regex("--.*?\n", DOT_MATCHES_ALL)
+
 /**
  * Removes pieces of a path, based on another path. This is useful for getting the sub directories of a path, with the
  * same ancestors as another path.
@@ -64,7 +66,7 @@ fun JsonElement.write(path: Path, gson: Gson = GsonBuilder().setPrettyPrinting()
  * Cleans this [String] by removing sql comments, newlines and blanks, followed by trimming ([trim]).
  */
 fun String.cleanSqlString() = this
-    .replace(Regex("--.*?\n", DOT_MATCHES_ALL), "")
+    .replace(sqlCommentRegex, "")
     .replace("\n", " ")
     .replace("\r", " ")
     .replace("\uFEFF", "") // This is a weird unicode blank character, present in some sql files.

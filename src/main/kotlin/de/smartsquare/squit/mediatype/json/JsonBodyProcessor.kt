@@ -13,7 +13,6 @@ import de.smartsquare.squit.mediatype.BodyProcessor
 import de.smartsquare.squit.util.write
 import groovy.lang.Binding
 import groovy.lang.GroovyShell
-import java.nio.file.Files
 import java.nio.file.Path
 
 /**
@@ -58,7 +57,7 @@ class JsonBodyProcessor : BodyProcessor {
             .forEach { it.process(request, response) }
 
         config.preProcessorScripts.forEach {
-            GroovyShell(javaClass.classLoader).parse(Files.newBufferedReader(it)).apply {
+            GroovyShell(javaClass.classLoader).parse(it.toFile()).apply {
                 binding = Binding(
                     mapOf(
                         "request" to request,
@@ -75,7 +74,7 @@ class JsonBodyProcessor : BodyProcessor {
             .forEach { it.process(actualResponse, expectedResponse) }
 
         config.postProcessorScripts.forEach {
-            GroovyShell(javaClass.classLoader).parse(Files.newBufferedReader(it)).apply {
+            GroovyShell(javaClass.classLoader).parse(it.toFile()).apply {
                 binding = Binding(
                     mapOf(
                         "actualResponse" to actualResponse,

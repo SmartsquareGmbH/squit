@@ -255,7 +255,7 @@ open class SquitRequestTask : DefaultTask() {
 
         config.preRunnerScripts.forEach {
             GroovyShell(javaClass.classLoader)
-                .parse(Files.newBufferedReader(it))
+                .parse(it.toFile())
                 .apply { binding = Binding(mapOf("config" to config)) }
                 .run()
         }
@@ -279,7 +279,7 @@ open class SquitRequestTask : DefaultTask() {
 
         config.postRunnerScripts.forEach {
             GroovyShell(javaClass.classLoader)
-                .parse(Files.newBufferedReader(it))
+                .parse(it.toFile())
                 .apply { binding = Binding(mapOf("config" to config)) }
                 .run()
         }
