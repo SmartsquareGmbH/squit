@@ -113,6 +113,11 @@ The following table lists all tasks and their purpose:
 | `squitPostProcess` | Post processes the responses in a configurable manner.                                                              |
 | `squitTest`        | Compares the expected and actual response and fails the build if differences were found. Also generates the report. |
 
+To run all your tests, execute `./gradlew squitTest`.
+
+> You do NOT need to run the clean task every time you rerun the tests. Squit and Gradle will always run the tests,
+> but only pre-process again if files have actually changed, saving execution time.
+
 ### Configuration
 
 The plugin features a variety of configuration possibilities. As aforementioned, these are collected in `test.conf` (or `local.conf`) files.
