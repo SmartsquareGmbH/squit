@@ -29,7 +29,7 @@ object GradleCompatibilitySpek : SubjectSpek<Path>({
             TestUtils.deleteDatabaseFiles(subject)
         }
 
-        listOf("6.0.1", "5.6.4", "5.1.1").forEach { version ->
+        listOf(GradleVersion.current().version, "6.0.1", "5.6.4", "5.1.1").forEach { version ->
             on("running the test task with Gradle version $version") {
                 server.enqueue(MockResponse().setBody("<cool/>"))
                 server.enqueue(MockResponse().setBody("<nice/>"))
