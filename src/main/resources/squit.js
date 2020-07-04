@@ -1,15 +1,24 @@
 function getState() {
-    var state = localStorage.getItem("state");
+    try {
+        var state = localStorage.getItem("state");
 
-    if (state) {
-        return JSON.parse(state);
-    } else {
+        if (state) {
+            return JSON.parse(state);
+        } else {
+            return {};
+        }
+    } catch (error) {
+        // This browser does not support localStorage.
         return {};
     }
 }
 
 function setState(state) {
-    localStorage.setItem("state", JSON.stringify(state));
+    try {
+        localStorage.setItem("state", JSON.stringify(state));
+    } catch (error) {
+        // This browser does not support localStorage.
+    }
 }
 
 $(document).ready(function () {
