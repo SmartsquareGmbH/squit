@@ -27,10 +27,10 @@ class HtmlReportWriter(private val logger: Logger) {
 
         private const val bootstrapPath = "META-INF/resources/webjars/bootstrap/4.4.1/dist"
         private const val fontAwesomePath = "META-INF/resources/webjars/font-awesome/5.13.0"
-        private const val jqueryPath = "META-INF/resources/webjars/jquery/3.4.1/dist"
+        private const val jqueryPath = "META-INF/resources/webjars/jquery/3.5.1/dist"
         private const val popperJsPath = "META-INF/resources/webjars/popper.js/1.16.1/dist/umd"
-        private const val markedPath = "META-INF/resources/webjars/marked/0.8.2"
-        private const val diff2htmlPath = "META-INF/resources/webjars/diff2html/3.1.6"
+        private const val markedPath = "META-INF/resources/webjars/marked/1.1.0"
+        private const val diff2htmlPath = "META-INF/resources/webjars/diff2html/3.1.7"
 
         private val resources = arrayOf(
             "$bootstrapPath/css/bootstrap.min.css" to "css/bootstrap.css",
