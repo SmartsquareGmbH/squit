@@ -12,19 +12,16 @@ jobs:
           - windows-latest
 
     steps:
-      - uses: actions/checkout@v2.0.0
+      - uses: actions/checkout@v2.3.1
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1.3.0
         with:
           java-version: 1.8
       - name: Set up Gradle cache
-        uses: actions/cache@v1.0.3
+        uses: actions/cache@v2.0.0
         with:
           path: ~/.gradle/caches/modules-2
-          key: ${{ runner.OS }}-gradle-${{ hashFiles('**/versions.gradle') }}
-          restore-keys: |
-            ${{ runner.OS }}-gradle-${{ hashFiles('**/versions.gradle') }}
-            ${{ runner.OS }}-gradle-
+          key: ${{ runner.OS }}-gradle-
 
       - name: Build with Gradle
         if: matrix.os == 'ubuntu-latest'
@@ -34,8 +31,8 @@ jobs:
         run: .\gradlew.bat build
 
       - name: Store reports
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         if: always()
         with:
-          name: Reports-${{ runner.OS }}
+          name: reports-${{ runner.OS }}
           path: build/reports
