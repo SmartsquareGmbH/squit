@@ -348,7 +348,7 @@ squit {
     // The path to save reports in. build/squit/reports is the default.
     reportDir "build/squit/reports"
 
-    // The timeout for requests before squit fails. The default is 10.
+    // The timeout in seconds for requests before squit fails. The default is 10.
     timeout = 60
 
     // If Squit should only print if a tests fails.
