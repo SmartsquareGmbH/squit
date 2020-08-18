@@ -22,8 +22,8 @@ jobs:
         uses: actions/cache@v2.1.0
         with:
           path: ~/.gradle/caches/modules-2
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/versions.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
+          key: ${{ runner.os }}-${{ matrix.java }}-gradle-${{ hashFiles('**/versions.gradle') }}
+          restore-keys: ${{ runner.os }}-${{ matrix.java }}-gradle
 
       - name: Build with Gradle
         if: matrix.os == 'ubuntu-latest'
