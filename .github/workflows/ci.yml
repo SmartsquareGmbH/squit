@@ -1,6 +1,6 @@
 name: CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -10,18 +10,20 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
+        java: [ 8, 14 ]
 
     steps:
-      - uses: actions/checkout@v2.3.1
-      - name: Set up JDK 1.8
-        uses: actions/setup-java@v1.3.0
+      - uses: actions/checkout@v2.3.2
+      - name: Setup JDK
+        uses: actions/setup-java@v1.4.1
         with:
-          java-version: 1.8
-      - name: Set up Gradle cache
-        uses: actions/cache@v2.0.0
+          java-version: ${{ matrix.java }}
+      - name: Setup Gradle cache
+        uses: actions/cache@v2.1.0
         with:
           path: ~/.gradle/caches/modules-2
-          key: ${{ runner.OS }}-gradle-
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/versions.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
 
       - name: Build with Gradle
         if: matrix.os == 'ubuntu-latest'
@@ -34,5 +36,5 @@ jobs:
         uses: actions/upload-artifact@v2
         if: always()
         with:
-          name: reports-${{ runner.OS }}
+          name: reports-${{ runner.OS }}-${{ matrix.java }}
           path: build/reports
