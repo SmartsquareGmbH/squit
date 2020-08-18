@@ -1,5 +1,6 @@
 package de.smartsquare.squit.entity
 
+import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.util.Constants.ACTUAL_RESPONSE_INFO
 import de.smartsquare.squit.util.Constants.DESCRIPTION
@@ -76,7 +77,7 @@ data class SquitResult(
         val descriptionPath = sourceDir.resolve(DESCRIPTION)
 
         if (Files.exists(descriptionPath)) {
-            Files.readAllBytes(descriptionPath).toString(Charset.defaultCharset())
+            FilesUtils.readAllBytes(descriptionPath).toString(Charset.defaultCharset())
         } else {
             null
         }
@@ -96,7 +97,7 @@ data class SquitResult(
      * Additional information associated with this result.
      */
     val metaInfo: SquitMetaInfo by lazy {
-        SquitMetaInfo.fromJson(Files.readAllBytes(metaInfoPath).toString(Charset.defaultCharset()))
+        SquitMetaInfo.fromJson(FilesUtils.readAllBytes(metaInfoPath).toString(Charset.defaultCharset()))
     }
 
     /**
@@ -104,9 +105,9 @@ data class SquitResult(
      */
     val expectedLines: List<String> by lazy {
         if (isError) {
-            Files.readAllLines(errorPath)
+            FilesUtils.readAllLines(errorPath)
         } else {
-            Files.readAllLines(expectedResponsePath)
+            FilesUtils.readAllLines(expectedResponsePath)
         }
     }
 
@@ -115,9 +116,9 @@ data class SquitResult(
      */
     val actualLines: List<String> by lazy {
         if (isError) {
-            Files.readAllLines(errorPath)
+            FilesUtils.readAllLines(errorPath)
         } else {
-            Files.readAllLines(actualResponsePath)
+            FilesUtils.readAllLines(actualResponsePath)
         }
     }
 
@@ -131,7 +132,7 @@ data class SquitResult(
             .resolve(fullPath)
             .resolve(ACTUAL_RESPONSE_INFO)
         if (Files.exists(resolvedActualResponseInfoPath)) {
-            Files.readAllLines(resolvedActualResponseInfoPath)
+            FilesUtils.readAllLines(resolvedActualResponseInfoPath)
         } else {
             emptyList()
         }

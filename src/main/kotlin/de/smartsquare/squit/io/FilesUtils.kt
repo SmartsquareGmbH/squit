@@ -3,6 +3,9 @@ package de.smartsquare.squit.io
 import de.smartsquare.squit.util.cut
 import org.gradle.api.GradleException
 import se.sawano.java.text.AlphanumericComparator
+import java.io.BufferedReader
+import java.io.IOException
+import java.nio.charset.MalformedInputException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
@@ -104,6 +107,35 @@ object FilesUtils {
 
         Files.createDirectories(target.parent)
         Files.write(target, modification(resource))
+    }
+
+    /**
+     * Creates a new [BufferedReader] for the given [path] and executes [block] with improved error handling.
+     */
+    fun <T> useBufferedReader(path: Path, block: (BufferedReader) -> T): T {
+        return try {
+            Files.newBufferedReader(path).use(block)
+        } catch (error: MalformedInputException) {
+            throw IOException("Error reading file $path. Squit expects UTF-8 encoded files only.", error)
+        }
+    }
+
+    /**
+     * Reads all bytes at the given [path] with improved error handling.
+     */
+    fun readAllBytes(path: Path): ByteArray = try {
+        Files.readAllBytes(path)
+    } catch (error: MalformedInputException) {
+        throw IOException("Error reading file $path. Squit expects UTF-8 encoded files only.", error)
+    }
+
+    /**
+     * Reads all lines at the given [path] with improved error handling.
+     */
+    fun readAllLines(path: Path): List<String> = try {
+        Files.readAllLines(path)
+    } catch (error: MalformedInputException) {
+        throw IOException("Error reading file $path. Squit expects UTF-8 encoded files only.", error)
     }
 
     private fun containsDirectories(path: Path) = Files.newDirectoryStream(path) { Files.isDirectory(it) }

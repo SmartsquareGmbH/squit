@@ -5,7 +5,6 @@ import com.google.gson.JsonParseException
 import com.google.gson.JsonParser
 import org.gradle.api.GradleException
 import java.io.IOException
-import java.nio.file.Files
 import java.nio.file.Path
 
 /**
@@ -19,8 +18,8 @@ object JsonParserSupport {
      * This is a safe operation, as such the file is correctly closed.
      */
     fun read(path: Path): JsonElement = try {
-        val jsonElement = Files.newBufferedReader(path).use {
-            JsonParser.parseReader(it)
+        val jsonElement = FilesUtils.useBufferedReader(path) { reader ->
+            JsonParser.parseReader(reader)
         }
 
         jsonElement

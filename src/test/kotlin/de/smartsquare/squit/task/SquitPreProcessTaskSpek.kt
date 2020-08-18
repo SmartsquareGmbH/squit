@@ -20,6 +20,8 @@ import org.jetbrains.spek.api.dsl.on
 import java.io.File
 import java.nio.charset.Charset
 import java.nio.file.Files
+import java.nio.file.StandardOpenOption.CREATE
+import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
 
 object SquitPreProcessTaskSpek : Spek({
 
@@ -186,6 +188,40 @@ object SquitPreProcessTaskSpek : Spek({
             it("should cache") {
                 result.task(":squitPreProcess")?.outcome shouldBeIn arrayOf(SUCCESS, FROM_CACHE)
                 cacheResult.task(":squitPreProcess")?.outcome shouldBe FROM_CACHE
+            }
+        }
+    }
+
+    given("a test project  with an ISO-8859-1 encoded file") {
+        val project = TestUtils.getResourcePath("test-project")
+
+        val call2Directory = project
+            .resolve("src")
+            .resolve("squit")
+            .resolve("project")
+            .resolve("call2")
+
+        val testFile = call2Directory.resolve("test_pre.sql")
+
+        beforeEachTest {
+            Files.write(testFile, listOf("ß"), Charsets.ISO_8859_1, CREATE, TRUNCATE_EXISTING)
+        }
+
+        afterEachTest {
+            Files.deleteIfExists(testFile)
+        }
+
+        on("running the pre-process task") {
+            val arguments = listOf(
+                "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
+                "-Psquit.rootDir=$project", "-PtagsOr=call1,call2,call4"
+            )
+
+            val result = gradleRunner(project, arguments).buildAndFail()
+
+            it("should show a meaningful error") {
+                result.task(":squitPreProcess")?.outcome shouldBe FAILED
+                result.output shouldContain "Squit expects UTF-8 encoded files only"
             }
         }
     }

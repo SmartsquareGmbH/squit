@@ -1,7 +1,7 @@
 package de.smartsquare.squit.db
 
+import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.util.cleanSqlString
-import java.nio.file.Files
 import java.nio.file.Path
 import java.sql.Connection
 import java.sql.SQLException
@@ -12,7 +12,7 @@ import java.sql.SQLException
 fun Connection.executeScript(path: Path) {
     try {
         createStatement().use { statement ->
-            Files.readAllBytes(path).toString(Charsets.UTF_8).cleanSqlString()
+            FilesUtils.readAllBytes(path).toString(Charsets.UTF_8).cleanSqlString()
                 .split(";")
                 .map { it.cleanSqlString() }
                 .filter { it.isNotBlank() }

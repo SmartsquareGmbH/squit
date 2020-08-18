@@ -3,6 +3,7 @@ package de.smartsquare.squit.task
 import de.smartsquare.squit.config.mediaType
 import de.smartsquare.squit.config.writeTo
 import de.smartsquare.squit.entity.SquitTest
+import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.util.Constants
 import de.smartsquare.squit.util.cut
@@ -58,7 +59,7 @@ object SquitPreProcessRunner {
         Files.newBufferedWriter(output, StandardOpenOption.CREATE_NEW, StandardOpenOption.APPEND)
             .use { writer ->
                 inputs.forEachIndexed { index, path ->
-                    Files.newBufferedReader(path).use { reader ->
+                    FilesUtils.useBufferedReader(path) { reader ->
                         reader.transferToCompat(writer)
 
                         if (index < inputs.lastIndex && separator.isNotEmpty()) {

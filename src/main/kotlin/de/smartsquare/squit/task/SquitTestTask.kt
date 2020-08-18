@@ -191,7 +191,7 @@ open class SquitTestTask : DefaultTask() {
 
                 resultList += if (Files.exists(errorFile)) {
                     constructResult(
-                        Files.readAllBytes(errorFile).toString(Charset.defaultCharset()),
+                        FilesUtils.readAllBytes(errorFile).toString(Charset.defaultCharset()),
                         expectedResponseInfo, actualResponsePath, config
                     )
                 } else {
@@ -229,7 +229,7 @@ open class SquitTestTask : DefaultTask() {
                 resolvedPath.resolve(ACTUAL_RESPONSE_INFO)
             )
 
-            val actualResponse = Files.readAllBytes(actualResponseInfoPath).toString(Charset.defaultCharset())
+            val actualResponse = FilesUtils.readAllBytes(actualResponseInfoPath).toString(Charset.defaultCharset())
             val responseInfo = SquitResponseInfo.fromJson(actualResponse)
             return expectedResponseInfo.diff(responseInfo)
         }
@@ -248,8 +248,8 @@ open class SquitTestTask : DefaultTask() {
                 .resolve(MediaTypeFactory.expectedResponse(config.mediaType))
         )
 
-        val expectedResponse = Files.readAllBytes(expectedResponseFilePath)
-        val actualResponse = Files.readAllBytes(actualResponseFilePath)
+        val expectedResponse = FilesUtils.readAllBytes(expectedResponseFilePath)
+        val actualResponse = FilesUtils.readAllBytes(actualResponseFilePath)
 
         return MediaTypeFactory.differ(config.mediaType, mediaTypeConfig)
             .diff(expectedResponse, actualResponse)
