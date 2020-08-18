@@ -3,6 +3,7 @@ package de.smartsquare.squit
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
+import org.gradle.api.JavaVersion
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
 import org.jetbrains.spek.api.dsl.given
@@ -29,21 +30,28 @@ object GradleCompatibilitySpek : SubjectSpek<Path>({
             TestUtils.deleteDatabaseFiles(subject)
         }
 
-        listOf(GradleVersion.current().version, "6.0.1", "5.6.4", "5.1.1").forEach { version ->
-            on("running the test task with Gradle version $version") {
-                server.enqueue(MockResponse().setBody("<cool/>"))
-                server.enqueue(MockResponse().setBody("<nice/>"))
-                server.enqueue(MockResponse().setBody("<relevant/>"))
+        mapOf(
+            GradleVersion.current().version to null,
+            "6.0.1" to JavaVersion.VERSION_13,
+            "5.6.4" to JavaVersion.VERSION_13,
+            "5.1.1" to JavaVersion.VERSION_13
+        ).forEach { (gradleVersion, javaVersion) ->
+            if (javaVersion == null || JavaVersion.current() <= javaVersion) {
+                on("running the test task with Gradle version $gradleVersion") {
+                    server.enqueue(MockResponse().setBody("<cool/>"))
+                    server.enqueue(MockResponse().setBody("<nice/>"))
+                    server.enqueue(MockResponse().setBody("<relevant/>"))
 
-                val arguments = listOf(
-                    "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-                    "-Psquit.rootDir=$subject", "--stacktrace"
-                )
+                    val arguments = listOf(
+                        "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
+                        "-Psquit.rootDir=$subject", "--stacktrace"
+                    )
 
-                val result = gradleRunner(subject, arguments, GradleVersion.version(version)).build()
+                    val result = gradleRunner(subject, arguments, GradleVersion.version(gradleVersion)).build()
 
-                it("should be able to complete without errors") {
-                    result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
+                    it("should be able to complete without errors") {
+                        result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
+                    }
                 }
             }
         }
