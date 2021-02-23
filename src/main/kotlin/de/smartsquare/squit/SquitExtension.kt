@@ -115,6 +115,18 @@ open class SquitExtension(private val project: Project) {
          */
         @get:Input
         var canonicalize = true
+
+        /**
+         * Whether to try to resolve invalid namespaces on canonicalization (e.g. missing http://)
+         */
+        @get:Input
+        var resolveInvalidNamespaces = false
+
+        /**
+         * The default resolving string for invalid namespaces (only used when resolveInvalidNamespaces is set to true).
+         */
+        @get:Input
+        var resolveNamespaceString = "http://"
     }
 
     /**
