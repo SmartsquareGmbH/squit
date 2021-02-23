@@ -29,12 +29,36 @@ class XmlCanonicalizer : Canonicalizer {
         return if (mediaTypeConfig.xmlCanonicalize) {
             val outputStream = ByteArrayOutputStream()
 
-            canonicalizer.canonicalize(input.toByteArray(), outputStream, false)
+            val content = if (mediaTypeConfig.resolveInvalidNamespaces)
+                resolveInvalidNamespaces(input, mediaTypeConfig.resolveNamespaceString)
+            else
+                input
+
+            canonicalizer.canonicalize(content.toByteArray(), outputStream, false)
 
             SAXReader().read(outputStream.toByteArray().inputStream()).asString()
         } else {
             input
         }
+    }
+
+    private fun resolveInvalidNamespaces(content: String, resolveNamespaceString: String): String {
+        var contentReplaced = content
+        val regexNamespaces = Regex("xmlns([^\\s!>]+)")
+        val regexNamespacesMatches = regexNamespaces.findAll(content)
+        val urlRegex = Regex("[\"'][^\\s]+[\"']")
+        for (match in regexNamespacesMatches) {
+            val potentialUrl = urlRegex.find(match.value)
+            if (potentialUrl != null) {
+                val potentialUrlString = potentialUrl.value.replace("\"", "").replace("'", "")
+                if (!potentialUrlString.startsWith("http://") && !potentialUrlString.startsWith("https://")) {
+                    val ns = match.value.substringAfter("xmlns", "").substringBefore("=", "")
+                    val replacement = "xmlns$ns=\"$resolveNamespaceString$potentialUrlString\""
+                    contentReplaced = contentReplaced.replaceFirst(match.value, replacement)
+                }
+            }
+        }
+        return contentReplaced
     }
 
     private fun Document.asString(outputFormat: OutputFormat = SquitOutputFormat): String {

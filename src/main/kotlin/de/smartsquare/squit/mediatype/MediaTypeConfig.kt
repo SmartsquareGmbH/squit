@@ -12,5 +12,7 @@ import org.gradle.api.tasks.Input
 data class MediaTypeConfig(
     @get:Input val xmlStrict: Boolean = true,
     @get:Input val xmlCanonicalize: Boolean = true,
-    @get:Input val jsonCanonicalize: Boolean = true
+    @get:Input val jsonCanonicalize: Boolean = true,
+    @get:Input val resolveInvalidNamespaces: Boolean = false,
+    @get:Input val resolveNamespaceString: String = "http://"
 )
