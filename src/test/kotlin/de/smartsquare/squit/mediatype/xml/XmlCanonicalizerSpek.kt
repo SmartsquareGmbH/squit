@@ -84,13 +84,16 @@ object XmlCanonicalizerSpek : Spek({
                 )
 
                 // language=xml
-                val expected = """<?xml version="1.0" encoding="UTF-8"?>
+                val expected = """
+                    <?xml version="1.0" encoding="UTF-8"?>
 
-                <ns3:test xmlns:ns3="http://w3.org/2001/XMLSchema-instance">
-                <hello b="b">Abc</hello>
-                </ns3:test>""".trimIndent()
+                    <ns3:test xmlns:ns3="http://w3.org/2001/XMLSchema-instance">
+                      <hello b="b">Abc</hello>
+                    </ns3:test>
 
-                result shouldBeEqualTo expected
+                """.trimIndent()
+
+                result.trim() shouldBeEqualTo expected.trim()
             }
         }
     }
