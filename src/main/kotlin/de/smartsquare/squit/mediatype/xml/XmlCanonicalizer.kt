@@ -43,22 +43,17 @@ class XmlCanonicalizer : Canonicalizer {
     }
 
     private fun resolveInvalidNamespaces(content: String, resolveNamespaceString: String): String {
-        var contentReplaced = content
-        val regexNamespaces = Regex("xmlns([^\\s!>]+)")
-        val regexNamespacesMatches = regexNamespaces.findAll(content)
-        val urlRegex = Regex("[\"'][^\\s]+[\"']")
-        for (match in regexNamespacesMatches) {
-            val potentialUrl = urlRegex.find(match.value)
-            if (potentialUrl != null) {
-                val potentialUrlString = potentialUrl.value.replace("\"", "").replace("'", "")
-                if (!potentialUrlString.startsWith("http://") && !potentialUrlString.startsWith("https://")) {
-                    val ns = match.value.substringAfter("xmlns", "").substringBefore("=", "")
-                    val replacement = "xmlns$ns=\"$resolveNamespaceString$potentialUrlString\""
-                    contentReplaced = contentReplaced.replaceFirst(match.value, replacement)
-                }
+        return content.replace(Regex("(xmlns:\\w+=['\"])(.*?)(['\"])")) { match ->
+            val start = match.groupValues[1]
+            val potentialUrlString = match.groupValues[2]
+            val end = match.groupValues[3]
+
+            if (!potentialUrlString.matches(Regex("^https?://"))) {
+                "$start$resolveNamespaceString$potentialUrlString$end"
+            } else {
+                "$start$potentialUrlString$end"
             }
         }
-        return contentReplaced
     }
 
     private fun Document.asString(outputFormat: OutputFormat = SquitOutputFormat): String {
