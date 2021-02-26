@@ -28,7 +28,7 @@ class XmlCanonicalizer : Canonicalizer {
     private companion object {
         private val xmlNamespaceRegex = Regex("(xmlns:\\w+=['\"])(.*?)(['\"])")
         private val urlRegex = Regex("^https?://")
-        private val resolveNamespaceString = "http://"
+        private const val resolveNamespaceString = "http://"
     }
 
     override fun canonicalize(input: String, mediaTypeConfig: MediaTypeConfig): String {
