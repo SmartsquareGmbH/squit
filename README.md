@@ -365,6 +365,11 @@ squit {
         // If xml should be canonicalized for the html report.
         // This means that both expected and actual response are transposed into a common format.
         canonicalize = true
+
+        // If invalid namespace resources given in the xml should be resolved.
+        // If neither http:// or https:// are set as part of the namespace url, http:// will be set as a prefix,
+        // so that the canonicalization does not throw errors.
+        resolveInvalidNamespaces = true
     }
 
     json {
