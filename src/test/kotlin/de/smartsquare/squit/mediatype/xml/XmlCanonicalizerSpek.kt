@@ -69,18 +69,18 @@ object XmlCanonicalizerSpek : Spek({
             // language=xml
             val structure = """
                 <ns3:test xmlns:ns3='w3.org/2001/XMLSchema-instance'>
-                    <hello b="b">Abc</hello>
+                    <hello b="b" a="a">Abc</hello>
                 </ns3:test>
             """.trimIndent()
 
             it("should produce a valid result") {
                 val result = canonicalizer.canonicalize(
                     structure, MediaTypeConfig(
-                    xmlStrict = false,
-                    xmlCanonicalize = true,
-                    jsonCanonicalize = false,
-                    resolveInvalidNamespaces = true
-                )
+                        xmlStrict = false,
+                        xmlCanonicalize = true,
+                        jsonCanonicalize = false,
+                        resolveInvalidNamespaces = true
+                    )
                 )
 
                 // language=xml
@@ -88,7 +88,39 @@ object XmlCanonicalizerSpek : Spek({
                     <?xml version="1.0" encoding="UTF-8"?>
 
                     <ns3:test xmlns:ns3="http://w3.org/2001/XMLSchema-instance">
-                      <hello b="b">Abc</hello>
+                      <hello a="a" b="b">Abc</hello>
+                    </ns3:test>
+
+                """.trimIndent()
+
+                result.trim() shouldBeEqualTo expected.trim()
+            }
+        }
+
+        on("canonicalize an xml structure with resolving valid namespaces") {
+            // language=xml
+            val structure = """
+                <ns3:test xmlns:ns3='http://w3.org/2001/XMLSchema-instance'>
+                    <hello b="b" a="a">Abc</hello>
+                </ns3:test>
+            """.trimIndent()
+
+            it("should produce a valid result") {
+                val result = canonicalizer.canonicalize(
+                    structure, MediaTypeConfig(
+                        xmlStrict = false,
+                        xmlCanonicalize = true,
+                        jsonCanonicalize = false,
+                        resolveInvalidNamespaces = true
+                    )
+                )
+
+                // language=xml
+                val expected = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+
+                    <ns3:test xmlns:ns3="http://w3.org/2001/XMLSchema-instance">
+                      <hello a="a" b="b">Abc</hello>
                     </ns3:test>
 
                 """.trimIndent()
