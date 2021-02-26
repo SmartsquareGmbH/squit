@@ -36,7 +36,7 @@ class XmlCanonicalizer : Canonicalizer {
             val outputStream = ByteArrayOutputStream()
 
             val content = if (mediaTypeConfig.resolveInvalidNamespaces)
-                resolveInvalidNamespaces(input, resolveNamespaceString)
+                resolveInvalidNamespaces(input)
             else
                 input
 
@@ -48,7 +48,7 @@ class XmlCanonicalizer : Canonicalizer {
         }
     }
 
-    private fun resolveInvalidNamespaces(content: String, resolveNamespaceString: String): String {
+    private fun resolveInvalidNamespaces(content: String): String {
         return content.replace(xmlNamespaceRegex) { match ->
             val start = match.groupValues[1]
             val potentialUrlString = match.groupValues[2]
