@@ -45,9 +45,8 @@ class SquitPlugin : Plugin<Project> {
                 it.mediaTypeConfig = MediaTypeConfig(
                     extension.xml.strict,
                     extension.xml.canonicalize,
-                    extension.json.canonicalize,
                     extension.xml.resolveInvalidNamespaces,
-                    extension.xml.resolveNamespaceString
+                    extension.json.canonicalize
                 )
 
                 it.dependsOn("squitPostProcess")

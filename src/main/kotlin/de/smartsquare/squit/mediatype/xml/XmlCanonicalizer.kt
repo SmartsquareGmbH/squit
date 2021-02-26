@@ -25,12 +25,18 @@ class XmlCanonicalizer : Canonicalizer {
         canonicalizer = ApacheCanonicalizer.getInstance(ApacheCanonicalizer.ALGO_ID_C14N11_OMIT_COMMENTS)
     }
 
+    private companion object {
+        private val xmlNamespaceRegex = Regex("(xmlns:\\w+=['\"])(.*?)(['\"])")
+        private val urlRegex = Regex("^https?://")
+        private val resolveNamespaceString = "http://"
+    }
+
     override fun canonicalize(input: String, mediaTypeConfig: MediaTypeConfig): String {
         return if (mediaTypeConfig.xmlCanonicalize) {
             val outputStream = ByteArrayOutputStream()
 
             val content = if (mediaTypeConfig.resolveInvalidNamespaces)
-                resolveInvalidNamespaces(input, mediaTypeConfig.resolveNamespaceString)
+                resolveInvalidNamespaces(input, resolveNamespaceString)
             else
                 input
 
@@ -43,12 +49,12 @@ class XmlCanonicalizer : Canonicalizer {
     }
 
     private fun resolveInvalidNamespaces(content: String, resolveNamespaceString: String): String {
-        return content.replace(Regex("(xmlns:\\w+=['\"])(.*?)(['\"])")) { match ->
+        return content.replace(xmlNamespaceRegex) { match ->
             val start = match.groupValues[1]
             val potentialUrlString = match.groupValues[2]
             val end = match.groupValues[3]
 
-            if (!potentialUrlString.matches(Regex("^https?://"))) {
+            if (!potentialUrlString.contains(urlRegex)) {
                 "$start$resolveNamespaceString$potentialUrlString$end"
             } else {
                 "$start$potentialUrlString$end"
