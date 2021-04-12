@@ -1,25 +1,25 @@
 ext {
-    gradleVersion = '6.6'
+    gradleVersion = '7.0'
     squitVersion = '3.1.0'
 
-    gradlePublishVersion = '0.12.0'
+    gradlePublishVersion = '0.14.0'
 
-    kotlinVersion = '1.3.72'
-    dokkaVersion = '0.10.1'
+    kotlinVersion = '1.4.32'
+    dokkaVersion = '1.4.30'
 
-    jacocoVersion = '0.8.5'
-    gradleVersionsVersion = '0.28.0'
+    jacocoVersion = '0.8.6'
+    gradleVersionsVersion = '0.38.0'
     gradleTestIdeaFixVersion = '0.1.0'
 
     jaxenVersion = '1.2.0'
     dom4jVersion = '2.1.3'
     gsonVersion = '2.8.6'
-    xmlSecVersion = '2.2.0'
-    xmlUnitVersion = '2.7.0'
-    jsonUnitVersion = '2.18.1'
-    typesafeConfigVersion = '1.4.0'
-    okhttpVersion = '4.7.2'
-    kotlinHtmlVersion = '0.7.1'
+    xmlSecVersion = '2.2.1'
+    xmlUnitVersion = '2.8.2'
+    jsonUnitVersion = '2.25.0'
+    typesafeConfigVersion = '1.4.1'
+    okhttpVersion = '4.9.1'
+    kotlinHtmlVersion = '0.7.2'
     diffUtilsVersion = '3.0'
     alphanumericComparatorVersion = "1.4.1"
 
@@ -30,12 +30,12 @@ ext {
     diff2htmlVersion = '3.1.7'
     markedVersion = '1.1.0'
 
-    detektVersion = '1.10.0'
-    ktlintPluginVersion = '9.2.1'
+    detektVersion = '1.16.0'
+    ktlintPluginVersion = '10.0.0'
 
-    junitPlatformVersion = '1.6.1'
+    junitPlatformVersion = '1.7.1'
     spekVersion = '1.2.1'
-    kluentVersion = '1.61'
+    kluentVersion = '1.65'
     h2Version = '1.4.200'
-    mockkVersion = '1.10.0'
+    mockkVersion = '1.11.0'
 }

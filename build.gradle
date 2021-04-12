@@ -105,6 +105,8 @@ java {
 
 tasks.withType(KotlinCompile).all {
     kotlinOptions {
+        freeCompilerArgs = ["-Xjsr305=strict"]
+        allWarningsAsErrors = true
         jvmTarget = "1.8"
     }
 }
@@ -136,31 +138,52 @@ detekt {
     }
 }
 
-dokka {
-    outputDirectory = javadoc.destinationDir
+dokkaHtml {
+    outputDirectory.set(javadoc.destinationDir)
 
-    configuration {
-        jdkVersion = 8
+    dokkaSourceSets {
+        named("main") {
+            jdkVersion.set(8)
 
-        externalDocumentationLink {
-            url = new URL("https://dom4j.github.io/javadoc/$dom4jVersion/")
-            packageListUrl = new URL("https://dom4j.github.io/javadoc/$dom4jVersion/package-list")
-        }
+            sourceLink {
+                localDirectory.set(file("src/main/kotlin"))
+                remoteUrl.set(new URL("https://github.com/SmartsquareGmbH/squit/blob/master/src/main/kotlin"))
+                remoteLineSuffix.set("#L")
+            }
 
-        externalDocumentationLink {
-            url = new URL("https://lightbend.github.io/config/latest/api/index.html")
-            packageListUrl = new URL("https://lightbend.github.io/config/latest/api/package-list")
-        }
+            externalDocumentationLink {
+                url.set(new URL("https://dom4j.github.io/javadoc/$dom4jVersion/"))
+                packageListUrl.set(new URL("https://dom4j.github.io/javadoc/$dom4jVersion/package-list"))
+            }
 
-        externalDocumentationLink {
-            url = new URL("https://www.javadoc.io/doc/com.google.code.gson/gson/$gsonVersion")
-            packageListUrl = new URL("https://raw.githubusercontent.com/google/gson/gson-parent-$gsonVersion/gson/docs/javadocs/package-list")
+            externalDocumentationLink {
+                url.set(new URL("https://lightbend.github.io/config/latest/api"))
+                packageListUrl.set(new URL("https://lightbend.github.io/config/latest/api/package-list"))
+            }
+
+            externalDocumentationLink {
+                url.set(new URL("https://www.javadoc.io/doc/com.google.code.gson/gson/$gsonVersion/com.google.gson"))
+                packageListUrl.set(new URL("https://raw.githubusercontent.com/google/gson/gson-parent-$gsonVersion/gson/docs/javadocs/package-list"))
+            }
         }
     }
 }
 
+dependencyUpdates {
+    rejectVersionIf {
+        isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
+    }
+}
+
+static def isNonStable(String version) {
+    def stableKeyword = ["RELEASE", "FINAL", "GA"].any { it -> version.toUpperCase().contains(it) }
+    def regex = /^[0-9,.v-]+(-r)?$/
+
+    return !stableKeyword && !(version ==~ regex)
+}
+
 tasks.withType(Javadoc).all {
-    it.dependsOn dokka
+    it.dependsOn dokkaHtml
 }
 
 pluginBundle {
@@ -202,6 +225,10 @@ task generateTestkitFiles {
         outputDir.mkdirs()
         file("$outputDir/testkit-gradle.properties").text = jvmArgs
     }
+}
+
+tasks.named("processTestResources") {
+    dependsOn generateTestkitFiles
 }
 
 gradle.projectsEvaluated {

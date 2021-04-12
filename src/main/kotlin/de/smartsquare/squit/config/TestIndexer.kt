@@ -60,9 +60,10 @@ class TestIndexer(private val projectConfig: Config) {
                     leafDirectory to config.resolve().validate()
                 } catch (error: Throwable) {
                     val innerMessage = when (error) {
-                        is ConfigException -> configExceptionMessageRegex
-                            .find(error.message ?: "")
-                            ?.groupValues?.getOrNull(1)
+                        is ConfigException ->
+                            configExceptionMessageRegex
+                                .find(error.message ?: "")
+                                ?.groupValues?.getOrNull(1)
                         else -> error.message
                     }
 

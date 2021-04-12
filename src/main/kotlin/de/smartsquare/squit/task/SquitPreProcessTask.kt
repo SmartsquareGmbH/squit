@@ -92,7 +92,7 @@ open class SquitPreProcessTask @Inject constructor(private val workerExecutor: W
     @Suppress("UnstableApiUsage")
     @TaskAction
     fun run() {
-        val index = TestIndexer(projectConfig).index(sourceDir, ::filterIndex)
+        val index = TestIndexer(projectConfig).index(sourceDir) { filterIndex(it) }
 
         FilesUtils.deleteRecursivelyIfExisting(processedSourcesPath)
         Files.createDirectories(processedSourcesPath)

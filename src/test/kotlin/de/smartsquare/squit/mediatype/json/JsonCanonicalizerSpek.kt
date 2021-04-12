@@ -31,7 +31,8 @@ object JsonCanonicalizerSpek : Spek({
 
             it("should produce a sorted, formatted and valid result") {
                 val result = canonicalizer.canonicalize(
-                    structure, MediaTypeConfig(
+                    structure,
+                    MediaTypeConfig(
                         xmlStrict = false,
                         xmlCanonicalize = false,
                         jsonCanonicalize = true
@@ -85,7 +86,8 @@ object JsonCanonicalizerSpek : Spek({
 
             it("should produce a sorted, formatted and valid result") {
                 val result = canonicalizer.canonicalize(
-                    structure, MediaTypeConfig(
+                    structure,
+                    MediaTypeConfig(
                         xmlStrict = false,
                         xmlCanonicalize = false,
                         jsonCanonicalize = true
@@ -134,7 +136,8 @@ object JsonCanonicalizerSpek : Spek({
 
             it("should return the input") {
                 val result = canonicalizer.canonicalize(
-                    structure, MediaTypeConfig(
+                    structure,
+                    MediaTypeConfig(
                         xmlStrict = false,
                         xmlCanonicalize = false,
                         jsonCanonicalize = false

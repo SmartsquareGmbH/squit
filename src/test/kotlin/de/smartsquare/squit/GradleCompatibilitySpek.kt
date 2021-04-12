@@ -32,6 +32,7 @@ object GradleCompatibilitySpek : SubjectSpek<Path>({
 
         mapOf(
             GradleVersion.current().version to null,
+            "7.0" to null,
             "6.0.1" to JavaVersion.VERSION_13,
             "5.6.4" to JavaVersion.VERSION_13,
             "5.1.1" to JavaVersion.VERSION_13

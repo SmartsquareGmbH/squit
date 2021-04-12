@@ -22,7 +22,8 @@ object XmlCanonicalizerSpek : Spek({
 
             it("should produce a valid result") {
                 val result = canonicalizer.canonicalize(
-                    structure, MediaTypeConfig(
+                    structure,
+                    MediaTypeConfig(
                         xmlStrict = false,
                         xmlCanonicalize = true,
                         jsonCanonicalize = false
@@ -54,7 +55,8 @@ object XmlCanonicalizerSpek : Spek({
 
             it("should return the input") {
                 val result = canonicalizer.canonicalize(
-                    structure, MediaTypeConfig(
+                    structure,
+                    MediaTypeConfig(
                         xmlStrict = false,
                         xmlCanonicalize = false,
                         jsonCanonicalize = false
@@ -75,7 +77,8 @@ object XmlCanonicalizerSpek : Spek({
 
             it("should produce a valid result") {
                 val result = canonicalizer.canonicalize(
-                    structure, MediaTypeConfig(
+                    structure,
+                    MediaTypeConfig(
                         xmlStrict = false,
                         xmlCanonicalize = true,
                         jsonCanonicalize = false,
@@ -107,7 +110,8 @@ object XmlCanonicalizerSpek : Spek({
 
             it("should produce a valid result") {
                 val result = canonicalizer.canonicalize(
-                    structure, MediaTypeConfig(
+                    structure,
+                    MediaTypeConfig(
                         xmlStrict = false,
                         xmlCanonicalize = true,
                         jsonCanonicalize = false,

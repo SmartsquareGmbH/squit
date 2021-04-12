@@ -67,7 +67,7 @@ fun GradleRunner.withJacoco(): GradleRunner {
 fun gradleRunner(project: Path, arguments: List<String>, version: GradleVersion? = null): GradleRunner {
     return GradleRunner.create()
         .withArguments(listOf("clean") + arguments + "--stacktrace")
-        .apply { if (version != null) withGradleVersion(version.version) }
+        .apply { if (version !== null) withGradleVersion(version.version) }
         .withProjectDir(project.toFile())
         .withExtendedPluginClasspath()
         .forwardOutput()
