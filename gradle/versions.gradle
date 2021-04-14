@@ -33,8 +33,8 @@ ext {
     detektVersion = '1.16.0'
     ktlintPluginVersion = '10.0.0'
 
+    junitVersion = '5.7.1'
     junitPlatformVersion = '1.7.1'
-    spekVersion = '1.2.1'
     kluentVersion = '1.65'
     h2Version = '1.4.200'
     mockkVersion = '1.11.0'

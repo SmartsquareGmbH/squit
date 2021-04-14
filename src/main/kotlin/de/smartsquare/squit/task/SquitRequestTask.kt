@@ -69,7 +69,6 @@ open class SquitRequestTask : DefaultTask() {
     /**
      * The timeout in seconds to use for requests.
      */
-    @Suppress("MagicNumber")
     @get:Internal
     var timeout = 10L
 

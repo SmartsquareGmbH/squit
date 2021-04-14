@@ -16,7 +16,6 @@ import org.gradle.util.ConfigureUtil
 /**
  * Class containing the available extensions for the squit dsl.
  */
-@Suppress("UnstableApiUsage")
 open class SquitExtension(private val project: Project) {
 
     /**

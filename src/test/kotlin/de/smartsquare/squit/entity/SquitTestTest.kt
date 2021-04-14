@@ -1,21 +1,19 @@
 package de.smartsquare.squit.entity
 
 import com.typesafe.config.ConfigFactory
-import org.amshove.kluent.shouldBeEqualTo
-import org.amshove.kluent.shouldBeInstanceOf
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.given
-import org.jetbrains.spek.api.dsl.it
-import org.jetbrains.spek.api.dsl.on
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.nio.file.Paths
+import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldBeInstanceOf
+import org.junit.jupiter.api.Test
 
-object SquitTestSpek : Spek({
+class SquitTestTest {
 
-    given("two SquitTest objects") {
+    @Test
+    fun `merging two SquitTest objects`() {
         val test1 = SquitTest(
             Paths.get("/test"),
             ConfigFactory.parseMap(mapOf("a" to "b")),
@@ -55,16 +53,11 @@ object SquitTestSpek : Spek({
             listOf(Paths.get("/test2/description.md"), Paths.get("/test1/description.md"))
         )
 
-        on("merging them") {
-            val merged = test1.merge(test2)
-
-            it("should return a correct object") {
-                merged shouldBeEqualTo expected
-            }
-        }
+        test1.merge(test2) shouldBeEqualTo expected
     }
 
-    given("a SquitTest object") {
+    @Test
+    fun `serializing a SquitTest object`() {
         val test = SquitTest(
             Paths.get("/test.xml"),
             ConfigFactory.parseMap(mapOf("a" to "b")),
@@ -75,25 +68,23 @@ object SquitTestSpek : Spek({
             listOf(Paths.get("/description/description.md"))
         )
 
-        it("should be serializable") {
-            val serialized = ByteArrayOutputStream().let { byteOut ->
-                byteOut.use {
-                    ObjectOutputStream(byteOut).use { objectOut ->
-                        objectOut.writeObject(test)
-                    }
-                }
-
-                byteOut.toByteArray()
-            }
-
-            val deserialized = ByteArrayInputStream(serialized).use { byteIn ->
-                ObjectInputStream(byteIn).use { objectIn ->
-                    objectIn.readObject()
+        val serialized = ByteArrayOutputStream().let { byteOut ->
+            byteOut.use {
+                ObjectOutputStream(byteOut).use { objectOut ->
+                    objectOut.writeObject(test)
                 }
             }
 
-            deserialized shouldBeInstanceOf SquitTest::class.java
-            deserialized shouldBeEqualTo test
+            byteOut.toByteArray()
         }
+
+        val deserialized = ByteArrayInputStream(serialized).use { byteIn ->
+            ObjectInputStream(byteIn).use { objectIn ->
+                objectIn.readObject()
+            }
+        }
+
+        deserialized shouldBeInstanceOf SquitTest::class.java
+        deserialized shouldBeEqualTo test
     }
-})
+}

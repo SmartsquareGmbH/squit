@@ -89,7 +89,6 @@ open class SquitPreProcessTask @Inject constructor(private val workerExecutor: W
     /**
      * Runs the task.
      */
-    @Suppress("UnstableApiUsage")
     @TaskAction
     fun run() {
         val index = TestIndexer(projectConfig).index(sourceDir) { filterIndex(it) }
@@ -151,7 +150,6 @@ open class SquitPreProcessTask @Inject constructor(private val workerExecutor: W
             (tagsOr.isEmpty() || tagsOr.any { it in config.tags })
     }
 
-    @Suppress("UnstableApiUsage")
     internal abstract class Worker : WorkAction<WorkerParameters> {
 
         private val sourceDir get() = parameters.sourceDir.asPath
@@ -163,7 +161,6 @@ open class SquitPreProcessTask @Inject constructor(private val workerExecutor: W
         }
     }
 
-    @Suppress("UnstableApiUsage")
     internal interface WorkerParameters : WorkParameters {
         val sourceDir: DirectoryProperty
         val processedSourcesPath: DirectoryProperty

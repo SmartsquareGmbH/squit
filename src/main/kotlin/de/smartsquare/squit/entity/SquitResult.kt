@@ -166,7 +166,6 @@ data class SquitResult(
     /**
      * Returns a copy of this result with the first part of the [fullPath] cut.
      */
-    @Suppress("DataClassContainsFunctions")
     fun cutFirstPathElement(): SquitResult {
         val isContextPathEmpty = contextPath.fileName.toString().isBlank()
         val isSquitPathEmpty = suitePath.fileName.toString().isBlank()

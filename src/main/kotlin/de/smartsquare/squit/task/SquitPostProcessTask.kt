@@ -84,7 +84,6 @@ open class SquitPostProcessTask @Inject constructor(private val workerExecutor: 
     /**
      * Runs the task.
      */
-    @Suppress("UnstableApiUsage")
     @TaskAction
     fun run() {
         FilesUtils.deleteRecursivelyIfExisting(processedActualResponsesPath)
@@ -110,7 +109,6 @@ open class SquitPostProcessTask @Inject constructor(private val workerExecutor: 
         }
     }
 
-    @Suppress("UnstableApiUsage")
     internal abstract class Worker : WorkAction<WorkerParameters> {
 
         private val processedSourcesPath get() = parameters.processedSourcesPath.asPath
@@ -125,7 +123,6 @@ open class SquitPostProcessTask @Inject constructor(private val workerExecutor: 
         }
     }
 
-    @Suppress("UnstableApiUsage")
     internal interface WorkerParameters : WorkParameters {
         val processedSourcesPath: DirectoryProperty
         val actualResponsesPath: DirectoryProperty
