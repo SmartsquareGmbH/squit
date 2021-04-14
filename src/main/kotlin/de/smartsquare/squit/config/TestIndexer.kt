@@ -58,7 +58,7 @@ class TestIndexer(private val projectConfig: Config) {
             .map { (leafDirectory, config) ->
                 try {
                     leafDirectory to config.resolve().validate()
-                } catch (error: Throwable) {
+                } catch (error: Exception) {
                     val innerMessage = when (error) {
                         is ConfigException ->
                             configExceptionMessageRegex

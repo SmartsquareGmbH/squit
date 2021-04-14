@@ -238,7 +238,7 @@ private fun checkClass(name: String) {
         Class.forName(name)
     } catch (error: ClassNotFoundException) {
         throw GradleException("Missing class: $name", error)
-    } catch (error: Throwable) {
+    } catch (error: Exception) {
         throw GradleException("Could not load class: $name", error)
     }
 }

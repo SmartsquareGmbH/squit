@@ -36,7 +36,7 @@ object SquitPreProcessRunner {
         try {
             MediaTypeFactory.processor(mediaType)
                 .preProcess(test.request, test.response, processedRequestPath, processedResponsePath, test.config)
-        } catch (error: Throwable) {
+        } catch (error: Exception) {
             Files.write(processedResultPath.resolve(Constants.ERROR), error.toString().toByteArray())
         }
 

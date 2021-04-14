@@ -161,7 +161,7 @@ class HtmlReportWriter(private val logger: Logger) {
                 MediaTypeFactory.canonicalizer(mediaType)
                     .canonicalize(lines.joinToString(""), mediaTypeConfig)
                     .lines()
-            } catch (error: Throwable) {
+            } catch (error: Exception) {
                 logger.warn(errorMessage, error)
 
                 lines
