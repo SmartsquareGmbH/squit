@@ -71,6 +71,5 @@ fun gradleRunner(project: Path, arguments: List<String>, version: GradleVersion?
         .withProjectDir(project.toFile())
         .withExtendedPluginClasspath()
         .forwardOutput()
-        .withDebug(true)
         .withJacoco()
 }
