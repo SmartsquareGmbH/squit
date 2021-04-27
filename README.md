@@ -8,16 +8,17 @@ It features high customizability and speed.
 - [Integration](#integration)
 - [Project structure](#project-structure)
 - [Usage](#usage)
-  - [Configuration](#configuration)
-    - [Templating](#templating)
-  - [Database modifications](#database-modifications)
-  - [Pre- and Post-processing](#pre--and-post-processing)
-    - [Groovy processing](#groovy-processing)
-    - [Interface processing](#interface-processing)
-  - [Pre- and Post-runners](#pre--and-post-runners)
-  - [Tagging](#tagging)
-  - [Squit Dsl](#squit-dsl)
-  - [Supported request formats](#supported-request-types)
+    - [Configuration](#configuration)
+        - [Templating](#templating)
+    - [Database modifications](#database-modifications)
+    - [Pre- and Post-processing](#pre--and-post-processing)
+        - [Groovy processing](#groovy-processing)
+        - [Interface processing](#interface-processing)
+    - [Pre- and Post-runners](#pre--and-post-runners)
+    - [Tagging](#tagging)
+    - [Supported request formats](#supported-request-types)
+    - [Command line options](#command-line-options)
+    - [Squit Dsl](#squit-dsl)
 
 ## Integration
 
@@ -46,7 +47,8 @@ The minimum supported Gradle version is `5.1.1`.
 
 ## Project structure
 
-Projects are structured in arbitrarily deep folders. The plugin expects the root to be in the `src/squit` folder per default.
+Projects are structured in arbitrarily deep folders. The plugin expects the root to be in the `src/squit` folder per
+default.
 
 A single test is represented by one leaf folder. That folder **must** contain:
 
@@ -60,19 +62,25 @@ Further it **can** contain:
 - `db_$name_pre.sql` files.
 - `db_$name_post.sql` files.
 
-The `request` file contains whatever payload you want to send to your backend. The `response` file contains the expected response.
+The `request` file contains whatever payload you want to send to your backend. The `response` file contains the expected
+response.
 
-A `test.conf` file is required at least once on the path of your test. That means that it is resolved recursively, starting at the leaf, e.g. your test folder. The `test.conf` can and must contain various properties, which are discussed in the `Configuration` section. These properties are then merged if not existing while going up the folder tree.<br>
-This allows for convenient definition of properties for multiple tests, with the ability to override properties in special cases.
+A `test.conf` file is required at least once on the path of your test. That means that it is resolved recursively,
+starting at the leaf, e.g. your test folder. The `test.conf` can and must contain various properties, which are
+discussed in the [Configuration section](#configuration). These properties are then merged if not existing while going up the folder
+tree.<br>
+This allows for convenient definition of properties for multiple tests, with the ability to override properties in
+special cases.
 
-The `description.md` file is an optional file containing additional descriptions for tests in the [Markdown](https://en.wikipedia.org/wiki/Markdown) format.
-If the tests are nested inside each other and there are multiple description files on the path, they are merged together from top to bottom.
+The `description.md` file is an optional file containing additional descriptions for tests in
+the [Markdown](https://en.wikipedia.org/wiki/Markdown) format. If the tests are nested inside each other and there are
+multiple description files on the path, they are merged together from top to bottom.
 
 A simple example looks like this:
 
 ```
 - src
---- test
+--- squit
 ----- my_suite
 ------- test1 (folder)
 --------- request.xml
@@ -85,19 +93,22 @@ A simple example looks like this:
 ------- test.conf
 ```
 
-This shows a valid project structure for `Squit`. `my_suite` contains all our tests (in this case only two: `test1` and `test2`).
+This shows a valid project structure for `Squit`. `my_suite` contains all our tests (in this case only two: `test1`
+and `test2`).
 
 > You _can_ have more directories beneath `my_suite` (e.g. `another_suite`) and as aforementioned can also nest more deeply.
 > At least one suite folder is required though, you can't have your tests directly in the `src/squit` folder.
 
 `my_suite` also contains a `test.conf` file, which could look like this:
 
-```properties
+```hocon
 endpoint = "http://localhost:1234/endpoint"
 ```
 
-`Squit` would then use `http://localhost:1234/endpoint` as the endpoint to call when running all tests in `my_suite`.<br>
-As the example shows, `test1` also contains a `test.conf` file. This one could be used to override the `endpoint` property of the `test.conf` file in the `my_suite` folder.
+`Squit` would then use `http://localhost:1234/endpoint` as the endpoint to call when running all tests in `my_suite`
+.<br>
+As the example shows, `test1` also contains a `test.conf` file. This one could be used to override the `endpoint`
+property of the `test.conf` file in the `my_suite` folder.
 
 > It is not **required** to have a `test.conf` file there, often it is enough to have one for all your tests in the root folder.
 
@@ -120,9 +131,10 @@ To run all your tests, execute `./gradlew squitTest`.
 
 ### Configuration
 
-The plugin features a variety of configuration possibilities. As aforementioned, these are collected in `test.conf` (or `local.conf`) files.
-`test.conf` files are in the [HOCON](https://github.com/lightbend/config/blob/master/HOCON.md) format and support all of its features.
-As of the current version, these are the supported properties:
+The plugin features a variety of configuration possibilities. As aforementioned, these are collected in `test.conf` (
+or `local.conf`) files.
+`test.conf` files are in the [HOCON](https://github.com/lightbend/config/blob/master/HOCON.md) format and support all of
+its features. As of the current version, these are the supported properties:
 
 | Name                   | Description                                                                                                                                        | Example                                                    |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
@@ -148,11 +160,12 @@ As of the current version, these are the supported properties:
 
 #### Templating
 
-It may be useful to have a placeholder in a `test.conf` file and fill it at runtime, for example when the port of an endpoint is dynamic or when running in a CI environment.
+It may be useful to have a placeholder in a `test.conf` file and fill it at runtime, for example when the port of an
+endpoint is dynamic or when running in a CI environment.
 
 The `HOCON` config format which `Squit` uses comes with support out of the box for it:
 
-```properties
+```hocon
 endpoint = "http://localhost:"${port}"/someEndpoint"
 ```
 
@@ -162,30 +175,30 @@ endpoint = "http://localhost:"${port}"/someEndpoint"
 ./gradlew squitTest -Psquit.port=1234
 ```
 
-> This mechanism can also be used to create global configuration properties, which are then used in configuration files
-deeper in the hierarchy.
+> This mechanism can also be used to create global configuration properties, which are then used in configuration files deeper in the hierarchy.
 
 #### Local configuration
 
 Squit also allows for configuration to be stored in a `local.conf` file. `local.conf` files have a higher priority than
 `test.conf` file and thus override `test.conf` files. This can be useful for overriding values of a versioned
-`test.conf` without having to check that change into a VCS for every collaborator on the project. 
+`test.conf` without having to check that change into a VCS for every collaborator on the project.
 
 ### Database modifications
 
-As part of your tests, you may want to modify your database into a specific state. `Squit` allows you to do so with ordinary `sql` scripts which can be run before and after a test.
+As part of your tests, you may want to modify your database into a specific state. `Squit` allows you to do so with
+ordinary `sql` scripts which can be run before and after a test.
 
 To do so, you have to add a database configuration to your `test.conf` file(s) and specify the jdbc driver to use.
 
 A simple example would look like this:
 
-```properties
+```hocon
 # test.conf
 
 databaseConfigurations = [
-  {name = "mydb", jdbc = "jdbc:oracle:thin:@localhost:1521:xe", username = "someusername", password = "thepassword"}
-  //=More are possible
-]=
+    {name = "mydb", jdbc = "jdbc:oracle:thin:@localhost:1521:xe", username = "someusername", password = "thepassword"}
+    // More are possible.
+]
 ```
 
 ```groovy
@@ -196,9 +209,12 @@ squit {
 }
 ```
 
-As you can see, the database properties follow a specific naming scheme. To be recognized, your database configurations must start with `db_` and you need all three shown variants (`_jdbc`, `_username`, `_password`). The name in the middle can be arbitrarily chosen and is later used to find the `sql` scripts.
+As you can see, the database properties follow a specific naming scheme. To be recognized, your database configurations
+must start with `db_` and you need all three shown variants (`_jdbc`, `_username`, `_password`). The name in the middle
+can be arbitrarily chosen and is later used to find the `sql` scripts.
 
-You would then have to add the jdbc driver to your classpath. This can be done like this (Assuming the `jar` is in the `libs` directory of your project):
+You would then have to add the jdbc driver to your classpath. This can be done like this (Assuming the `jar` is in
+the `libs` directory of your project):
 
 ```groovy
 buildscript {
@@ -208,15 +224,19 @@ buildscript {
 }
 ```
 
-The `sql` files are added per test. They are required to be named after the configuration you added in the `test.conf` file, ending with either `_pre.sql` or `_post.sql`. The example from before would be `mydb_pre.sql` and `mydb_post.sql`.
+The `sql` files are added per test. They are required to be named after the configuration you added in the `test.conf`
+file, ending with either `_pre.sql` or `_post.sql`. The example from before would be `mydb_pre.sql` and `mydb_post.sql`.
 
-You can also add a `sql` script in a higher level of your project structure to merge it into existing scripts. `_pre.sql` scripts are prepended and `_post.sql` scrips are appended.<br>
+You can also add a `sql` script in a higher level of your project structure to merge it into existing
+scripts. `_pre.sql` scripts are prepended and `_post.sql` scrips are appended.<br>
 
-The last option is to have scripts which are only run once. For this, you name the script `example_pre_once.sql` or `example_post_once.sql`.
+The last option is to have scripts which are only run once. For this, you name the script `example_pre_once.sql`
+or `example_post_once.sql`.
 
 ### Pre- and Post-processing
 
-`Squit` allows you to pre- and post-process the requests and actual responses. This may be required for incremental ids you have no control over, dates or other things.
+`Squit` allows you to pre- and post-process the requests and actual responses. This may be required for incremental ids
+you have no control over, dates or other things.
 
 There are currently two ways to do so: Using `Groovy` scripts or implementing a specific `interface`.
 
@@ -226,13 +246,14 @@ There are currently two ways to do so: Using `Groovy` scripts or implementing a 
 
 You add a `.groovy` script somewhere in your project and supply `Squit` with the path:
 
-```properties
+```hocon
 # test.conf
 
 preProcessorScripts = [./some/path/pre_process.groovy]
 ```
 
-As for the pre process step, the script gets passed `request` and `expectedResponse` objects, which types depend on the request type. See [supported request types](#supported-request-types).
+As for the pre process step, the script gets passed `request` and `expectedResponse` objects, which types depend on the
+request type. See [supported request types](#supported-request-types).
 
 A simple script could look like this:
 
@@ -250,9 +271,12 @@ request.selectNodes("//Date").each {
 
 Implementing the `Squit` interfaces is harder to set up, but much more flexible than the scripting approach.
 
-To do so, you need to set up a [buildSrc](https://docs.gradle.org/current/userguide/organizing_build_logic.html#sec:build_sources) project or an external project, which is added to the classpath. In the following example, a `buildSrc` project is set up:
+To do so, you need to set up
+a [buildSrc](https://docs.gradle.org/current/userguide/organizing_build_logic.html#sec:build_sources) project or an
+external project, which is added to the classpath. In the following example, a `buildSrc` project is set up:
 
-Create the `buildSrc` folder and set up a normal project in your preferred JVM language. After that, you add the `Squit` library to your dependencies:
+Create the `buildSrc` folder and set up a normal project in your preferred JVM language. After that, you add the `Squit`
+library to your dependencies:
 
 ```groovy
 repositories {
@@ -265,7 +289,8 @@ dependencies {
 }
 ```
 
-Then you can implement one of the `interfaces`. An example for the `SquitXmlPreProcessor` equivalent to the scripting example could look like this:
+Then you can implement one of the `interfaces`. An example for the `SquitXmlPreProcessor` equivalent to the scripting
+example could look like this:
 
 ```java
 import de.smartsquare.squit.SquitPreProcessor;
@@ -278,7 +303,7 @@ public class MyPreProcessor implements SquitXmlPreProcessor {
     @Override
     public void process(Document request, Document expectedResponse) {
         request.selectNodes("//Date")
-                .forEach(it -> it.setText(LocalDate.now().toString()));
+            .forEach(it -> it.setText(LocalDate.now().toString()));
     }
 }
 ```
@@ -287,7 +312,7 @@ public class MyPreProcessor implements SquitXmlPreProcessor {
 
 The last step is to add the class to your `test.conf`, similar to the approach with `groovy` scripts:
 
-```properties
+```hocon
 # test.conf
 
 preProcessors = ["com.example.MyPreProcessor"]
@@ -296,8 +321,8 @@ preProcessors = ["com.example.MyPreProcessor"]
 ### Pre- and Post-runners
 
 Similar to [Pre- and Post-processing](#pre--and-post-processing), it is possible to specify implementations or scripts,
-which can run arbitrary code before and after each request. The setup is analogous to pre- and post-processors.
-See the [configuration](#configuration) section for the different options to enable them in your `test.conf`.
+which can run arbitrary code before and after each request. The setup is analogous to pre- and post-processors. See
+the [Configuration section](#configuration) for the different options to enable them in your `test.conf`.
 
 ### Tagging
 
@@ -305,7 +330,7 @@ Tags allow to run only a subset of your tests to save time and resources if need
 
 You can specify tags in corresponding `test.conf` files. An example could look like this:
 
-```properties
+```hocon
 tags = ["fast", "mysuite"]
 ```
 
@@ -316,11 +341,12 @@ To run only tests with the tag `fast`, you would invoke `Squit` like so:
 ./gradlew squitTest -Ptags=fast
 ```
 
-You can also specify more tags by separating with a `,`. Tags are then linked like an "and".
-If you specify `-Ptags=fast,mysuite` a test would need to have both tags to be included.
-If you want to have the semantics of an "or", use `-PtagsOr`.
+You can also specify more tags by separating with a `,`. Tags are then linked like an "and". If you
+specify `-Ptags=fast,mysuite` a test would need to have both tags to be included. If you want to have the semantics of
+an "or", use `-PtagsOr`.
 
-`Squit` also automatically tags your tests named on the folders they reside in. If you have a test in the folder `test1`, it would have the tag `test1` and could be run exclusively by invoking `./gradlew squitTest -Ptags=test1`
+`Squit` also automatically tags your tests named on the folders they reside in. If you have a test in the folder `test1`
+, it would have the tag `test1` and could be run exclusively by invoking `./gradlew squitTest -Ptags=test1`.
 
 ### Supported request types
 
@@ -332,6 +358,17 @@ As of the current version, Squit supports these request formats:
 | `application/json` | `.json`     | [Gson JsonElements](https://google.github.io/gson/apidocs/com/google/gson/JsonElement.html) |
 | All others         | `.txt`      | :x:                                                                                         |
 
+### Command line options
+
+Because Squit is a Gradle plugin, it supports all of Gradle's command line options and configuration options.
+Additionally, these options are evaluated:
+
+| Option      | Description                                                       | Example                                 |
+|-------------|-------------------------------------------------------------------|-----------------------------------------|
+| `tags`      | The tags tests must have to be included in a run.                 | `./gradlew squitTest -Ptags=fast`       |
+| `tagsOr`    | The tags tests must have at least one of to be included in a run. | `./gradlew squitTest -Ptags=fast,suite` |
+| `unignore`  | Handle all tests as if the ignore property would not be set.      | `./gradlew squitTest -Punignore`        |
+| `unexclude` | Handle all tests as if the `exclude` property would not be set.   | `./gradlew squitTest -Punexclude`       |
 
 ### Squit Dsl
 
