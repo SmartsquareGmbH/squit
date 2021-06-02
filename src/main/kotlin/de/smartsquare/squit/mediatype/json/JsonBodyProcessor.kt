@@ -54,14 +54,15 @@ class JsonBodyProcessor : BodyProcessor {
     private fun runPreProcessors(config: Config, request: JsonElement?, response: JsonElement) {
         config.preProcessors.map { Class.forName(it).getConstructor().newInstance() }
             .filterIsInstance(SquitJsonPreProcessor::class.java)
-            .forEach { it.process(request, response) }
+            .forEach { it.process(request, response, config) }
 
         config.preProcessorScripts.forEach {
             GroovyShell(javaClass.classLoader).parse(it.toFile()).apply {
                 binding = Binding(
                     mapOf(
                         "request" to request,
-                        "expectedResponse" to response
+                        "expectedResponse" to response,
+                        "config" to config
                     )
                 )
             }.run()
@@ -71,7 +72,7 @@ class JsonBodyProcessor : BodyProcessor {
     private fun runPostProcessors(config: Config, actualResponse: JsonElement, expectedResponse: JsonElement) {
         config.postProcessors.map { Class.forName(it).getConstructor().newInstance() }
             .filterIsInstance(SquitJsonPostProcessor::class.java)
-            .forEach { it.process(actualResponse, expectedResponse) }
+            .forEach { it.process(actualResponse, expectedResponse, config) }
 
         config.postProcessorScripts.forEach {
             GroovyShell(javaClass.classLoader).parse(it.toFile()).apply {

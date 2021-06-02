@@ -95,7 +95,7 @@ java {
 
 tasks.withType(KotlinCompile).all {
     kotlinOptions {
-        freeCompilerArgs = ["-Xjsr305=strict"]
+        freeCompilerArgs = ["-Xjsr305=strict", "-Xjvm-default=enable"]
         allWarningsAsErrors = true
         jvmTarget = "1.8"
     }

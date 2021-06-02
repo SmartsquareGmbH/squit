@@ -51,7 +51,10 @@ class SquitPostProcessTaskTest {
 
         result.task(":squitPostProcess")?.outcome shouldBe TaskOutcome.SUCCESS
 
-        Files.readAllBytes(call2Response).toString(Charsets.UTF_8) shouldContain "<nice post=\"true\"/>"
+        // language=xml
+        val expectedResponse = """<nice post="true" postConfig="application/xml"/>"""
+
+        Files.readAllBytes(call2Response).toString(Charsets.UTF_8) shouldContain expectedResponse
     }
 
     @Test

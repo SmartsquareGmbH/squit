@@ -54,14 +54,15 @@ class XmlBodyProcessor : BodyProcessor {
     private fun runPreProcessors(config: Config, request: Document?, response: Document) {
         config.preProcessors.map { Class.forName(it).getConstructor().newInstance() }
             .filterIsInstance(SquitXmlPreProcessor::class.java)
-            .forEach { it.process(request, response) }
+            .forEach { it.process(request, response, config) }
 
         config.preProcessorScripts.forEach {
             GroovyShell(javaClass.classLoader).parse(it.toFile()).apply {
                 binding = Binding(
                     mapOf(
                         "request" to request,
-                        "expectedResponse" to response
+                        "expectedResponse" to response,
+                        "config" to config
                     )
                 )
             }.run()
@@ -71,7 +72,7 @@ class XmlBodyProcessor : BodyProcessor {
     private fun runPostProcessors(config: Config, actualResponse: Document, expectedResponse: Document) {
         config.postProcessors.map { Class.forName(it).getConstructor().newInstance() }
             .filterIsInstance(SquitXmlPostProcessor::class.java)
-            .forEach { it.process(actualResponse, expectedResponse) }
+            .forEach { it.process(actualResponse, expectedResponse, config) }
 
         config.postProcessorScripts.forEach {
             GroovyShell(javaClass.classLoader).parse(it.toFile()).apply {

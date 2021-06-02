@@ -7,6 +7,7 @@ import org.dom4j.Node
 
 class XmlPreProcessor : SquitXmlPreProcessor {
 
+    @Suppress("OverridingDeprecatedMember")
     override fun process(request: Document?, expectedResponse: Document) {
         request?.selectNodes("//animal")?.forEach { node: Node ->
             (node as Element).addAttribute("pre", "true")

@@ -67,8 +67,8 @@ response.
 
 A `test.conf` file is required at least once on the path of your test. That means that it is resolved recursively,
 starting at the leaf, e.g. your test folder. The `test.conf` can and must contain various properties, which are
-discussed in the [Configuration section](#configuration). These properties are then merged if not existing while going up the folder
-tree.<br>
+discussed in the [Configuration section](#configuration). These properties are then merged if not existing while going
+up the folder tree.<br>
 This allows for convenient definition of properties for multiple tests, with the ability to override properties in
 special cases.
 
@@ -252,8 +252,8 @@ You add a `.groovy` script somewhere in your project and supply `Squit` with the
 preProcessorScripts = [./some/path/pre_process.groovy]
 ```
 
-As for the pre process step, the script gets passed `request` and `expectedResponse` objects, which types depend on the
-request type. See [supported request types](#supported-request-types).
+As for the pre process step, the script gets passed `request`, `expectedResponse` and `config` objects, which types
+depend on the request type. See [supported request types](#supported-request-types).
 
 A simple script could look like this:
 
@@ -293,6 +293,7 @@ Then you can implement one of the `interfaces`. An example for the `SquitXmlPreP
 example could look like this:
 
 ```java
+import com.typesafe.config.Config;
 import de.smartsquare.squit.SquitPreProcessor;
 import org.dom4j.Document;
 
@@ -301,7 +302,7 @@ import java.time.LocalDate;
 public class MyPreProcessor implements SquitXmlPreProcessor {
 
     @Override
-    public void process(Document request, Document expectedResponse) {
+    public void process(Document request, Document expectedResponse, Config config) {
         request.selectNodes("//Date")
             .forEach(it -> it.setText(LocalDate.now().toString()));
     }
