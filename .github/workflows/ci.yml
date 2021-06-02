@@ -22,20 +22,22 @@ jobs:
       - name: Setup Gradle cache
         uses: actions/cache@v2
         with:
-          path: ~/.gradle
-          key: ${{ runner.os }}-${{ matrix.java }}-gradle-${{ hashFiles('**/versions.gradle') }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-${{ matrix.java }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-${{ matrix.java }}-gradle
 
       - name: Build with Gradle
         if: matrix.os == 'ubuntu-latest'
-        run: ./gradlew build
+        run: ./gradlew build --stacktrace
       - name: Build with Gradle
         if: matrix.os == 'windows-latest'
-        run: .\gradlew.bat build
+        run: .\gradlew.bat build --stacktrace
 
       - name: Store reports
         uses: actions/upload-artifact@v2
         if: always()
         with:
-          name: reports-${{ runner.OS }}-${{ matrix.java }}
+          name: reports-${{ runner.os }}-${{ matrix.java }}
           path: build/reports
