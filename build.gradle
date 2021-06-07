@@ -101,8 +101,10 @@ tasks.withType(KotlinCompile).all {
     }
 }
 
+// Generates a Gradle properties file with the jacoco javaagent as a jvmarg for Gradle runner tests.
+// This allows to generate coverage for code run in the forked JVM.
 task generateTestkitFiles {
-    def jacocoJar = configurations.jacocoAgent.asPath.toString()
+    def jacocoJar = configurations[JacocoPlugin.AGENT_CONFIGURATION_NAME].asPath.toString()
 
     def jacocoAgentJar = new JacocoAgentJar(project.services.get(FileOperations)).tap {
         agentConf = project.files(jacocoJar)
