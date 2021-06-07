@@ -73,6 +73,7 @@ dependencies {
     testImplementation "com.h2database:h2:$h2Version"
     testImplementation "io.mockk:mockk:$mockkVersion"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+    testRuntimeOnly "net.bytebuddy:byte-buddy:$byteBuddyVersion"
 }
 
 sourceSets {

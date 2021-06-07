@@ -38,4 +38,5 @@ ext {
     kluentVersion = '1.65'
     h2Version = '1.4.200'
     mockkVersion = '1.11.0'
+    byteBuddyVersion = '1.11.1'
 }
