@@ -101,7 +101,7 @@ tasks.withType(KotlinCompile).all {
 }
 
 task generateTestkitFiles {
-    def jacocoJar = configurations.jacocoAgent.asPath.toString().replace("\\", "/")
+    def jacocoJar = configurations.jacocoAgent.asPath.toString()
 
     def jacocoAgentJar = new JacocoAgentJar(project.services.get(FileOperations)).tap {
         agentConf = project.files(jacocoJar)
