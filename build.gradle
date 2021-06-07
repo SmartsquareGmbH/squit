@@ -108,7 +108,7 @@ task generateTestkitFiles {
     }
 
     def javaagent = jacocoAgentJar.getJar()
-    def destfile = new File(buildDir, "jacoco/test.exec")
+    def destfile = new File(buildDir, "jacoco/testkit.exec")
 
     def jvmArgs = "org.gradle.jvmargs=-javaagent:$javaagent=destfile=$destfile".replace("\\", "\\\\")
     def outputDir = file("$buildDir/testkit")
@@ -128,6 +128,10 @@ test {
 
     dependsOn generateTestkitFiles
     finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    getExecutionData().setFrom(fileTree(buildDir).include("/jacoco/*.exec"))
 }
 
 tasks.named("processTestResources") {
