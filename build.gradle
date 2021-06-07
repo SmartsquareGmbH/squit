@@ -107,7 +107,10 @@ task generateTestkitFiles {
         agentConf = project.files(jacocoJar)
     }
 
-    def jvmArgs = "org.gradle.jvmargs=-javaagent:${jacocoAgentJar.getJar()}=destfile=$buildDir/jacoco/test.exec"
+    def javaagent = jacocoAgentJar.getJar()
+    def destfile = new File(buildDir, "jacoco/test.exec")
+
+    def jvmArgs = "org.gradle.jvmargs=-javaagent:$javaagent=destfile=$destfile".replace("\\", "\\\\")
     def outputDir = file("$buildDir/testkit")
 
     inputs.files jacocoJar
