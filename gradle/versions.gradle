@@ -1,5 +1,5 @@
 ext {
-    gradleVersion = '7.0.2'
+    gradleVersion = '7.0'
     squitVersion = '3.2.0'
 
     gradlePublishVersion = '0.15.0'
@@ -7,7 +7,7 @@ ext {
     kotlinVersion = '1.4.32'
     dokkaVersion = '1.4.32'
 
-    jacocoVersion = '0.8.6'
+    jacocoVersion = '0.8.7'
     gradleVersionsVersion = '0.39.0'
     gradleTestIdeaFixVersion = '0.1.0'
 
