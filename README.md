@@ -1,4 +1,4 @@
-# Squit ![CI](https://github.com/SmartsquareGmbH/squit/workflows/CI/badge.svg)
+# Squit [![CI](https://github.com/SmartsquareGmbH/squit/workflows/CI/badge.svg)](https://github.com/SmartsquareGmbH/squit/actions) [![Gradle Plugin Portal](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/de/smartsquare/squit/maven-metadata.xml.svg?label=Gradle%20Plugin%20Portal)](https://plugins.gradle.org/plugin/de.smartsquare.squit)
 
 `Squit` is a `Gradle` plugin for file-based, automated testing of `JSON`, `XML`, `SOAP` and other apis.<br>
 It features high customizability and speed.
@@ -25,22 +25,9 @@ It features high customizability and speed.
 Add the [plugin](https://plugins.gradle.org/plugin/de.smartsquare.squit) to your `buildscript`:
 
 ```groovy
-buildscript {
-    repositories {
-        gradlePluginPortal()
-        jcenter()
-    }
-
-    dependencies {
-        classpath "de.smartsquare:squit:4.0.0"
-    }
+plugins {
+    id "de.smartsquare.squit" version "4.0.0"
 }
-```
-
-and apply it:
-
-```groovy
-apply plugin: "de.smartsquare.squit"
 ```
 
 The minimum supported Gradle version is `5.1.1`.
