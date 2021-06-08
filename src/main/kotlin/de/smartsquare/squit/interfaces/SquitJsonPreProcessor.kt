@@ -9,25 +9,7 @@ import com.typesafe.config.Config
 interface SquitJsonPreProcessor {
 
     /**
-     * Processes the given [request] in place. The passed [expectedResponse] is not written, but can be useful for
-     * reference when modifying the [request].
+     * Processes the given [request] and [expectedResponse] in place.
      */
-    @Deprecated(
-        message = "Use variant with config instead",
-        replaceWith = ReplaceWith(
-            "process(request, expectedResponse, Config)",
-            imports = ["com.typesafe.config.Config"]
-        )
-    )
-    @JvmDefault
-    fun process(request: JsonElement?, expectedResponse: JsonElement) = Unit
-
-    /**
-     * Overloaded [process] with [config]. Users should only override one variant.
-     */
-    @Suppress("DEPRECATION")
-    @JvmDefault
-    fun process(request: JsonElement?, expectedResponse: JsonElement, config: Config) {
-        process(request, expectedResponse)
-    }
+    fun process(request: JsonElement?, expectedResponse: JsonElement, config: Config)
 }

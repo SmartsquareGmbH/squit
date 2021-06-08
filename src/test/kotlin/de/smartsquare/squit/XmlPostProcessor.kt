@@ -1,5 +1,6 @@
 package de.smartsquare.squit
 
+import com.typesafe.config.Config
 import de.smartsquare.squit.interfaces.SquitXmlPostProcessor
 import org.dom4j.Document
 import org.dom4j.Element
@@ -7,10 +8,9 @@ import org.dom4j.Node
 
 class XmlPostProcessor : SquitXmlPostProcessor {
 
-    @Suppress("OverridingDeprecatedMember")
-    override fun process(actualResponse: Document, expectedResponse: Document) {
+    override fun process(actualResponse: Document, expectedResponse: Document, config: Config) {
         actualResponse.selectNodes("//test")?.forEach { node: Node ->
-            (node as Element).addAttribute("post", "true")
+            (node as Element).addAttribute("post", config.getString("mediaType"))
         }
     }
 }

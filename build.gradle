@@ -95,7 +95,7 @@ jacoco {
 
 tasks.withType(KotlinCompile).all {
     kotlinOptions {
-        freeCompilerArgs = ["-Xjsr305=strict", "-Xjvm-default=enable"]
+        freeCompilerArgs = ["-Xjsr305=strict"]
         allWarningsAsErrors = true
         jvmTarget = "1.8"
     }
