@@ -30,6 +30,7 @@ class TestIndexerTest {
 
         index.size shouldBeEqualTo 4
         index[0].path.toString() shouldEndWith "call1"
+        index[0].config.getString("testDir") shouldEndWith "test-project/src/squit/project/call1"
         index[0].config.hasPath("headers").shouldBeTrue()
         index[0].config.getStringList("tags").size shouldBeEqualTo 3
         index[0].config.getStringList("tags") shouldContain "unique"

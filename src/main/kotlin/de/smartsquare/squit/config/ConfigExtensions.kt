@@ -17,6 +17,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 private const val TITLE = "title"
+private const val TEST_DIRECTORY = "testDir"
 private const val ENDPOINT = "endpoint"
 private const val MEDIA_TYPE = "mediaType"
 private const val MEDIA_TYPE_FALLBACK = "text/plain"
@@ -44,8 +45,12 @@ private const val EXPECTED_RESPONSE_CODE = "expectedResponseCode"
 /**
  * The alternative title of the test.
  */
-val Config.title: String
-    get() = getSafeString(TITLE)
+val Config.title: String get() = getSafeString(TITLE)
+
+/**
+ * The path to the directory of the test
+ */
+val Config.testDir: Path get() = Paths.get(getSafeString(TEST_DIRECTORY))
 
 /**
  * The endpoint to request against.
@@ -156,6 +161,14 @@ val Config.expectedResponseCode get() = getSafeInt(EXPECTED_RESPONSE_CODE)
  * Merges the given [tag] into the existing List of tags or creates a new one with it.
  */
 fun Config.mergeTag(tag: String): Config = withValue(TAGS, ConfigValueFactory.fromIterable(this.tags.plus(tag)))
+
+/**
+ * Sets the given [testDir].
+ */
+fun Config.setTestDir(testDir: Path): Config = withValue(
+    TEST_DIRECTORY,
+    ConfigValueFactory.fromAnyRef(testDir.toString())
+)
 
 /**
  * Validates all properties of this instance and throws if a problem is detected.
