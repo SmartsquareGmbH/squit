@@ -29,8 +29,7 @@ class TestIndexerTest {
         val index = testIndexer.index(testProject) { true }
 
         index.size shouldBeEqualTo 4
-        val testDir = Paths.get(index[0].config.getString("testDir"))
-        testDir.toString() shouldEndWith "test-project/src/squit/project/call1"
+        index[0].config.getString("testDir") shouldEndWith Paths.get("test-project/src/squit/project/call1").toString()
         index[0].path.toString() shouldEndWith "call1"
         index[0].config.hasPath("headers").shouldBeTrue()
         index[0].config.getStringList("tags").size shouldBeEqualTo 3
