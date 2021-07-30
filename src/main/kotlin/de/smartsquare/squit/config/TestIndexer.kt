@@ -136,7 +136,11 @@ class TestIndexer(private val projectConfig: Config) {
                     acc.withFallback(config).mergeTag(currentPath.fileName.toString())
                 }
             }
-            .let { projectConfig.withFallback(it) }
+            .let {
+                projectConfig
+                    .setTestDir(path)
+                    .withFallback(it)
+            }
     }
 
     private fun resolveConfig(path: Path): Config {
@@ -144,7 +148,8 @@ class TestIndexer(private val projectConfig: Config) {
         val localConfigPath = path.resolve(Constants.LOCAL_CONFIG)
 
         return configCache.getOrPut(path) {
-            ConfigFactory.parseFile(localConfigPath.toFile())
+            ConfigFactory
+                .parseFile(localConfigPath.toFile())
                 .withFallback(ConfigFactory.parseFile(configPath.toFile()))
         }
     }
