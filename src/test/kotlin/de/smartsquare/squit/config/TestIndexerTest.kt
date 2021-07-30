@@ -2,13 +2,13 @@ package de.smartsquare.squit.config
 
 import com.typesafe.config.ConfigFactory
 import de.smartsquare.squit.TestUtils
-import java.nio.file.Paths
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeTrue
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldEndWith
 import org.amshove.kluent.shouldHaveKey
 import org.junit.jupiter.api.Test
+import java.nio.file.Paths
 
 class TestIndexerTest {
 
@@ -29,8 +29,9 @@ class TestIndexerTest {
         val index = testIndexer.index(testProject) { true }
 
         index.size shouldBeEqualTo 4
+        val testDir = Paths.get(index[0].config.getString("testDir"))
+        testDir.toString() shouldEndWith "test-project/src/squit/project/call1"
         index[0].path.toString() shouldEndWith "call1"
-        index[0].config.getString("testDir") shouldEndWith "test-project/src/squit/project/call1"
         index[0].config.hasPath("headers").shouldBeTrue()
         index[0].config.getStringList("tags").size shouldBeEqualTo 3
         index[0].config.getStringList("tags") shouldContain "unique"
