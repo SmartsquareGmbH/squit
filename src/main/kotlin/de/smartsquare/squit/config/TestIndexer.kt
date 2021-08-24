@@ -138,7 +138,7 @@ class TestIndexer(private val projectConfig: Config) {
             }
             .let {
                 projectConfig
-                    .setTestDir(path)
+                    .withTestDir(path)
                     .withFallback(it)
             }
     }

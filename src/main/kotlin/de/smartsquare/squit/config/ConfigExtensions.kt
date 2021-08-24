@@ -165,7 +165,7 @@ fun Config.mergeTag(tag: String): Config = withValue(TAGS, ConfigValueFactory.fr
 /**
  * Sets the given [testDir].
  */
-fun Config.setTestDir(testDir: Path): Config = withValue(
+fun Config.withTestDir(testDir: Path): Config = withValue(
     TEST_DIRECTORY,
     ConfigValueFactory.fromAnyRef(testDir.toString())
 )
