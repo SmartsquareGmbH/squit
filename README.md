@@ -26,11 +26,11 @@ Add the [plugin](https://plugins.gradle.org/plugin/de.smartsquare.squit) to your
 
 ```groovy
 plugins {
-    id "de.smartsquare.squit" version "4.1.0"
+    id "de.smartsquare.squit" version "5.0.0"
 }
 ```
 
-The minimum supported Gradle version is `5.1.1`.
+The minimum supported Gradle version is `6.8`.
 
 ## Project structure
 
@@ -272,7 +272,7 @@ repositories {
 }
 
 dependencies {
-    compile 'de.smartsquare:squit:4.1.0'
+    compile 'de.smartsquare:squit:5.0.0'
 }
 ```
 
