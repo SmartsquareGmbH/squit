@@ -10,6 +10,8 @@ import org.gradle.util.GradleVersion
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.DisabledForJreRange
+import org.junit.jupiter.api.condition.JRE
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -71,6 +73,7 @@ class GradleCompatibilityTest {
     }
 
     @Test
+    @DisabledForJreRange(min = JRE.JAVA_16)
     fun `outdated version`() {
         val result = gradleRunner(project, emptyList(), GradleVersion.version("6.7")).buildAndFail()
 
