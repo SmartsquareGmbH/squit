@@ -103,10 +103,12 @@ object FilesUtils {
      * Copies a resource specified by the passed [name] to the given [target] path.
      */
     fun copyResource(name: String, target: Path, modification: (ByteArray) -> ByteArray = { it }) {
-        val resource = requireNotNull(javaClass.classLoader.getResource(name)).readBytes()
+        val resource = requireNotNull(javaClass.classLoader.getResource(name)) {
+            "Could not find resource $name on classpath"
+        }
 
         Files.createDirectories(target.parent)
-        Files.write(target, modification(resource))
+        Files.write(target, modification(resource.readBytes()))
     }
 
     /**

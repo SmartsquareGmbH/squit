@@ -1,35 +1,35 @@
 package de.smartsquare.squit
 
-import java.util.stream.Stream
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
+import org.amshove.kluent.shouldContain
 import org.gradle.api.JavaVersion
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.GradleVersion
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 
 class GradleCompatibilityTest {
 
-    private companion object {
+    companion object {
 
         @JvmStatic
-        private fun provideVersions(): Stream<Arguments> {
+        fun provideVersions(): Stream<Arguments> {
             val result = mutableListOf(
                 Arguments.of(GradleVersion.current()),
                 Arguments.of(GradleVersion.version("7.0"))
             )
 
-            // These older Gradle Versions do not work Java 14+.
-            if (JavaVersion.current() <= JavaVersion.VERSION_13) {
+            // These older Gradle Versions do not work on Java 16+.
+            if (JavaVersion.current() <= JavaVersion.VERSION_15) {
                 result += listOf(
-                    Arguments.of(GradleVersion.version("6.0.1"), JavaVersion.VERSION_13),
-                    Arguments.of(GradleVersion.version("5.6.4"), JavaVersion.VERSION_13),
-                    Arguments.of(GradleVersion.version("5.1.1"), JavaVersion.VERSION_13),
+                    Arguments.of(GradleVersion.version("6.8"))
                 )
             }
 
@@ -68,5 +68,12 @@ class GradleCompatibilityTest {
         val result = gradleRunner(project, arguments, gradleVersion).build()
 
         result.task(":squitTest")?.outcome shouldBe TaskOutcome.SUCCESS
+    }
+
+    @Test
+    fun `outdated version`() {
+        val result = gradleRunner(project, emptyList(), GradleVersion.version("6.7")).buildAndFail()
+
+        result.output shouldContain "Minimum supported Gradle version is 6.8. Current version is 6.7."
     }
 }

@@ -1,6 +1,5 @@
 package de.smartsquare.squit
 
-import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
@@ -11,7 +10,6 @@ import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
-import org.gradle.util.ConfigureUtil
 
 /**
  * Class containing the available extensions for the squit dsl.
@@ -82,13 +80,6 @@ open class SquitExtension(private val project: Project) {
      */
     fun reportDir(path: String) = reportDir.apply {
         set(project.projectDir.resolve(path))
-    }
-
-    /**
-     * Configures the xml dsl.
-     */
-    fun xml(closure: Closure<*>) {
-        ConfigureUtil.configure(closure, xml)
     }
 
     /**

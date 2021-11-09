@@ -29,7 +29,7 @@ class XmlReportWriter {
                 addAttribute("failures", "${tests.count { !it.isIgnored && !it.isSuccess && !it.isError }}")
                 addAttribute("skipped", "${tests.count { it.isIgnored }}")
                 addAttribute("errors", "${tests.count { !it.isIgnored && it.isError }}")
-                addAttribute("time", "${tests.sumBy { it.metaInfo.duration.toInt() } / 1000f}")
+                addAttribute("time", "${tests.sumOf { it.metaInfo.duration.toInt() } / 1000f}")
             }
 
             tests.forEach {

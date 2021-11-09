@@ -268,7 +268,7 @@ library to your dependencies:
 ```groovy
 repositories {
     gradlePluginPortal()
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {

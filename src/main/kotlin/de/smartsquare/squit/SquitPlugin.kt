@@ -6,10 +6,10 @@ import de.smartsquare.squit.task.SquitPreProcessTask
 import de.smartsquare.squit.task.SquitRequestTask
 import de.smartsquare.squit.task.SquitTestTask
 import de.smartsquare.squit.util.asPath
-import groovy.lang.MissingMethodException
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.util.GradleVersion
 
 /**
  * The main plugin class.
@@ -18,41 +18,43 @@ import org.gradle.api.Project
 class SquitPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
-        try {
-            val extension = project.extensions.create("squit", SquitExtension::class.java, project)
+        if (GradleVersion.current() < GradleVersion.version("6.8")) {
+            throw GradleException(
+                "Minimum supported Gradle version is 6.8. Current version is ${GradleVersion.current().version}."
+            )
+        }
 
-            project.tasks.register("squitPreProcess", SquitPreProcessTask::class.java) {
-                it.sourceDir = extension.sourceDir.asPath
-            }
+        val extension = project.extensions.create("squit", SquitExtension::class.java, project)
 
-            project.tasks.register("squitRunRequests", SquitRequestTask::class.java) {
-                it.jdbcDrivers = extension.jdbcDrivers
-                it.timeout = extension.timeout
-                it.silent = extension.silent
+        project.tasks.register("squitPreProcess", SquitPreProcessTask::class.java) {
+            it.sourceDir = extension.sourceDir.asPath
+        }
 
-                it.dependsOn("squitPreProcess")
-                it.outputs.upToDateWhen { false }
-            }
+        project.tasks.register("squitRunRequests", SquitRequestTask::class.java) {
+            it.jdbcDrivers = extension.jdbcDrivers
+            it.timeout = extension.timeout
+            it.silent = extension.silent
 
-            project.tasks.register("squitPostProcess", SquitPostProcessTask::class.java) {
-                it.dependsOn("squitRunRequests")
-            }
+            it.dependsOn("squitPreProcess")
+            it.outputs.upToDateWhen { false }
+        }
 
-            project.tasks.register("squitTest", SquitTestTask::class.java) {
-                it.reportDir = extension.reportDir.asPath
-                it.silent = extension.silent
-                it.ignoreFailures = extension.ignoreFailures
-                it.mediaTypeConfig = MediaTypeConfig(
-                    extension.xml.strict,
-                    extension.xml.canonicalize,
-                    extension.xml.resolveInvalidNamespaces,
-                    extension.json.canonicalize
-                )
+        project.tasks.register("squitPostProcess", SquitPostProcessTask::class.java) {
+            it.dependsOn("squitRunRequests")
+        }
 
-                it.dependsOn("squitPostProcess")
-            }
-        } catch (error: MissingMethodException) {
-            throw GradleException("Your Gradle version is too old.", error)
+        project.tasks.register("squitTest", SquitTestTask::class.java) {
+            it.reportDir = extension.reportDir.asPath
+            it.silent = extension.silent
+            it.ignoreFailures = extension.ignoreFailures
+            it.mediaTypeConfig = MediaTypeConfig(
+                extension.xml.strict,
+                extension.xml.canonicalize,
+                extension.xml.resolveInvalidNamespaces,
+                extension.json.canonicalize
+            )
+
+            it.dependsOn("squitPostProcess")
         }
     }
 }
