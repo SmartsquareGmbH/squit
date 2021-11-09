@@ -10,7 +10,7 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
-        java: [ 8, 15, 16 ]
+        java: [ 8, 11, 16, 17 ]
 
     steps:
       - uses: actions/checkout@v2
