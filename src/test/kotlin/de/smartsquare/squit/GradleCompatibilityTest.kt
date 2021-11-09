@@ -24,9 +24,15 @@ class GradleCompatibilityTest {
         @JvmStatic
         fun provideVersions(): Stream<Arguments> {
             val result = mutableListOf(
-                Arguments.of(GradleVersion.current()),
-                Arguments.of(GradleVersion.version("7.0"))
+                Arguments.of(GradleVersion.current())
             )
+
+            // These older Gradle Versions do not work on Java 17+.
+            if (JavaVersion.current() <= JavaVersion.VERSION_16) {
+                result += listOf(
+                    Arguments.of(GradleVersion.version("7.0"))
+                )
+            }
 
             // These older Gradle Versions do not work on Java 16+.
             if (JavaVersion.current() <= JavaVersion.VERSION_15) {
