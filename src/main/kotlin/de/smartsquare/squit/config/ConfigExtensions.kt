@@ -48,6 +48,11 @@ private const val EXPECTED_RESPONSE_CODE = "expectedResponseCode"
 val Config.title: String get() = getSafeString(TITLE)
 
 /**
+ * The path to the directory of the test
+ */
+val Config.testDir: Path get() = Paths.get(getSafeString(TEST_DIRECTORY))
+
+/**
  * The endpoint to request against.
  */
 val Config.endpoint: HttpUrl
