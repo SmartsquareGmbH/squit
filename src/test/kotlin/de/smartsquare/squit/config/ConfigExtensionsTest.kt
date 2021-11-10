@@ -12,6 +12,7 @@ import org.amshove.kluent.shouldThrow
 import org.amshove.kluent.withMessage
 import org.gradle.api.GradleException
 import org.junit.jupiter.api.Test
+import java.nio.file.Paths
 
 class ConfigExtensionsTest {
 
@@ -80,6 +81,34 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(mapOf("endpoint" to "https://example.com"))
 
         config.method shouldBeEqualTo "POST"
+    }
+
+    @Test
+    fun `config object with a valid testDir`() {
+        val config = ConfigFactory.parseMap(
+            mapOf(
+                "endpoint" to "https://example.com",
+                "testDir" to Paths.get(".").toString()
+            )
+        )
+
+        val call = { config.validate() }
+
+        call shouldNotThrow AnyException
+    }
+
+    @Test
+    fun `config object with an invalid testDir`() {
+        val config = ConfigFactory.parseMap(
+            mapOf(
+                "endpoint" to "https://example.com",
+                "testDir" to Paths.get("does_not_exist").toString()
+            )
+        )
+
+        val call = { config.validate() }
+
+        call shouldThrow GradleException::class withMessage "Missing expected file: does_not_exist"
     }
 
     @Test

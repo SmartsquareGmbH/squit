@@ -50,7 +50,7 @@ val Config.title: String get() = getSafeString(TITLE)
 /**
  * The path to the directory of the test
  */
-val Config.testDir: Path get() = Paths.get(getSafeString(TEST_DIRECTORY))
+val Config.testDir: Path get() = FilesUtils.validateExistence(Paths.get(getSafeString(TEST_DIRECTORY)))
 
 /**
  * The endpoint to request against.
@@ -175,7 +175,7 @@ fun Config.withTestDir(testDir: Path): Config = withValue(
  */
 fun Config.validate() = this.apply {
     // Call getters of properties to check existence and correct declaration.
-    endpoint; mediaType; shouldExclude; shouldIgnore; headers
+    endpoint; mediaType; shouldExclude; shouldIgnore; headers; testDir
 
     preProcessors.forEach { checkClass(it) }
     preProcessorScripts.forEach { FilesUtils.validateExistence(it) }
