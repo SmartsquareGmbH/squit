@@ -31,9 +31,6 @@ plugins {
 group = "de.smartsquare"
 version = squitVersion
 
-sourceCompatibility = project.ext.javaVersion
-targetCompatibility = project.ext.javaVersion
-
 repositories {
     mavenCentral()
 }
