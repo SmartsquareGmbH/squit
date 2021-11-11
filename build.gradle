@@ -31,7 +31,8 @@ plugins {
 group = "de.smartsquare"
 version = squitVersion
 
-sourceCompatibility = 1.8
+sourceCompatibility = project.ext.javaVersion
+targetCompatibility = project.ext.javaVersion
 
 repositories {
     mavenCentral()
@@ -93,11 +94,17 @@ jacoco {
     toolVersion = jacocoVersion
 }
 
+kotlin {
+    jvmToolchain {
+        languageVersion = JavaLanguageVersion.of(project.ext.javaVersion.majorVersion)
+    }
+}
+
 tasks.withType(KotlinCompile).all {
     kotlinOptions {
         freeCompilerArgs = ["-Xjsr305=strict"]
         allWarningsAsErrors = true
-        jvmTarget = "1.8"
+        jvmTarget = project.ext.javaVersion
     }
 }
 
