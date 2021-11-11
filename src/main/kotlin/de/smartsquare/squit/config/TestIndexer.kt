@@ -179,19 +179,17 @@ class TestIndexer(private val projectConfig: Config) {
         leafs: List<Path>,
         leafPath: Path
     ): Map<String, SqlScripts> {
-        return config.databaseConfigurations
-            .map { databaseConfig ->
-                val pre = FilesUtils.ifExists(path.resolve("${databaseConfig.name}_pre.sql"))
-                val preOnce = FilesUtils.ifExists(path.resolve("${databaseConfig.name}_pre_once.sql"))
-                    ?.takeIf { leafs.firstOrNull() == leafPath }
+        return config.databaseConfigurations.associate { databaseConfig ->
+            val pre = FilesUtils.ifExists(path.resolve("${databaseConfig.name}_pre.sql"))
+            val preOnce = FilesUtils.ifExists(path.resolve("${databaseConfig.name}_pre_once.sql"))
+                ?.takeIf { leafs.firstOrNull() == leafPath }
 
-                val post = FilesUtils.ifExists(path.resolve("${databaseConfig.name}_post.sql"))
-                val postOnce = FilesUtils.ifExists(path.resolve("${databaseConfig.name}_post_once.sql"))
-                    ?.takeIf { leafs.lastOrNull() == leafPath }
+            val post = FilesUtils.ifExists(path.resolve("${databaseConfig.name}_post.sql"))
+            val postOnce = FilesUtils.ifExists(path.resolve("${databaseConfig.name}_post_once.sql"))
+                ?.takeIf { leafs.lastOrNull() == leafPath }
 
-                databaseConfig.name to SqlScripts(pre, preOnce, post, postOnce)
-            }
-            .toMap()
+            databaseConfig.name to SqlScripts(pre, preOnce, post, postOnce)
+        }
     }
 
     private fun resolveDescription(path: Path): Path? {

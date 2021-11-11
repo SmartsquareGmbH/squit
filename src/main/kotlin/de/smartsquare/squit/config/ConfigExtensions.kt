@@ -149,8 +149,7 @@ val Config.headers
     get() = getSafeConfig(HEADERS)
         .entrySet()
         .map { it.toPair() }
-        .map { (key, value) -> key to value.unwrapped().toString() }
-        .toMap()
+        .associate { (key, value) -> key to value.unwrapped().toString() }
 
 /**
  * The http status response code that is expected in the response.

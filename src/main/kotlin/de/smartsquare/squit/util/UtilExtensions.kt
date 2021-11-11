@@ -27,7 +27,7 @@ fun Path.cut(other: Path): Path {
 
     return this.toMutableList()
         .dropWhile {
-            val isSame = it.fileName == mutableOther.firstOrNull()?.fileName ?: ""
+            val isSame = it.fileName == (mutableOther.firstOrNull()?.fileName ?: "")
 
             if (mutableOther.isNotEmpty()) {
                 mutableOther = mutableOther.drop(1)
@@ -75,7 +75,7 @@ fun String.cleanSqlString() = this
 /**
  * Returns this as a [Path].
  */
-val DirectoryProperty.asPath get() = asFile.get().toPath()
+val DirectoryProperty.asPath: Path get() = asFile.get().toPath()
 
 /**
  * Iterate the list of [SquitResult]s and returns a [Triple] of successful, failed and ignored tests.

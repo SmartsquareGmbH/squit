@@ -110,7 +110,7 @@ open class SquitTestTask : DefaultTask() {
                 stream.filter { Files.isRegularFile(it) && it.fileName.toString() == META }.toList()
             }
         } else {
-            emptyList<Path>()
+            emptyList()
         }
     }
 
