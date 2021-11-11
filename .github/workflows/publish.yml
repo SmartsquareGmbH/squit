@@ -1,0 +1,29 @@
+name: Publish
+
+on:
+  release:
+    types: [ created ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: 8
+
+      - name: Setup Gradle cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-8-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-8-gradle
+
+      - name: Publish with Gradle
+        run: ./gradlew publishPlugins -Pgradle.publish.key=${{ secrets.PUBLISH_KEY }} -Pgradle.publish.secret=${{ secrets.PUBLISH_SECRET }}
