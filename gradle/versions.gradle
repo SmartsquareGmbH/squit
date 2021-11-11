@@ -1,6 +1,6 @@
 ext {
     javaVersion = JavaVersion.VERSION_1_8
-    gradleVersion = '7.2'
+    gradleVersion = '7.3'
     squitVersion = '5.0.2'
 
     gradlePublishVersion = '0.17.0'
@@ -39,5 +39,5 @@ ext {
     kluentVersion = '1.68'
     h2Version = '1.4.200'
     mockkVersion = '1.12.0'
-    byteBuddyVersion = '1.12.0'
+    byteBuddyVersion = '1.12.1'
 }
