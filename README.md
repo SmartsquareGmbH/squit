@@ -26,7 +26,7 @@ Add the [plugin](https://plugins.gradle.org/plugin/de.smartsquare.squit) to your
 
 ```groovy
 plugins {
-    id "de.smartsquare.squit" version "5.0.1"
+    id "de.smartsquare.squit" version "5.0.2"
 }
 ```
 
@@ -272,7 +272,7 @@ repositories {
 }
 
 dependencies {
-    compile 'de.smartsquare:squit:5.0.1'
+    compile 'de.smartsquare:squit:5.0.2'
 }
 ```
 
