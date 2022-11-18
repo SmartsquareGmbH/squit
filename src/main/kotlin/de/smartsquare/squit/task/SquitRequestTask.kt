@@ -193,6 +193,7 @@ open class SquitRequestTask : DefaultTask() {
                     true -> it
                     else -> null
                 }
+
                 else -> null
             }
         }
@@ -259,14 +260,24 @@ open class SquitRequestTask : DefaultTask() {
                 .run()
         }
 
-        config.databaseConfigurations.forEach { (name, jdbcAddress, username, password) ->
-            executeScriptIfExisting(testDirectoryPath.resolve("${name}_pre.sql"), jdbcAddress, username, password)
+        config.databaseConfigurations.forEach {
+            executeScriptIfExisting(
+                testDirectoryPath.resolve("${it.name}_pre.sql"),
+                it.jdbcAddress,
+                it.username,
+                it.password
+            )
         }
     }
 
     private fun doPostScriptExecutions(config: Config, testDirectoryPath: Path) {
-        config.databaseConfigurations.forEach { (name, jdbcAddress, username, password) ->
-            executeScriptIfExisting(testDirectoryPath.resolve("${name}_post.sql"), jdbcAddress, username, password)
+        config.databaseConfigurations.forEach {
+            executeScriptIfExisting(
+                testDirectoryPath.resolve("${it.name}_post.sql"),
+                it.jdbcAddress,
+                it.username,
+                it.password
+            )
         }
 
         config

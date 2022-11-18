@@ -45,6 +45,7 @@ dependencies {
     api "com.typesafe:config:$typesafeConfigVersion"
 
     implementation "jaxen:jaxen:$jaxenVersion"
+    implementation "pull-parser:pull-parser:$pullParserVersion"
     implementation "org.apache.santuario:xmlsec:$xmlSecVersion"
     implementation "org.xmlunit:xmlunit-core:$xmlUnitVersion"
     implementation "net.javacrumbs.json-unit:json-unit:$jsonUnitVersion"
@@ -80,11 +81,6 @@ sourceSets {
             srcDir "$buildDir/testkit"
         }
     }
-}
-
-java {
-    withJavadocJar()
-    withSourcesJar()
 }
 
 jacoco {
@@ -157,11 +153,6 @@ detekt {
     config = files("${rootProject.projectDir}/detekt.yml")
     input = files("$projectDir/src/main/kotlin")
     buildUponDefaultConfig = true
-
-    reports {
-        xml.destination = file("$buildDir/reports/detekt/detekt.xml")
-        html.destination = file("$buildDir/reports/detekt/detekt.html")
-    }
 }
 
 dokkaHtml {
@@ -209,25 +200,13 @@ tasks.withType(Javadoc).all {
     it.dependsOn dokkaHtml
 }
 
-pluginBundle {
-    website = "https://github.com/SmartsquareGmbH/squit"
-    vcsUrl = "https://github.com/SmartsquareGmbH/squit"
-    description = "Gradle plugin for simple testing of JSON/XML/SOAP/etc APIs."
-    tags = ["testing", "json", "xml", "soap", "automation"]
-
-    plugins {
-        squit {
-            id = "de.smartsquare.squit"
-            displayName = "Squit"
-        }
-    }
-}
-
 gradlePlugin {
     plugins {
         squit {
+            displayName = "Squit"
             id = "de.smartsquare.squit"
             implementationClass = "de.smartsquare.squit.SquitPlugin"
+            description = "Gradle plugin for simple testing of JSON/XML/SOAP/etc APIs."
         }
     }
 }

@@ -185,11 +185,11 @@ fun Config.validate() = this.apply {
     postRunnerScripts.forEach { FilesUtils.validateExistence(it) }
     postRunners.forEach { checkClass(it) }
     tags.forEach { require(it.isNotEmpty()) { "tags cannot be empty." } }
-    databaseConfigurations.forEach { (name, jdbcAddress, username, password) ->
-        require(name.isNotEmpty()) { "name of a databaseConfiguration cannot be empty." }
-        require(jdbcAddress.isNotEmpty()) { "jdbc of a databaseConfiguration cannot be empty." }
-        require(username.isNotEmpty()) { "username of a databaseConfiguration cannot be empty." }
-        require(password.isNotEmpty()) { "password of a databaseConfiguration cannot be empty." }
+    databaseConfigurations.forEach {
+        require(it.name.isNotEmpty()) { "name of a databaseConfiguration cannot be empty." }
+        require(it.jdbcAddress.isNotEmpty()) { "jdbc of a databaseConfiguration cannot be empty." }
+        require(it.username.isNotEmpty()) { "username of a databaseConfiguration cannot be empty." }
+        require(it.password.isNotEmpty()) { "password of a databaseConfiguration cannot be empty." }
     }
     require(expectedResponseCode == 0 || expectedResponseCode in 100..599) {
         "expectedResponseCode not in HTTP status code range."
