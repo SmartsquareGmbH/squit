@@ -17,7 +17,9 @@ class SquitPreProcessTaskGetTest {
     @Test
     fun `normal run`() {
         val arguments = listOf(
-            "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com", "-Psquit.rootDir=$getProject"
+            "squitPreProcess",
+            "-Psquit.endpointPlaceholder=https://example.com",
+            "-Psquit.rootDir=$getProject",
         )
 
         val result = gradleRunner(getProject, arguments).build()

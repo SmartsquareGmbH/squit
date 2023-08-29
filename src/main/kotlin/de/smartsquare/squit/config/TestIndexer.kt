@@ -43,13 +43,13 @@ class TestIndexer(private val projectConfig: Config) {
     private fun indexConfigs(
         leafDirectories: Sequence<Path>,
         sourceDir: Path,
-        filter: (Pair<Path, Config>) -> Boolean
+        filter: (Pair<Path, Config>) -> Boolean,
     ): List<Pair<Path, Config>> {
         return leafDirectories
             .onEach { path ->
                 if (path.cut(sourceDir).toList().size < 2) {
                     throw GradleException(
-                        "Invalid project structure. Please add a project directory to the src/squit directory."
+                        "Invalid project structure. Please add a project directory to the src/squit directory.",
                     )
                 }
             }
@@ -72,7 +72,7 @@ class TestIndexer(private val projectConfig: Config) {
                             |Invalid test.conf or local.conf file on path of test:
                             | ${leafDirectory.cut(sourceDir)} ($innerMessage)
                         """.trimMargin().replace("\n", ""),
-                        error
+                        error,
                     )
                 }
             }
@@ -81,7 +81,7 @@ class TestIndexer(private val projectConfig: Config) {
 
     private fun indexTests(
         leafDirectoriesWithConfig: List<Pair<Path, Config>>,
-        sourceDir: Path
+        sourceDir: Path,
     ): List<SquitTest> {
         return leafDirectoriesWithConfig
             .filterNot { (path, _) -> FilesUtils.isDirectoryEmpty(path) }
@@ -169,7 +169,7 @@ class TestIndexer(private val projectConfig: Config) {
 
     private fun resolveResponse(path: Path, config: Config): Path {
         return FilesUtils.validateExistence(
-            path.resolve(MediaTypeFactory.sourceResponse(config.mediaType))
+            path.resolve(MediaTypeFactory.sourceResponse(config.mediaType)),
         )
     }
 
@@ -177,7 +177,7 @@ class TestIndexer(private val projectConfig: Config) {
         path: Path,
         config: Config,
         leafs: List<Path>,
-        leafPath: Path
+        leafPath: Path,
     ): Map<String, SqlScripts> {
         return config.databaseConfigurations.associate { databaseConfig ->
             val pre = FilesUtils.ifExists(path.resolve("${databaseConfig.name}_pre.sql"))

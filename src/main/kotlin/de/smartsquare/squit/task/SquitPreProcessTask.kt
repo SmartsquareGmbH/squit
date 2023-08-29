@@ -47,7 +47,8 @@ open class SquitPreProcessTask @Inject constructor(private val workerExecutor: W
      * The directory to save the results in.
      */
     @get:OutputDirectory
-    val processedSourcesPath: Path = Paths.get(project.buildDir.path, SQUIT_DIRECTORY, SOURCES_DIRECTORY)
+    val processedSourcesPath: Path =
+        Paths.get(project.layout.buildDirectory.get().asFile.path, SQUIT_DIRECTORY, SOURCES_DIRECTORY)
 
     /**
      * The tags to filter by (and).
@@ -76,7 +77,7 @@ open class SquitPreProcessTask @Inject constructor(private val workerExecutor: W
             .fromMap(
                 project.properties
                     .filterKeys { it is String && it.startsWith("squit.") }
-                    .mapKeys { (key, _) -> key.replaceFirst("squit.", "") }
+                    .mapKeys { (key, _) -> key.replaceFirst("squit.", "") },
             )
             .toConfig()
     }
@@ -133,11 +134,13 @@ open class SquitPreProcessTask @Inject constructor(private val workerExecutor: W
 
             false
         }
+
         !isTestCoveredByTags(input.second) -> {
             logger.info("Ignoring test ${input.first.cut(sourceDir)}")
 
             false
         }
+
         else -> true
     }
 

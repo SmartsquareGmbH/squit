@@ -98,9 +98,9 @@ open class SquitRequestTask : DefaultTask() {
      */
     @get:InputDirectory
     val processedSourcesPath: Path = Paths.get(
-        project.buildDir.path,
+        project.layout.buildDirectory.get().asFile.path,
         SQUIT_DIRECTORY,
-        SOURCES_DIRECTORY
+        SOURCES_DIRECTORY,
     )
 
     /**
@@ -108,10 +108,10 @@ open class SquitRequestTask : DefaultTask() {
      */
     @get:OutputDirectory
     val actualResponsesPath: Path = Paths.get(
-        project.buildDir.path,
+        project.layout.buildDirectory.get().asFile.path,
         SQUIT_DIRECTORY,
         RESPONSES_DIRECTORY,
-        RAW_DIRECTORY
+        RAW_DIRECTORY,
     )
 
     private val okHttpClient by lazy {
@@ -150,12 +150,12 @@ open class SquitRequestTask : DefaultTask() {
                 if (!silent) {
                     logger.lifecycleOnSameLine(
                         "Running test ${index + 1}",
-                        project.gradle.startParameter.consoleOutput
+                        project.gradle.startParameter.consoleOutput,
                     )
                 }
 
                 val resultResponsePath = Files.createDirectories(
-                    actualResponsesPath.resolve(testDirectoryPath.cut(processedSourcesPath))
+                    actualResponsesPath.resolve(testDirectoryPath.cut(processedSourcesPath)),
                 )
 
                 val errorFile = testDirectoryPath.resolve(ERROR)
@@ -202,7 +202,7 @@ open class SquitRequestTask : DefaultTask() {
         testDirectoryPath: Path,
         resultResponsePath: Path,
         requestPath: Path?,
-        config: Config
+        config: Config,
     ) {
         val resultResponseFilePath = resultResponsePath.resolve(MediaTypeFactory.actualResponse(config.mediaType))
 
@@ -225,7 +225,7 @@ open class SquitRequestTask : DefaultTask() {
 
                 logger.info(
                     "Unsuccessful request for test ${testDirectoryPath.cut(processedSourcesPath)} " +
-                        "(status code: ${apiResponse.code})"
+                        "(status code: ${apiResponse.code})",
                 )
             } else if (
                 mediaType?.type != config.mediaType.type ||
@@ -235,7 +235,7 @@ open class SquitRequestTask : DefaultTask() {
 
                 logger.info(
                     "Unexpected Media type $mediaType for test ${testDirectoryPath.cut(processedSourcesPath)}. " +
-                        "Expected ${config.mediaType}"
+                        "Expected ${config.mediaType}",
                 )
             }
         } catch (error: IOException) {
@@ -265,7 +265,7 @@ open class SquitRequestTask : DefaultTask() {
                 testDirectoryPath.resolve("${it.name}_pre.sql"),
                 it.jdbcAddress,
                 it.username,
-                it.password
+                it.password,
             )
         }
     }
@@ -276,7 +276,7 @@ open class SquitRequestTask : DefaultTask() {
                 testDirectoryPath.resolve("${it.name}_post.sql"),
                 it.jdbcAddress,
                 it.username,
-                it.password
+                it.password,
             )
         }
 
@@ -303,7 +303,7 @@ open class SquitRequestTask : DefaultTask() {
                 .headers(config.headers.toHeaders())
                 .method(config.method, requestBody)
                 .url(config.endpoint)
-                .build()
+                .build(),
         )
     }
 
@@ -311,7 +311,7 @@ open class SquitRequestTask : DefaultTask() {
         path: Path,
         jdbc: String,
         username: String,
-        password: String
+        password: String,
     ) = if (Files.exists(path)) {
         try {
             dbConnections.createOrGet(jdbc, username, password).executeScript(path)
@@ -321,7 +321,7 @@ open class SquitRequestTask : DefaultTask() {
             logger.newLineIfNeeded()
             logger.warn(
                 "Could not run database script ${path.fileName} for test " +
-                    "${path.parent.cut(processedSourcesPath)} (${error.toString().trim()})"
+                    "${path.parent.cut(processedSourcesPath)} (${error.toString().trim()})",
             )
 
             false

@@ -24,20 +24,20 @@ class GradleCompatibilityTest {
         @JvmStatic
         fun provideVersions(): Stream<Arguments> {
             val result = mutableListOf(
-                Arguments.of(GradleVersion.current())
+                Arguments.of(GradleVersion.current()),
             )
 
             // These older Gradle Versions do not work on Java 17+.
             if (JavaVersion.current() <= JavaVersion.VERSION_16) {
                 result += listOf(
-                    Arguments.of(GradleVersion.version("7.0"))
+                    Arguments.of(GradleVersion.version("7.0")),
                 )
             }
 
             // These older Gradle Versions do not work on Java 16+.
             if (JavaVersion.current() <= JavaVersion.VERSION_15) {
                 result += listOf(
-                    Arguments.of(GradleVersion.version("6.8"))
+                    Arguments.of(GradleVersion.version("6.8")),
                 )
             }
 
@@ -69,8 +69,10 @@ class GradleCompatibilityTest {
         server.enqueue(MockResponse().setBody("<relevant/>"))
 
         val arguments = listOf(
-            "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "--stacktrace"
+            "squitTest",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "--stacktrace",
         )
 
         val result = gradleRunner(project, arguments, gradleVersion).build()

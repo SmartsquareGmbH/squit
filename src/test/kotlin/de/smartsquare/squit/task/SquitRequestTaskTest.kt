@@ -59,8 +59,10 @@ class SquitRequestTaskTest {
         server.enqueue(MockResponse().setBody("<nice/>"))
 
         val arguments = listOf(
-            "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-PtagsOr=call1,call2"
+            "squitRunRequests",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-PtagsOr=call1,call2",
         )
 
         val result = gradleRunner(project, arguments).build()
@@ -73,7 +75,7 @@ class SquitRequestTaskTest {
 
         val (date, duration) = SquitMetaInfo.fromJson(
             Files.readAllBytes(call1Meta)
-                .toString(Charset.defaultCharset())
+                .toString(Charset.defaultCharset()),
         )
 
         date shouldBeBefore LocalDateTime.now()
@@ -113,8 +115,11 @@ class SquitRequestTaskTest {
         server.enqueue(MockResponse().setBody("error").setResponseCode(500))
 
         val arguments = listOf(
-            "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-PtagsOr=call1", "--info"
+            "squitRunRequests",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-PtagsOr=call1",
+            "--info",
         )
 
         val result = gradleRunner(project, arguments).build()
@@ -130,8 +135,10 @@ class SquitRequestTaskTest {
         // Nothing enqueued to cause timeout.
 
         val arguments = listOf(
-            "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-Ptags=call1"
+            "squitRunRequests",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-Ptags=call1",
         )
 
         val result = gradleRunner(project, arguments).build()
@@ -147,8 +154,11 @@ class SquitRequestTaskTest {
         server.enqueue(MockResponse().setBody("<cool/>").setHeader("Content-Type", "text/plain"))
 
         val arguments = listOf(
-            "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-Ptags=call1", "--info"
+            "squitRunRequests",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-Ptags=call1",
+            "--info",
         )
 
         val result = gradleRunner(project, arguments).build()

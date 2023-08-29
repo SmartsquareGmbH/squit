@@ -21,10 +21,10 @@ object SquitPostProcessRunner {
         processedSourcesPath: Path,
         actualResponsesPath: Path,
         processedActualResponsesPath: Path,
-        testPath: Path
+        testPath: Path,
     ) {
         val resultActualResponsePath = Files.createDirectories(
-            processedActualResponsesPath.resolve(testPath.cut(actualResponsesPath))
+            processedActualResponsesPath.resolve(testPath.cut(actualResponsesPath)),
         )
 
         val errorFile = testPath.resolve(Constants.ERROR)
@@ -39,13 +39,13 @@ object SquitPostProcessRunner {
             val config = ConfigFactory.parseFile(configPath.toFile())
 
             val actualResponsePath = FilesUtils.validateExistence(
-                testPath.resolve(MediaTypeFactory.actualResponse(config.mediaType))
+                testPath.resolve(MediaTypeFactory.actualResponse(config.mediaType)),
             )
 
             val expectedResponsePath = FilesUtils.validateExistence(
                 processedSourcesPath
                     .resolve(testPath.cut(actualResponsesPath))
-                    .resolve(MediaTypeFactory.expectedResponse(config.mediaType))
+                    .resolve(MediaTypeFactory.expectedResponse(config.mediaType)),
             )
 
             val resultActualResponseFilePath = resultActualResponsePath

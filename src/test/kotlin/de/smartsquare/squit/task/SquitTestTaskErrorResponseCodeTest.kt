@@ -33,8 +33,9 @@ class SquitTestTaskErrorResponseCodeTest {
         server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}").setResponseCode(400))
 
         val arguments = listOf(
-            "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$projectWithResponseCode"
+            "squitTest",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$projectWithResponseCode",
         )
 
         val result = gradleRunner(projectWithResponseCode, arguments).build()
@@ -47,8 +48,9 @@ class SquitTestTaskErrorResponseCodeTest {
         server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}").setResponseCode(200))
 
         val arguments = listOf(
-            "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$projectWithResponseCode"
+            "squitTest",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$projectWithResponseCode",
         )
 
         val result = gradleRunner(projectWithResponseCode, arguments).buildAndFail()

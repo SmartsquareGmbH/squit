@@ -54,8 +54,9 @@ class SquitTestTaskTest {
         server.enqueue(MockResponse().setBody("<relevant/>"))
 
         val arguments = listOf(
-            "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project"
+            "squitTest",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
         )
 
         val result = gradleRunner(project, arguments).build()
@@ -83,8 +84,10 @@ class SquitTestTaskTest {
         server.enqueue(MockResponse().setBody("<nice/>"))
 
         val arguments = listOf(
-            "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-PtagsOr=call1,call2"
+            "squitTest",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-PtagsOr=call1,call2",
         )
 
         val result = gradleRunner(project, arguments).buildAndFail()
@@ -109,8 +112,10 @@ class SquitTestTaskTest {
         server.enqueue(MockResponse().setBody("<relevant/>"))
 
         val arguments = listOf(
-            "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-Punignore"
+            "squitTest",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-Punignore",
         )
 
         val result = gradleRunner(project, arguments).buildAndFail()
@@ -129,8 +134,10 @@ class SquitTestTaskTest {
         server.enqueue(MockResponse().setBody("<relevant/>"))
 
         val arguments = listOf(
-            "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-Punexclude"
+            "squitTest",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-Punexclude",
         )
 
         val result = gradleRunner(project, arguments).buildAndFail()

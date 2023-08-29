@@ -52,7 +52,7 @@ fun GradleRunner.withJacoco(): GradleRunner {
         Files.copy(
             File(properties.toURI()).toPath(),
             projectDir.toPath().resolve("gradle.properties"),
-            StandardCopyOption.REPLACE_EXISTING
+            StandardCopyOption.REPLACE_EXISTING,
         )
     }
 

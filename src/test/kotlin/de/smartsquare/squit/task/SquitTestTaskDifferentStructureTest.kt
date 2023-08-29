@@ -37,8 +37,9 @@ class SquitTestTaskDifferentStructureTest {
         server.enqueue(MockResponse().setBody("<cool/>"))
 
         val arguments = listOf(
-            "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$differentStructureProject"
+            "squitTest",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$differentStructureProject",
         )
 
         val result = gradleRunner(differentStructureProject, arguments).build()

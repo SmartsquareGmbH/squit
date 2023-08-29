@@ -12,7 +12,7 @@ class JsonDiffer : Differ {
         return try {
             JsonAssert.assertJsonEquals(
                 expectedResponse.toString(Charsets.UTF_8),
-                actualResponse.toString(Charsets.UTF_8)
+                actualResponse.toString(Charsets.UTF_8),
             )
 
             ""

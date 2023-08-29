@@ -17,8 +17,9 @@ class SquitPreProcessTaskJsonTest {
     @Test
     fun `normal run`() {
         val arguments = listOf(
-            "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-            "-Psquit.rootDir=$jsonProject"
+            "squitPreProcess",
+            "-Psquit.endpointPlaceholder=https://example.com",
+            "-Psquit.rootDir=$jsonProject",
         )
 
         val result = gradleRunner(jsonProject, arguments).build()

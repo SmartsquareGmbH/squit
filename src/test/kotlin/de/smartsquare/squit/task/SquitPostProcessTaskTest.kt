@@ -43,8 +43,10 @@ class SquitPostProcessTaskTest {
         server.enqueue(MockResponse().setBody("<test/>"))
 
         val arguments = listOf(
-            "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-PtagsOr=call1,call2"
+            "squitPostProcess",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-PtagsOr=call1,call2",
         )
 
         val result = gradleRunner(project, arguments).build()
@@ -63,8 +65,10 @@ class SquitPostProcessTaskTest {
         server.enqueue(MockResponse().setBody("<unclosed_tag>"))
 
         val arguments = listOf(
-            "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-PtagsOr=call1,call2"
+            "squitPostProcess",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-PtagsOr=call1,call2",
         )
 
         val result = gradleRunner(project, arguments).build()
@@ -83,8 +87,11 @@ class SquitPostProcessTaskTest {
         }
 
         val arguments = listOf(
-            "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-PtagsOr=call1,call2", "--build-cache"
+            "squitPostProcess",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-PtagsOr=call1,call2",
+            "--build-cache",
         )
 
         val result = gradleRunner(project, arguments).build()
