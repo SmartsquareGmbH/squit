@@ -33,8 +33,8 @@ data class SquitResponseInfo(val responseCode: Int = 0) {
      */
     fun toJson(): String = GsonBuilder().setPrettyPrinting().create().toJson(
         mapOf(
-            RESPONSE_CODE to responseCode
-        )
+            RESPONSE_CODE to responseCode,
+        ),
     )
 
     /**

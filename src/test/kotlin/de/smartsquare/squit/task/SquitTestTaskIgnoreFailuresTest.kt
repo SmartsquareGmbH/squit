@@ -33,8 +33,9 @@ class SquitTestTaskIgnoreFailuresTest {
         server.enqueue(MockResponse().setBody("<failure/>"))
 
         val arguments = listOf(
-            "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$projectIgnoreFailures"
+            "squitTest",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$projectIgnoreFailures",
         )
 
         val result = gradleRunner(projectIgnoreFailures, arguments).build()

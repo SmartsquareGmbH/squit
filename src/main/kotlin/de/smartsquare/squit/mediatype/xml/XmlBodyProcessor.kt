@@ -26,7 +26,7 @@ class XmlBodyProcessor : BodyProcessor {
         responsePath: Path,
         resultRequestPath: Path,
         resultResponsePath: Path,
-        config: Config
+        config: Config,
     ) {
         val request = requestPath?.let { SAXReaderSupport.read(requestPath) }
         val response = SAXReaderSupport.read(responsePath)
@@ -41,7 +41,7 @@ class XmlBodyProcessor : BodyProcessor {
         actualResponsePath: Path,
         expectedResponsePath: Path,
         resultActualResponseFilePath: Path,
-        config: Config
+        config: Config,
     ) {
         val actualResponse = SAXReaderSupport.read(actualResponsePath)
         val expectedResponse = SAXReaderSupport.read(expectedResponsePath)
@@ -62,8 +62,8 @@ class XmlBodyProcessor : BodyProcessor {
                     mapOf(
                         "request" to request,
                         "expectedResponse" to response,
-                        "config" to config
-                    )
+                        "config" to config,
+                    ),
                 )
             }.run()
         }
@@ -79,8 +79,8 @@ class XmlBodyProcessor : BodyProcessor {
                 binding = Binding(
                     mapOf(
                         "actualResponse" to actualResponse,
-                        "expectedResponse" to expectedResponse
-                    )
+                        "expectedResponse" to expectedResponse,
+                    ),
                 )
             }.run()
         }

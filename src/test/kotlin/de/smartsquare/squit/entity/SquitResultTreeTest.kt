@@ -19,7 +19,7 @@ class SquitResultTreeTest {
             constructTestSquitResult(Paths.get("a"), Paths.get("b"), Paths.get("c").resolve("c")),
             constructTestSquitResult(Paths.get("a"), Paths.get("b"), Paths.get("d"), isIgnored = true),
             constructTestSquitResult(Paths.get("a"), Paths.get("c"), Paths.get(""), result = "xyz"),
-            constructTestSquitResult(Paths.get("x"), Paths.get("y").resolve("z"), Paths.get("x"))
+            constructTestSquitResult(Paths.get("x"), Paths.get("y").resolve("z"), Paths.get("x")),
         )
 
         val resultTrees = SquitResultTree.fromList(resultList)
@@ -45,9 +45,9 @@ class SquitResultTreeTest {
         testDirectoryPath: Path,
         mediaType: MediaType = "application/xml".toMediaType(),
         result: String = "",
-        isIgnored: Boolean = false
+        isIgnored: Boolean = false,
     ) = SquitResult(
         0, result, SquitResponseInfo(), isIgnored, mediaType, "",
-        contextPath, suitePath, testDirectoryPath, Paths.get("")
+        contextPath, suitePath, testDirectoryPath, Paths.get(""),
     )
 }

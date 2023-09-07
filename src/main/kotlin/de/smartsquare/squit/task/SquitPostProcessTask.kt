@@ -40,9 +40,9 @@ open class SquitPostProcessTask @Inject constructor(private val workerExecutor: 
     @InputDirectory
     @PathSensitive(PathSensitivity.RELATIVE)
     val processedSourcesPath: Path = Paths.get(
-        project.buildDir.path,
+        project.layout.buildDirectory.get().asFile.path,
         SQUIT_DIRECTORY,
-        SOURCES_DIRECTORY
+        SOURCES_DIRECTORY,
     )
 
     /**
@@ -50,10 +50,10 @@ open class SquitPostProcessTask @Inject constructor(private val workerExecutor: 
      */
     @Internal
     val actualResponsesPath: Path = Paths.get(
-        project.buildDir.path,
+        project.layout.buildDirectory.get().asFile.path,
         SQUIT_DIRECTORY,
         RESPONSES_DIRECTORY,
-        RAW_DIRECTORY
+        RAW_DIRECTORY,
     )
 
     /**
@@ -70,10 +70,10 @@ open class SquitPostProcessTask @Inject constructor(private val workerExecutor: 
      */
     @OutputDirectory
     val processedActualResponsesPath: Path = Paths.get(
-        project.buildDir.path,
+        project.layout.buildDirectory.get().asFile.path,
         SQUIT_DIRECTORY,
         RESPONSES_DIRECTORY,
-        PROCESSED_DIRECTORY
+        PROCESSED_DIRECTORY,
     )
 
     init {
@@ -103,7 +103,10 @@ open class SquitPostProcessTask @Inject constructor(private val workerExecutor: 
         } else {
             FilesUtils.getLeafDirectories(actualResponsesPath, sort = false).forEach { testPath ->
                 SquitPostProcessRunner.run(
-                    processedSourcesPath, actualResponsesPath, processedActualResponsesPath, testPath
+                    processedSourcesPath,
+                    actualResponsesPath,
+                    processedActualResponsesPath,
+                    testPath,
                 )
             }
         }
@@ -118,7 +121,10 @@ open class SquitPostProcessTask @Inject constructor(private val workerExecutor: 
 
         override fun execute() {
             SquitPostProcessRunner.run(
-                processedSourcesPath, actualResponsesPath, processedActualResponsesPath, testPath
+                processedSourcesPath,
+                actualResponsesPath,
+                processedActualResponsesPath,
+                testPath,
             )
         }
     }

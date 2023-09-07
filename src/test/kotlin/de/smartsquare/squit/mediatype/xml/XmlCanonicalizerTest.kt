@@ -22,8 +22,8 @@ class XmlCanonicalizerTest {
             MediaTypeConfig(
                 xmlStrict = false,
                 xmlCanonicalize = true,
-                jsonCanonicalize = false
-            )
+                jsonCanonicalize = false,
+            ),
         )
 
         // language=xml
@@ -54,8 +54,8 @@ class XmlCanonicalizerTest {
             MediaTypeConfig(
                 xmlStrict = false,
                 xmlCanonicalize = false,
-                jsonCanonicalize = false
-            )
+                jsonCanonicalize = false,
+            ),
         )
 
         result shouldBeEqualTo structure
@@ -76,8 +76,8 @@ class XmlCanonicalizerTest {
                 xmlStrict = false,
                 xmlCanonicalize = true,
                 jsonCanonicalize = false,
-                resolveInvalidNamespaces = true
-            )
+                resolveInvalidNamespaces = true,
+            ),
         )
 
         // language=xml
@@ -108,8 +108,8 @@ class XmlCanonicalizerTest {
                 xmlStrict = false,
                 xmlCanonicalize = true,
                 jsonCanonicalize = false,
-                resolveInvalidNamespaces = true
-            )
+                resolveInvalidNamespaces = true,
+            ),
         )
 
         // language=xml

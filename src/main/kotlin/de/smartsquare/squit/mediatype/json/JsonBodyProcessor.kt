@@ -26,7 +26,7 @@ class JsonBodyProcessor : BodyProcessor {
         responsePath: Path,
         resultRequestPath: Path,
         resultResponsePath: Path,
-        config: Config
+        config: Config,
     ) {
         val request = requestPath?.let { JsonParserSupport.read(it) }
         val response = JsonParserSupport.read(responsePath)
@@ -41,7 +41,7 @@ class JsonBodyProcessor : BodyProcessor {
         actualResponsePath: Path,
         expectedResponsePath: Path,
         resultActualResponseFilePath: Path,
-        config: Config
+        config: Config,
     ) {
         val actualResponse = JsonParserSupport.read(actualResponsePath)
         val expectedResponse = JsonParserSupport.read(expectedResponsePath)
@@ -62,8 +62,8 @@ class JsonBodyProcessor : BodyProcessor {
                     mapOf(
                         "request" to request,
                         "expectedResponse" to response,
-                        "config" to config
-                    )
+                        "config" to config,
+                    ),
                 )
             }.run()
         }
@@ -79,8 +79,8 @@ class JsonBodyProcessor : BodyProcessor {
                 binding = Binding(
                     mapOf(
                         "actualResponse" to actualResponse,
-                        "expectedResponse" to expectedResponse
-                    )
+                        "expectedResponse" to expectedResponse,
+                    ),
                 )
             }.run()
         }

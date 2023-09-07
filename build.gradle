@@ -87,10 +87,9 @@ jacoco {
     toolVersion = jacocoVersion
 }
 
-kotlin {
-    jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(project.ext.javaVersion.majorVersion)
-    }
+java {
+    sourceCompatibility = project.ext.javaVersion
+    targetCompatibility = project.ext.javaVersion
 }
 
 tasks.withType(KotlinCompile).all {

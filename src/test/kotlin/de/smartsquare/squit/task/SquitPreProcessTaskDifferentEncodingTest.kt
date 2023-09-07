@@ -32,8 +32,10 @@ class SquitPreProcessTaskDifferentEncodingTest {
     @Test
     fun `normal run`() {
         val arguments = listOf(
-            "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-            "-Psquit.rootDir=$project", "-PtagsOr=call1,call2,call4"
+            "squitPreProcess",
+            "-Psquit.endpointPlaceholder=https://example.com",
+            "-Psquit.rootDir=$project",
+            "-PtagsOr=call1,call2,call4",
         )
 
         val result = gradleRunner(project, arguments).buildAndFail()

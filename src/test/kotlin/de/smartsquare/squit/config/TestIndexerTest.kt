@@ -19,9 +19,9 @@ class TestIndexerTest {
         ConfigFactory.parseMap(
             mapOf(
                 "rootDir" to "$testProjectRoot",
-                "endpointPlaceholder" to "https://example.com"
-            )
-        )
+                "endpointPlaceholder" to "https://example.com",
+            ),
+        ),
     )
 
     @Test

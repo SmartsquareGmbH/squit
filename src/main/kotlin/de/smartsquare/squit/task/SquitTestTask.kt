@@ -81,8 +81,9 @@ open class SquitTestTask : DefaultTask() {
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
     val processedSourcesPath: Path = Paths.get(
-        project.buildDir.path,
-        SQUIT_DIRECTORY, SOURCES_DIRECTORY
+        project.layout.buildDirectory.get().asFile.path,
+        SQUIT_DIRECTORY,
+        SOURCES_DIRECTORY,
     )
 
     /**
@@ -91,8 +92,10 @@ open class SquitTestTask : DefaultTask() {
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
     val processedResponsesPath: Path = Paths.get(
-        project.buildDir.path,
-        SQUIT_DIRECTORY, RESPONSES_DIRECTORY, PROCESSED_DIRECTORY
+        project.layout.buildDirectory.get().asFile.path,
+        SQUIT_DIRECTORY,
+        RESPONSES_DIRECTORY,
+        PROCESSED_DIRECTORY,
     )
 
     /**
@@ -103,7 +106,12 @@ open class SquitTestTask : DefaultTask() {
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
     val metaPaths: List<Path> by lazy {
-        val rawDirectoryPath = Paths.get(project.buildDir.path, SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)
+        val rawDirectoryPath = Paths.get(
+            project.layout.buildDirectory.get().asFile.path,
+            SQUIT_DIRECTORY,
+            RESPONSES_DIRECTORY,
+            RAW_DIRECTORY,
+        )
 
         if (Files.exists(rawDirectoryPath)) {
             Files.walk(rawDirectoryPath).use { stream ->
@@ -180,7 +188,7 @@ open class SquitTestTask : DefaultTask() {
 
         FilesUtils.getLeafDirectories(processedResponsesPath).forEach { actualResponsePath ->
             val configPath = FilesUtils.validateExistence(
-                processedSourcesPath.resolve(actualResponsePath.cut(processedResponsesPath)).resolve(CONFIG)
+                processedSourcesPath.resolve(actualResponsePath.cut(processedResponsesPath)).resolve(CONFIG),
             )
 
             val config = ConfigFactory.parseFile(configPath.toFile())
@@ -192,7 +200,9 @@ open class SquitTestTask : DefaultTask() {
                 resultList += if (Files.exists(errorFile)) {
                     constructResult(
                         FilesUtils.readAllBytes(errorFile).toString(Charset.defaultCharset()),
-                        expectedResponseInfo, actualResponsePath, config
+                        expectedResponseInfo,
+                        actualResponsePath,
+                        config,
                     )
                 } else {
                     val bodyDiff = createBodyDifference(actualResponsePath, config)
@@ -211,13 +221,13 @@ open class SquitTestTask : DefaultTask() {
 
     private fun createResponseInfoDifference(
         actualResponsePath: Path,
-        expectedResponseInfo: SquitResponseInfo
+        expectedResponseInfo: SquitResponseInfo,
     ): String {
         if (!expectedResponseInfo.isDefault) {
             val contextPath = actualResponsePath.parent.parent.cut(processedResponsesPath)
             val suitePath = actualResponsePath.parent.fileName
             val path: Path = contextPath.resolve(suitePath)
-            val squitBuildDirectoryPath = Paths.get(project.buildDir.path, SQUIT_DIRECTORY)
+            val squitBuildDirectoryPath = Paths.get(project.layout.buildDirectory.get().asFile.path, SQUIT_DIRECTORY)
             val testDirectoryPath = actualResponsePath.fileName
             val fullPath = path.resolve(testDirectoryPath)
             val resolvedPath = squitBuildDirectoryPath
@@ -226,7 +236,7 @@ open class SquitTestTask : DefaultTask() {
                 .resolve(fullPath)
 
             val actualResponseInfoPath = FilesUtils.validateExistence(
-                resolvedPath.resolve(ACTUAL_RESPONSE_INFO)
+                resolvedPath.resolve(ACTUAL_RESPONSE_INFO),
             )
 
             val actualResponse = FilesUtils.readAllBytes(actualResponseInfoPath).toString(Charset.defaultCharset())
@@ -239,13 +249,13 @@ open class SquitTestTask : DefaultTask() {
 
     private fun createBodyDifference(actualResponsePath: Path, config: Config): String {
         val actualResponseFilePath = FilesUtils.validateExistence(
-            actualResponsePath.resolve(MediaTypeFactory.actualResponse(config.mediaType))
+            actualResponsePath.resolve(MediaTypeFactory.actualResponse(config.mediaType)),
         )
 
         val expectedResponseFilePath = FilesUtils.validateExistence(
             processedSourcesPath
                 .resolve(actualResponsePath.cut(processedResponsesPath))
-                .resolve(MediaTypeFactory.expectedResponse(config.mediaType))
+                .resolve(MediaTypeFactory.expectedResponse(config.mediaType)),
         )
 
         val expectedResponse = FilesUtils.readAllBytes(expectedResponseFilePath)
@@ -289,9 +299,9 @@ open class SquitTestTask : DefaultTask() {
         responseInfo: SquitResponseInfo,
         actualResponsePath: Path,
         config: Config,
-        isIgnored: Boolean = false
+        isIgnored: Boolean = false,
     ): SquitResult {
-        val squitBuildDirectoryPath = Paths.get(project.buildDir.path, SQUIT_DIRECTORY)
+        val squitBuildDirectoryPath = Paths.get(project.layout.buildDirectory.get().asFile.path, SQUIT_DIRECTORY)
         val contextPath = actualResponsePath.parent.parent.cut(processedResponsesPath)
         val suitePath = actualResponsePath.parent.fileName
         val testDirectoryPath = actualResponsePath.fileName
@@ -301,13 +311,13 @@ open class SquitTestTask : DefaultTask() {
             true -> SquitResult(
                 id, differences, responseInfo, isIgnored, config.mediaType, config.title,
                 contextPath, suitePath,
-                testDirectoryPath, squitBuildDirectoryPath
+                testDirectoryPath, squitBuildDirectoryPath,
             )
 
             false -> SquitResult(
                 id, "", responseInfo, isIgnored, config.mediaType, config.title,
                 contextPath, suitePath,
-                testDirectoryPath, squitBuildDirectoryPath
+                testDirectoryPath, squitBuildDirectoryPath,
             )
         }
     }

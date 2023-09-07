@@ -35,10 +35,11 @@ class XmlCanonicalizer : Canonicalizer {
         return if (mediaTypeConfig.xmlCanonicalize) {
             val outputStream = ByteArrayOutputStream()
 
-            val content = if (mediaTypeConfig.resolveInvalidNamespaces)
+            val content = if (mediaTypeConfig.resolveInvalidNamespaces) {
                 resolveInvalidNamespaces(input)
-            else
+            } else {
                 input
+            }
 
             canonicalizer.canonicalize(content.toByteArray(), outputStream, false)
 

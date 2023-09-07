@@ -69,8 +69,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "method" to "GET"
-            )
+                "method" to "GET",
+            ),
         )
 
         config.method shouldBeEqualTo "GET"
@@ -88,8 +88,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "testDir" to Paths.get(".").toString()
-            )
+                "testDir" to Paths.get(".").toString(),
+            ),
         )
 
         val call = { config.validate() }
@@ -102,8 +102,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "testDir" to Paths.get("does_not_exist").toString()
-            )
+                "testDir" to Paths.get("does_not_exist").toString(),
+            ),
         )
 
         val call = { config.validate() }
@@ -116,8 +116,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "preProcessors" to listOf("java.lang.String")
-            )
+                "preProcessors" to listOf("java.lang.String"),
+            ),
         )
 
         val call = { config.validate() }
@@ -130,8 +130,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "preProcessors" to listOf("not.existing")
-            )
+                "preProcessors" to listOf("not.existing"),
+            ),
         )
 
         val call = { config.validate() }
@@ -144,8 +144,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "preProcessorScripts" to listOf(testProject.resolve("build.gradle").toString())
-            )
+                "preProcessorScripts" to listOf(testProject.resolve("build.gradle").toString()),
+            ),
         )
 
         val call = { config.validate() }
@@ -159,8 +159,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "preProcessorScripts" to listOf(notExistingFilePath.toString())
-            )
+                "preProcessorScripts" to listOf(notExistingFilePath.toString()),
+            ),
         )
 
         val call = { config.validate() }
@@ -173,8 +173,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "postProcessors" to listOf("java.lang.String")
-            )
+                "postProcessors" to listOf("java.lang.String"),
+            ),
         )
 
         val call = { config.validate() }
@@ -187,8 +187,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "postProcessors" to listOf("not.existing")
-            )
+                "postProcessors" to listOf("not.existing"),
+            ),
         )
 
         val call = { config.validate() }
@@ -201,8 +201,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "postProcessorScripts" to listOf(testProject.resolve("build.gradle").toString())
-            )
+                "postProcessorScripts" to listOf(testProject.resolve("build.gradle").toString()),
+            ),
         )
 
         val call = { config.validate() }
@@ -216,8 +216,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "postProcessorScripts" to listOf(notExistingFilePath.toString())
-            )
+                "postProcessorScripts" to listOf(notExistingFilePath.toString()),
+            ),
         )
 
         val call = { config.validate() }
@@ -230,8 +230,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "preRunners" to listOf("java.lang.String")
-            )
+                "preRunners" to listOf("java.lang.String"),
+            ),
         )
 
         val call = { config.validate() }
@@ -244,8 +244,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "preRunners" to listOf("not.existing")
-            )
+                "preRunners" to listOf("not.existing"),
+            ),
         )
 
         val call = { config.validate() }
@@ -258,8 +258,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "preRunnerScripts" to listOf(testProject.resolve("build.gradle").toString())
-            )
+                "preRunnerScripts" to listOf(testProject.resolve("build.gradle").toString()),
+            ),
         )
 
         val call = { config.validate() }
@@ -273,8 +273,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "preRunnerScripts" to listOf(notExistingFilePath.toString())
-            )
+                "preRunnerScripts" to listOf(notExistingFilePath.toString()),
+            ),
         )
 
         val call = { config.validate() }
@@ -287,8 +287,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "postRunners" to listOf("java.lang.String")
-            )
+                "postRunners" to listOf("java.lang.String"),
+            ),
         )
 
         val call = { config.validate() }
@@ -301,8 +301,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "postRunners" to listOf("not.existing")
-            )
+                "postRunners" to listOf("not.existing"),
+            ),
         )
 
         val call = { config.validate() }
@@ -315,8 +315,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "postRunnerScripts" to listOf(testProject.resolve("build.gradle").toString())
-            )
+                "postRunnerScripts" to listOf(testProject.resolve("build.gradle").toString()),
+            ),
         )
 
         val call = { config.validate() }
@@ -330,8 +330,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "postRunnerScripts" to listOf(notExistingFilePath.toString())
-            )
+                "postRunnerScripts" to listOf(notExistingFilePath.toString()),
+            ),
         )
 
         val call = { config.validate() }
@@ -344,8 +344,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "tags" to listOf("a", "b")
-            )
+                "tags" to listOf("a", "b"),
+            ),
         )
 
         val call = { config.validate() }
@@ -358,8 +358,8 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "tags" to listOf("a", "")
-            )
+                "tags" to listOf("a", ""),
+            ),
         )
 
         val call = { config.validate() }
@@ -377,10 +377,10 @@ class ConfigExtensionsTest {
                         "name" to "test1",
                         "jdbc" to "test2",
                         "username" to "test3",
-                        "password" to "test4"
-                    )
-                )
-            )
+                        "password" to "test4",
+                    ),
+                ),
+            ),
         )
 
         val call = { config.validate() }
@@ -398,10 +398,10 @@ class ConfigExtensionsTest {
                         "name" to "",
                         "jdbc" to "test2",
                         "username" to "test3",
-                        "password" to "test4"
-                    )
-                )
-            )
+                        "password" to "test4",
+                    ),
+                ),
+            ),
         )
 
         val call = { config.validate() }
@@ -419,10 +419,10 @@ class ConfigExtensionsTest {
                         "name" to "test1",
                         "jdbc" to "",
                         "username" to "test3",
-                        "password" to "test4"
-                    )
-                )
-            )
+                        "password" to "test4",
+                    ),
+                ),
+            ),
         )
 
         val call = { config.validate() }
@@ -440,10 +440,10 @@ class ConfigExtensionsTest {
                         "name" to "test1",
                         "jdbc" to "test2",
                         "username" to "",
-                        "password" to "test4"
-                    )
-                )
-            )
+                        "password" to "test4",
+                    ),
+                ),
+            ),
         )
 
         val call = { config.validate() }
@@ -461,10 +461,10 @@ class ConfigExtensionsTest {
                         "name" to "test1",
                         "jdbc" to "test2",
                         "username" to "test3",
-                        "password" to ""
-                    )
-                )
-            )
+                        "password" to "",
+                    ),
+                ),
+            ),
         )
 
         val call = { config.validate() }
@@ -479,9 +479,9 @@ class ConfigExtensionsTest {
                 "endpoint" to "https://example.com",
                 "headers" to mapOf(
                     "abc" to "def",
-                    "ghi" to "jkl"
-                )
-            )
+                    "ghi" to "jkl",
+                ),
+            ),
         )
 
         config.headers shouldContain ("abc" to "def")

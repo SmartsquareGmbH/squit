@@ -20,7 +20,7 @@ class SquitPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         if (GradleVersion.current() < GradleVersion.version("6.8")) {
             throw GradleException(
-                "Minimum supported Gradle version is 6.8. Current version is ${GradleVersion.current().version}."
+                "Minimum supported Gradle version is 6.8. Current version is ${GradleVersion.current().version}.",
             )
         }
 
@@ -51,7 +51,7 @@ class SquitPlugin : Plugin<Project> {
                 extension.xml.strict,
                 extension.xml.canonicalize,
                 extension.xml.resolveInvalidNamespaces,
-                extension.json.canonicalize
+                extension.json.canonicalize,
             )
 
             it.dependsOn("squitPostProcess")

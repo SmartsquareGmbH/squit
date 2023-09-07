@@ -41,8 +41,9 @@ class SquitRequestTaskJsonTest {
         server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}"))
 
         val arguments = listOf(
-            "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$jsonProject"
+            "squitRunRequests",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$jsonProject",
         )
 
         val result = gradleRunner(jsonProject, arguments).build()
@@ -56,7 +57,7 @@ class SquitRequestTaskJsonTest {
         }
 
         val (expectedResponseCode) = SquitResponseInfo.fromJson(
-            Files.readAllBytes(jsonCall1ActualResponseInfo).toString(Charsets.UTF_8)
+            Files.readAllBytes(jsonCall1ActualResponseInfo).toString(Charsets.UTF_8),
         )
 
         expectedResponseCode shouldBeInRange 200..599

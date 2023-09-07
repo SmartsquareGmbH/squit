@@ -41,7 +41,7 @@ data class SquitResult(
     private val contextPath: Path,
     private val suitePath: Path,
     private val testDirectoryPath: Path,
-    private val squitBuildDirectoryPath: Path
+    private val squitBuildDirectoryPath: Path,
 ) {
 
     /**

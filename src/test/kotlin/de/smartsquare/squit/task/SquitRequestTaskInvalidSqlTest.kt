@@ -35,8 +35,9 @@ class SquitRequestTaskInvalidSqlTest {
         server.enqueue(MockResponse().setBody("<cool/>"))
 
         val arguments = listOf(
-            "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$invalidProject2"
+            "squitRunRequests",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$invalidProject2",
         )
 
         val result = gradleRunner(invalidProject2, arguments).build()
