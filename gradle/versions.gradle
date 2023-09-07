@@ -10,7 +10,6 @@ ext {
 
     jacocoVersion = '0.8.10'
     gradleVersionsVersion = '0.47.0'
-    gradleTestIdeaFixVersion = '0.1.0'
 
     jaxenVersion = '2.0.0'
     dom4jVersion = '2.1.4'
@@ -36,7 +35,6 @@ ext {
     ktlintPluginVersion = '11.5.1'
 
     junitVersion = '5.10.0'
-    junitPlatformVersion = '1.7.2'
     kluentVersion = '1.73'
     h2Version = '2.2.220'
     mockkVersion = '1.13.7'
