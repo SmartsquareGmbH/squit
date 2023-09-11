@@ -201,12 +201,16 @@ tasks.withType(Javadoc).all {
 }
 
 gradlePlugin {
+    website = "https://github.com/SmartsquareGmbH/squit"
+    vcsUrl = "https://github.com/SmartsquareGmbH/squit"
+
     plugins {
         squit {
             displayName = "Squit"
             id = "de.smartsquare.squit"
             implementationClass = "de.smartsquare.squit.SquitPlugin"
             description = "Gradle plugin for simple testing of JSON/XML/SOAP/etc APIs."
+            tags.set(["testing", "soap", "xml" ,"automation"])
         }
     }
 }
