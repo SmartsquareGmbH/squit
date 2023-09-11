@@ -146,6 +146,7 @@ class HtmlReportWriter(private val logger: Logger) {
         return bodyDiff
             .map { it.replace(Regex("(?<!\\\\)'"), Regex.escapeReplacement("\\'")) }
             .map { it.replace(Regex("(?<!\\\\)\""), Regex.escapeReplacement("\\\"")) }
+            .map { it.replace(Regex("\\\\n"), Regex.escapeReplacement("\\\\n")) }
             .joinToString(HTML_LINE_ENDING)
     }
 
