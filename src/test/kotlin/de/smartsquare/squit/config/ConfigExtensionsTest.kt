@@ -1,5 +1,6 @@
 package de.smartsquare.squit.config
 
+import com.typesafe.config.ConfigException.BadValue
 import com.typesafe.config.ConfigFactory
 import de.smartsquare.squit.TestUtils
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -490,5 +491,36 @@ class ConfigExtensionsTest {
         val call = { config.validate() }
 
         call shouldNotThrow AnyException
+    }
+
+    @Test
+    fun `config object with an invalid preTestTask`() {
+        val config = ConfigFactory.parseMap(
+            mapOf(
+                "endpoint" to "https://example.com",
+                "preTestTasks" to listOf("[NotExistingTask]"),
+            )
+        )
+
+        val call = { config.validate() }
+        @Suppress("MaxLineLength")
+        call shouldThrow BadValue::class withMessage "hardcoded value: Invalid value at 'preTestTasks': " +
+            "The enum class SquitPreTestTask has no constant of the name '[NotExistingTask]' " +
+            "(should be one of [DATABASE_SCRIPTS, PRE_RUNNERS, PRE_RUNNER_SCRIPTS].)"
+    }
+
+    @Test
+    fun `config object with an invalid postTestTask`() {
+        val config = ConfigFactory.parseMap(
+            mapOf(
+                "endpoint" to "https://example.com",
+                "postTestTasks" to listOf("[NotExistingTask]"),
+            )
+        )
+
+        val call = { config.validate() }
+        call shouldThrow BadValue::class withMessage "hardcoded value: Invalid value at 'postTestTasks': " +
+            "The enum class SquitPostTestTask has no constant of the name '[NotExistingTask]' " +
+            "(should be one of [DATABASE_SCRIPTS, POST_RUNNERS, POST_RUNNER_SCRIPTS].)"
     }
 }

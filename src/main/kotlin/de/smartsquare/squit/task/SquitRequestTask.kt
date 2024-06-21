@@ -9,8 +9,10 @@ import de.smartsquare.squit.config.mediaType
 import de.smartsquare.squit.config.method
 import de.smartsquare.squit.config.postRunnerScripts
 import de.smartsquare.squit.config.postRunners
+import de.smartsquare.squit.config.postTestTasks
 import de.smartsquare.squit.config.preRunnerScripts
 import de.smartsquare.squit.config.preRunners
+import de.smartsquare.squit.config.preTestTasks
 import de.smartsquare.squit.db.ConnectionCollection
 import de.smartsquare.squit.db.executeScript
 import de.smartsquare.squit.entity.SquitMetaInfo
@@ -58,6 +60,7 @@ import java.util.concurrent.TimeUnit
  * Task for running requests against the given api. Also capable of running existing sql scripts before and after the
  * request.
  */
+@Suppress("TooManyFunctions")
 open class SquitRequestTask : DefaultTask() {
 
     /**
@@ -246,20 +249,16 @@ open class SquitRequestTask : DefaultTask() {
     }
 
     private fun doPreScriptExecutions(config: Config, testDirectoryPath: Path) {
-        config
-            .preRunners
-            .map {
-                preRunnersCache.getOrPut(it) { Class.forName(it).getConstructor().newInstance() as SquitPreRunner }
+        config.preTestTasks.forEach { task ->
+            when (task!!) {
+                SquitPreTestTask.PRE_RUNNERS -> executePreRunners(config)
+                SquitPreTestTask.PRE_RUNNER_SCRIPTS -> executePreRunnerScripts(config)
+                SquitPreTestTask.DATABASE_SCRIPTS -> executePreDatabaseScripts(config, testDirectoryPath)
             }
-            .forEach { it.run(config) }
-
-        config.preRunnerScripts.forEach {
-            GroovyShell(javaClass.classLoader)
-                .parse(it.toFile())
-                .apply { binding = Binding(mapOf("config" to config)) }
-                .run()
         }
+    }
 
+    private fun executePreDatabaseScripts(config: Config, testDirectoryPath: Path) {
         config.databaseConfigurations.forEach {
             executeScriptIfExisting(
                 testDirectoryPath.resolve("${it.name}_pre.sql"),
@@ -270,7 +269,35 @@ open class SquitRequestTask : DefaultTask() {
         }
     }
 
+    private fun executePreRunnerScripts(config: Config) {
+        config.preRunnerScripts.forEach {
+            GroovyShell(javaClass.classLoader)
+                .parse(it.toFile())
+                .apply { binding = Binding(mapOf("config" to config)) }
+                .run()
+        }
+    }
+
+    private fun executePreRunners(config: Config) {
+        config
+            .preRunners
+            .map {
+                preRunnersCache.getOrPut(it) { Class.forName(it).getConstructor().newInstance() as SquitPreRunner }
+            }
+            .forEach { it.run(config) }
+    }
+
     private fun doPostScriptExecutions(config: Config, testDirectoryPath: Path) {
+        config.postTestTasks.forEach { task ->
+            when (task!!) {
+                SquitPostTestTask.POST_RUNNER_SCRIPTS -> executePostRunnerScripts(config)
+                SquitPostTestTask.POST_RUNNERS -> executePostRunners(config)
+                SquitPostTestTask.DATABASE_SCRIPTS -> executePostDatabaseScripts(config, testDirectoryPath)
+            }
+        }
+    }
+
+    private fun executePostDatabaseScripts(config: Config, testDirectoryPath: Path) {
         config.databaseConfigurations.forEach {
             executeScriptIfExisting(
                 testDirectoryPath.resolve("${it.name}_post.sql"),
@@ -279,20 +306,24 @@ open class SquitRequestTask : DefaultTask() {
                 it.password
             )
         }
+    }
 
-        config
-            .postRunners
-            .map {
-                postRunnersCache.getOrPut(it) { Class.forName(it).getConstructor().newInstance() as SquitPostRunner }
-            }
-            .forEach { it.run(config) }
-
+    private fun executePostRunnerScripts(config: Config) {
         config.postRunnerScripts.forEach {
             GroovyShell(javaClass.classLoader)
                 .parse(it.toFile())
                 .apply { binding = Binding(mapOf("config" to config)) }
                 .run()
         }
+    }
+
+    private fun executePostRunners(config: Config) {
+        config
+            .postRunners
+            .map {
+                postRunnersCache.getOrPut(it) { Class.forName(it).getConstructor().newInstance() as SquitPostRunner }
+            }
+            .forEach { it.run(config) }
     }
 
     private fun constructApiCall(requestPath: Path?, config: Config): Call {

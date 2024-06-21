@@ -8,6 +8,8 @@ import com.typesafe.config.ConfigRenderOptions
 import com.typesafe.config.ConfigValueFactory
 import de.smartsquare.squit.entity.SquitDatabaseConfiguration
 import de.smartsquare.squit.io.FilesUtils
+import de.smartsquare.squit.task.SquitPostTestTask
+import de.smartsquare.squit.task.SquitPreTestTask
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -29,10 +31,12 @@ private const val PRE_PROCESSORS = "preProcessors"
 private const val PRE_PROCESSOR_SCRIPTS = "preProcessorScripts"
 private const val PRE_RUNNERS = "preRunners"
 private const val PRE_RUN_SCRIPTS = "preRunnerScripts"
+private const val PRE_TEST_TASKS = "preTestTasks"
 private const val POST_PROCESSORS = "postProcessors"
 private const val POST_PROCESSOR_SCRIPTS = "postProcessorScripts"
 private const val POST_RUNNERS = "postRunners"
 private const val POST_RUN_SCRIPTS = "postRunnerScripts"
+private const val POST_TEST_TASKS = "postTestTasks"
 private const val TAGS = "tags"
 private const val DATABASE_CONFIGURATIONS = "databaseConfigurations"
 private const val DATABASE_CONFIGURATION_NAME = "name"
@@ -105,6 +109,20 @@ val Config.preRunners get() = getSafeStringList(PRE_RUNNERS)
 val Config.preRunnerScripts get() = getSafePathList(PRE_RUN_SCRIPTS)
 
 /**
+ * preTestTasks to execute.
+ * default: PRE_RUNNERS, PRE_RUNNER_SCRIPTS, DATABASE_SCRIPTS
+ */
+val Config.preTestTasks get() =
+    when (hasPath(PRE_TEST_TASKS)) {
+        true -> getEnumList(SquitPreTestTask::class.java, PRE_TEST_TASKS)!!
+        else -> listOf(
+            SquitPreTestTask.PRE_RUNNERS,
+            SquitPreTestTask.PRE_RUNNER_SCRIPTS,
+            SquitPreTestTask.DATABASE_SCRIPTS
+        )
+    }
+
+/**
  * List of post-processors to use.
  */
 val Config.postProcessors get() = getSafeStringList(POST_PROCESSORS)
@@ -123,6 +141,20 @@ val Config.postRunners get() = getSafeStringList(POST_RUNNERS)
  * List of paths to pre-run scripts to use.
  */
 val Config.postRunnerScripts get() = getSafePathList(POST_RUN_SCRIPTS)
+
+/**
+ * postTestTasks to execute.
+ * default: DATABASE_SCRIPTS, POST_RUNNERS, POST_RUNNER_SCRIPTS
+ */
+val Config.postTestTasks get() =
+    when (hasPath(POST_TEST_TASKS)) {
+        true -> getEnumList(SquitPostTestTask::class.java, POST_TEST_TASKS)!!
+        else -> listOf(
+            SquitPostTestTask.DATABASE_SCRIPTS,
+            SquitPostTestTask.POST_RUNNERS,
+            SquitPostTestTask.POST_RUNNER_SCRIPTS
+        )
+    }
 
 /**
  * List of tags associated with the test.
@@ -174,7 +206,7 @@ fun Config.withTestDir(testDir: Path): Config = withValue(
  */
 fun Config.validate() = this.apply {
     // Call getters of properties to check existence and correct declaration.
-    endpoint; mediaType; shouldExclude; shouldIgnore; headers; testDir
+    endpoint; mediaType; shouldExclude; shouldIgnore; headers; testDir; preTestTasks; postTestTasks
 
     preProcessors.forEach { checkClass(it) }
     preProcessorScripts.forEach { FilesUtils.validateExistence(it) }
