@@ -18,14 +18,12 @@ data class SquitResponseInfo(val responseCode: Int = 0) {
         /**
          * Constructs a [SquitResponseInfo] instance from the given [json] String.
          */
-        fun fromJson(json: String): SquitResponseInfo =
-            Gson().fromJson(json, SquitResponseInfo::class.java)
+        fun fromJson(json: String): SquitResponseInfo = Gson().fromJson(json, SquitResponseInfo::class.java)
 
         /**
          * Constructs a [SquitResponseInfo] instance from the given [config] Config.
          */
-        fun fromConfig(config: Config): SquitResponseInfo =
-            SquitResponseInfo(config.expectedResponseCode)
+        fun fromConfig(config: Config): SquitResponseInfo = SquitResponseInfo(config.expectedResponseCode)
     }
 
     /**
@@ -33,8 +31,8 @@ data class SquitResponseInfo(val responseCode: Int = 0) {
      */
     fun toJson(): String = GsonBuilder().setPrettyPrinting().create().toJson(
         mapOf(
-            RESPONSE_CODE to responseCode
-        )
+            RESPONSE_CODE to responseCode,
+        ),
     )
 
     /**

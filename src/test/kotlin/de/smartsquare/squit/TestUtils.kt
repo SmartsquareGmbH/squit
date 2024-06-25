@@ -6,23 +6,19 @@ import org.gradle.util.GradleVersion
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.StandardCopyOption
+import org.h2.Driver as H2Driver
 
 /**
  * Utility class for methods which cannot be a extension function.
  */
 object TestUtils {
 
-    private val DB_FILTER = { it: Path ->
-        Files.isRegularFile(it) && it.fileName.toString().endsWith(".db")
-    }
-
     /**
-     * Deletes all database files found in the passed [path] directory.
+     * Deletes all database files found in the given [path] directory.
      */
-    fun deleteDatabaseFiles(path: Path) = Files.newDirectoryStream(path, DB_FILTER).use { files ->
-        files.forEach { Files.delete(it) }
-    }
+    fun deleteDatabaseFiles(path: Path) = Files
+        .newDirectoryStream(path) { Files.isRegularFile(it) && it.fileName.toString().endsWith(".db") }
+        .use { files -> files.forEach { Files.delete(it) } }
 
     /**
      * Returns the [Path] of the resource with the given [name]…
@@ -35,7 +31,7 @@ object TestUtils {
  */
 fun GradleRunner.withExtendedPluginClasspath(): GradleRunner {
     val classpath = PluginUnderTestMetadataReading.readImplementationClasspath()
-        .plus(File(org.h2.Driver::class.java.protectionDomain.codeSource.location.toURI()))
+        .plus(File(H2Driver::class.java.protectionDomain.codeSource.location.toURI()))
         .plus(File(XmlPreProcessor::class.java.protectionDomain.codeSource.location.toURI()))
         .plus(File(XmlPostProcessor::class.java.protectionDomain.codeSource.location.toURI()))
 
@@ -43,33 +39,15 @@ fun GradleRunner.withExtendedPluginClasspath(): GradleRunner {
 }
 
 /**
- * Configures the GradleRunner to run with the jacoco agent.
- */
-fun GradleRunner.withJacoco(): GradleRunner {
-    val properties = this.javaClass.classLoader.getResource("testkit-gradle.properties")
-
-    if (properties != null) {
-        Files.copy(
-            File(properties.toURI()).toPath(),
-            projectDir.toPath().resolve("gradle.properties"),
-            StandardCopyOption.REPLACE_EXISTING
-        )
-    }
-
-    return this
-}
-
-/**
  * Creates a [GradleRunner] with the given [project], [arguments] and an optional [version].
  *
  * This also applies the following default arguments: "clean --stacktrace".
  */
-fun gradleRunner(project: Path, arguments: List<String>, version: GradleVersion? = null): GradleRunner {
-    return GradleRunner.create()
+fun gradleRunner(project: Path, arguments: List<String>, version: GradleVersion? = null): GradleRunner =
+    GradleRunner.create()
         .withArguments(listOf("clean") + arguments + "--stacktrace")
         .apply { if (version !== null) withGradleVersion(version.version) }
         .withProjectDir(project.toFile())
         .withExtendedPluginClasspath()
+        .withDebug(true)
         .forwardOutput()
-        .withJacoco()
-}

@@ -118,7 +118,7 @@ val Config.preTestTasks: List<SquitPreTestTask>
         else -> listOf(
             SquitPreTestTask.PRE_RUNNERS,
             SquitPreTestTask.PRE_RUNNER_SCRIPTS,
-            SquitPreTestTask.DATABASE_SCRIPTS
+            SquitPreTestTask.DATABASE_SCRIPTS,
         )
     }
 
@@ -152,7 +152,7 @@ val Config.postTestTasks: List<SquitPostTestTask>
         else -> listOf(
             SquitPostTestTask.DATABASE_SCRIPTS,
             SquitPostTestTask.POST_RUNNERS,
-            SquitPostTestTask.POST_RUNNER_SCRIPTS
+            SquitPostTestTask.POST_RUNNER_SCRIPTS,
         )
     }
 
@@ -170,7 +170,7 @@ val Config.databaseConfigurations
             it.getString(DATABASE_CONFIGURATION_NAME),
             it.getString(DATABASE_CONFIGURATION_JDBC_ADDRESS),
             it.getString(DATABASE_CONFIGURATION_USERNAME),
-            it.getString(DATABASE_CONFIGURATION_PASSWORD)
+            it.getString(DATABASE_CONFIGURATION_PASSWORD),
         )
     }
 
@@ -198,7 +198,7 @@ fun Config.mergeTag(tag: String): Config = withValue(TAGS, ConfigValueFactory.fr
  */
 fun Config.withTestDir(testDir: Path): Config = withValue(
     TEST_DIRECTORY,
-    ConfigValueFactory.fromAnyRef(testDir.toString())
+    ConfigValueFactory.fromAnyRef(testDir.toString()),
 )
 
 /**
@@ -206,7 +206,14 @@ fun Config.withTestDir(testDir: Path): Config = withValue(
  */
 fun Config.validate() = this.apply {
     // Call getters of properties to check existence and correct declaration.
-    endpoint; mediaType; shouldExclude; shouldIgnore; headers; testDir; preTestTasks; postTestTasks
+    endpoint
+    mediaType
+    shouldExclude
+    shouldIgnore
+    headers
+    testDir
+    preTestTasks
+    postTestTasks
 
     preProcessors.forEach { checkClass(it) }
     preProcessorScripts.forEach { FilesUtils.validateExistence(it) }
@@ -236,7 +243,7 @@ fun Config.writeTo(
     options: ConfigRenderOptions = ConfigRenderOptions.defaults()
         .setComments(false)
         .setOriginComments(false)
-        .setJson(false)
+        .setJson(false),
 ): Path = Files.write(path, root().render(options).toByteArray())
 
 private fun Config.getSafeBoolean(path: String, fallback: Boolean = false) = when (hasPath(path)) {
@@ -249,13 +256,11 @@ private fun Config.getSafeString(path: String, fallback: String = "") = when (ha
     false -> fallback
 }
 
-private fun Config.getSafeStringList(
-    path: String,
-    fallback: List<String> = emptyList()
-): List<String> = when (hasPath(path)) {
-    true -> getStringList(path)
-    false -> fallback
-}
+private fun Config.getSafeStringList(path: String, fallback: List<String> = emptyList()): List<String> =
+    when (hasPath(path)) {
+        true -> getStringList(path)
+        false -> fallback
+    }
 
 private fun Config.getSafeConfig(path: String, fallback: Config = ConfigFactory.empty()) = when (hasPath(path)) {
     true -> getConfig(path)

@@ -8,7 +8,5 @@ import de.smartsquare.squit.mediatype.MediaTypeConfig
  */
 class GenericCanonicalizer : Canonicalizer {
 
-    override fun canonicalize(input: String, mediaTypeConfig: MediaTypeConfig): String {
-        return input
-    }
+    override fun canonicalize(input: String, mediaTypeConfig: MediaTypeConfig): String = input
 }

@@ -25,7 +25,7 @@ data class SquitMetaInfo(val date: LocalDateTime, val duration: Long) {
 
             return SquitMetaInfo(
                 LocalDateTime.parse(config.getString(DATE)),
-                config.getLong(DURATION)
+                config.getLong(DURATION),
             )
         }
     }
@@ -36,7 +36,7 @@ data class SquitMetaInfo(val date: LocalDateTime, val duration: Long) {
     fun toJson(): String = Gson().toJson(
         mapOf(
             DATE to date.toString(),
-            DURATION to duration
-        )
+            DURATION to duration,
+        ),
     )
 }

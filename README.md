@@ -362,21 +362,21 @@ Additionally, these options are evaluated:
 
 ### Squit Dsl
 
-Here is a complete example of the `Squit` dsl:
+Here is a complete example of the `Squit` dsl (`.kts` syntax):
 
-```groovy
+```kotlin
 squit {
     // The jdbc drivers to use. Must be on the classpath.
-    jdbcDrivers = ['oracle.jdbc.driver.OracleDriver']
+    jdbcDrivers = listOf("oracle.jdbc.driver.OracleDriver")
 
     // The path of your test sources. src/squit is the default.
-    sourceDir "src/squit"
+    sourceDir = "src/squit"
 
     // The path to save reports in. build/squit/reports is the default.
-    reportDir "build/squit/reports"
+    reportDir = "build/squit/reports"
 
     // The timeout in seconds for requests before squit fails. The default is 10.
-    timeout = 60
+    requestTimeout = 60
 
     // If Squit should only print if a tests fails.
     silent = false

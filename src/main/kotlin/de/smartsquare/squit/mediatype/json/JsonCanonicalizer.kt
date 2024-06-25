@@ -14,37 +14,34 @@ class JsonCanonicalizer : Canonicalizer {
 
     private val gson = GsonBuilder().setPrettyPrinting().create()
 
-    override fun canonicalize(input: String, mediaTypeConfig: MediaTypeConfig): String {
-        return if (mediaTypeConfig.jsonCanonicalize) {
+    override fun canonicalize(input: String, mediaTypeConfig: MediaTypeConfig): String =
+        if (mediaTypeConfig.jsonCanonicalize) {
             val element = gson.fromJson(input, JsonElement::class.java)
 
             gson.toJson(element.canonicalize())
         } else {
             input
         }
-    }
 
-    private fun JsonElement.canonicalize(): JsonElement {
-        return when (this) {
-            is JsonObject -> {
-                val newEntries = entrySet().map { (key, value) -> key to value.canonicalize() }
+    private fun JsonElement.canonicalize(): JsonElement = when (this) {
+        is JsonObject -> {
+            val newEntries = entrySet().map { (key, value) -> key to value.canonicalize() }
 
-                JsonObject().also { newObject ->
-                    newEntries.sortedBy { (key) -> key }.forEach { (key, value) ->
-                        newObject.add(key, value)
-                    }
+            JsonObject().also { newObject ->
+                newEntries.sortedBy { (key) -> key }.forEach { (key, value) ->
+                    newObject.add(key, value)
                 }
             }
-            is JsonArray -> {
-                val newEntries = this.map { it.canonicalize() }
-
-                JsonArray().also { newArray ->
-                    newEntries.forEach {
-                        newArray.add(it)
-                    }
-                }
-            }
-            else -> this
         }
+        is JsonArray -> {
+            val newEntries = this.map { it.canonicalize() }
+
+            JsonArray().also { newArray ->
+                newEntries.forEach {
+                    newArray.add(it)
+                }
+            }
+        }
+        else -> this
     }
 }

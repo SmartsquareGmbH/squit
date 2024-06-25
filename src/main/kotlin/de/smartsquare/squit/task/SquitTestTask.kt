@@ -23,10 +23,18 @@ import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
 import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
+import de.smartsquare.squit.util.asPath
 import de.smartsquare.squit.util.countTestResults
 import de.smartsquare.squit.util.cut
+import de.smartsquare.squit.util.dir
+import de.smartsquare.squit.util.file
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.file.Directory
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.FileTree
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
@@ -41,59 +49,52 @@ import org.gradle.api.tasks.TaskAction
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
-import kotlin.streams.toList
 
 /**
  * Task for comparing the actual responses to the expected responses and generating a report.
  */
 @CacheableTask
-open class SquitTestTask : DefaultTask() {
+abstract class SquitTestTask : DefaultTask() {
 
     /**
      * The path to save reports and possible failures in.
      */
     @get:OutputDirectory
-    lateinit var reportDir: Path
+    abstract val reportDir: DirectoryProperty
 
     /**
      * If squit should avoid printing anything if all tests pass.
      */
     @get:Internal
-    var silent = false
+    abstract val silent: Property<Boolean>
 
     /**
      * If failures should be ignored.
      * In that case the task passes, even if tests have failed.
      */
     @get:Input
-    var ignoreFailures = false
+    abstract val ignoreFailures: Property<Boolean>
 
     /**
      * Configuration class for various properties of the media types.
      */
     @get:Nested
-    lateinit var mediaTypeConfig: MediaTypeConfig
+    abstract val mediaTypeConfig: Property<MediaTypeConfig>
 
     /**
      * The directory of the test sources.
      */
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    val processedSourcesPath: Path = Paths.get(
-        project.buildDir.path,
-        SQUIT_DIRECTORY, SOURCES_DIRECTORY
-    )
+    val processedSourcesDir = project.layout.buildDirectory.dir(SQUIT_DIRECTORY, SOURCES_DIRECTORY)
 
     /**
      * The directory of the previously (processed) requested responses.
      */
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    val processedResponsesPath: Path = Paths.get(
-        project.buildDir.path,
-        SQUIT_DIRECTORY, RESPONSES_DIRECTORY, PROCESSED_DIRECTORY
-    )
+    val processedResponsesDir = project.layout.buildDirectory
+        .dir(SQUIT_DIRECTORY, RESPONSES_DIRECTORY, PROCESSED_DIRECTORY)
 
     /**
      * Collection of meta.json files for up-to-date checking.
@@ -102,41 +103,30 @@ open class SquitTestTask : DefaultTask() {
     @get:Optional
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    val metaPaths: List<Path> by lazy {
-        val rawDirectoryPath = Paths.get(project.buildDir.path, SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)
-
-        if (Files.exists(rawDirectoryPath)) {
-            Files.walk(rawDirectoryPath).use { stream ->
-                stream.filter { Files.isRegularFile(it) && it.fileName.toString() == META }.toList()
-            }
-        } else {
-            emptyList()
-        }
-    }
+    val metaFiles: Provider<FileTree> = project.layout.buildDirectory
+        .dir(SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)
+        .map { dir -> dir.asFileTree.matching { tree -> tree.include("**/$META") } }
 
     /**
      * The directory to generate the xml report file into.
      */
     @get:OutputFile
-    val xmlReportFilePath: Path by lazy {
-        reportDir.resolve("xml").resolve("index.xml")
-    }
+    val xmlReportFile
+        get() = reportDir.file("xml", "index.xml")
 
     /**
      * The directory to generate the xml report file into.
      */
     @get:OutputDirectory
-    val htmlReportDirectoryPath: Path by lazy {
-        reportDir.resolve("html")
-    }
+    val htmlReportDir: Provider<Directory>
+        get() = reportDir.dir("html")
 
     /**
      * The directory to copy failed tests into.
      */
     @get:OutputDirectory
-    val failureResultDirectory: Path by lazy {
-        reportDir.resolve("failures")
-    }
+    val failureReportDir: Provider<Directory>
+        get() = reportDir.dir("failures")
 
     private var nextResultId = 0L
 
@@ -148,11 +138,10 @@ open class SquitTestTask : DefaultTask() {
     /**
      * Runs the task.
      */
-    @Suppress("unused")
     @TaskAction
     fun run() {
-        FilesUtils.deleteRecursivelyIfExisting(reportDir)
-        Files.createDirectories(processedSourcesPath)
+        FilesUtils.deleteRecursivelyIfExisting(reportDir.asPath)
+        Files.createDirectories(processedSourcesDir.asPath)
 
         val results = processTests()
 
@@ -162,25 +151,27 @@ open class SquitTestTask : DefaultTask() {
 
         val (successfulTests, failedTests, ignoredTests) = results.countTestResults()
 
-        if (!silent) {
+        if (!silent.get()) {
             val totalText = if (results.size == 1) "One test ran." else "${results.size} tests ran."
             val ignoredText = if (ignoredTests > 0) " ($ignoredTests ignored)" else ""
 
             println("$totalText\n$successfulTests successful and $failedTests failed$ignoredText.")
             println()
-            println("XML report: file://$xmlReportFilePath")
-            println("HTML report: file://${htmlReportDirectoryPath.resolve("index.html")}")
+            println("XML report: file://${xmlReportFile.asPath}")
+            println("HTML report: file://${htmlReportDir.asPath.resolve("index.html")}")
         }
 
-        if (failedTests > 0 && !ignoreFailures) throw GradleException("Failing tests.")
+        if (failedTests > 0 && !ignoreFailures.get()) throw GradleException("Failing tests.")
     }
 
     private fun processTests(): List<SquitResult> {
         val resultList = mutableListOf<SquitResult>()
 
-        FilesUtils.getLeafDirectories(processedResponsesPath).forEach { actualResponsePath ->
+        FilesUtils.getLeafDirectories(processedResponsesDir.asPath).forEach { actualResponsePath ->
             val configPath = FilesUtils.validateExistence(
-                processedSourcesPath.resolve(actualResponsePath.cut(processedResponsesPath)).resolve(CONFIG)
+                processedSourcesDir.asPath
+                    .resolve(actualResponsePath.cut(processedResponsesDir.asPath))
+                    .resolve(CONFIG),
             )
 
             val config = ConfigFactory.parseFile(configPath.toFile())
@@ -192,7 +183,9 @@ open class SquitTestTask : DefaultTask() {
                 resultList += if (Files.exists(errorFile)) {
                     constructResult(
                         FilesUtils.readAllBytes(errorFile).toString(Charset.defaultCharset()),
-                        expectedResponseInfo, actualResponsePath, config
+                        expectedResponseInfo,
+                        actualResponsePath,
+                        config,
                     )
                 } else {
                     val bodyDiff = createBodyDifference(actualResponsePath, config)
@@ -211,13 +204,13 @@ open class SquitTestTask : DefaultTask() {
 
     private fun createResponseInfoDifference(
         actualResponsePath: Path,
-        expectedResponseInfo: SquitResponseInfo
+        expectedResponseInfo: SquitResponseInfo,
     ): String {
         if (!expectedResponseInfo.isDefault) {
-            val contextPath = actualResponsePath.parent.parent.cut(processedResponsesPath)
+            val contextPath = actualResponsePath.parent.parent.cut(processedResponsesDir.asPath)
             val suitePath = actualResponsePath.parent.fileName
             val path: Path = contextPath.resolve(suitePath)
-            val squitBuildDirectoryPath = Paths.get(project.buildDir.path, SQUIT_DIRECTORY)
+            val squitBuildDirectoryPath = project.layout.buildDirectory.asPath.resolve(SQUIT_DIRECTORY)
             val testDirectoryPath = actualResponsePath.fileName
             val fullPath = path.resolve(testDirectoryPath)
             val resolvedPath = squitBuildDirectoryPath
@@ -226,7 +219,7 @@ open class SquitTestTask : DefaultTask() {
                 .resolve(fullPath)
 
             val actualResponseInfoPath = FilesUtils.validateExistence(
-                resolvedPath.resolve(ACTUAL_RESPONSE_INFO)
+                resolvedPath.resolve(ACTUAL_RESPONSE_INFO),
             )
 
             val actualResponse = FilesUtils.readAllBytes(actualResponseInfoPath).toString(Charset.defaultCharset())
@@ -239,43 +232,47 @@ open class SquitTestTask : DefaultTask() {
 
     private fun createBodyDifference(actualResponsePath: Path, config: Config): String {
         val actualResponseFilePath = FilesUtils.validateExistence(
-            actualResponsePath.resolve(MediaTypeFactory.actualResponse(config.mediaType))
+            actualResponsePath.resolve(MediaTypeFactory.actualResponse(config.mediaType)),
         )
 
         val expectedResponseFilePath = FilesUtils.validateExistence(
-            processedSourcesPath
-                .resolve(actualResponsePath.cut(processedResponsesPath))
-                .resolve(MediaTypeFactory.expectedResponse(config.mediaType))
+            processedSourcesDir.asPath
+                .resolve(actualResponsePath.cut(processedResponsesDir.asPath))
+                .resolve(MediaTypeFactory.expectedResponse(config.mediaType)),
         )
 
         val expectedResponse = FilesUtils.readAllBytes(expectedResponseFilePath)
         val actualResponse = FilesUtils.readAllBytes(actualResponseFilePath)
 
-        return MediaTypeFactory.differ(config.mediaType, mediaTypeConfig)
+        return MediaTypeFactory.differ(config.mediaType, mediaTypeConfig.get())
             .diff(expectedResponse, actualResponse)
     }
 
     private fun writeXmlReport(result: List<SquitResult>) {
-        Files.createDirectories(xmlReportFilePath.parent)
+        Files.createDirectories(xmlReportFile.asPath.parent)
 
-        XmlReportWriter().writeReport(result, xmlReportFilePath)
+        XmlReportWriter().writeReport(result, xmlReportFile.asPath)
     }
 
     private fun writeHtmlReport(result: List<SquitResult>) {
-        Files.createDirectories(htmlReportDirectoryPath)
+        Files.createDirectories(htmlReportDir.asPath)
 
-        HtmlReportWriter(logger).writeReport(result, htmlReportDirectoryPath, mediaTypeConfig)
+        HtmlReportWriter(logger).writeReport(result, htmlReportDir.asPath, mediaTypeConfig.get())
     }
 
     private fun copyFailures(result: List<SquitResult>) {
-        FilesUtils.deleteRecursivelyIfExisting(failureResultDirectory)
-        Files.createDirectories(failureResultDirectory)
+        FilesUtils.deleteRecursivelyIfExisting(failureReportDir.asPath)
+        Files.createDirectories(failureReportDir.asPath)
 
         result.filterNot { it.isSuccess }.forEach {
-            val resultDirectoryPath = Files.createDirectories(failureResultDirectory.resolve(it.fullPath))
+            val resultDirectoryPath = Files.createDirectories(failureReportDir.asPath.resolve(it.fullPath))
 
-            val testProcessedSourcesPath = FilesUtils.validateExistence(processedSourcesPath.resolve(it.fullPath))
-            val testActualResponsesPath = FilesUtils.validateExistence(processedResponsesPath.resolve(it.fullPath))
+            val testProcessedSourcesPath = FilesUtils
+                .validateExistence(processedSourcesDir.asPath.resolve(it.fullPath))
+
+            val testActualResponsesPath = FilesUtils
+                .validateExistence(processedResponsesDir.asPath.resolve(it.fullPath))
+
             val testDifferenceFile = Files.createFile(resultDirectoryPath.resolve(DIFF))
 
             FilesUtils.copyFilesFromDirectory(testProcessedSourcesPath, resultDirectoryPath)
@@ -289,10 +286,10 @@ open class SquitTestTask : DefaultTask() {
         responseInfo: SquitResponseInfo,
         actualResponsePath: Path,
         config: Config,
-        isIgnored: Boolean = false
+        isIgnored: Boolean = false,
     ): SquitResult {
-        val squitBuildDirectoryPath = Paths.get(project.buildDir.path, SQUIT_DIRECTORY)
-        val contextPath = actualResponsePath.parent.parent.cut(processedResponsesPath)
+        val squitBuildDirectoryPath = project.layout.buildDirectory.dir(SQUIT_DIRECTORY).asPath
+        val contextPath = actualResponsePath.parent.parent.cut(processedResponsesDir.asPath)
         val suitePath = actualResponsePath.parent.fileName
         val testDirectoryPath = actualResponsePath.fileName
         val id = nextResultId++
@@ -301,13 +298,13 @@ open class SquitTestTask : DefaultTask() {
             true -> SquitResult(
                 id, differences, responseInfo, isIgnored, config.mediaType, config.title,
                 contextPath, suitePath,
-                testDirectoryPath, squitBuildDirectoryPath
+                testDirectoryPath, squitBuildDirectoryPath,
             )
 
             false -> SquitResult(
                 id, "", responseInfo, isIgnored, config.mediaType, config.title,
                 contextPath, suitePath,
-                testDirectoryPath, squitBuildDirectoryPath
+                testDirectoryPath, squitBuildDirectoryPath,
             )
         }
     }

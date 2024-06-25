@@ -3,13 +3,20 @@ package de.smartsquare.squit.db
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeFalse
 import org.amshove.kluent.shouldBeTrue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.h2.Driver as H2Driver
 
 class ConnectionCollectionTest {
 
     private val jdbc = "jdbc:h2:mem:testDb"
     private val username = "test"
     private val password = "test"
+
+    @BeforeEach
+    fun setUp() {
+        H2Driver.load()
+    }
 
     @Test
     fun `creating a new db connection`() {

@@ -2,11 +2,11 @@ package de.smartsquare.squit.task
 
 import de.smartsquare.squit.TestUtils
 import de.smartsquare.squit.gradleRunner
-import java.nio.file.Files
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeFalse
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
+import java.nio.file.Files
 
 class SquitPreProcessTaskGetTest {
 
@@ -17,7 +17,9 @@ class SquitPreProcessTaskGetTest {
     @Test
     fun `normal run`() {
         val arguments = listOf(
-            "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com", "-Psquit.rootDir=$getProject"
+            "squitPreProcess",
+            "-Psquit.endpointPlaceholder=https://example.com",
+            "-Psquit.rootDir=$getProject",
         )
 
         val result = gradleRunner(getProject, arguments).build()

@@ -2,8 +2,6 @@ package de.smartsquare.squit.task
 
 import de.smartsquare.squit.TestUtils
 import de.smartsquare.squit.gradleRunner
-import java.nio.file.Files
-import kotlin.streams.toList
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
@@ -17,6 +15,8 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.nio.file.Files
+import kotlin.streams.toList
 
 class SquitTestTaskTest {
 
@@ -54,8 +54,9 @@ class SquitTestTaskTest {
         server.enqueue(MockResponse().setBody("<relevant/>"))
 
         val arguments = listOf(
-            "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project"
+            "squitTest",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
         )
 
         val result = gradleRunner(project, arguments).build()
@@ -83,8 +84,10 @@ class SquitTestTaskTest {
         server.enqueue(MockResponse().setBody("<nice/>"))
 
         val arguments = listOf(
-            "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-PtagsOr=call1,call2"
+            "squitTest",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-PtagsOr=call1,call2",
         )
 
         val result = gradleRunner(project, arguments).buildAndFail()
@@ -109,8 +112,10 @@ class SquitTestTaskTest {
         server.enqueue(MockResponse().setBody("<relevant/>"))
 
         val arguments = listOf(
-            "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-Punignore"
+            "squitTest",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-Punignore",
         )
 
         val result = gradleRunner(project, arguments).buildAndFail()
@@ -129,8 +134,10 @@ class SquitTestTaskTest {
         server.enqueue(MockResponse().setBody("<relevant/>"))
 
         val arguments = listOf(
-            "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-Punexclude"
+            "squitTest",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-Punexclude",
         )
 
         val result = gradleRunner(project, arguments).buildAndFail()

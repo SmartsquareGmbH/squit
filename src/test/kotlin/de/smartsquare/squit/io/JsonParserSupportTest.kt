@@ -1,13 +1,13 @@
 package de.smartsquare.squit.io
 
 import de.smartsquare.squit.TestUtils
-import java.io.IOException
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldThrow
 import org.amshove.kluent.withCause
 import org.amshove.kluent.withMessage
 import org.gradle.api.GradleException
 import org.junit.jupiter.api.Test
+import java.io.IOException
 
 class JsonParserSupportTest {
 
