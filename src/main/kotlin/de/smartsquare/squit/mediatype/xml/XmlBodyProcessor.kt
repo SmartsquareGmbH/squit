@@ -26,7 +26,7 @@ class XmlBodyProcessor : BodyProcessor {
         responsePath: Path,
         resultRequestPath: Path,
         resultResponsePath: Path,
-        config: Config
+        config: Config,
     ) {
         val request = requestPath?.let { SAXReaderSupport.read(requestPath) }
         val response = SAXReaderSupport.read(responsePath)
@@ -41,7 +41,7 @@ class XmlBodyProcessor : BodyProcessor {
         actualResponsePath: Path,
         expectedResponsePath: Path,
         resultActualResponseFilePath: Path,
-        config: Config
+        config: Config,
     ) {
         val actualResponse = SAXReaderSupport.read(actualResponsePath)
         val expectedResponse = SAXReaderSupport.read(expectedResponsePath)
@@ -53,7 +53,7 @@ class XmlBodyProcessor : BodyProcessor {
 
     private fun runPreProcessors(config: Config, request: Document?, response: Document) {
         config.preProcessors.map { Class.forName(it).getConstructor().newInstance() }
-            .filterIsInstance(SquitXmlPreProcessor::class.java)
+            .filterIsInstance<SquitXmlPreProcessor>()
             .forEach { it.process(request, response, config) }
 
         config.preProcessorScripts.forEach {
@@ -62,8 +62,8 @@ class XmlBodyProcessor : BodyProcessor {
                     mapOf(
                         "request" to request,
                         "expectedResponse" to response,
-                        "config" to config
-                    )
+                        "config" to config,
+                    ),
                 )
             }.run()
         }
@@ -71,7 +71,7 @@ class XmlBodyProcessor : BodyProcessor {
 
     private fun runPostProcessors(config: Config, actualResponse: Document, expectedResponse: Document) {
         config.postProcessors.map { Class.forName(it).getConstructor().newInstance() }
-            .filterIsInstance(SquitXmlPostProcessor::class.java)
+            .filterIsInstance<SquitXmlPostProcessor>()
             .forEach { it.process(actualResponse, expectedResponse, config) }
 
         config.postProcessorScripts.forEach {
@@ -79,8 +79,8 @@ class XmlBodyProcessor : BodyProcessor {
                 binding = Binding(
                     mapOf(
                         "actualResponse" to actualResponse,
-                        "expectedResponse" to expectedResponse
-                    )
+                        "expectedResponse" to expectedResponse,
+                    ),
                 )
             }.run()
         }

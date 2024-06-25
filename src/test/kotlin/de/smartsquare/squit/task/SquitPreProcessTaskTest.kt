@@ -2,7 +2,6 @@ package de.smartsquare.squit.task
 
 import de.smartsquare.squit.TestUtils
 import de.smartsquare.squit.gradleRunner
-import java.nio.file.Files
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeFalse
@@ -12,6 +11,7 @@ import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldNotContain
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
+import java.nio.file.Files
 
 class SquitPreProcessTaskTest {
 
@@ -38,8 +38,10 @@ class SquitPreProcessTaskTest {
     @Test
     fun `normal run`() {
         val arguments = listOf(
-            "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-            "-Psquit.rootDir=$project", "-PtagsOr=call1,call2,call4"
+            "squitPreProcess",
+            "-Psquit.endpointPlaceholder=https://example.com",
+            "-Psquit.rootDir=$project",
+            "-PtagsOr=call1,call2,call4",
         )
 
         val result = gradleRunner(project, arguments).build()
@@ -85,8 +87,10 @@ class SquitPreProcessTaskTest {
     @Test
     fun `running with tags`() {
         val arguments = listOf(
-            "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-            "-Psquit.rootDir=$project", "-PtagsAnd=project,unique"
+            "squitPreProcess",
+            "-Psquit.endpointPlaceholder=https://example.com",
+            "-Psquit.rootDir=$project",
+            "-PtagsAnd=project,unique",
         )
 
         val result = gradleRunner(project, arguments).build()
@@ -102,8 +106,10 @@ class SquitPreProcessTaskTest {
     @Test
     fun `running with the unignore flag`() {
         val arguments = listOf(
-            "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-            "-Psquit.rootDir=$project", "-Psquit.titlePlaceholder=newTitle"
+            "squitPreProcess",
+            "-Psquit.endpointPlaceholder=https://example.com",
+            "-Psquit.rootDir=$project",
+            "-Psquit.titlePlaceholder=newTitle",
         )
 
         val result = gradleRunner(project, arguments).build()
@@ -118,8 +124,10 @@ class SquitPreProcessTaskTest {
     @Test
     fun `running with overriding config`() {
         val arguments = listOf(
-            "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-            "-Psquit.rootDir=$project", "-Punignore"
+            "squitPreProcess",
+            "-Psquit.endpointPlaceholder=https://example.com",
+            "-Psquit.rootDir=$project",
+            "-Punignore",
         )
 
         val result = gradleRunner(project, arguments).build()
@@ -130,8 +138,11 @@ class SquitPreProcessTaskTest {
     @Test
     fun `running with build cache twice`() {
         val arguments = listOf(
-            "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-            "-Psquit.rootDir=$project", "-Punignore", "--build-cache"
+            "squitPreProcess",
+            "-Psquit.endpointPlaceholder=https://example.com",
+            "-Psquit.rootDir=$project",
+            "-Punignore",
+            "--build-cache",
         )
 
         val result = gradleRunner(project, arguments).build()

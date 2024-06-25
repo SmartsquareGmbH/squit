@@ -2,7 +2,6 @@ package de.smartsquare.squit.task
 
 import de.smartsquare.squit.TestUtils
 import de.smartsquare.squit.gradleRunner
-import java.nio.file.Files
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
@@ -13,6 +12,7 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.nio.file.Files
 
 class SquitPostProcessTaskTest {
 
@@ -43,8 +43,10 @@ class SquitPostProcessTaskTest {
         server.enqueue(MockResponse().setBody("<test/>"))
 
         val arguments = listOf(
-            "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-PtagsOr=call1,call2"
+            "squitPostProcess",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-PtagsOr=call1,call2",
         )
 
         val result = gradleRunner(project, arguments).build()
@@ -63,8 +65,10 @@ class SquitPostProcessTaskTest {
         server.enqueue(MockResponse().setBody("<unclosed_tag>"))
 
         val arguments = listOf(
-            "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-PtagsOr=call1,call2"
+            "squitPostProcess",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-PtagsOr=call1,call2",
         )
 
         val result = gradleRunner(project, arguments).build()
@@ -83,8 +87,11 @@ class SquitPostProcessTaskTest {
         }
 
         val arguments = listOf(
-            "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-PtagsOr=call1,call2", "--build-cache"
+            "squitPostProcess",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-PtagsOr=call1,call2",
+            "--build-cache",
         )
 
         val result = gradleRunner(project, arguments).build()

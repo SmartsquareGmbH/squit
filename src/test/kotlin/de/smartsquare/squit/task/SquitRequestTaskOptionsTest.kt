@@ -35,8 +35,9 @@ class SquitRequestTaskOptionsTest {
         server.enqueue(MockResponse().setBody("<nice/>"))
 
         val arguments = listOf(
-            "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$optionsProject"
+            "squitRunRequests",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$optionsProject",
         )
 
         val result = gradleRunner(optionsProject, arguments).build()

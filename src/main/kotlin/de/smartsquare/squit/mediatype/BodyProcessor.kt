@@ -17,7 +17,7 @@ interface BodyProcessor {
         responsePath: Path,
         resultRequestPath: Path,
         resultResponsePath: Path,
-        config: Config
+        config: Config,
     )
 
     /**
@@ -28,6 +28,6 @@ interface BodyProcessor {
         actualResponsePath: Path,
         expectedResponsePath: Path,
         resultActualResponseFilePath: Path,
-        config: Config
+        config: Config,
     )
 }

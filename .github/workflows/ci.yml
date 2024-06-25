@@ -1,6 +1,9 @@
 name: CI
-
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   build:
@@ -10,27 +13,26 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
-        java: [8, 11, 17]
+        java: [17, 21]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
       - name: Setup JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
-          cache: 'gradle'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
 
       - name: Build with Gradle
-        if: matrix.os == 'ubuntu-latest'
         run: ./gradlew build --stacktrace
-      - name: Build with Gradle
-        if: matrix.os == 'windows-latest'
-        run: .\gradlew.bat build --stacktrace
 
       - name: Store reports
-        uses: actions/upload-artifact@v3
-        if: always()
+        uses: actions/upload-artifact@v4
+        if: failure()
         with:
-          name: reports-${{ runner.os }}-${{ matrix.java }}
-          path: build/reports
+          name: "Gradle Reports ${{ runner.os }} ${{ matrix.java }}"
+          path: "**/build/reports"

@@ -1,10 +1,10 @@
 package de.smartsquare.squit.io
 
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.createTempDirectory
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldNotExist
 import org.junit.jupiter.api.Test
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createTempDirectory
 
 @ExperimentalPathApi
 class FilesUtilsTest {

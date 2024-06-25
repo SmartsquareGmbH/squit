@@ -2,15 +2,15 @@ package de.smartsquare.squit.task
 
 import de.smartsquare.squit.TestUtils
 import de.smartsquare.squit.gradleRunner
-import java.nio.file.Files
-import java.nio.file.StandardOpenOption.CREATE
-import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldContain
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.nio.file.Files
+import java.nio.file.StandardOpenOption.CREATE
+import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
 
 class SquitPreProcessTaskDifferentEncodingTest {
 
@@ -32,8 +32,10 @@ class SquitPreProcessTaskDifferentEncodingTest {
     @Test
     fun `normal run`() {
         val arguments = listOf(
-            "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com",
-            "-Psquit.rootDir=$project", "-PtagsOr=call1,call2,call4"
+            "squitPreProcess",
+            "-Psquit.endpointPlaceholder=https://example.com",
+            "-Psquit.rootDir=$project",
+            "-PtagsOr=call1,call2,call4",
         )
 
         val result = gradleRunner(project, arguments).buildAndFail()

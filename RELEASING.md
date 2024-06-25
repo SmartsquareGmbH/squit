@@ -1,4 +1,4 @@
-**The following steps are required to do a release of Squit:**
+Squit will be automatically released by creating a release on GitHub. To manually release Squit:
 
 - Log into the Gradle Plugins Portal with the `login` Gradle task:
 

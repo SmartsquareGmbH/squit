@@ -3,11 +3,6 @@ package de.smartsquare.squit.task
 import de.smartsquare.squit.TestUtils
 import de.smartsquare.squit.entity.SquitMetaInfo
 import de.smartsquare.squit.gradleRunner
-import java.io.File
-import java.nio.charset.Charset
-import java.nio.file.Files
-import java.sql.DriverManager
-import java.time.LocalDateTime
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
@@ -23,6 +18,12 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.io.File
+import java.nio.charset.Charset
+import java.nio.file.Files
+import java.sql.DriverManager
+import java.time.LocalDateTime
+import org.h2.Driver as H2Driver
 
 class SquitRequestTaskTest {
 
@@ -59,8 +60,10 @@ class SquitRequestTaskTest {
         server.enqueue(MockResponse().setBody("<nice/>"))
 
         val arguments = listOf(
-            "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-PtagsOr=call1,call2"
+            "squitRunRequests",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-PtagsOr=call1,call2",
         )
 
         val result = gradleRunner(project, arguments).build()
@@ -73,7 +76,7 @@ class SquitRequestTaskTest {
 
         val (date, duration) = SquitMetaInfo.fromJson(
             Files.readAllBytes(call1Meta)
-                .toString(Charset.defaultCharset())
+                .toString(Charset.defaultCharset()),
         )
 
         date shouldBeBefore LocalDateTime.now()
@@ -92,6 +95,7 @@ class SquitRequestTaskTest {
             it.headers["some"] shouldBeEqualTo "header"
         }
 
+        H2Driver.load()
         DriverManager.getConnection(jdbc, username, password).use { connection ->
             val resultSet = connection.createStatement().executeQuery("SELECT * FROM animals")
 
@@ -113,8 +117,11 @@ class SquitRequestTaskTest {
         server.enqueue(MockResponse().setBody("error").setResponseCode(500))
 
         val arguments = listOf(
-            "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-PtagsOr=call1", "--info"
+            "squitRunRequests",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-PtagsOr=call1",
+            "--info",
         )
 
         val result = gradleRunner(project, arguments).build()
@@ -130,8 +137,10 @@ class SquitRequestTaskTest {
         // Nothing enqueued to cause timeout.
 
         val arguments = listOf(
-            "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-Ptags=call1"
+            "squitRunRequests",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-Ptags=call1",
         )
 
         val result = gradleRunner(project, arguments).build()
@@ -147,8 +156,11 @@ class SquitRequestTaskTest {
         server.enqueue(MockResponse().setBody("<cool/>").setHeader("Content-Type", "text/plain"))
 
         val arguments = listOf(
-            "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-Ptags=call1", "--info"
+            "squitRunRequests",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-Ptags=call1",
+            "--info",
         )
 
         val result = gradleRunner(project, arguments).build()

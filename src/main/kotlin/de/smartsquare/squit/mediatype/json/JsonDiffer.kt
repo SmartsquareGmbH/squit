@@ -8,16 +8,14 @@ import net.javacrumbs.jsonunit.JsonAssert
  */
 class JsonDiffer : Differ {
 
-    override fun diff(expectedResponse: ByteArray, actualResponse: ByteArray): String {
-        return try {
-            JsonAssert.assertJsonEquals(
-                expectedResponse.toString(Charsets.UTF_8),
-                actualResponse.toString(Charsets.UTF_8)
-            )
+    override fun diff(expectedResponse: ByteArray, actualResponse: ByteArray): String = try {
+        JsonAssert.assertJsonEquals(
+            expectedResponse.toString(Charsets.UTF_8),
+            actualResponse.toString(Charsets.UTF_8),
+        )
 
-            ""
-        } catch (error: AssertionError) {
-            requireNotNull(error.message)
-        }
+        ""
+    } catch (error: AssertionError) {
+        requireNotNull(error.message)
     }
 }

@@ -19,7 +19,7 @@ data class SquitResultTree(
     val name: String,
     val successfulTests: Int,
     val failedTests: Int,
-    val ignoredTests: Int
+    val ignoredTests: Int,
 ) {
 
     companion object {
@@ -41,7 +41,7 @@ data class SquitResultTree(
                         group.first().combinedName,
                         successfulTests,
                         failedTests,
-                        ignoredTests
+                        ignoredTests,
                     )
                 } else {
                     SquitResultTree(
@@ -50,7 +50,7 @@ data class SquitResultTree(
                         path.first().fileName.toString(),
                         successfulTests,
                         failedTests,
-                        ignoredTests
+                        ignoredTests,
                     )
                 }
             }

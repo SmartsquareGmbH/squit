@@ -34,8 +34,9 @@ class SquitRequestTaskGetTest {
         server.enqueue(MockResponse().setBody("<cool/>"))
 
         val arguments = listOf(
-            "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$getProject"
+            "squitRunRequests",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$getProject",
         )
 
         val result = gradleRunner(getProject, arguments).build()
