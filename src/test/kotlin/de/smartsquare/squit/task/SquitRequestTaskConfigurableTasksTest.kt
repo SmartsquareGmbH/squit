@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.sql.DriverManager
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 class SquitRequestTaskConfigurableTasksTest {
     private val project = TestUtils.getResourcePath("test-project-task-config")
@@ -45,7 +46,11 @@ class SquitRequestTaskConfigurableTasksTest {
 
     @Test
     fun `should execute pre and post tasks in default order`() {
-        server.enqueue(MockResponse().setBody("<cool/>"))
+        server.enqueue(
+            MockResponse()
+                .setHeadersDelay(10L, TimeUnit.MILLISECONDS)
+                .setBody("<cool/>")
+        )
 
         val arguments = listOf(
             "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
@@ -74,7 +79,11 @@ class SquitRequestTaskConfigurableTasksTest {
 
     @Test
     fun `should execute scripts in configured order`() {
-        server.enqueue(MockResponse().setBody("<cool/>"))
+        server.enqueue(
+            MockResponse()
+                .setHeadersDelay(10L, TimeUnit.MILLISECONDS)
+                .setBody("<cool/>")
+        )
 
         val arguments = listOf(
             "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
@@ -104,7 +113,11 @@ class SquitRequestTaskConfigurableTasksTest {
 
     @Test
     fun `should only execute pre db script and post script`() {
-        server.enqueue(MockResponse().setBody("<cool/>"))
+        server.enqueue(
+            MockResponse()
+                .setHeadersDelay(10L, TimeUnit.MILLISECONDS)
+                .setBody("<cool/>")
+        )
 
         val arguments = listOf(
             "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
