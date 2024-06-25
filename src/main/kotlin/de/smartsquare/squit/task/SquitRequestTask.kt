@@ -60,7 +60,6 @@ import java.util.concurrent.TimeUnit
  * Task for running requests against the given api. Also capable of running existing sql scripts before and after the
  * request.
  */
-@Suppress("TooManyFunctions")
 open class SquitRequestTask : DefaultTask() {
 
     /**
@@ -250,7 +249,7 @@ open class SquitRequestTask : DefaultTask() {
 
     private fun doPreScriptExecutions(config: Config, testDirectoryPath: Path) {
         config.preTestTasks.forEach { task ->
-            when (task!!) {
+            when (task) {
                 SquitPreTestTask.PRE_RUNNERS -> executePreRunners(config)
                 SquitPreTestTask.PRE_RUNNER_SCRIPTS -> executePreRunnerScripts(config)
                 SquitPreTestTask.DATABASE_SCRIPTS -> executePreDatabaseScripts(config, testDirectoryPath)
@@ -289,7 +288,7 @@ open class SquitRequestTask : DefaultTask() {
 
     private fun doPostScriptExecutions(config: Config, testDirectoryPath: Path) {
         config.postTestTasks.forEach { task ->
-            when (task!!) {
+            when (task) {
                 SquitPostTestTask.POST_RUNNER_SCRIPTS -> executePostRunnerScripts(config)
                 SquitPostTestTask.POST_RUNNERS -> executePostRunners(config)
                 SquitPostTestTask.DATABASE_SCRIPTS -> executePostDatabaseScripts(config, testDirectoryPath)
