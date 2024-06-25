@@ -26,19 +26,21 @@ class XmlCanonicalizer : Canonicalizer {
     }
 
     private companion object {
+        private const val RESOLVE_NAMESPACE_STRING = "http://"
+
         private val xmlNamespaceRegex = Regex("(xmlns:\\w+=['\"])(.*?)(['\"])")
         private val urlRegex = Regex("^https?://")
-        private const val resolveNamespaceString = "http://"
     }
 
-    override fun canonicalize(input: String, mediaTypeConfig: MediaTypeConfig): String {
-        return if (mediaTypeConfig.xmlCanonicalize) {
+    override fun canonicalize(input: String, mediaTypeConfig: MediaTypeConfig): String =
+        if (mediaTypeConfig.xmlCanonicalize) {
             val outputStream = ByteArrayOutputStream()
 
-            val content = if (mediaTypeConfig.resolveInvalidNamespaces)
+            val content = if (mediaTypeConfig.xmlResolveInvalidNamespaces) {
                 resolveInvalidNamespaces(input)
-            else
+            } else {
                 input
+            }
 
             canonicalizer.canonicalize(content.toByteArray(), outputStream, false)
 
@@ -46,25 +48,20 @@ class XmlCanonicalizer : Canonicalizer {
         } else {
             input
         }
-    }
 
-    private fun resolveInvalidNamespaces(content: String): String {
-        return content.replace(xmlNamespaceRegex) { match ->
-            val start = match.groupValues[1]
-            val potentialUrlString = match.groupValues[2]
-            val end = match.groupValues[3]
+    private fun resolveInvalidNamespaces(content: String): String = content.replace(xmlNamespaceRegex) { match ->
+        val start = match.groupValues[1]
+        val potentialUrlString = match.groupValues[2]
+        val end = match.groupValues[3]
 
-            if (!potentialUrlString.contains(urlRegex)) {
-                "$start$resolveNamespaceString$potentialUrlString$end"
-            } else {
-                "$start$potentialUrlString$end"
-            }
+        if (!potentialUrlString.contains(urlRegex)) {
+            "$start$RESOLVE_NAMESPACE_STRING$potentialUrlString$end"
+        } else {
+            "$start$potentialUrlString$end"
         }
     }
 
-    private fun Document.asString(outputFormat: OutputFormat = SquitOutputFormat): String {
-        return StringWriter()
-            .also { XMLWriter(it, outputFormat).write(this) }
-            .toString()
-    }
+    private fun Document.asString(outputFormat: OutputFormat = SquitOutputFormat): String = StringWriter()
+        .also { XMLWriter(it, outputFormat).write(this) }
+        .toString()
 }

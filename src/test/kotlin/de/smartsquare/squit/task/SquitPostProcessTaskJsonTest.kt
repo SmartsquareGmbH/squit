@@ -2,7 +2,6 @@ package de.smartsquare.squit.task
 
 import de.smartsquare.squit.TestUtils
 import de.smartsquare.squit.gradleRunner
-import java.nio.file.Files
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
@@ -11,6 +10,7 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.nio.file.Files
 
 class SquitPostProcessTaskJsonTest {
 
@@ -38,8 +38,9 @@ class SquitPostProcessTaskJsonTest {
         server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}"))
 
         val arguments = listOf(
-            "squitPostProcess", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$jsonProject"
+            "squitPostProcess",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$jsonProject",
         )
 
         val result = gradleRunner(jsonProject, arguments).build()

@@ -7,11 +7,11 @@ max_line_length = 120
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.kt]
-continuation_indent_size = 4
-
-[*.{java,gradle}]
-continuation_indent_size = 8
+[*.{kt,kts}]
+ij_continuation_indent_size = 4
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+ktlint_code_style = intellij_idea
 
 [*.{yml,json,conf}]
 indent_size = 2

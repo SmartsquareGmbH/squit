@@ -2,7 +2,6 @@ package de.smartsquare.squit.task
 
 import de.smartsquare.squit.TestUtils
 import de.smartsquare.squit.gradleRunner
-import java.nio.file.Files
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
@@ -11,6 +10,7 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.nio.file.Files
 
 class SquitTestTaskDifferentStructureTest {
 
@@ -37,8 +37,9 @@ class SquitTestTaskDifferentStructureTest {
         server.enqueue(MockResponse().setBody("<cool/>"))
 
         val arguments = listOf(
-            "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$differentStructureProject"
+            "squitTest",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$differentStructureProject",
         )
 
         val result = gradleRunner(differentStructureProject, arguments).build()

@@ -15,6 +15,7 @@ import de.smartsquare.squit.config.preRunners
 import de.smartsquare.squit.config.preTestTasks
 import de.smartsquare.squit.db.ConnectionCollection
 import de.smartsquare.squit.db.executeScript
+import de.smartsquare.squit.entity.SquitDatabaseConfiguration
 import de.smartsquare.squit.entity.SquitMetaInfo
 import de.smartsquare.squit.entity.SquitResponseInfo
 import de.smartsquare.squit.interfaces.SquitPostRunner
@@ -29,7 +30,9 @@ import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
 import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
+import de.smartsquare.squit.util.asPath
 import de.smartsquare.squit.util.cut
+import de.smartsquare.squit.util.dir
 import de.smartsquare.squit.util.lifecycleOnSameLine
 import de.smartsquare.squit.util.newLineIfNeeded
 import groovy.lang.Binding
@@ -41,17 +44,20 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.internal.http.HttpMethod
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.Directory
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.sql.Driver
-import java.sql.DriverManager
 import java.sql.SQLException
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
@@ -60,67 +66,53 @@ import java.util.concurrent.TimeUnit
  * Task for running requests against the given api. Also capable of running existing sql scripts before and after the
  * request.
  */
-open class SquitRequestTask : DefaultTask() {
+abstract class SquitRequestTask : DefaultTask() {
 
     /**
      * The jdbc driver classes to use.
      */
     @get:Input
-    lateinit var jdbcDrivers: List<String>
+    abstract val jdbcDrivers: ListProperty<String>
 
     /**
      * The timeout in seconds to use for requests.
      */
-    @get:Internal
-    var timeout = 10L
+    @get:Input
+    abstract val requestTimeout: Property<Long>
 
     /**
      * If squit should avoid printing anything if all tests pass.
      */
-    @get:Internal
-    var silent = false
+    @get:Input
+    abstract val silent: Property<Boolean>
 
     /**
      * The class name of the jdbc [Driver] to use.
      */
     @get:Input
-    val jdbcDriverClassNames by lazy {
-        jdbcDrivers
-            .map { it.trim() }
-            .filter { it.isNotBlank() }
-            .let {
-                logger.info("Using $it for jdbc connections.")
-
-                it
-            }
-    }
+    val jdbcDriverClassNames: Provider<List<String>>
+        get() = jdbcDrivers.map { driver -> driver.map(String::trim).filter(String::isNotBlank) }
 
     /**
      * The directory of the test sources.
      */
     @get:InputDirectory
-    val processedSourcesPath: Path = Paths.get(
-        project.buildDir.path,
-        SQUIT_DIRECTORY,
-        SOURCES_DIRECTORY
-    )
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    val processedSourcesDir: Provider<Directory> = project.layout.buildDirectory
+        .dir(SQUIT_DIRECTORY, SOURCES_DIRECTORY)
 
     /**
      * The directory to save the results in.
      */
     @get:OutputDirectory
-    val actualResponsesPath: Path = Paths.get(
-        project.buildDir.path,
-        SQUIT_DIRECTORY,
-        RESPONSES_DIRECTORY,
-        RAW_DIRECTORY
-    )
+    val actualResponsesDir: Provider<Directory> = project.layout.buildDirectory
+        .dir(SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)
 
     private val okHttpClient by lazy {
         OkHttpClient.Builder()
-            .connectTimeout(timeout, TimeUnit.SECONDS)
-            .writeTimeout(timeout, TimeUnit.SECONDS)
-            .readTimeout(timeout, TimeUnit.SECONDS)
+            .connectTimeout(requestTimeout.get(), TimeUnit.SECONDS)
+            .writeTimeout(requestTimeout.get(), TimeUnit.SECONDS)
+            .readTimeout(requestTimeout.get(), TimeUnit.SECONDS)
             .build()
     }
 
@@ -137,27 +129,26 @@ open class SquitRequestTask : DefaultTask() {
     /**
      * Runs the task.
      */
-    @Suppress("unused")
     @TaskAction
     fun run() {
-        jdbcDriverClassNames.forEach {
-            DriverManager.registerDriver(Class.forName(it).getConstructor().newInstance() as Driver)
-        }
+        jdbcDriverClassNames.get()
+            .onEach { logger.info("Using $it for jdbc connections.") }
+            .forEach { Class.forName(it) }
 
-        FilesUtils.deleteRecursivelyIfExisting(actualResponsesPath)
-        Files.createDirectories(actualResponsesPath)
+        FilesUtils.deleteRecursivelyIfExisting(actualResponsesDir.asPath)
+        Files.createDirectories(actualResponsesDir.asPath)
 
         dbConnections.use {
-            FilesUtils.getLeafDirectories(processedSourcesPath).forEachIndexed { index, testDirectoryPath ->
-                if (!silent) {
+            FilesUtils.getLeafDirectories(processedSourcesDir.asPath).forEachIndexed { index, testDirectoryPath ->
+                if (!silent.get()) {
                     logger.lifecycleOnSameLine(
                         "Running test ${index + 1}",
-                        project.gradle.startParameter.consoleOutput
+                        project.gradle.startParameter.consoleOutput,
                     )
                 }
 
                 val resultResponsePath = Files.createDirectories(
-                    actualResponsesPath.resolve(testDirectoryPath.cut(processedSourcesPath))
+                    actualResponsesDir.asPath.resolve(testDirectoryPath.cut(processedSourcesDir.asPath)),
                 )
 
                 val errorFile = testDirectoryPath.resolve(ERROR)
@@ -204,7 +195,7 @@ open class SquitRequestTask : DefaultTask() {
         testDirectoryPath: Path,
         resultResponsePath: Path,
         requestPath: Path?,
-        config: Config
+        config: Config,
     ) {
         val resultResponseFilePath = resultResponsePath.resolve(MediaTypeFactory.actualResponse(config.mediaType))
 
@@ -223,21 +214,21 @@ open class SquitRequestTask : DefaultTask() {
             Files.write(resultResponseInfoFilePath, responseInfo.toJson().toByteArray())
 
             if (!apiResponse.isSuccessful) {
-                if (!silent) logger.newLineIfNeeded()
+                if (!silent.get()) logger.newLineIfNeeded()
 
                 logger.info(
-                    "Unsuccessful request for test ${testDirectoryPath.cut(processedSourcesPath)} " +
-                        "(status code: ${apiResponse.code})"
+                    "Unsuccessful request for test ${testDirectoryPath.cut(processedSourcesDir.asPath)} " +
+                        "(status code: ${apiResponse.code})",
                 )
             } else if (
                 mediaType?.type != config.mediaType.type ||
                 mediaType.subtype != config.mediaType.subtype
             ) {
-                if (!silent) logger.newLineIfNeeded()
+                if (!silent.get()) logger.newLineIfNeeded()
 
                 logger.info(
-                    "Unexpected Media type $mediaType for test ${testDirectoryPath.cut(processedSourcesPath)}. " +
-                        "Expected ${config.mediaType}"
+                    "Unexpected Media type $mediaType for test " +
+                        "${testDirectoryPath.cut(processedSourcesDir.asPath)}. Expected ${config.mediaType}",
                 )
             }
         } catch (error: IOException) {
@@ -259,12 +250,7 @@ open class SquitRequestTask : DefaultTask() {
 
     private fun executePreDatabaseScripts(config: Config, testDirectoryPath: Path) {
         config.databaseConfigurations.forEach {
-            executeScriptIfExisting(
-                testDirectoryPath.resolve("${it.name}_pre.sql"),
-                it.jdbcAddress,
-                it.username,
-                it.password
-            )
+            executeScriptIfExisting(it, testDirectoryPath.resolve("${it.name}_pre.sql"))
         }
     }
 
@@ -298,12 +284,7 @@ open class SquitRequestTask : DefaultTask() {
 
     private fun executePostDatabaseScripts(config: Config, testDirectoryPath: Path) {
         config.databaseConfigurations.forEach {
-            executeScriptIfExisting(
-                testDirectoryPath.resolve("${it.name}_post.sql"),
-                it.jdbcAddress,
-                it.username,
-                it.password
-            )
+            executeScriptIfExisting(it, testDirectoryPath.resolve("${it.name}_post.sql"))
         }
     }
 
@@ -333,30 +314,27 @@ open class SquitRequestTask : DefaultTask() {
                 .headers(config.headers.toHeaders())
                 .method(config.method, requestBody)
                 .url(config.endpoint)
-                .build()
+                .build(),
         )
     }
 
-    private fun executeScriptIfExisting(
-        path: Path,
-        jdbc: String,
-        username: String,
-        password: String
-    ) = if (Files.exists(path)) {
-        try {
-            dbConnections.createOrGet(jdbc, username, password).executeScript(path)
+    private fun executeScriptIfExisting(dbConfiguration: SquitDatabaseConfiguration, path: Path): Boolean {
+        if (!Files.exists(path)) return true
+
+        return try {
+            dbConnections
+                .createOrGet(dbConfiguration.jdbcAddress, dbConfiguration.username, dbConfiguration.password)
+                .executeScript(path)
 
             true
         } catch (error: SQLException) {
             logger.newLineIfNeeded()
             logger.warn(
                 "Could not run database script ${path.fileName} for test " +
-                    "${path.parent.cut(processedSourcesPath)} (${error.toString().trim()})"
+                    "${path.parent.cut(processedSourcesDir.asPath)} (${error.toString().trim()})",
             )
 
             false
         }
-    } else {
-        true
     }
 }

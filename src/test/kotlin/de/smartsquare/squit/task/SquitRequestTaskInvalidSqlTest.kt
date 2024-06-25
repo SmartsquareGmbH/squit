@@ -2,7 +2,6 @@ package de.smartsquare.squit.task
 
 import de.smartsquare.squit.TestUtils
 import de.smartsquare.squit.gradleRunner
-import java.io.File
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
@@ -11,6 +10,7 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.io.File
 
 class SquitRequestTaskInvalidSqlTest {
 
@@ -35,8 +35,9 @@ class SquitRequestTaskInvalidSqlTest {
         server.enqueue(MockResponse().setBody("<cool/>"))
 
         val arguments = listOf(
-            "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$invalidProject2"
+            "squitRunRequests",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$invalidProject2",
         )
 
         val result = gradleRunner(invalidProject2, arguments).build()

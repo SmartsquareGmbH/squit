@@ -33,8 +33,9 @@ class SquitTestTaskNonStrictXmlDiffingTest {
         server.enqueue(MockResponse().setBody("<abc:cool xmlns:abc='https://example.com'/>"))
 
         val arguments = listOf(
-            "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$projectWithNonStrictXml"
+            "squitTest",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$projectWithNonStrictXml",
         )
 
         val result = gradleRunner(projectWithNonStrictXml, arguments).build()

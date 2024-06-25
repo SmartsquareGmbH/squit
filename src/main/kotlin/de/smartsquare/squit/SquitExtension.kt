@@ -3,84 +3,65 @@ package de.smartsquare.squit
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.Internal
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Nested
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
+import javax.inject.Inject
 
-/**
- * Class containing the available extensions for the squit dsl.
- */
-open class SquitExtension(private val project: Project) {
+open class SquitExtension @Inject constructor(private val project: Project) {
 
     /**
      * Extension for xml configuration.
      */
-    @get:Nested
-    val xml = XmlExtension()
+    @Nested
+    val xml: XmlExtension = project.objects.newInstance(XmlExtension::class.java, project)
 
     /**
      * Extension for json configuration.
      */
-    @get:Nested
-    val json = JsonExtension()
+    @Nested
+    val json: JsonExtension = project.objects.newInstance(JsonExtension::class.java, project)
 
     /**
      * The jdbc driver classes to use.
      */
-    @get:Input
-    var jdbcDrivers: List<String> = emptyList()
+    val jdbcDrivers: ListProperty<String> = project.objects.listProperty(String::class.java)
 
     /**
      * The path the sources lie in. Defaults to src/squit.
      */
-    @get:InputDirectory
-    @get:PathSensitive(PathSensitivity.RELATIVE)
     val sourceDir: DirectoryProperty = project.objects.directoryProperty()
-        .convention(project.layout.projectDirectory.dir("src/squit"))
 
     /**
      * The path to save reports and possible failures in.
      */
-    @get:OutputDirectory
     val reportDir: DirectoryProperty = project.objects.directoryProperty()
-        .convention(project.layout.buildDirectory.dir("squit/reports"))
 
     /**
      * The timeout in seconds to use for requests.
      */
-    @get:Internal
-    var timeout = 10L
+    val requestTimeout: Property<Long> = project.objects.property(Long::class.java)
 
     /**
      * If squit should avoid printing anything if all tests pass.
      */
-    @get:Internal
-    var silent = false
+    val silent: Property<Boolean> = project.objects.property(Boolean::class.java)
 
     /**
      * If failures should be ignored.
      * In that case the task passes, even if tests have failed.
      */
-    @get:Input
-    var ignoreFailures = false
+    val ignoreFailures: Property<Boolean> = project.objects.property(Boolean::class.java)
 
     /**
      * Helper method to set the sourceDir via String.
      */
-    fun sourceDir(path: String) = sourceDir.apply {
-        set(project.projectDir.resolve(path))
-    }
+    fun sourceDir(path: String) = sourceDir.set(project.layout.projectDirectory.dir(path))
 
     /**
      * Helper method to set the reportDir via String.
      */
-    fun reportDir(path: String) = reportDir.apply {
-        set(project.projectDir.resolve(path))
-    }
+    fun reportDir(path: String) = reportDir.set(project.layout.projectDirectory.dir(path))
 
     /**
      * Configures the xml dsl.
@@ -90,38 +71,41 @@ open class SquitExtension(private val project: Project) {
     }
 
     /**
+     * Configures the json dsl.
+     */
+    fun json(action: Action<JsonExtension>) {
+        action.execute(json)
+    }
+
+    /**
      * Class containing the available extensions for the xml dsl.
      */
-    open class XmlExtension {
+    open class XmlExtension @Inject constructor(project: Project) {
 
         /**
          * If the xml diffing should use strict (e.g. identic) comparison.
          */
-        @get:Input
-        var strict = true
+        val strict: Property<Boolean> = project.objects.property(Boolean::class.java)
 
         /**
          * If the html report should be canonicalized for xml tests.
          */
-        @get:Input
-        var canonicalize = true
+        val canonicalize: Property<Boolean> = project.objects.property(Boolean::class.java)
 
         /**
          * Whether to try to resolve invalid namespaces on canonicalization (e.g. missing http://)
          */
-        @get:Input
-        var resolveInvalidNamespaces = false
+        val resolveInvalidNamespaces: Property<Boolean> = project.objects.property(Boolean::class.java)
     }
 
     /**
      * Class containing the available extensions for the json dsl.
      */
-    open class JsonExtension {
+    open class JsonExtension @Inject constructor(project: Project) {
 
         /**
          * If the html report should be canonicalized for json tests.
          */
-        @get:Input
-        var canonicalize = true
+        val canonicalize: Property<Boolean> = project.objects.property(Boolean::class.java)
     }
 }

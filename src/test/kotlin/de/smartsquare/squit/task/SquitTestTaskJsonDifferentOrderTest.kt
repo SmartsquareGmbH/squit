@@ -40,13 +40,14 @@ class SquitTestTaskJsonDifferentOrderTest {
                       "olleh": 321,
                       "hello": "123"
                     }
-                """.trimIndent()
-            )
+                """.trimIndent(),
+            ),
         )
 
         val arguments = listOf(
-            "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$jsonProjectWithDifferentOrder"
+            "squitTest",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$jsonProjectWithDifferentOrder",
         )
 
         val result = gradleRunner(jsonProjectWithDifferentOrder, arguments).build()

@@ -25,25 +25,25 @@ class HtmlReportWriter(private val logger: Logger) {
         private const val DIFF_CONTEXT_SIZE = 1_000_000
         private const val HTML_LINE_ENDING = "\\n\\\n"
 
-        private const val bootstrapPath = "META-INF/resources/webjars/bootstrap/4.6.0/dist"
-        private const val fontAwesomePath = "META-INF/resources/webjars/font-awesome/5.15.4"
-        private const val jqueryPath = "META-INF/resources/webjars/jquery/3.6.0/dist"
-        private const val popperJsPath = "META-INF/resources/webjars/popper.js/1.16.1/dist/umd"
-        private const val markedPath = "META-INF/resources/webjars/marked/2.0.6"
-        private const val diff2htmlPath = "META-INF/resources/webjars/diff2html/3.1.7"
+        private const val BOOTSTRAP_PATH = "META-INF/resources/webjars/bootstrap/4.6.0/dist"
+        private const val FONT_AWESOME_PATH = "META-INF/resources/webjars/font-awesome/5.15.4"
+        private const val JQUERY_PATH = "META-INF/resources/webjars/jquery/3.6.0/dist"
+        private const val POPPER_JS_PATH = "META-INF/resources/webjars/popper.js/1.16.1/dist/umd"
+        private const val MARKED_PATH = "META-INF/resources/webjars/marked/2.0.6"
+        private const val DIFF_2_HTML_PATH = "META-INF/resources/webjars/diff2html/3.1.7"
 
         private val resources = arrayOf(
-            "$bootstrapPath/css/bootstrap.min.css" to "css/bootstrap.css",
-            "$bootstrapPath/js/bootstrap.min.js" to "js/bootstrap.js",
-            "$fontAwesomePath/js/all.min.js" to "js/fontawesome.js",
-            "$jqueryPath/jquery.slim.min.js" to "js/jquery.js",
-            "$popperJsPath/popper.min.js" to "js/popper.js",
-            "$markedPath/marked.min.js" to "js/marked.js",
-            "$diff2htmlPath/bundles/css/diff2html.min.css" to "css/diff2html.css",
-            "$diff2htmlPath/bundles/js/diff2html.min.js" to "js/diff2html.js",
-            "$diff2htmlPath/bundles/js/diff2html-ui.min.js" to "js/diff2html-ui.js",
+            "$BOOTSTRAP_PATH/css/bootstrap.min.css" to "css/bootstrap.css",
+            "$BOOTSTRAP_PATH/js/bootstrap.min.js" to "js/bootstrap.js",
+            "$FONT_AWESOME_PATH/js/all.min.js" to "js/fontawesome.js",
+            "$JQUERY_PATH/jquery.slim.min.js" to "js/jquery.js",
+            "$POPPER_JS_PATH/popper.min.js" to "js/popper.js",
+            "$MARKED_PATH/marked.min.js" to "js/marked.js",
+            "$DIFF_2_HTML_PATH/bundles/css/diff2html.min.css" to "css/diff2html.css",
+            "$DIFF_2_HTML_PATH/bundles/js/diff2html.min.js" to "js/diff2html.js",
+            "$DIFF_2_HTML_PATH/bundles/js/diff2html-ui.min.js" to "js/diff2html-ui.js",
             "squit.js" to "js/squit.js",
-            "squit.css" to "css/squit.css"
+            "squit.css" to "css/squit.css",
         )
 
         private val emptyDiffHeader = listOf("--- $DIFF_FILE_NAME", "+++ $DIFF_FILE_NAME", "@@ -1 +1 @@")
@@ -52,11 +52,7 @@ class HtmlReportWriter(private val logger: Logger) {
     /**
      * Generates and writes the Squit html report, given the [results] list and [reportDirectoryPath].
      */
-    fun writeReport(
-        results: List<SquitResult>,
-        reportDirectoryPath: Path,
-        mediaTypeConfig: MediaTypeConfig
-    ) {
+    fun writeReport(results: List<SquitResult>, reportDirectoryPath: Path, mediaTypeConfig: MediaTypeConfig) {
         val document = StringBuilder("<!DOCTYPE html>").appendHTML().html {
             squitHead()
             squitBody(results)
@@ -78,7 +74,7 @@ class HtmlReportWriter(private val logger: Logger) {
                     result.expectedLines,
                     result.mediaType,
                     mediaTypeConfig,
-                    "Could not canonicalize expected response"
+                    "Could not canonicalize expected response",
                 )
                 else -> result.expectedLines
             }
@@ -88,7 +84,7 @@ class HtmlReportWriter(private val logger: Logger) {
                     result.actualLines,
                     result.mediaType,
                     mediaTypeConfig,
-                    "Could not canonicalize actual response"
+                    "Could not canonicalize actual response",
                 )
                 else -> result.actualLines
             }
@@ -98,8 +94,12 @@ class HtmlReportWriter(private val logger: Logger) {
             val unifiedDiffForJs = prepareForJs(bodyDiff)
             val unifiedInfoDiffForJs = prepareInfoForJs(result)
 
-            val descriptionForReplacement = if (result.description == null) "null" else "\"${result.description}\""
-                .replace("\n", HTML_LINE_ENDING)
+            val descriptionForReplacement = if (result.description == null) {
+                "null"
+            } else {
+                "\"${result.description}\""
+                    .replace("\n", HTML_LINE_ENDING)
+            }
 
             Files.createDirectories(detailPath)
             Files.write(detailHtmlPath, detailDocument.toString().toByteArray())
@@ -124,8 +124,8 @@ class HtmlReportWriter(private val logger: Logger) {
     }
 
     // Visible for testing.
-    internal fun prepareInfoForJs(result: SquitResult): String {
-        return if (!result.expectedResponseInfo.isDefault && !result.isError) {
+    internal fun prepareInfoForJs(result: SquitResult): String =
+        if (!result.expectedResponseInfo.isDefault && !result.isError) {
             val expectedInfoLines = result.expectedResponseInfo.toJson().lines()
 
             val actualInfo = result.actualInfoLines.joinToString(separator = "\n")
@@ -140,33 +140,28 @@ class HtmlReportWriter(private val logger: Logger) {
         } else {
             ""
         }
-    }
 
-    private fun prepareForJs(bodyDiff: List<String>): String {
-        return bodyDiff
-            .map { it.replace(Regex("(?<!\\\\)'"), Regex.escapeReplacement("\\'")) }
-            .map { it.replace(Regex("(?<!\\\\)\""), Regex.escapeReplacement("\\\"")) }
-            .map { it.replace(Regex("\\\\n"), Regex.escapeReplacement("\\\\n")) }
-            .joinToString(HTML_LINE_ENDING)
-    }
+    private fun prepareForJs(bodyDiff: List<String>): String = bodyDiff
+        .map { it.replace(Regex("(?<!\\\\)'"), Regex.escapeReplacement("\\'")) }
+        .map { it.replace(Regex("(?<!\\\\)\""), Regex.escapeReplacement("\\\"")) }
+        .map { it.replace(Regex("\\\\n"), Regex.escapeReplacement("\\\\n")) }
+        .joinToString(HTML_LINE_ENDING)
 
     private fun canonicalize(
         lines: List<String>,
         mediaType: MediaType,
         mediaTypeConfig: MediaTypeConfig,
-        errorMessage: String
-    ): List<String> {
-        return when {
-            lines.isEmpty() -> lines
-            else -> try {
-                MediaTypeFactory.canonicalizer(mediaType)
-                    .canonicalize(lines.joinToString(""), mediaTypeConfig)
-                    .lines()
-            } catch (error: Exception) {
-                logger.warn(errorMessage, error)
+        errorMessage: String,
+    ): List<String> = when {
+        lines.isEmpty() -> lines
+        else -> try {
+            MediaTypeFactory.canonicalizer(mediaType)
+                .canonicalize(lines.joinToString(""), mediaTypeConfig)
+                .lines()
+        } catch (error: Exception) {
+            logger.warn(errorMessage, error)
 
-                lines
-            }
+            lines
         }
     }
 
@@ -178,7 +173,7 @@ class HtmlReportWriter(private val logger: Logger) {
             filename,
             expectedLines,
             diff,
-            DIFF_CONTEXT_SIZE
+            DIFF_CONTEXT_SIZE,
         )
 
         return when (unifiedDiff.isEmpty()) {

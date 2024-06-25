@@ -7,7 +7,11 @@ import de.smartsquare.squit.entity.SquitOutputFormat
 import de.smartsquare.squit.entity.SquitResult
 import org.dom4j.io.OutputFormat
 import org.dom4j.io.XMLWriter
+import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.FileSystemLocation
+import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.Provider
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -73,9 +77,26 @@ fun String.cleanSqlString() = this
     .trim()
 
 /**
+ * Resolves one or more directory parts.
+ */
+fun DirectoryProperty.dir(first: String, vararg more: String): Provider<Directory> =
+    dir(Paths.get(first, *more).toString())
+
+/**
+ * Resolves one or more file parts.
+ */
+fun DirectoryProperty.file(first: String, vararg more: String): Provider<RegularFile> =
+    file(Paths.get(first, *more).toString())
+
+/**
  * Returns this as a [Path].
  */
 val DirectoryProperty.asPath: Path get() = asFile.get().toPath()
+
+/**
+ * Returns this as a [Path].
+ */
+val Provider<out FileSystemLocation>.asPath: Path get() = get().asFile.toPath()
 
 /**
  * Iterate the list of [SquitResult]s and returns a [Triple] of successful, failed and ignored tests.

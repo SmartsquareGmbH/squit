@@ -3,7 +3,6 @@ package de.smartsquare.squit.task
 import de.smartsquare.squit.TestUtils
 import de.smartsquare.squit.entity.SquitResponseInfo
 import de.smartsquare.squit.gradleRunner
-import java.nio.file.Files
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
@@ -13,6 +12,7 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.nio.file.Files
 
 class SquitRequestTaskJsonTest {
 
@@ -41,8 +41,9 @@ class SquitRequestTaskJsonTest {
         server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}"))
 
         val arguments = listOf(
-            "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$jsonProject"
+            "squitRunRequests",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$jsonProject",
         )
 
         val result = gradleRunner(jsonProject, arguments).build()
@@ -56,7 +57,7 @@ class SquitRequestTaskJsonTest {
         }
 
         val (expectedResponseCode) = SquitResponseInfo.fromJson(
-            Files.readAllBytes(jsonCall1ActualResponseInfo).toString(Charsets.UTF_8)
+            Files.readAllBytes(jsonCall1ActualResponseInfo).toString(Charsets.UTF_8),
         )
 
         expectedResponseCode shouldBeInRange 200..599

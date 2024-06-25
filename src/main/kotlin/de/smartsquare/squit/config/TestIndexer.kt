@@ -34,7 +34,7 @@ class TestIndexer(private val projectConfig: Config) {
      * individual tests.
      */
     fun index(sourceDir: Path, filter: (Pair<Path, Config>) -> Boolean): List<SquitTest> {
-        val leafDirectories = FilesUtils.getLeafDirectories(sourceDir, sort = true).asSequence()
+        val leafDirectories = FilesUtils.getLeafDirectories(sourceDir, sort = true)
         val leafDirectoriesWithConfig = indexConfigs(leafDirectories, sourceDir, filter)
 
         return indexTests(leafDirectoriesWithConfig, sourceDir)
@@ -43,47 +43,42 @@ class TestIndexer(private val projectConfig: Config) {
     private fun indexConfigs(
         leafDirectories: Sequence<Path>,
         sourceDir: Path,
-        filter: (Pair<Path, Config>) -> Boolean
-    ): List<Pair<Path, Config>> {
-        return leafDirectories
-            .onEach { path ->
-                if (path.cut(sourceDir).toList().size < 2) {
-                    throw GradleException(
-                        "Invalid project structure. Please add a project directory to the src/squit directory."
-                    )
-                }
+        filter: (Pair<Path, Config>) -> Boolean,
+    ): List<Pair<Path, Config>> = leafDirectories
+        .onEach { path ->
+            if (path.cut(sourceDir).toList().size < 2) {
+                throw GradleException(
+                    "Invalid project structure. Please add a project directory to the src/squit directory.",
+                )
             }
-            .map { leafDirectory -> leafDirectory to resolveConfigs(leafDirectory, sourceDir) }
-            .filter(filter)
-            .map { (leafDirectory, config) ->
-                try {
-                    leafDirectory to config.resolve().validate()
-                } catch (error: Exception) {
-                    val innerMessage = when (error) {
-                        is ConfigException ->
-                            configExceptionMessageRegex
-                                .find(error.message ?: "")
-                                ?.groupValues?.getOrNull(1)
-                        else -> error.message
-                    }
+        }
+        .map { leafDirectory -> leafDirectory to resolveConfigs(leafDirectory, sourceDir) }
+        .filter(filter)
+        .map { (leafDirectory, config) ->
+            try {
+                leafDirectory to config.resolve().validate()
+            } catch (error: Exception) {
+                val innerMessage = when (error) {
+                    is ConfigException ->
+                        configExceptionMessageRegex
+                            .find(error.message ?: "")
+                            ?.groupValues?.getOrNull(1)
+                    else -> error.message
+                }
 
-                    throw GradleException(
-                        """
+                throw GradleException(
+                    """
                             |Invalid test.conf or local.conf file on path of test:
                             | ${leafDirectory.cut(sourceDir)} ($innerMessage)
-                        """.trimMargin().replace("\n", ""),
-                        error
-                    )
-                }
+                    """.trimMargin().replace("\n", ""),
+                    error,
+                )
             }
-            .toList()
-    }
+        }
+        .toList()
 
-    private fun indexTests(
-        leafDirectoriesWithConfig: List<Pair<Path, Config>>,
-        sourceDir: Path
-    ): List<SquitTest> {
-        return leafDirectoriesWithConfig
+    private fun indexTests(leafDirectoriesWithConfig: List<Pair<Path, Config>>, sourceDir: Path): List<SquitTest> =
+        leafDirectoriesWithConfig
             .filterNot { (path, _) -> FilesUtils.isDirectoryEmpty(path) }
             .mapNotNull { (leafDirectory, config) ->
                 val request = resolveRequest(leafDirectory, config)
@@ -121,27 +116,24 @@ class TestIndexer(private val projectConfig: Config) {
                     else -> testParts.reduce { acc, test -> acc.merge(test) }
                 }
             }
-    }
 
-    private fun resolveConfigs(path: Path, sourceDir: Path): Config {
-        return FilesUtils.walkUpwards(path, sourceDir)
-            .map { it to resolveConfig(it) }
-            .fold(ConfigFactory.empty()) { acc, currentPathToConfig ->
-                val (currentPath, config) = currentPathToConfig
+    private fun resolveConfigs(path: Path, sourceDir: Path): Config = FilesUtils.walkUpwards(path, sourceDir)
+        .map { it to resolveConfig(it) }
+        .fold(ConfigFactory.empty()) { acc, currentPathToConfig ->
+            val (currentPath, config) = currentPathToConfig
 
-                // Do not add tag for the last part since it is part of the sourceDir.
-                if (currentPath.endsWith(sourceDir)) {
-                    acc.withFallback(config)
-                } else {
-                    acc.withFallback(config).mergeTag(currentPath.fileName.toString())
-                }
+            // Do not add tag for the last part since it is part of the sourceDir.
+            if (currentPath.endsWith(sourceDir)) {
+                acc.withFallback(config)
+            } else {
+                acc.withFallback(config).mergeTag(currentPath.fileName.toString())
             }
-            .let {
-                projectConfig
-                    .withTestDir(path)
-                    .withFallback(it)
-            }
-    }
+        }
+        .let {
+            projectConfig
+                .withTestDir(path)
+                .withFallback(it)
+        }
 
     private fun resolveConfig(path: Path): Config {
         val configPath = path.resolve(Constants.CONFIG)
@@ -167,34 +159,28 @@ class TestIndexer(private val projectConfig: Config) {
             }
         }
 
-    private fun resolveResponse(path: Path, config: Config): Path {
-        return FilesUtils.validateExistence(
-            path.resolve(MediaTypeFactory.sourceResponse(config.mediaType))
-        )
-    }
+    private fun resolveResponse(path: Path, config: Config): Path = FilesUtils.validateExistence(
+        path.resolve(MediaTypeFactory.sourceResponse(config.mediaType)),
+    )
 
     private fun resolveSqlScripts(
         path: Path,
         config: Config,
         leafs: List<Path>,
-        leafPath: Path
-    ): Map<String, SqlScripts> {
-        return config.databaseConfigurations.associate { databaseConfig ->
-            val pre = FilesUtils.ifExists(path.resolve("${databaseConfig.name}_pre.sql"))
-            val preOnce = FilesUtils.ifExists(path.resolve("${databaseConfig.name}_pre_once.sql"))
-                ?.takeIf { leafs.firstOrNull() == leafPath }
+        leafPath: Path,
+    ): Map<String, SqlScripts> = config.databaseConfigurations.associate { databaseConfig ->
+        val pre = FilesUtils.ifExists(path.resolve("${databaseConfig.name}_pre.sql"))
+        val preOnce = FilesUtils.ifExists(path.resolve("${databaseConfig.name}_pre_once.sql"))
+            ?.takeIf { leafs.firstOrNull() == leafPath }
 
-            val post = FilesUtils.ifExists(path.resolve("${databaseConfig.name}_post.sql"))
-            val postOnce = FilesUtils.ifExists(path.resolve("${databaseConfig.name}_post_once.sql"))
-                ?.takeIf { leafs.lastOrNull() == leafPath }
+        val post = FilesUtils.ifExists(path.resolve("${databaseConfig.name}_post.sql"))
+        val postOnce = FilesUtils.ifExists(path.resolve("${databaseConfig.name}_post_once.sql"))
+            ?.takeIf { leafs.lastOrNull() == leafPath }
 
-            databaseConfig.name to SqlScripts(pre, preOnce, post, postOnce)
-        }
+        databaseConfig.name to SqlScripts(pre, preOnce, post, postOnce)
     }
 
-    private fun resolveDescription(path: Path): Path? {
-        return FilesUtils.ifExists(path.resolve(DESCRIPTION))
-    }
+    private fun resolveDescription(path: Path): Path? = FilesUtils.ifExists(path.resolve(DESCRIPTION))
 
     private data class SqlScripts(val pre: Path?, val preOnce: Path?, val post: Path?, val postOnce: Path?)
 }
