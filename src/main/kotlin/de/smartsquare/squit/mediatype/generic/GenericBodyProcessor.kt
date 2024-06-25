@@ -15,7 +15,7 @@ class GenericBodyProcessor : BodyProcessor {
         responsePath: Path,
         resultRequestPath: Path,
         resultResponsePath: Path,
-        config: Config
+        config: Config,
     ) {
         if (requestPath != null) Files.copy(requestPath, resultRequestPath)
         Files.copy(responsePath, resultResponsePath)
@@ -25,7 +25,7 @@ class GenericBodyProcessor : BodyProcessor {
         actualResponsePath: Path,
         expectedResponsePath: Path,
         resultActualResponseFilePath: Path,
-        config: Config
+        config: Config,
     ) {
         Files.copy(actualResponsePath, resultActualResponseFilePath)
     }

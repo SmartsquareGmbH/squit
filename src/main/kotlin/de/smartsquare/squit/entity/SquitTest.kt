@@ -23,7 +23,7 @@ data class SquitTest(
     val response: Path,
     val preSqlScripts: Map<String, List<Path>>,
     val postSqlScripts: Map<String, List<Path>>,
-    val descriptions: List<Path>
+    val descriptions: List<Path>,
 ) : Serializable {
 
     private companion object {
@@ -50,17 +50,15 @@ data class SquitTest(
     // Paths are not serializable so we have to copy to a special proxy class with Strings instead of paths.
     // This should be hidden from the user.
     @Suppress("UnusedPrivateMember")
-    private fun writeReplace(): Any {
-        return SquitTestSerializationProxy(
-            path.toString(),
-            config,
-            request?.toString(),
-            response.toString(),
-            preSqlScripts.mapValues { (_, scripts) -> scripts.map { it.toString() } },
-            postSqlScripts.mapValues { (_, scripts) -> scripts.map { it.toString() } },
-            descriptions.map { it.toString() }
-        )
-    }
+    private fun writeReplace(): Any = SquitTestSerializationProxy(
+        path.toString(),
+        config,
+        request?.toString(),
+        response.toString(),
+        preSqlScripts.mapValues { (_, scripts) -> scripts.map { it.toString() } },
+        postSqlScripts.mapValues { (_, scripts) -> scripts.map { it.toString() } },
+        descriptions.map { it.toString() },
+    )
 
     private data class SquitTestSerializationProxy(
         val path: String,
@@ -69,7 +67,7 @@ data class SquitTest(
         val response: String,
         val preSqlScripts: Map<String, List<String>>,
         val postSqlScripts: Map<String, List<String>>,
-        val descriptions: List<String>
+        val descriptions: List<String>,
     ) : Serializable {
 
         private companion object {
@@ -84,7 +82,7 @@ data class SquitTest(
             Paths.get(response),
             preSqlScripts.mapValues { (_, scripts) -> scripts.map { Paths.get(it) } },
             postSqlScripts.mapValues { (_, scripts) -> scripts.map { Paths.get(it) } },
-            descriptions.map { Paths.get(it) }
+            descriptions.map { Paths.get(it) },
         )
     }
 }

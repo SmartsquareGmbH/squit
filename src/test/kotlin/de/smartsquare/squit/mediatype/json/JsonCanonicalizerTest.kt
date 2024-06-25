@@ -32,8 +32,8 @@ class JsonCanonicalizerTest {
             MediaTypeConfig(
                 xmlStrict = false,
                 xmlCanonicalize = false,
-                jsonCanonicalize = true
-            )
+                jsonCanonicalize = true,
+            ),
         )
 
         // language=json
@@ -86,8 +86,8 @@ class JsonCanonicalizerTest {
             MediaTypeConfig(
                 xmlStrict = false,
                 xmlCanonicalize = false,
-                jsonCanonicalize = true
-            )
+                jsonCanonicalize = true,
+            ),
         )
 
         // language=json
@@ -135,8 +135,8 @@ class JsonCanonicalizerTest {
             MediaTypeConfig(
                 xmlStrict = false,
                 xmlCanonicalize = false,
-                jsonCanonicalize = false
-            )
+                jsonCanonicalize = false,
+            ),
         )
 
         result shouldBeEqualTo structure

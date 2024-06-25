@@ -78,9 +78,8 @@ object FilesUtils {
     /**
      * Checks whether the directory at the given [path] is empty.
      */
-    fun isDirectoryEmpty(path: Path): Boolean {
-        return Files.newDirectoryStream(path).use { dirStream -> !dirStream.iterator().hasNext() }
-    }
+    fun isDirectoryEmpty(path: Path): Boolean =
+        Files.newDirectoryStream(path).use { dirStream -> !dirStream.iterator().hasNext() }
 
     /**
      * Returns the given [path] if it exists or null otherwise.
@@ -114,12 +113,10 @@ object FilesUtils {
     /**
      * Creates a new [BufferedReader] for the given [path] and executes [block] with improved error handling.
      */
-    fun <T> useBufferedReader(path: Path, block: (BufferedReader) -> T): T {
-        return try {
-            Files.newBufferedReader(path).use(block)
-        } catch (error: MalformedInputException) {
-            throw IOException("Error reading file $path. Squit expects UTF-8 encoded files only.", error)
-        }
+    fun <T> useBufferedReader(path: Path, block: (BufferedReader) -> T): T = try {
+        Files.newBufferedReader(path).use(block)
+    } catch (error: MalformedInputException) {
+        throw IOException("Error reading file $path. Squit expects UTF-8 encoded files only.", error)
     }
 
     /**

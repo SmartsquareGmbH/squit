@@ -1,8 +1,8 @@
 package de.smartsquare.squit.util
 
-import java.nio.file.Paths
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.jupiter.api.Test
+import java.nio.file.Paths
 
 class UtilExtensionsTest {
 

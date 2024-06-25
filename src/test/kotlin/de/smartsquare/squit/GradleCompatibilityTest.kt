@@ -23,22 +23,16 @@ class GradleCompatibilityTest {
 
         @JvmStatic
         fun provideVersions(): Stream<Arguments> {
-            val result = mutableListOf(
-                Arguments.of(GradleVersion.current())
-            )
+            val result = mutableListOf(Arguments.of(GradleVersion.current()))
 
-            // These older Gradle Versions do not work on Java 17+.
-            if (JavaVersion.current() <= JavaVersion.VERSION_16) {
-                result += listOf(
-                    Arguments.of(GradleVersion.version("7.0"))
-                )
+            // This older Gradle version does not work on Java 20+.
+            if (JavaVersion.current() < JavaVersion.VERSION_20) {
+                result += Arguments.of(GradleVersion.version("8.0.2"))
             }
 
-            // These older Gradle Versions do not work on Java 16+.
-            if (JavaVersion.current() <= JavaVersion.VERSION_15) {
-                result += listOf(
-                    Arguments.of(GradleVersion.version("6.8"))
-                )
+            // This older Gradle version does not work on Java 21+.
+            if (JavaVersion.current() < JavaVersion.VERSION_21) {
+                result += Arguments.of(GradleVersion.version("7.3.2"))
             }
 
             return result.stream()
@@ -69,8 +63,9 @@ class GradleCompatibilityTest {
         server.enqueue(MockResponse().setBody("<relevant/>"))
 
         val arguments = listOf(
-            "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "--stacktrace"
+            "squitTest",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
         )
 
         val result = gradleRunner(project, arguments, gradleVersion).build()
@@ -81,8 +76,8 @@ class GradleCompatibilityTest {
     @Test
     @DisabledForJreRange(min = JRE.JAVA_16)
     fun `outdated version`() {
-        val result = gradleRunner(project, emptyList(), GradleVersion.version("6.7")).buildAndFail()
+        val result = gradleRunner(project, emptyList(), GradleVersion.version("7.2")).buildAndFail()
 
-        result.output shouldContain "Minimum supported Gradle version is 6.8. Current version is 6.7."
+        result.output shouldContain "Minimum supported Gradle version is 7.3. Current version is 7.2."
     }
 }

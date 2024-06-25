@@ -13,7 +13,7 @@ class GenericDiffer : Differ {
         val diff = DiffUtils.diff(
             expectedResponse.toString(Charset.defaultCharset()),
             actualResponse.toString(Charset.defaultCharset()),
-            null
+            null,
         )
 
         return diff.deltas.joinToString("\n") {

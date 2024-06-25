@@ -2,12 +2,12 @@ package de.smartsquare.squit.task
 
 import de.smartsquare.squit.TestUtils
 import de.smartsquare.squit.gradleRunner
-import java.nio.charset.Charset
-import java.nio.file.Files
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldStartWith
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
+import java.nio.charset.Charset
+import java.nio.file.Files
 
 class SquitTestTaskPreviousTaskErrorTest {
 

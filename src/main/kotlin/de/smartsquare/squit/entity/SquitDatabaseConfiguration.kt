@@ -12,5 +12,5 @@ data class SquitDatabaseConfiguration(
     val name: String,
     val jdbcAddress: String,
     val username: String,
-    val password: String
+    val password: String,
 )

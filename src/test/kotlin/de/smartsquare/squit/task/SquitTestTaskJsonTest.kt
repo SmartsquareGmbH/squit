@@ -33,8 +33,9 @@ class SquitTestTaskJsonTest {
         server.enqueue(MockResponse().setBody("{\n  \"cool\": true\n}"))
 
         val arguments = listOf(
-            "squitTest", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$jsonProject"
+            "squitTest",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$jsonProject",
         )
 
         val result = gradleRunner(jsonProject, arguments).build()

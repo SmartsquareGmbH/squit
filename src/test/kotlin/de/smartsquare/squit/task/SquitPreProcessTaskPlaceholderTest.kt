@@ -13,8 +13,11 @@ class SquitPreProcessTaskPlaceholderTest {
     @Test
     fun `normal run`() {
         val arguments = listOf(
-            "squitPreProcess", "-Psquit.endpointPlaceholder=https://example.com", "-Ptags=call2",
-            "-Psquit.rootDir=$projectWithPlaceholders", "-Psquit.placeholder2=test"
+            "squitPreProcess",
+            "-Psquit.endpointPlaceholder=https://example.com",
+            "-Ptags=call2",
+            "-Psquit.rootDir=$projectWithPlaceholders",
+            "-Psquit.placeholder2=test",
         )
 
         val result = gradleRunner(projectWithPlaceholders, arguments).build()

@@ -18,8 +18,10 @@ import org.junit.jupiter.api.Test
 import java.sql.DriverManager
 import java.time.Instant
 import java.util.concurrent.TimeUnit
+import org.h2.Driver as H2Driver
 
 class SquitRequestTaskConfigurableTasksTest {
+
     private val project = TestUtils.getResourcePath("test-project-task-config")
 
     private val jdbc = "jdbc:h2:$project/testDb;IFEXISTS=TRUE"
@@ -32,6 +34,8 @@ class SquitRequestTaskConfigurableTasksTest {
 
     @BeforeEach
     fun setUp() {
+        H2Driver.load()
+
         server = MockWebServer()
     }
 
@@ -40,6 +44,7 @@ class SquitRequestTaskConfigurableTasksTest {
         server.shutdown()
 
         TestUtils.deleteDatabaseFiles(project)
+
         preRunFile.delete()
         postRunFile.delete()
     }
@@ -49,19 +54,23 @@ class SquitRequestTaskConfigurableTasksTest {
         server.enqueue(
             MockResponse()
                 .setHeadersDelay(10L, TimeUnit.MILLISECONDS)
-                .setBody("<cool/>")
+                .setBody("<cool/>"),
         )
 
         val arguments = listOf(
-            "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-Ptags=default"
+            "squitRunRequests",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-Ptags=default",
         )
 
         val result = gradleRunner(project, arguments).build()
 
         result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
+
         val preScriptExecution = Instant.ofEpochMilli(preRunFile.readText().toLong())
         val postScriptExecution = Instant.ofEpochMilli(postRunFile.readText().toLong())
+
         DriverManager.getConnection(jdbc, username, password).use { connection ->
             val resultSet = connection.createStatement().executeQuery("SELECT * FROM TIMESTAMPS")
             resultSet.next()
@@ -82,12 +91,14 @@ class SquitRequestTaskConfigurableTasksTest {
         server.enqueue(
             MockResponse()
                 .setHeadersDelay(10L, TimeUnit.MILLISECONDS)
-                .setBody("<cool/>")
+                .setBody("<cool/>"),
         )
 
         val arguments = listOf(
-            "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-Ptags=configured_order"
+            "squitRunRequests",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-Ptags=configured_order",
         )
 
         val result = gradleRunner(project, arguments).build()
@@ -96,6 +107,7 @@ class SquitRequestTaskConfigurableTasksTest {
 
         val preScriptExecution = Instant.ofEpochMilli(preRunFile.readText().toLong())
         val postScriptExecution = Instant.ofEpochMilli(postRunFile.readText().toLong())
+
         DriverManager.getConnection(jdbc, username, password).use { connection ->
             val resultSet = connection.createStatement().executeQuery("SELECT * FROM TIMESTAMPS")
             resultSet.next()
@@ -116,12 +128,14 @@ class SquitRequestTaskConfigurableTasksTest {
         server.enqueue(
             MockResponse()
                 .setHeadersDelay(10L, TimeUnit.MILLISECONDS)
-                .setBody("<cool/>")
+                .setBody("<cool/>"),
         )
 
         val arguments = listOf(
-            "squitRunRequests", "-Psquit.endpointPlaceholder=${server.url("/")}",
-            "-Psquit.rootDir=$project", "-Ptags=only_pre_db_script"
+            "squitRunRequests",
+            "-Psquit.endpointPlaceholder=${server.url("/")}",
+            "-Psquit.rootDir=$project",
+            "-Ptags=only_pre_db_script",
         )
 
         val result = gradleRunner(project, arguments).build()
@@ -134,6 +148,7 @@ class SquitRequestTaskConfigurableTasksTest {
             resultSet.getString(3) shouldBeEqualTo "TEST_PRE.SQL"
             resultSet.next().shouldBeFalse()
         }
+
         preRunFile.shouldNotExist()
         postRunFile.shouldExist()
     }
