@@ -494,18 +494,31 @@ class ConfigExtensionsTest {
     }
 
     @Test
-    fun `config object with an invalid preTestTask`() {
+    fun `config object with an valid preTestTask and postTestTask`() {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "preTestTasks" to listOf("[NotExistingTask]"),
+                "preTestTasks" to listOf("DATABASE_SCRIPTS", "PRE_RUNNERS", "PRE_RUNNER_SCRIPTS"),
+                "postTestTasks" to emptyList<String>(),
             )
         )
 
         val call = { config.validate() }
-        @Suppress("MaxLineLength")
+        call shouldNotThrow AnyException
+    }
+
+    @Test
+    fun `config object with an invalid preTestTask`() {
+        val config = ConfigFactory.parseMap(
+            mapOf(
+                "endpoint" to "https://example.com",
+                "preTestTasks" to listOf("NotExistingTask"),
+            )
+        )
+
+        val call = { config.validate() }
         call shouldThrow BadValue::class withMessage "hardcoded value: Invalid value at 'preTestTasks': " +
-            "The enum class SquitPreTestTask has no constant of the name '[NotExistingTask]' " +
+            "The enum class SquitPreTestTask has no constant of the name 'NotExistingTask' " +
             "(should be one of [DATABASE_SCRIPTS, PRE_RUNNERS, PRE_RUNNER_SCRIPTS].)"
     }
 
@@ -514,13 +527,13 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "postTestTasks" to listOf("[NotExistingTask]"),
+                "postTestTasks" to listOf("NotExistingTask"),
             )
         )
 
         val call = { config.validate() }
         call shouldThrow BadValue::class withMessage "hardcoded value: Invalid value at 'postTestTasks': " +
-            "The enum class SquitPostTestTask has no constant of the name '[NotExistingTask]' " +
+            "The enum class SquitPostTestTask has no constant of the name 'NotExistingTask' " +
             "(should be one of [DATABASE_SCRIPTS, POST_RUNNERS, POST_RUNNER_SCRIPTS].)"
     }
 }

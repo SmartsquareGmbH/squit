@@ -5,3 +5,7 @@ exceptions:
 style:
   MagicNumber:
     active: false
+
+complexity:
+  TooManyFunctions:
+    ignorePrivate: true
