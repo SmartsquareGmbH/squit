@@ -59,12 +59,14 @@ class SquitPlugin : Plugin<Project> {
             it.ignoreFailures.set(extension.ignoreFailures)
 
             it.mediaTypeConfig.set(
-                MediaTypeConfig(
-                    xmlStrict = extension.xml.strict.get(),
-                    xmlCanonicalize = extension.xml.canonicalize.get(),
-                    xmlResolveInvalidNamespaces = extension.xml.resolveInvalidNamespaces.get(),
-                    jsonCanonicalize = extension.json.canonicalize.get(),
-                ),
+                project.provider {
+                    MediaTypeConfig(
+                        xmlStrict = extension.xml.strict.get(),
+                        xmlCanonicalize = extension.xml.canonicalize.get(),
+                        xmlResolveInvalidNamespaces = extension.xml.resolveInvalidNamespaces.get(),
+                        jsonCanonicalize = extension.json.canonicalize.get(),
+                    )
+                },
             )
 
             it.dependsOn("squitPostProcess")
