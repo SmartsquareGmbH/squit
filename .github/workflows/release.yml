@@ -1,14 +1,12 @@
-name: CI
+name: CD
 
 on:
-  push:
+  release:
+    types: [ created ]
 
 jobs:
-  check:
+  publish-maven-artifact:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        java: [ 17, 21, 25 ]
 
     steps:
       - name: Checkout
@@ -17,16 +15,16 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v5
         with:
-          java-version: ${{ matrix.java }}
+          java-version: 17
           distribution: temurin
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
 
-      - name: Check
-        run: ./gradlew check detektMain
+      - name: Publish
+        run: ./gradlew publishPlugins -Pgradle.publish.key=${{ secrets.PUBLISH_KEY }} -Pgradle.publish.secret=${{ secrets.PUBLISH_SECRET }}
 
-      - name: Upload Gradle reports ${{ matrix.java }}
+      - name: Upload Gradle reports
         uses: actions/upload-artifact@v7
         if: failure()
         with:
