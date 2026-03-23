@@ -61,7 +61,7 @@ class TestIndexer(private val projectConfig: Config) {
                 val innerMessage = when (error) {
                     is ConfigException ->
                         configExceptionMessageRegex
-                            .find(error.message ?: "")
+                            .find(error.message.orEmpty())
                             ?.groupValues?.getOrNull(1)
 
                     else -> error.message
@@ -97,16 +97,16 @@ class TestIndexer(private val projectConfig: Config) {
                         val sqlScripts = resolveSqlScripts(path, config, leafsFromHere, leafDirectory)
 
                         val preSqlScripts = sqlScripts.mapValues { (_, scripts) ->
-                            (scripts.preOnce?.let { listOf(it) } ?: emptyList()) +
-                                (scripts.pre?.let { listOf(it) } ?: emptyList())
+                            scripts.preOnce?.let { listOf(it) }.orEmpty() +
+                                scripts.pre?.let { listOf(it) }.orEmpty()
                         }
 
                         val postSqlScripts = sqlScripts.mapValues { (_, scripts) ->
-                            (scripts.post?.let { listOf(it) } ?: emptyList()) +
-                                (scripts.postOnce?.let { listOf(it) } ?: emptyList())
+                            scripts.post?.let { listOf(it) }.orEmpty() +
+                                scripts.postOnce?.let { listOf(it) }.orEmpty()
                         }
 
-                        val descriptions = resolveDescription(path)?.let { listOf(it) } ?: emptyList()
+                        val descriptions = resolveDescription(path)?.let { listOf(it) }.orEmpty()
 
                         SquitTest(path, config, request, response, preSqlScripts, postSqlScripts, descriptions)
                     }

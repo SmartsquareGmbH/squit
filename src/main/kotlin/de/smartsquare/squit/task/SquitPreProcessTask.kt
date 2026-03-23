@@ -121,7 +121,7 @@ abstract class SquitPreProcessTask @Inject constructor(private val workerExecuto
             ?.map { it.trim() }
             ?.filter { it.isNotBlank() }
             ?.toSet()
-            ?: emptySet()
+            .orEmpty()
     }
 
     private fun filterIndex(input: Pair<Path, Config>) = when {

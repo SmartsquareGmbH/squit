@@ -35,11 +35,11 @@ data class SquitTest(
      */
     fun merge(other: SquitTest): SquitTest {
         val mergedPreSqlScripts = preSqlScripts
-            .mapValues { (key, scripts) -> (other.preSqlScripts[key] ?: emptyList()) + scripts }
+            .mapValues { (key, scripts) -> other.preSqlScripts[key].orEmpty() + scripts }
             .plus(other.preSqlScripts.filterKeys { !preSqlScripts.containsKey(it) })
 
         val mergedPostSqlScripts = postSqlScripts
-            .mapValues { (key, scripts) -> scripts + (other.postSqlScripts[key] ?: emptyList()) }
+            .mapValues { (key, scripts) -> scripts + other.postSqlScripts[key].orEmpty() }
             .plus(other.postSqlScripts.filterKeys { !postSqlScripts.containsKey(it) })
 
         val mergedDescriptions = other.descriptions + descriptions
@@ -49,7 +49,7 @@ data class SquitTest(
 
     // Paths are not serializable so we have to copy to a special proxy class with Strings instead of paths.
     // This should be hidden from the user.
-    @Suppress("UnusedPrivateMember")
+    @Suppress("UnusedPrivateFunction")
     private fun writeReplace(): Any = SquitTestSerializationProxy(
         path.toString(),
         config,
@@ -74,7 +74,7 @@ data class SquitTest(
             private const val serialVersionUID = 1L
         }
 
-        @Suppress("UnusedPrivateMember")
+        @Suppress("UnusedPrivateFunction")
         private fun readResolve(): Any = SquitTest(
             Paths.get(path),
             config,

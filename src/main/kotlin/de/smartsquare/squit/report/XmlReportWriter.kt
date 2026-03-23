@@ -23,7 +23,7 @@ class XmlReportWriter {
         result.groupBy { it.path }.forEach { (suite, tests) ->
             val suiteElement = root.addElement("testsuite").apply {
                 addAttribute("name", suite.toString())
-                addAttribute("timestamp", tests.firstOrNull()?.metaInfo?.date?.toString() ?: "")
+                addAttribute("timestamp", tests.firstOrNull()?.metaInfo?.date?.toString().orEmpty())
                 addAttribute("hostname", InetAddress.getLocalHost().hostName)
                 addAttribute("tests", "${tests.size}")
                 addAttribute("failures", "${tests.count { !it.isIgnored && !it.isSuccess && !it.isError }}")
