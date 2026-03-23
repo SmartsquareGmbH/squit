@@ -6,7 +6,6 @@ import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldStartWith
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
-import java.nio.charset.Charset
 import java.nio.file.Files
 
 class SquitTestTaskPreviousTaskErrorTest {
@@ -23,7 +22,7 @@ class SquitTestTaskPreviousTaskErrorTest {
 
         result.task(":squitTest")?.outcome shouldBe TaskOutcome.FAILED
 
-        Files.readAllBytes(invalid3Call1Error).toString(Charset.defaultCharset()) shouldStartWith
+        Files.readAllBytes(invalid3Call1Error).toString(Charsets.UTF_8) shouldStartWith
             "org.dom4j.DocumentException: Error on line 4 of document"
     }
 }

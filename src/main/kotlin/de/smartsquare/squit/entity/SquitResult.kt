@@ -11,7 +11,6 @@ import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
 import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import okhttp3.MediaType
-import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -77,7 +76,7 @@ data class SquitResult(
         val descriptionPath = sourceDir.resolve(DESCRIPTION)
 
         if (Files.exists(descriptionPath)) {
-            FilesUtils.readAllBytes(descriptionPath).toString(Charset.defaultCharset())
+            FilesUtils.readAllBytes(descriptionPath).toString(Charsets.UTF_8)
         } else {
             null
         }
@@ -97,7 +96,7 @@ data class SquitResult(
      * Additional information associated with this result.
      */
     val metaInfo: SquitMetaInfo by lazy {
-        SquitMetaInfo.fromJson(FilesUtils.readAllBytes(metaInfoPath).toString(Charset.defaultCharset()))
+        SquitMetaInfo.fromJson(FilesUtils.readAllBytes(metaInfoPath).toString(Charsets.UTF_8))
     }
 
     /**

@@ -46,7 +46,6 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
-import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -182,7 +181,7 @@ abstract class SquitTestTask : DefaultTask() {
 
                 resultList += if (Files.exists(errorFile)) {
                     constructResult(
-                        FilesUtils.readAllBytes(errorFile).toString(Charset.defaultCharset()),
+                        FilesUtils.readAllBytes(errorFile).toString(Charsets.UTF_8),
                         expectedResponseInfo,
                         actualResponsePath,
                         config,
@@ -222,7 +221,7 @@ abstract class SquitTestTask : DefaultTask() {
                 resolvedPath.resolve(ACTUAL_RESPONSE_INFO),
             )
 
-            val actualResponse = FilesUtils.readAllBytes(actualResponseInfoPath).toString(Charset.defaultCharset())
+            val actualResponse = FilesUtils.readAllBytes(actualResponseInfoPath).toString(Charsets.UTF_8)
             val responseInfo = SquitResponseInfo.fromJson(actualResponse)
             return expectedResponseInfo.diff(responseInfo)
         }

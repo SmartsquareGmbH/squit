@@ -10,7 +10,6 @@ import kotlinx.html.html
 import kotlinx.html.stream.appendHTML
 import okhttp3.MediaType
 import org.gradle.api.logging.Logger
-import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -107,7 +106,7 @@ class HtmlReportWriter(private val logger: Logger) {
 
             FilesUtils.copyResource("squit-detail.css", detailCssPath)
             FilesUtils.copyResource("squit-detail.js", detailJsPath) {
-                it.toString(Charset.defaultCharset())
+                it.toString(Charsets.UTF_8)
                     .replace("infoDiffPlaceholder", unifiedInfoDiffForJs)
                     .replace("diffPlaceholder", unifiedDiffForJs)
                     .replace("namePlaceholder", result.simpleName)

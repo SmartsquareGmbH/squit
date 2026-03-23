@@ -43,6 +43,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
@@ -262,11 +263,15 @@ abstract class SquitRequestTask : DefaultTask() {
     }
 
     private fun executePreRunnerScripts(config: Config) {
-        config.preRunnerScripts.forEach {
-            GroovyShell(javaClass.classLoader)
-                .parse(it.toFile())
-                .apply { binding = Binding(mapOf("config" to config)) }
-                .run()
+        config.preRunnerScripts.forEach { scriptPath ->
+            try {
+                GroovyShell(javaClass.classLoader)
+                    .parse(scriptPath.toFile())
+                    .apply { binding = Binding(mapOf("config" to config)) }
+                    .run()
+            } catch (error: Exception) {
+                throw GradleException("Error executing pre-runner script $scriptPath: ${error.message}", error)
+            }
         }
     }
 
@@ -296,11 +301,15 @@ abstract class SquitRequestTask : DefaultTask() {
     }
 
     private fun executePostRunnerScripts(config: Config) {
-        config.postRunnerScripts.forEach {
-            GroovyShell(javaClass.classLoader)
-                .parse(it.toFile())
-                .apply { binding = Binding(mapOf("config" to config)) }
-                .run()
+        config.postRunnerScripts.forEach { scriptPath ->
+            try {
+                GroovyShell(javaClass.classLoader)
+                    .parse(scriptPath.toFile())
+                    .apply { binding = Binding(mapOf("config" to config)) }
+                    .run()
+            } catch (error: Exception) {
+                throw GradleException("Error executing post-runner script $scriptPath: ${error.message}", error)
+            }
         }
     }
 

@@ -19,7 +19,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
-import java.nio.charset.Charset
 import java.nio.file.Files
 import java.sql.DriverManager
 import java.time.LocalDateTime
@@ -76,7 +75,7 @@ class SquitRequestTaskTest {
 
         val (date, duration) = SquitMetaInfo.fromJson(
             Files.readAllBytes(call1Meta)
-                .toString(Charset.defaultCharset()),
+                .toString(Charsets.UTF_8),
         )
 
         date shouldBeBefore LocalDateTime.now()
@@ -147,7 +146,7 @@ class SquitRequestTaskTest {
 
         result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
 
-        Files.readAllBytes(call1Error).toString(Charset.defaultCharset()) shouldStartWith
+        Files.readAllBytes(call1Error).toString(Charsets.UTF_8) shouldStartWith
             "java.net.SocketTimeoutException"
     }
 
