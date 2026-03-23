@@ -77,7 +77,7 @@ abstract class SquitPreProcessTask @Inject constructor(private val workerExecuto
         ConfigValueFactory
             .fromMap(
                 project.properties
-                    .filterKeys { it is String && it.startsWith("squit.") }
+                    .filterKeys { it.startsWith("squit.") }
                     .mapKeys { (key, _) -> key.replaceFirst("squit.", "") },
             )
             .toConfig()

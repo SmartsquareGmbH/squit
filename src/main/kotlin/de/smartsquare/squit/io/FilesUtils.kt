@@ -22,6 +22,7 @@ object FilesUtils {
      */
     fun walkUpwards(path: Path, until: (Path) -> Boolean = { path.parent == null }): Sequence<Path> = when {
         until(path) -> emptySequence()
+
         else -> sequence {
             yield(path)
             yieldAll(walkUpwards(path.parent, until))
@@ -45,10 +46,10 @@ object FilesUtils {
                 false -> directories
             }
         }
-        .fold(sequenceOf()) { current, next ->
+        .fold(emptySequence()) { current, next ->
             current + when (containsDirectories(next)) {
                 true -> getLeafDirectories(next, sort)
-                false -> sequenceOf(next)
+                false -> sequence { yield(next) }
             }
         }
 
@@ -59,6 +60,7 @@ object FilesUtils {
         Files.exists(path) -> Files.walk(path)
             .sorted(Comparator.reverseOrder())
             .forEach { Files.delete(it) }
+
         else -> Unit
     }
 

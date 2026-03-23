@@ -1,34 +1,31 @@
 [versions]
-java = "17"
-gradle = "8.9"
-squit = "6.0.0"
-
-gradlePublish = "1.2.1"
-kotlin = "2.0.0"
-dokkatoo = "2.3.1"
+kotlin = "2.3.20"
+dokka = "2.1.0"
 detekt = "1.23.6"
-kotlinter = "4.4.1"
+kotlinter = "5.4.2"
 jacoco = "0.8.12"
-jacocoTestkit = "1.0.12"
-gradleVersions = "0.51.0"
+jacoco-testkit = "1.0.12"
+publish-plugin = "1.2.1"
+versions-plugin = "0.53.0"
+gradle = "9.4.1"
 
 jaxen = "2.0.0"
 dom4j = "2.1.4"
-pullParser = "2.1.10"
+pull-parser = "2.1.10"
 gson = "2.11.0"
-xmlSec = "4.0.2"
-xmlUnit = "2.10.0"
-jsonUnit = "3.4.0"
-typesafeConfig = "1.4.3"
+xml-sec = "4.0.2"
+xml-unit = "2.10.0"
+json-unit = "3.4.0"
+typesafe-config = "1.4.3"
 okhttp = "4.12.0"
-kotlinxHtml = "0.11.0"
-diffUtils = "3.0"
-alphanumericComparator = "1.4.1"
+kotlinx-html = "0.11.0"
+diff-utils = "3.0"
+alphanumeric-comparator = "1.4.1"
 
 bootstrap = "4.6.0"
 jquery = "3.6.0"
 popper = "1.16.1"
-fontAwesome = "5.15.4"
+font-awesome = "5.15.4"
 diff2html = "3.1.7"
 marked = "2.0.6"
 
@@ -38,38 +35,39 @@ h2 = "2.2.224"
 mockk = "1.13.11"
 
 [plugins]
-pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "gradlePublish" }
-dokkatooHtml = { id = "dev.adamko.dokkatoo-html", version.ref = "dokkatoo" }
-dokkatooJavadoc = { id = "dev.adamko.dokkatoo-javadoc", version.ref = "dokkatoo" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+dokka-javadoc = { id = "org.jetbrains.dokka-javadoc", version.ref = "dokka" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
-jacocoTestkit = { id = "pl.droidsonroids.jacoco.testkit", version.ref = "jacocoTestkit" }
-gradleVersions = { id = "com.github.ben-manes.versions", version.ref = "gradleVersions" }
+jacoco-testkit = { id = "pl.droidsonroids.jacoco.testkit", version.ref = "jacoco-testkit" }
+publish = { id = "com.gradle.plugin-publish", version.ref = "publish-plugin" }
+versions = { id = "com.github.ben-manes.versions", version.ref = "versions-plugin" }
 
 [libraries]
-kotlinxHtml = { module = "org.jetbrains.kotlinx:kotlinx-html-jvm", version.ref = "kotlinxHtml" }
+kotlinx-html = { module = "org.jetbrains.kotlinx:kotlinx-html-jvm", version.ref = "kotlinx-html" }
 dom4j = { module = "org.dom4j:dom4j", version.ref = "dom4j" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-typesafeConfig = { module = "com.typesafe:config", version.ref = "typesafeConfig" }
+typesafe-config = { module = "com.typesafe:config", version.ref = "typesafe-config" }
 jaxen = { module = "jaxen:jaxen", version.ref = "jaxen" }
-pullParser = { module = "pull-parser:pull-parser", version.ref = "pullParser" }
-xmlSec = { module = "org.apache.santuario:xmlsec", version.ref = "xmlSec" }
-xmlUnit = { module = "org.xmlunit:xmlunit-core", version.ref = "xmlUnit" }
-jsonUnit = { module = "net.javacrumbs.json-unit:json-unit", version.ref = "jsonUnit" }
+pull-parser = { module = "pull-parser:pull-parser", version.ref = "pull-parser" }
+xml-sec = { module = "org.apache.santuario:xmlsec", version.ref = "xml-sec" }
+xml-unit = { module = "org.xmlunit:xmlunit-core", version.ref = "xml-unit" }
+json-unit = { module = "net.javacrumbs.json-unit:json-unit", version.ref = "json-unit" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
-alphanumericComparator = { module = "se.sawano.java:alphanumeric-comparator", version.ref = "alphanumericComparator" }
-diffUtils = { module = "com.github.wumpz:diffutils", version.ref = "diffUtils" }
+alphanumeric-comparator = { module = "se.sawano.java:alphanumeric-comparator", version.ref = "alphanumeric-comparator" }
+diff-utils = { module = "com.github.wumpz:diffutils", version.ref = "diff-utils" }
 
 jquery = { module = "org.webjars.npm:jquery", version.ref = "jquery" }
 bootstrap = { module = "org.webjars.npm:bootstrap", version.ref = "bootstrap" }
 popper = { module = "org.webjars.npm:popper.js", version.ref = "popper" }
-fontAwesome = { module = "org.webjars:font-awesome", version.ref = "fontAwesome" }
+font-awesome = { module = "org.webjars:font-awesome", version.ref = "font-awesome" }
 marked = { module = "org.webjars.npm:marked", version.ref = "marked" }
 diff2html = { module = "org.webjars.npm:diff2html", version.ref = "diff2html" }
 
 junit = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
-junitParams = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
-junitPlatformLauncher = { module = "org.junit.platform:junit-platform-launcher" }
+junit-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 kluent = { module = "org.amshove.kluent:kluent", version.ref = "kluent" }
 mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
 h2 = { module = "com.h2database:h2", version.ref = "h2" }

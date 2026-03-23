@@ -1,21 +1,21 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    kotlin("jvm") version libs.versions.kotlin
-    alias(libs.plugins.pluginPublish)
-    alias(libs.plugins.dokkatooHtml)
-    alias(libs.plugins.dokkatooJavadoc)
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.dokka.javadoc)
     alias(libs.plugins.detekt)
     alias(libs.plugins.kotlinter)
-    alias(libs.plugins.jacocoTestkit)
-    alias(libs.plugins.gradleVersions)
-    `java-gradle-plugin`
-    `maven-publish`
+    alias(libs.plugins.jacoco.testkit)
+    alias(libs.plugins.publish)
+    alias(libs.plugins.versions)
     jacoco
 }
 
 group = "de.smartsquare"
-version = libs.versions.squit.get()
+version = System.getenv("GITHUB_VERSION") ?: "1.0.0-SNAPSHOT"
+description = "Automated testing of JSON, XML, SOAP and other apis"
 
 repositories {
     mavenCentral()
@@ -24,24 +24,24 @@ repositories {
 dependencies {
     api(libs.dom4j)
     api(libs.gson)
-    api(libs.typesafeConfig)
+    api(libs.typesafe.config)
 
     implementation(libs.jaxen)
-    implementation(libs.pullParser)
-    implementation(libs.xmlSec)
-    implementation(libs.xmlUnit)
-    implementation(libs.jsonUnit)
+    implementation(libs.pull.parser)
+    implementation(libs.xml.sec)
+    implementation(libs.xml.unit)
+    implementation(libs.json.unit)
     implementation(libs.okhttp)
-    implementation(libs.kotlinxHtml)
-    implementation(libs.alphanumericComparator)
-    implementation(libs.diffUtils) {
+    implementation(libs.kotlinx.html)
+    implementation(libs.alphanumeric.comparator)
+    implementation(libs.diff.utils) {
         exclude(group = "org.eclipse.jgit")
     }
 
     implementation(libs.jquery)
     implementation(libs.bootstrap)
     implementation(libs.popper)
-    implementation(libs.fontAwesome)
+    implementation(libs.font.awesome)
     implementation(libs.marked)
     implementation(libs.diff2html) {
         exclude(group = "org.webjars.npm")
@@ -50,13 +50,13 @@ dependencies {
     testImplementation(gradleTestKit())
     testImplementation(kotlin("reflect"))
     testImplementation(libs.junit)
-    testImplementation(libs.junitParams)
+    testImplementation(libs.junit.params)
     testImplementation(libs.h2)
     testImplementation(libs.kluent)
     testImplementation(libs.mockwebserver)
     testImplementation(libs.mockk)
 
-    testRuntimeOnly(libs.junitPlatformLauncher)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 java {
@@ -65,67 +65,68 @@ java {
 }
 
 kotlin {
-    jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(libs.versions.java.get())
-    }
+    jvmToolchain(17)
 
     compilerOptions {
         allWarningsAsErrors = true
     }
 }
 
-tasks.named<Test>("test") {
+tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+
+    testLogging {
+        events(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
+    }
 
     finalizedBy(tasks.jacocoTestReport)
 }
 
 jacoco {
-    toolVersion = libs.versions.jacoco.get()
+    toolVersion = libs.versions.jacoco.asProvider().get()
 }
 
 detekt {
-    config.from(file("${rootDir}/detekt.yml"))
+    config.setFrom("$rootDir/detekt.yml")
 
     buildUponDefaultConfig = true
 }
 
 tasks.named<Jar>("javadocJar") {
-    from(tasks.named("dokkatooGeneratePublicationJavadoc"))
+    from(tasks.dokkaGeneratePublicationJavadoc)
 }
 
-dokkatoo {
+dokka {
     val dom4jVersion = resolveVersion("org.dom4j:dom4j")
     val typesafeConfigVersion = resolveVersion("com.typesafe:config")
     val gsonVersion = resolveVersion("com.google.code.gson:gson")
 
-    dokkatooSourceSets.configureEach {
-        externalDocumentationLinks.create("gradle") {
+    dokkaSourceSets.configureEach {
+        externalDocumentationLinks.register("gradle") {
             url("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/")
             packageListUrl("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/element-list")
         }
 
-        externalDocumentationLinks.create("dom4j") {
+        externalDocumentationLinks.register("dom4j") {
             url("https://javadoc.io/doc/org.dom4j/dom4j/$dom4jVersion/")
         }
 
-        externalDocumentationLinks.create("config") {
+        externalDocumentationLinks.register("config") {
             url("https://javadoc.io/doc/com.typesafe/config/$typesafeConfigVersion/")
         }
 
-        externalDocumentationLinks.create("gson") {
+        externalDocumentationLinks.register("gson") {
             url("https://javadoc.io/doc/com.google.code.gson/gson/$gsonVersion")
             packageListUrl("https://javadoc.io/doc/com.google.code.gson/gson/$gsonVersion/element-list")
         }
     }
 }
 
-fun resolveVersion(dependency: String): String {
-    return project.configurations.getByName("runtimeClasspath").resolvedConfiguration.resolvedArtifacts
+fun resolveVersion(dependency: String): String =
+    project.configurations.getByName("runtimeClasspath").resolvedConfiguration.resolvedArtifacts
         .find { it.moduleVersion.id.module.toString() == dependency }
         ?.moduleVersion?.id?.version
         ?: "latest"
-}
 
 gradlePlugin {
     website = "https://github.com/SmartsquareGmbH/squit"

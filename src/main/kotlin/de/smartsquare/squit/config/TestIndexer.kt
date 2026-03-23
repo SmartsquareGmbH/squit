@@ -63,6 +63,7 @@ class TestIndexer(private val projectConfig: Config) {
                         configExceptionMessageRegex
                             .find(error.message ?: "")
                             ?.groupValues?.getOrNull(1)
+
                     else -> error.message
                 }
 
@@ -151,10 +152,12 @@ class TestIndexer(private val projectConfig: Config) {
         .let {
             when {
                 HttpMethod.requiresRequestBody(config.method) -> FilesUtils.validateExistence(it)
+
                 HttpMethod.permitsRequestBody(config.method) -> when (Files.exists(it)) {
                     true -> it
                     else -> null
                 }
+
                 else -> null
             }
         }

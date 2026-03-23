@@ -115,6 +115,7 @@ val Config.preRunnerScripts get() = getSafePathList(PRE_RUN_SCRIPTS)
 val Config.preTestTasks: List<SquitPreTestTask>
     get() = when (hasPath(PRE_TEST_TASKS)) {
         true -> getEnumList(SquitPreTestTask::class.java, PRE_TEST_TASKS)
+
         else -> listOf(
             SquitPreTestTask.PRE_RUNNERS,
             SquitPreTestTask.PRE_RUNNER_SCRIPTS,
@@ -149,6 +150,7 @@ val Config.postRunnerScripts get() = getSafePathList(POST_RUN_SCRIPTS)
 val Config.postTestTasks: List<SquitPostTestTask>
     get() = when (hasPath(POST_TEST_TASKS)) {
         true -> getEnumList(SquitPostTestTask::class.java, POST_TEST_TASKS)
+
         else -> listOf(
             SquitPostTestTask.DATABASE_SCRIPTS,
             SquitPostTestTask.POST_RUNNERS,

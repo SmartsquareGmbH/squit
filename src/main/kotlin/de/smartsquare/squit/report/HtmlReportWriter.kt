@@ -155,6 +155,7 @@ class HtmlReportWriter(private val logger: Logger) {
         errorMessage: String,
     ): List<String> = when {
         lines.isEmpty() -> lines
+
         else -> try {
             MediaTypeFactory.canonicalizer(mediaType)
                 .canonicalize(lines.joinToString(""), mediaTypeConfig)

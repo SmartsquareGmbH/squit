@@ -54,6 +54,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -66,6 +67,7 @@ import java.util.concurrent.TimeUnit
  * Task for running requests against the given api. Also capable of running existing sql scripts before and after the
  * request.
  */
+@DisableCachingByDefault(because = "Should run every time")
 abstract class SquitRequestTask : DefaultTask() {
 
     /**
@@ -182,6 +184,7 @@ abstract class SquitRequestTask : DefaultTask() {
         .let {
             when {
                 HttpMethod.requiresRequestBody(config.method) -> FilesUtils.validateExistence(it)
+
                 HttpMethod.permitsRequestBody(config.method) -> when (Files.exists(it)) {
                     true -> it
                     else -> null
