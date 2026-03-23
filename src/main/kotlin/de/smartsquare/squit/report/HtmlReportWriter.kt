@@ -25,12 +25,12 @@ class HtmlReportWriter(private val logger: Logger) {
         private const val DIFF_CONTEXT_SIZE = 1_000_000
         private const val HTML_LINE_ENDING = "\\n\\\n"
 
-        private const val BOOTSTRAP_PATH = "META-INF/resources/webjars/bootstrap/4.6.0/dist"
-        private const val FONT_AWESOME_PATH = "META-INF/resources/webjars/font-awesome/5.15.4"
-        private const val JQUERY_PATH = "META-INF/resources/webjars/jquery/3.6.0/dist"
+        private const val BOOTSTRAP_PATH = "META-INF/resources/webjars/bootstrap/5.3.8/dist"
+        private const val FONT_AWESOME_PATH = "META-INF/resources/webjars/font-awesome/7.2.0"
+        private const val JQUERY_PATH = "META-INF/resources/webjars/jquery/4.0.0/dist"
         private const val POPPER_JS_PATH = "META-INF/resources/webjars/popper.js/1.16.1/dist/umd"
-        private const val MARKED_PATH = "META-INF/resources/webjars/marked/2.0.6"
-        private const val DIFF_2_HTML_PATH = "META-INF/resources/webjars/diff2html/3.1.7"
+        private const val MARKED_PATH = "META-INF/resources/webjars/marked/17.0.5/lib"
+        private const val DIFF_2_HTML_PATH = "META-INF/resources/webjars/diff2html/3.4.52"
 
         private val resources = arrayOf(
             "$BOOTSTRAP_PATH/css/bootstrap.min.css" to "css/bootstrap.css",
@@ -38,7 +38,7 @@ class HtmlReportWriter(private val logger: Logger) {
             "$FONT_AWESOME_PATH/js/all.min.js" to "js/fontawesome.js",
             "$JQUERY_PATH/jquery.slim.min.js" to "js/jquery.js",
             "$POPPER_JS_PATH/popper.min.js" to "js/popper.js",
-            "$MARKED_PATH/marked.min.js" to "js/marked.js",
+            "$MARKED_PATH/marked.umd.js" to "js/marked.js",
             "$DIFF_2_HTML_PATH/bundles/css/diff2html.min.css" to "css/diff2html.css",
             "$DIFF_2_HTML_PATH/bundles/js/diff2html.min.js" to "js/diff2html.js",
             "$DIFF_2_HTML_PATH/bundles/js/diff2html-ui.min.js" to "js/diff2html-ui.js",

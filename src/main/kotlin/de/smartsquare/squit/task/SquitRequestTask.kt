@@ -42,7 +42,6 @@ import okhttp3.Headers.Companion.toHeaders
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.internal.http.HttpMethod
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.ListProperty
@@ -183,9 +182,9 @@ abstract class SquitRequestTask : DefaultTask() {
         .resolve(MediaTypeFactory.request(config.mediaType))
         .let {
             when {
-                HttpMethod.requiresRequestBody(config.method) -> FilesUtils.validateExistence(it)
+                requiresRequestBody(config.method) -> FilesUtils.validateExistence(it)
 
-                HttpMethod.permitsRequestBody(config.method) -> when (Files.exists(it)) {
+                permitsRequestBody(config.method) -> when (Files.exists(it)) {
                     true -> it
                     else -> null
                 }
@@ -193,6 +192,11 @@ abstract class SquitRequestTask : DefaultTask() {
                 else -> null
             }
         }
+
+    private fun requiresRequestBody(method: String) =
+        method == "POST" || method == "PUT" || method == "PATCH" || method == "PROPPATCH" || method == "REPORT"
+
+    private fun permitsRequestBody(method: String) = method != "GET" && method != "HEAD"
 
     private fun doRequestAndScriptExecutions(
         testDirectoryPath: Path,
@@ -206,8 +210,8 @@ abstract class SquitRequestTask : DefaultTask() {
 
         try {
             val apiResponse = constructApiCall(requestPath, config).execute()
-            val apiBody = apiResponse.body?.string() ?: throw IOException("Subject did not answer with a body")
-            val mediaType = apiResponse.body?.contentType()
+            val apiBody = apiResponse.body.string()
+            val mediaType = apiResponse.body.contentType()
 
             Files.write(resultResponseFilePath, apiBody.toByteArray())
 

@@ -45,7 +45,7 @@ fun HTML.squitDetailBody(result: SquitResult) {
 
 private fun DIV.squitTitle(result: SquitResult) {
     div(classes = "row mt-4 mb-2") {
-        div(classes = "row offset-lg-1 col-12 col-lg-10") {
+        div(classes = "d-flex align-items-center offset-lg-1 col-12 col-lg-10") {
             div(classes = "d-inline-flex") {
                 h1(classes = "d-inline-flex") {
                     id = "title"
@@ -56,11 +56,11 @@ private fun DIV.squitTitle(result: SquitResult) {
                 }
             }
 
-            div(classes = "ml-2 d-inline-flex align-self-center") {
+            div(classes = "ms-2 d-inline-flex align-self-center") {
                 val badgeType = when {
-                    result.isIgnored -> "badge-secondary"
-                    result.isSuccess -> "badge-success"
-                    else -> "badge-danger"
+                    result.isIgnored -> "text-bg-secondary"
+                    result.isSuccess -> "text-bg-success"
+                    else -> "text-bg-danger"
                 }
 
                 val text = when {
@@ -69,7 +69,7 @@ private fun DIV.squitTitle(result: SquitResult) {
                     else -> "Failed"
                 }
 
-                span(classes = "badge $badgeType float-right") {
+                span(classes = "badge $badgeType float-end") {
                     +text
                 }
             }
@@ -89,7 +89,7 @@ private fun DIV.squitControls() {
                 }
             }
 
-            button(classes = "btn btn-primary float-right") {
+            button(classes = "btn btn-primary float-end") {
                 id = "output-toggle"
                 type = ButtonType.button
 
@@ -105,12 +105,12 @@ private fun DIV.squitDescription() {
     div(classes = "row mt-4 mb-2") {
         div(classes = "offset-lg-1 col-12 col-lg-10") {
             div(classes = "card card-body") {
-                a(classes = "link-unstyled", href = "#description-container") {
+                a(classes = "text-decoration-none", href = "#description-container") {
                     id = "description-toggle"
 
-                    attributes["data-toggle"] = "collapse"
+                    attributes["data-bs-toggle"] = "collapse"
 
-                    i(classes = "fas fa-fw fa-chevron-right mr-2") {}
+                    i(classes = "fas fa-fw fa-chevron-right me-2") {}
 
                     +"Description"
                 }

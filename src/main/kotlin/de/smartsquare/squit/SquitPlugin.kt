@@ -17,9 +17,9 @@ import org.gradle.util.GradleVersion
 class SquitPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
-        if (GradleVersion.current() < GradleVersion.version("7.3")) {
+        if (GradleVersion.current() < GradleVersion.version("7.5")) {
             throw GradleException(
-                "Minimum supported Gradle version is 7.3. Current version is ${GradleVersion.current().version}.",
+                "Minimum supported Gradle version is 7.5. Current version is ${GradleVersion.current().version}.",
             )
         }
 

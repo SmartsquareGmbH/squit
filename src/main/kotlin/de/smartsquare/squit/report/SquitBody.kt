@@ -124,12 +124,12 @@ private fun DIV.squitControls() {
             form {
                 role = "form"
 
-                div(classes = "custom-control custom-checkbox") {
-                    input(type = InputType.checkBox, classes = "custom-control-input") {
+                div(classes = "form-check") {
+                    input(type = InputType.checkBox, classes = "form-check-input") {
                         id = "failed-only"
                     }
 
-                    label(classes = "custom-control-label") {
+                    label(classes = "form-check-label") {
                         attributes += "for" to "failed-only"
                         classes = classes + "unselectable"
 
@@ -140,14 +140,14 @@ private fun DIV.squitControls() {
         }
 
         div(classes = "col-6 col-lg-5") {
-            button(classes = "btn btn-primary float-right") {
+            button(classes = "btn btn-primary float-end") {
                 type = ButtonType.button
                 id = "collapse-all"
 
                 +"Collapse all"
             }
 
-            button(classes = "btn btn-primary float-right mr-2") {
+            button(classes = "btn btn-primary float-end me-2") {
                 type = ButtonType.button
                 id = "expand-all"
 
@@ -162,7 +162,9 @@ private fun DIV.squitItems(results: List<SquitResult>) {
         id = "result-tree"
 
         div(classes = "offset-lg-1 col-12 col-lg-10") {
-            squitItemContainers(SquitResultTree.fromList(results), 1)
+            div(classes = "list-group") {
+                squitItemContainers(SquitResultTree.fromList(results), 1)
+            }
         }
     }
 }
@@ -183,19 +185,19 @@ private fun DIV.squitContainerItem(resultTree: SquitResultTree, level: Int) {
     a(href = "#item-$currentId", classes = "list-group-item list-group-item-action") {
         attributes["data-success"] = if (resultTree.isSuccess) "true" else "false"
         attributes["style"] = "padding-left: ${12 * level}px"
-        attributes["data-toggle"] = "collapse"
+        attributes["data-bs-toggle"] = "collapse"
 
-        i(classes = "fas fa-fw fa-chevron-right mr-2") {}
+        i(classes = "fas fa-fw fa-chevron-right me-2") {}
 
         +resultTree.name
 
         val badgeType = when {
-            resultTree.isIgnored -> "badge-secondary"
-            resultTree.isSuccess -> "badge-success"
-            else -> "badge-danger"
+            resultTree.isIgnored -> "text-bg-secondary"
+            resultTree.isSuccess -> "text-bg-success"
+            else -> "text-bg-danger"
         }
 
-        span(classes = "badge $badgeType float-right") {
+        span(classes = "badge $badgeType float-end") {
             +"${resultTree.successfulTests}/${resultTree.totalTests - resultTree.ignoredTests} passed"
         }
     }
@@ -215,9 +217,9 @@ private fun DIV.squitLeafItem(resultTree: SquitResultTree, level: Int) {
         +resultTree.name
 
         val badgeType = when {
-            resultTree.isIgnored -> "badge-secondary"
-            resultTree.isSuccess -> "badge-success"
-            else -> "badge-danger"
+            resultTree.isIgnored -> "text-bg-secondary"
+            resultTree.isSuccess -> "text-bg-success"
+            else -> "text-bg-danger"
         }
 
         val text = when {
@@ -226,7 +228,7 @@ private fun DIV.squitLeafItem(resultTree: SquitResultTree, level: Int) {
             else -> "Failed"
         }
 
-        span(classes = "badge $badgeType float-right") {
+        span(classes = "badge $badgeType float-end") {
             +text
         }
     }

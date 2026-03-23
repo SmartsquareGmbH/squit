@@ -13,7 +13,7 @@ var outputToggleElement = $("#output-toggle");
 var descriptionToggleElement = $("#description-toggle");
 
 $(document).ready(function () {
-    outputToggleElement.click(function () {
+    outputToggleElement.on("click", function () {
         if (outputToggleElement.text().indexOf("side by side") !== -1) {
             drawDiff("side-by-side");
 
@@ -50,7 +50,7 @@ function drawHeader() {
     }
 
     if (description) {
-        descriptionElement.html(marked(description));
+        descriptionElement.html(marked.parse(description));
     }
 }
 

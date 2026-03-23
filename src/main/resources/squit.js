@@ -74,7 +74,7 @@ $(document).ready(function () {
         $(window).scrollTop(state.position)
     }
 
-    failedOnlyCheckbox.change(function () {
+    failedOnlyCheckbox.on("change", function () {
         var state = getState();
         state.failedOnly = this.checked;
         setState(state);
@@ -82,12 +82,16 @@ $(document).ready(function () {
         toggleFailedOnly(this.checked);
     });
 
-    collapseAllButton.click(function () {
-        collapsibleItems.collapse("hide");
+    collapseAllButton.on("click", function () {
+        collapsibleItems.each(function () {
+            bootstrap.Collapse.getOrCreateInstance(this).hide();
+        });
     });
 
-    expandAllButton.click(function () {
-        collapsibleItems.collapse("show");
+    expandAllButton.on("click", function () {
+        collapsibleItems.each(function () {
+            bootstrap.Collapse.getOrCreateInstance(this).show();
+        });
     });
 
     collapsibleItems
@@ -112,7 +116,7 @@ $(document).ready(function () {
 
     containerItems.on("click", function () {
         $(this).next(".list-group").find(".list-group").each(function () {
-            $(this).collapse("hide");
+            bootstrap.Collapse.getOrCreateInstance(this).hide();
         })
     });
 

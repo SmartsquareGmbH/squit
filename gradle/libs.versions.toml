@@ -1,33 +1,33 @@
 [versions]
 kotlin = "2.3.20"
 dokka = "2.1.0"
-detekt = "1.23.6"
+detekt = "2.0.0-alpha.2"
 kotlinter = "5.4.2"
-jacoco = "0.8.12"
+jacoco = "0.8.14"
 jacoco-testkit = "1.0.12"
-publish-plugin = "1.2.1"
+publish-plugin = "2.1.1"
 versions-plugin = "0.53.0"
 gradle = "9.4.1"
 
 jaxen = "2.0.0"
-dom4j = "2.1.4"
+dom4j = "2.2.0"
 pull-parser = "2.1.10"
-gson = "2.11.0"
-xml-sec = "4.0.2"
-xml-unit = "2.10.0"
-json-unit = "3.4.0"
-typesafe-config = "1.4.3"
-okhttp = "4.12.0"
-kotlinx-html = "0.11.0"
+gson = "2.13.2"
+xml-sec = "4.0.4"
+xml-unit = "2.11.0"
+json-unit = "5.1.1"
+typesafe-config = "1.4.6"
+okhttp = "5.3.2"
+kotlinx-html = "0.12.0"
 diff-utils = "3.0"
-alphanumeric-comparator = "1.4.1"
+alphanumeric-comparator = "2.0.0"
 
-bootstrap = "4.6.0"
-jquery = "3.6.0"
+bootstrap = "5.3.8"
+jquery = "4.0.0"
 popper = "1.16.1"
-font-awesome = "5.15.4"
-diff2html = "3.1.7"
-marked = "2.0.6"
+font-awesome = "7.2.0"
+diff2html = "3.4.52"
+marked = "17.0.5"
 
 junit = "5.10.3"
 kluent = "1.73"
@@ -38,7 +38,7 @@ mockk = "1.13.11"
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 dokka-javadoc = { id = "org.jetbrains.dokka-javadoc", version.ref = "dokka" }
-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+detekt = { id = "dev.detekt", version.ref = "detekt" }
 kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
 jacoco-testkit = { id = "pl.droidsonroids.jacoco.testkit", version.ref = "jacoco-testkit" }
 publish = { id = "com.gradle.plugin-publish", version.ref = "publish-plugin" }

@@ -30,11 +30,6 @@ class GradleCompatibilityTest {
                 result += Arguments.of(GradleVersion.version("8.0.2"))
             }
 
-            // This older Gradle version does not work on Java 21+.
-            if (JavaVersion.current() < JavaVersion.VERSION_21) {
-                result += Arguments.of(GradleVersion.version("7.3.2"))
-            }
-
             return result.stream()
         }
     }
@@ -74,10 +69,9 @@ class GradleCompatibilityTest {
     }
 
     @Test
-    @DisabledForJreRange(min = JRE.JAVA_16)
     fun `outdated version`() {
-        val result = gradleRunner(project, emptyList(), GradleVersion.version("7.2")).buildAndFail()
+        val result = gradleRunner(project, emptyList(), GradleVersion.version("7.4")).buildAndFail()
 
-        result.output shouldContain "Minimum supported Gradle version is 7.3. Current version is 7.2."
+        result.output shouldContain "Minimum supported Gradle version is 7.5. Current version is 7.4."
     }
 }
