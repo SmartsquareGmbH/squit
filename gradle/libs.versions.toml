@@ -29,7 +29,7 @@ font-awesome = "7.2.0"
 diff2html = "3.4.52"
 marked = "17.0.5"
 
-junit = "5.10.3"
+junit = "6.0.3"
 kluent = "1.73"
 h2 = "2.2.224"
 mockk = "1.13.11"
