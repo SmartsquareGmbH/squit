@@ -1,5 +1,6 @@
 [versions]
 kotlin = "2.3.20"
+node = "7.1.0"
 dokka = "2.2.0"
 detekt = "2.0.0-alpha.2"
 kotlinter = "5.4.2"
@@ -18,16 +19,8 @@ xml-unit = "2.11.0"
 json-unit = "5.1.1"
 typesafe-config = "1.4.6"
 okhttp = "5.3.2"
-kotlinx-html = "0.12.0"
 diff-utils = "3.0"
 alphanumeric-comparator = "2.0.0"
-
-bootstrap = "5.3.8"
-jquery = "4.0.0"
-popper = "1.16.1"
-font-awesome = "7.2.0"
-diff2html = "3.4.52"
-marked = "17.0.5"
 
 junit = "6.0.3"
 kluent = "1.73"
@@ -36,6 +29,7 @@ mockk = "1.13.11"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+node = { id = "com.github.node-gradle.node", version.ref = "node" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 dokka-javadoc = { id = "org.jetbrains.dokka-javadoc", version.ref = "dokka" }
 detekt = { id = "dev.detekt", version.ref = "detekt" }
@@ -45,7 +39,6 @@ publish = { id = "com.gradle.plugin-publish", version.ref = "publish-plugin" }
 versions = { id = "com.github.ben-manes.versions", version.ref = "versions-plugin" }
 
 [libraries]
-kotlinx-html = { module = "org.jetbrains.kotlinx:kotlinx-html-jvm", version.ref = "kotlinx-html" }
 dom4j = { module = "org.dom4j:dom4j", version.ref = "dom4j" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 typesafe-config = { module = "com.typesafe:config", version.ref = "typesafe-config" }
@@ -57,13 +50,6 @@ json-unit = { module = "net.javacrumbs.json-unit:json-unit", version.ref = "json
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 alphanumeric-comparator = { module = "se.sawano.java:alphanumeric-comparator", version.ref = "alphanumeric-comparator" }
 diff-utils = { module = "com.github.wumpz:diffutils", version.ref = "diff-utils" }
-
-jquery = { module = "org.webjars.npm:jquery", version.ref = "jquery" }
-bootstrap = { module = "org.webjars.npm:bootstrap", version.ref = "bootstrap" }
-popper = { module = "org.webjars.npm:popper.js", version.ref = "popper" }
-font-awesome = { module = "org.webjars:font-awesome", version.ref = "font-awesome" }
-marked = { module = "org.webjars.npm:marked", version.ref = "marked" }
-diff2html = { module = "org.webjars.npm:diff2html", version.ref = "diff2html" }
 
 junit = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }

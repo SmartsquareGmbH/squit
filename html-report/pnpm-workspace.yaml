@@ -1,0 +1,3 @@
+allowBuilds:
+  v-code-diff: true
+  vue-demi: false
