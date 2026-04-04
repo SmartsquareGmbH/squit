@@ -1,0 +1,9 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "ignorePatterns": ["dist"],
+  "plugins": ["eslint", "typescript", "unicorn", "oxc", "import", "promise", "vue"],
+  "options": {
+    "maxWarnings": 0,
+    "typeAware": true
+  }
+}

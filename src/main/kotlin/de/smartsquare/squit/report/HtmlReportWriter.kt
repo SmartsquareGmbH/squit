@@ -1,151 +1,125 @@
 package de.smartsquare.squit.report
 
-import com.github.difflib.DiffUtils
-import com.github.difflib.UnifiedDiffUtils
+import com.google.gson.Gson
 import de.smartsquare.squit.entity.SquitResult
-import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeConfig
 import de.smartsquare.squit.mediatype.MediaTypeFactory
-import kotlinx.html.html
-import kotlinx.html.stream.appendHTML
 import okhttp3.MediaType
 import org.gradle.api.logging.Logger
 import java.nio.file.Files
 import java.nio.file.Path
 
 /**
- * Object for writing the Squit html report.
+ * Object for writing the Squit HTML report.
  */
 class HtmlReportWriter(private val logger: Logger) {
 
     private companion object {
-        private const val DIFF_FILE_NAME = "Result"
-        private const val DIFF_INFO_FILE_NAME = "ResultInfo"
-        private const val DIFF_CONTEXT_SIZE = 1_000_000
-        private const val HTML_LINE_ENDING = "\\n\\\n"
-
-        private const val BOOTSTRAP_PATH = "META-INF/resources/webjars/bootstrap/5.3.8/dist"
-        private const val FONT_AWESOME_PATH = "META-INF/resources/webjars/font-awesome/7.2.0"
-        private const val JQUERY_PATH = "META-INF/resources/webjars/jquery/4.0.0/dist"
-        private const val POPPER_JS_PATH = "META-INF/resources/webjars/popper.js/1.16.1/dist/umd"
-        private const val MARKED_PATH = "META-INF/resources/webjars/marked/17.0.5/lib"
-        private const val DIFF_2_HTML_PATH = "META-INF/resources/webjars/diff2html/3.4.52"
-
-        private val resources = arrayOf(
-            "$BOOTSTRAP_PATH/css/bootstrap.min.css" to "css/bootstrap.css",
-            "$BOOTSTRAP_PATH/js/bootstrap.min.js" to "js/bootstrap.js",
-            "$FONT_AWESOME_PATH/js/all.min.js" to "js/fontawesome.js",
-            "$JQUERY_PATH/jquery.slim.min.js" to "js/jquery.js",
-            "$POPPER_JS_PATH/popper.min.js" to "js/popper.js",
-            "$MARKED_PATH/marked.umd.js" to "js/marked.js",
-            "$DIFF_2_HTML_PATH/bundles/css/diff2html.min.css" to "css/diff2html.css",
-            "$DIFF_2_HTML_PATH/bundles/js/diff2html.min.js" to "js/diff2html.js",
-            "$DIFF_2_HTML_PATH/bundles/js/diff2html-ui.min.js" to "js/diff2html-ui.js",
-            "squit.js" to "js/squit.js",
-            "squit.css" to "css/squit.css",
-        )
-
-        private val emptyDiffHeader = listOf("--- $DIFF_FILE_NAME", "+++ $DIFF_FILE_NAME", "@@ -1 +1 @@")
+        private const val DATA_PLACEHOLDER = "__SQUIT_DATA__"
     }
 
     /**
-     * Generates and writes the Squit html report, given the [results] list and [reportDirectoryPath].
+     * Generates and writes the Squit HTML report, given the [results] list and [reportDirectoryPath].
      */
     fun writeReport(results: List<SquitResult>, reportDirectoryPath: Path, mediaTypeConfig: MediaTypeConfig) {
-        val document = StringBuilder("<!DOCTYPE html>").appendHTML().html {
-            squitHead()
-            squitBody(results)
-        }
+        val firstTest = results.minByOrNull { it.metaInfo.date }
+        val duration = results.fold(0L) { acc, next -> acc + next.metaInfo.duration }
 
-        results.forEach { result ->
-            val detailDocument = StringBuilder("<!doctype html>").appendHTML().html {
-                squitDetailHead()
-                squitDetailBody(result)
-            }
+        val averageTime = results.map { it.metaInfo.duration }.average().let { if (it.isNaN()) 0L else it.toLong() }
+        val slowestTest = results.maxByOrNull { it.metaInfo.duration }
 
-            val detailPath = reportDirectoryPath.resolve("detail").resolve(result.id.toString())
-            val detailHtmlPath = detailPath.resolve("detail.html")
-            val detailCssPath = detailPath.resolve("detail.css")
-            val detailJsPath = detailPath.resolve("detail.js")
+        val data = SquitHtmlReportData(
+            startedAt = firstTest?.metaInfo?.date?.toString(),
+            totalDuration = duration,
+            averageDuration = averageTime,
+            slowestTest = slowestTest?.let { SquitSlowestTest(it.id, it.simpleName, it.metaInfo.duration) },
+            results = constructResults(results, mediaTypeConfig),
+        )
 
-            val canonicalizedExpectedLines = when {
-                !result.isError -> canonicalize(
-                    result.expectedLines,
-                    result.mediaType,
-                    mediaTypeConfig,
-                    "Could not canonicalize expected response",
-                )
+        val json = Gson().toJson(data)
 
-                else -> result.expectedLines
-            }
+        val template = javaClass.getResourceAsStream("/squit-report-template.html")!!
+            .readBytes()
+            .toString(Charsets.UTF_8)
 
-            val canonicalizedActualLines = when {
-                !result.isError -> canonicalize(
-                    result.actualLines,
-                    result.mediaType,
-                    mediaTypeConfig,
-                    "Could not canonicalize actual response",
-                )
+        val html = template.replace(DATA_PLACEHOLDER, json)
 
-                else -> result.actualLines
-            }
-
-            val bodyDiff = generateDiff(canonicalizedExpectedLines, canonicalizedActualLines, DIFF_FILE_NAME)
-
-            val unifiedDiffForJs = prepareForJs(bodyDiff)
-            val unifiedInfoDiffForJs = prepareInfoForJs(result)
-
-            val descriptionForReplacement = if (result.description == null) {
-                "null"
-            } else {
-                "\"${result.description}\"".replace("\n", HTML_LINE_ENDING)
-            }
-
-            Files.createDirectories(detailPath)
-            Files.write(detailHtmlPath, detailDocument.toString().toByteArray())
-
-            FilesUtils.copyResource("squit-detail.css", detailCssPath)
-            FilesUtils.copyResource("squit-detail.js", detailJsPath) {
-                it.toString(Charsets.UTF_8)
-                    .replace("infoDiffPlaceholder", unifiedInfoDiffForJs)
-                    .replace("diffPlaceholder", unifiedDiffForJs)
-                    .replace("namePlaceholder", result.simpleName)
-                    .replace("alternativeNamePlaceholder", result.alternativeName)
-                    .replace("\"descriptionPlaceholder\"", descriptionForReplacement)
-                    .toByteArray()
-            }
-        }
-
-        resources.forEach { (name, target) ->
-            FilesUtils.copyResource(name, reportDirectoryPath.resolve(target))
-        }
-
-        Files.write(reportDirectoryPath.resolve("index.html"), document.toString().toByteArray())
+        Files.createDirectories(reportDirectoryPath)
+        Files.write(reportDirectoryPath.resolve("index.html"), html.toByteArray())
     }
 
-    // Visible for testing.
-    internal fun prepareInfoForJs(result: SquitResult): String =
-        if (!result.expectedResponseInfo.isDefault && !result.isError) {
-            val expectedInfoLines = result.expectedResponseInfo.toJson().lines()
+    private fun constructResults(results: List<SquitResult>, mediaTypeConfig: MediaTypeConfig): Map<String, Any> {
+        val root = SquitReportResultBranch()
 
-            val actualInfo = result.actualInfoLines.joinToString(separator = "\n")
-            val actualInfoLines = when {
-                actualInfo.isEmpty() -> emptyList()
-                else -> actualInfo.lines()
+        for (result in results) {
+            var current = root
+
+            for (segment in result.path) {
+                val next = current.children.getOrPut(segment.toString()) { SquitReportResultBranch() }
+
+                current = next as? SquitReportResultBranch
+                    ?: error("Path segment '$segment' is already occupied by a result.")
             }
 
-            val infoDiff = generateDiff(expectedInfoLines, actualInfoLines, DIFF_INFO_FILE_NAME)
-
-            prepareForJs(infoDiff)
-        } else {
-            ""
+            current.children[result.simpleName] = buildReportResult(result, mediaTypeConfig)
         }
 
-    private fun prepareForJs(bodyDiff: List<String>): String = bodyDiff
-        .map { it.replace(Regex("(?<!\\\\)'"), Regex.escapeReplacement("\\'")) }
-        .map { it.replace(Regex("(?<!\\\\)\""), Regex.escapeReplacement("\\\"")) }
-        .map { it.replace(Regex("\\\\n"), Regex.escapeReplacement("\\\\n")) }
-        .joinToString(HTML_LINE_ENDING)
+        return root.toMap()
+    }
+
+    private fun buildReportResult(result: SquitResult, mediaTypeConfig: MediaTypeConfig): SquitReportResult {
+        val canonicalizedExpectedLines = canonicalizeExpectedLines(result, mediaTypeConfig)
+        val canonicalizedActualLines = canonicalizeActualLines(result, mediaTypeConfig)
+
+        val hasInfoDiff = !result.expectedResponseInfo.isDefault && !result.isError
+        val infoExpected = if (hasInfoDiff) result.expectedResponseInfo.toJson() else null
+        val infoActual = if (hasInfoDiff) result.actualLines.joinToString("\n") else null
+
+        return SquitReportResult(
+            result.id,
+            result.alternativeName,
+            result.description,
+            result.isSuccess,
+            result.isIgnored,
+            result.isError,
+            result.metaInfo.duration,
+            canonicalizedExpectedLines.joinToString("\n"),
+            canonicalizedActualLines.joinToString("\n"),
+            infoExpected,
+            infoActual,
+            highlightLanguage(result.mediaType),
+        )
+    }
+
+    private fun highlightLanguage(mediaType: MediaType): String? = when (mediaType) {
+        MediaTypeFactory.xmlMediaType, MediaTypeFactory.applicationXmlMediaType, MediaTypeFactory.soapMediaType -> "xml"
+        MediaTypeFactory.jsonMediaType -> "json"
+        else -> null
+    }
+
+    private fun canonicalizeExpectedLines(result: SquitResult, mediaTypeConfig: MediaTypeConfig): List<String> =
+        if (!result.isError) {
+            canonicalize(
+                result.expectedLines,
+                result.mediaType,
+                mediaTypeConfig,
+                "Could not canonicalize expected response",
+            )
+        } else {
+            result.expectedLines
+        }
+
+    private fun canonicalizeActualLines(result: SquitResult, mediaTypeConfig: MediaTypeConfig): List<String> =
+        if (!result.isError) {
+            canonicalize(
+                result.actualLines,
+                result.mediaType,
+                mediaTypeConfig,
+                "Could not canonicalize actual response",
+            )
+        } else {
+            result.actualLines
+        }
 
     private fun canonicalize(
         lines: List<String>,
@@ -163,23 +137,6 @@ class HtmlReportWriter(private val logger: Logger) {
             logger.warn(errorMessage, error)
 
             lines
-        }
-    }
-
-    private fun generateDiff(expectedLines: List<String>, actualLines: List<String>, filename: String): List<String> {
-        val diff = DiffUtils.diff(expectedLines, actualLines)
-
-        val unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(
-            filename,
-            filename,
-            expectedLines,
-            diff,
-            DIFF_CONTEXT_SIZE,
-        )
-
-        return when (unifiedDiff.isEmpty()) {
-            true -> emptyDiffHeader + actualLines.map { " $it" }
-            false -> unifiedDiff
         }
     }
 }

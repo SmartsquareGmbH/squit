@@ -1,0 +1,52 @@
+{
+  "startedAt": "2026-04-04T00:53:20.610375536",
+  "totalDuration": 384,
+  "averageDuration": 128,
+  "slowestTest": {
+    "id": 1,
+    "name": "get-user",
+    "duration": 310
+  },
+  "results": {
+    "api": {
+      "users": {
+        "get-user": {
+          "id": 1,
+          "alternativeName": "Get User by ID",
+          "description": "## Get User\nRetrieves a user by their unique identifier.\n\n**Expected:** Returns 200 with user data.",
+          "success": true,
+          "ignored": false,
+          "error": false,
+          "duration": 120,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<user id=\"1\"/>\n",
+          "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<user id=\"1\"/>\n",
+          "language": "xml"
+        },
+        "create-user": {
+          "id": 2,
+          "alternativeName": "",
+          "success": false,
+          "ignored": false,
+          "error": false,
+          "duration": 543,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<result status=\"created\"/>\n",
+          "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<result status=\"error\"/>\n",
+          "infoExpected": "{\"responseCode\": 201}",
+          "infoActual": "{\"responseCode\": 400}",
+          "language": "xml"
+        }
+      },
+      "health-check": {
+        "id": 3,
+        "alternativeName": "",
+        "success": false,
+        "ignored": true,
+        "error": false,
+        "duration": 89,
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<status value=\"ok\"/>\n",
+        "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<status value=\"ok\"/>\n",
+        "language": "xml"
+      }
+    }
+  }
+}

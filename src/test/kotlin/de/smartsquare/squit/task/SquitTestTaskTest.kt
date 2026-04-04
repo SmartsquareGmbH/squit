@@ -5,12 +5,12 @@ import de.smartsquare.squit.gradleRunner
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBe
-import org.amshove.kluent.shouldBeDir
 import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldBeFalse
 import org.amshove.kluent.shouldBeFile
 import org.amshove.kluent.shouldBeTrue
 import org.amshove.kluent.shouldContain
+import org.amshove.kluent.shouldNotExist
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -69,10 +69,9 @@ class SquitTestTaskTest {
         xmlReportPath.toFile().shouldBeFile()
         htmlReportPath.toFile().shouldBeFile()
 
-        htmlReportPath.parent.resolve("css").toFile().shouldBeDir()
-        htmlReportPath.parent.resolve("detail").toFile().shouldBeDir()
-        htmlReportPath.parent.resolve("js").toFile().shouldBeDir()
-        htmlReportPath.parent.resolve("detail").resolve("0").resolve("detail.html").toFile().shouldBeFile()
+        htmlReportPath.parent.resolve("css").toFile().shouldNotExist()
+        htmlReportPath.parent.resolve("js").toFile().shouldNotExist()
+        htmlReportPath.parent.resolve("detail").toFile().shouldNotExist()
 
         Files.exists(call4Directory).shouldBeTrue()
         Files.list(failuresDirectory).use { it.toList().shouldBeEmpty() }

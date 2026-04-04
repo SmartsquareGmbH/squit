@@ -1,8 +1,10 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import com.github.gradle.node.pnpm.task.PnpmTask
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.node)
     alias(libs.plugins.dokka)
     alias(libs.plugins.dokka.javadoc)
     alias(libs.plugins.detekt)
@@ -32,19 +34,9 @@ dependencies {
     implementation(libs.xml.unit)
     implementation(libs.json.unit)
     implementation(libs.okhttp)
-    implementation(libs.kotlinx.html)
     implementation(libs.alphanumeric.comparator)
     implementation(libs.diff.utils) {
         exclude(group = "org.eclipse.jgit")
-    }
-
-    implementation(libs.jquery)
-    implementation(libs.bootstrap)
-    implementation(libs.popper)
-    implementation(libs.font.awesome)
-    implementation(libs.marked)
-    implementation(libs.diff2html) {
-        exclude(group = "org.webjars.npm")
     }
 
     testImplementation(gradleTestKit())
@@ -69,6 +61,33 @@ kotlin {
 
     compilerOptions {
         allWarningsAsErrors = true
+    }
+}
+
+node {
+    nodeProjectDir = file("html-report")
+}
+
+val buildHtmlReport = tasks.register<PnpmTask>("buildHtmlReport") {
+    dependsOn(tasks.pnpmInstall)
+
+    args = listOf("run", "build")
+
+    inputs.files(
+        fileTree("html-report") {
+            exclude("node_modules/**")
+            exclude("dist/**")
+        },
+    )
+
+    outputs.file("report-frontend/dist/index.html")
+}
+
+tasks.processResources {
+    dependsOn(buildHtmlReport)
+
+    from("html-report/dist/index.html") {
+        rename { "squit-report-template.html" }
     }
 }
 
