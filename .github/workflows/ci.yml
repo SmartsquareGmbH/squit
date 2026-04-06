@@ -21,6 +21,18 @@ jobs:
           distribution: temurin
           cache: "gradle"
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          package_json_file: html-report/package.json
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: html-report/.node-version
+          cache: pnpm
+          cache-dependency-path: html-report/pnpm-lock.yaml
+
       - name: Check
         run: ./gradlew check detektMain
 
@@ -30,3 +42,30 @@ jobs:
         with:
           name: Gradle Reports
           path: "**/build/reports"
+
+  verify-html-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          package_json_file: html-report/package.json
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: html-report/.node-version
+          cache: pnpm
+          cache-dependency-path: html-report/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: html-report
+        run: pnpm install
+
+      - name: Verify
+        working-directory: html-report
+        run: pnpm verify
