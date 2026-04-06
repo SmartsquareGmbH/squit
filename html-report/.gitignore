@@ -1,3 +1,4 @@
 .vite
 dist
+coverage
 node_modules
