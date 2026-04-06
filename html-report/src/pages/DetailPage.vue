@@ -21,12 +21,7 @@
     </expansion-panel>
 
     <template v-if="result.infoExpected && result.infoActual">
-      <diff-viewer
-        :expected="result.infoExpected"
-        :actual="result.infoActual"
-        language="json"
-        class="mb-4"
-      />
+      <diff-viewer :expected="result.infoExpected" :actual="result.infoActual" language="json" class="mb-4" />
     </template>
 
     <diff-viewer :expected="result.expected" :actual="result.actual" :language="result.language" />

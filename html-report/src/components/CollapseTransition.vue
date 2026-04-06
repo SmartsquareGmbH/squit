@@ -5,7 +5,8 @@
 </template>
 
 <script setup lang="ts">
-function onEnter(element: HTMLElement) {
+function onEnter(el: Element) {
+  const element = el as HTMLElement
   element.style.height = "0"
   element.style.overflow = "hidden"
 
@@ -15,13 +16,15 @@ function onEnter(element: HTMLElement) {
   })
 }
 
-function onAfterEnter(element: HTMLElement) {
+function onAfterEnter(el: Element) {
+  const element = el as HTMLElement
   element.style.height = ""
   element.style.overflow = ""
   element.style.transition = ""
 }
 
-function onLeave(element: HTMLElement) {
+function onLeave(el: Element) {
+  const element = el as HTMLElement
   element.style.height = `${element.scrollHeight}px`
   element.style.overflow = "hidden"
 
@@ -32,7 +35,8 @@ function onLeave(element: HTMLElement) {
   element.style.height = "0"
 }
 
-function onAfterLeave(element: HTMLElement) {
+function onAfterLeave(el: Element) {
+  const element = el as HTMLElement
   element.style.height = ""
   element.style.overflow = ""
   element.style.transition = ""

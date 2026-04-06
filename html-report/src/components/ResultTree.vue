@@ -12,7 +12,7 @@
   <expansion-panel v-else v-show="!failedOnly || stats.failed > 0" v-model="isOpen">
     <template #title>
       <span class="min-w-0 flex-1 truncate text-sm font-medium text-gray-800 dark:text-gray-200">
-        {{ node.alternativeName || name}}
+        {{ node.alternativeName || name }}
       </span>
       <icon-button size="sm" title="Expand all" @click.stop="expand">
         <ChevronsUpDown class="h-3.5 w-3.5" aria-hidden="true" />
