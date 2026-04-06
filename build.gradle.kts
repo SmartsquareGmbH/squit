@@ -66,6 +66,7 @@ kotlin {
 
 node {
     nodeProjectDir = file("html-report")
+    download = false
 }
 
 val buildHtmlReport = tasks.register<PnpmTask>("buildHtmlReport") {

@@ -12,6 +12,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          package_json_file: html-report/package.json
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: html-report/.node-version
+          cache: pnpm
+          cache-dependency-path: html-report/pnpm-lock.yaml
+
       - name: Setup JDK
         uses: actions/setup-java@v5
         with:
