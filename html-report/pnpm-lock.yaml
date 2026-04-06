@@ -34,52 +34,52 @@ importers:
         version: 5.0.4(@vue/compiler-sfc@3.5.32)(vue@3.5.32(typescript@6.0.2))
     devDependencies:
       '@tailwindcss/typography':
-        specifier: ^0.5.19
+        specifier: 0.5.19
         version: 0.5.19(tailwindcss@4.2.2)
       '@tailwindcss/vite':
-        specifier: ^4.2.2
+        specifier: 4.2.2
         version: 4.2.2(vite@8.0.5(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(jiti@2.6.1)(yaml@2.8.3))
       '@tsconfig/vite-react':
-        specifier: ^7.0.2
+        specifier: 7.0.2
         version: 7.0.2
       '@vitejs/plugin-vue':
-        specifier: ^6.0.5
+        specifier: 6.0.5
         version: 6.0.5(vite@8.0.5(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(jiti@2.6.1)(yaml@2.8.3))(vue@3.5.32(typescript@6.0.2))
       '@vue/test-utils':
-        specifier: ^2.4.6
+        specifier: 2.4.6
         version: 2.4.6
       happy-dom:
-        specifier: ^20.8.9
+        specifier: 20.8.9
         version: 20.8.9
       oxfmt:
-        specifier: ^0.43.0
+        specifier: 0.43.0
         version: 0.43.0
       oxlint:
-        specifier: ^1.58.0
+        specifier: 1.58.0
         version: 1.58.0(oxlint-tsgolint@0.20.0)
       oxlint-tsgolint:
-        specifier: ^0.20.0
+        specifier: 0.20.0
         version: 0.20.0
       tailwindcss:
-        specifier: ^4.2.2
+        specifier: 4.2.2
         version: 4.2.2
       typescript:
-        specifier: ^6.0.2
+        specifier: 6.0.2
         version: 6.0.2
       vite:
-        specifier: ^8.0.5
+        specifier: 8.0.5
         version: 8.0.5(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(jiti@2.6.1)(yaml@2.8.3)
       vite-plugin-singlefile:
-        specifier: ^2.3.2
+        specifier: 2.3.2
         version: 2.3.2(rollup@4.60.1)(vite@8.0.5(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(jiti@2.6.1)(yaml@2.8.3))
       vite-plugin-vue-devtools:
-        specifier: ^8.1.1
+        specifier: 8.1.1
         version: 8.1.1(vite@8.0.5(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(jiti@2.6.1)(yaml@2.8.3))(vue@3.5.32(typescript@6.0.2))
       vitest:
-        specifier: ^4.1.2
+        specifier: 4.1.2
         version: 4.1.2(@types/node@25.5.2)(happy-dom@20.8.9)(vite@8.0.5(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(jiti@2.6.1)(yaml@2.8.3))
       vue-tsc:
-        specifier: ^3.2.6
+        specifier: 3.2.6
         version: 3.2.6(typescript@6.0.2)
 
 packages:
