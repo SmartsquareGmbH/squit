@@ -8,14 +8,9 @@
     <overview-stats class="mb-6" />
 
     <div class="mb-4 flex flex-wrap items-center gap-4">
-      <label class="mr-auto flex cursor-pointer items-center gap-2 text-sm select-none">
-        <input
-          type="checkbox"
-          v-model="failedOnly"
-          class="h-4 w-4 cursor-pointer rounded border-gray-300 text-indigo-600 dark:border-gray-600 dark:text-indigo-400"
-        />
-        <span>Show only failed tests</span>
-      </label>
+      <div class="mr-auto flex flex-wrap items-center gap-4">
+        <search-input v-model="searchQuery" />
+      </div>
 
       <icon-button size="sm" title="Expand all" @click.stop="expand">
         <ChevronsUpDown class="h-3.5 w-3.5" aria-hidden="true" />
@@ -32,31 +27,43 @@
         :key="name"
         :name="name"
         :node="node"
-        :failed-only="failedOnly"
+        :search-query="searchQuery"
       />
+
+      <div
+        v-if="searchQuery && !hasSearchResults"
+        class="flex flex-col items-center gap-2 py-12 text-gray-400 dark:text-gray-500"
+      >
+        <Search class="h-8 w-8" aria-hidden="true" />
+        <p class="text-sm">
+          No results for "<span class="font-medium text-gray-600 dark:text-gray-400">{{ searchQuery }}</span
+          >"
+        </p>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ChevronsDownUp, ChevronsUpDown } from "@lucide/vue"
+import { ChevronsDownUp, ChevronsUpDown, Search } from "@lucide/vue"
 import { computed, useTemplateRef } from "vue"
 import IconButton from "../components/IconButton.vue"
 import OverviewStats from "../components/OverviewStats.vue"
 import ResultTree from "../components/ResultTree.vue"
-import { useFilter } from "../composables/useFilter"
+import SearchInput from "../components/SearchInput.vue"
+import { useSearch } from "../composables/useSearch.ts"
 import { useSquitData } from "../composables/useSquitData.ts"
 import { getResultNodeStats } from "../data.ts"
 
 const data = useSquitData()
-const { failedOnly } = useFilter()
+const { searchQuery, hasSearchResults } = useSearch(data.results)
 
 const summary = computed(() => {
   const { success, failed } = getResultNodeStats(data.results)
   const total = success + failed
 
   if (total === 0) return "No tests run."
-  if (failed === 0) return `${total} tests run. All passed!`
+  if (failed === 0) return `${total} ${total === 1 ? "test" : "tests"} run. All passed!`
   if (total === 1) return `One test run. ${failed} failed.`
   return `${total} tests run. ${failed} failed.`
 })

@@ -5,10 +5,10 @@
       class="flex items-center justify-end gap-2 border-b border-gray-200 px-3 py-2 dark:border-gray-800"
     >
       <btn @click="toggleDiffStyle">
-        {{ diffStyle === "word" ? "Char diff" : "Word diff" }}
+        {{ diffStyle === "word" ? "Word diff" : "Char diff" }}
       </btn>
       <btn @click="toggleOutputFormat">
-        {{ outputFormat === "side-by-side" ? "Inline" : "Side by side" }}
+        {{ outputFormat === "side-by-side" ? "Side by side" : "Inline" }}
       </btn>
     </div>
     <div :class="{ 'no-changes': !hasChanges }">

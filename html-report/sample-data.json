@@ -1,11 +1,11 @@
 {
   "startedAt": "2026-04-04T00:53:20.610375536",
-  "totalDuration": 384,
-  "averageDuration": 128,
+  "totalDuration": 3167,
+  "averageDuration": 158,
   "slowestTest": {
-    "id": 1,
-    "name": "get-user",
-    "duration": 310
+    "id": 2,
+    "name": "create-user",
+    "duration": 543
   },
   "results": {
     "api": {
@@ -34,6 +34,44 @@
           "infoExpected": "{\"responseCode\": 201}",
           "infoActual": "{\"responseCode\": 400}",
           "language": "xml"
+        },
+        "update-user": {
+          "id": 4,
+          "alternativeName": "Update User Profile",
+          "success": true,
+          "ignored": false,
+          "error": false,
+          "duration": 95,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<result status=\"updated\"/>\n",
+          "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<result status=\"updated\"/>\n",
+          "infoExpected": "{\"responseCode\": 200}",
+          "infoActual": "{\"responseCode\": 200}",
+          "language": "xml"
+        },
+        "delete-user": {
+          "id": 5,
+          "alternativeName": "",
+          "success": true,
+          "ignored": false,
+          "error": false,
+          "duration": 78,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<result status=\"deleted\"/>\n",
+          "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<result status=\"deleted\"/>\n",
+          "infoExpected": "{\"responseCode\": 200}",
+          "infoActual": "{\"responseCode\": 200}",
+          "language": "xml"
+        },
+        "list-users": {
+          "id": 6,
+          "alternativeName": "List All Users",
+          "description": "## List Users\nReturns a paginated list of all users.\n\n**Expected:** Returns 200 with a list of user objects.",
+          "success": true,
+          "ignored": false,
+          "error": false,
+          "duration": 210,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<users total=\"42\"/>\n",
+          "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<users total=\"42\"/>\n",
+          "language": "xml"
         }
       },
       "health-check": {
@@ -46,6 +84,177 @@
         "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<status value=\"ok\"/>\n",
         "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<status value=\"ok\"/>\n",
         "language": "xml"
+      },
+      "products": {
+        "get-product": {
+          "id": 7,
+          "alternativeName": "Get Product by ID",
+          "success": true,
+          "ignored": false,
+          "error": false,
+          "duration": 145,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<product id=\"42\" name=\"Widget\"/>\n",
+          "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<product id=\"42\" name=\"Widget\"/>\n",
+          "language": "xml"
+        },
+        "create-product": {
+          "id": 8,
+          "alternativeName": "",
+          "success": false,
+          "ignored": false,
+          "error": false,
+          "duration": 310,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<result status=\"created\" id=\"99\"/>\n",
+          "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<result status=\"conflict\"/>\n",
+          "infoExpected": "{\"responseCode\": 201}",
+          "infoActual": "{\"responseCode\": 409}",
+          "language": "xml"
+        },
+        "list-products": {
+          "id": 9,
+          "alternativeName": "List Products",
+          "success": true,
+          "ignored": false,
+          "error": false,
+          "duration": 188,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<products total=\"150\"/>\n",
+          "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<products total=\"150\"/>\n",
+          "language": "xml"
+        },
+        "update-product": {
+          "id": 10,
+          "alternativeName": "",
+          "success": true,
+          "ignored": false,
+          "error": false,
+          "duration": 102,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<result status=\"updated\"/>\n",
+          "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<result status=\"updated\"/>\n",
+          "language": "xml"
+        },
+        "delete-product": {
+          "id": 11,
+          "alternativeName": "",
+          "success": false,
+          "ignored": false,
+          "error": true,
+          "duration": 67,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<result status=\"deleted\"/>\n",
+          "actual": "connection refused",
+          "language": "xml"
+        }
+      },
+      "orders": {
+        "create-order": {
+          "id": 12,
+          "alternativeName": "Place New Order",
+          "description": "## Create Order\nPlaces a new order for a given product and quantity.\n\n**Expected:** Returns 201 with the new order ID.",
+          "success": true,
+          "ignored": false,
+          "error": false,
+          "duration": 224,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<order id=\"7\" status=\"pending\"/>\n",
+          "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<order id=\"7\" status=\"pending\"/>\n",
+          "infoExpected": "{\"responseCode\": 201}",
+          "infoActual": "{\"responseCode\": 201}",
+          "language": "xml"
+        },
+        "get-order": {
+          "id": 13,
+          "alternativeName": "",
+          "success": true,
+          "ignored": false,
+          "error": false,
+          "duration": 133,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<order id=\"7\" status=\"shipped\"/>\n",
+          "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<order id=\"7\" status=\"shipped\"/>\n",
+          "language": "xml"
+        },
+        "list-orders": {
+          "id": 14,
+          "alternativeName": "List Orders for User",
+          "success": false,
+          "ignored": false,
+          "error": false,
+          "duration": 156,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<orders total=\"3\"/>\n",
+          "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<orders total=\"5\"/>\n",
+          "language": "xml"
+        },
+        "cancel-order": {
+          "id": 15,
+          "alternativeName": "",
+          "success": true,
+          "ignored": false,
+          "error": false,
+          "duration": 98,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<result status=\"cancelled\"/>\n",
+          "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<result status=\"cancelled\"/>\n",
+          "infoExpected": "{\"responseCode\": 200}",
+          "infoActual": "{\"responseCode\": 200}",
+          "language": "xml"
+        }
+      },
+      "auth": {
+        "login": {
+          "id": 16,
+          "alternativeName": "User Login",
+          "success": true,
+          "ignored": false,
+          "error": false,
+          "duration": 87,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<session token=\"abc123\"/>\n",
+          "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<session token=\"abc123\"/>\n",
+          "infoExpected": "{\"responseCode\": 200}",
+          "infoActual": "{\"responseCode\": 200}",
+          "language": "xml"
+        },
+        "logout": {
+          "id": 17,
+          "alternativeName": "",
+          "success": true,
+          "ignored": false,
+          "error": false,
+          "duration": 65,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<result status=\"ok\"/>\n",
+          "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<result status=\"ok\"/>\n",
+          "language": "xml"
+        },
+        "refresh-token": {
+          "id": 18,
+          "alternativeName": "Refresh Auth Token",
+          "success": false,
+          "ignored": false,
+          "error": false,
+          "duration": 201,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<session token=\"xyz789\"/>\n",
+          "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<error code=\"token_expired\"/>\n",
+          "infoExpected": "{\"responseCode\": 200}",
+          "infoActual": "{\"responseCode\": 401}",
+          "language": "xml"
+        },
+        "change-password": {
+          "id": 19,
+          "alternativeName": "",
+          "success": false,
+          "ignored": true,
+          "error": false,
+          "duration": 112,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<result status=\"ok\"/>\n",
+          "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<result status=\"ok\"/>\n",
+          "language": "xml"
+        },
+        "get-profile": {
+          "id": 20,
+          "alternativeName": "Get Current User Profile",
+          "success": true,
+          "ignored": false,
+          "error": false,
+          "duration": 144,
+          "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<profile username=\"alice\" role=\"admin\"/>\n",
+          "actual": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<profile username=\"alice\" role=\"admin\"/>\n",
+          "language": "xml"
+        }
       }
     }
   }

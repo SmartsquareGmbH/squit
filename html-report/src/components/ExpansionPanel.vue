@@ -28,20 +28,12 @@
 
 <script setup lang="ts">
 import { ChevronRight } from "@lucide/vue"
-import { ref, watch } from "vue"
 import CollapseTransition from "./CollapseTransition.vue"
 
 const { title = "" } = defineProps<{ title?: string }>()
-const model = defineModel<boolean>()
-
-const isOpen = ref(model.value ?? false)
-
-watch(model, (val) => {
-  isOpen.value = val ?? false
-})
+const isOpen = defineModel<boolean>({ default: false })
 
 function toggle() {
   isOpen.value = !isOpen.value
-  model.value = isOpen.value
 }
 </script>

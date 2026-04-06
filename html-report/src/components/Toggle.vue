@@ -17,5 +17,5 @@
 <script setup lang="ts">
 const model = defineModel<boolean>()
 
-defineProps<{ modelValue: boolean; ariaLabel?: string }>()
+defineProps<{ ariaLabel?: string }>()
 </script>

@@ -8,4 +8,7 @@ export const router = createRouter({
     { path: "/", component: MainPage },
     { path: "/detail/:id", component: DetailPage },
   ],
+  scrollBehavior(_to, _from, savedPosition) {
+    return savedPosition ?? { top: 0 }
+  },
 })

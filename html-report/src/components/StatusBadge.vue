@@ -10,11 +10,12 @@
 <script setup lang="ts">
 import { computed } from "vue"
 
-const props = defineProps<{ variant: "success" | "failure" | "ignored" }>()
+const props = defineProps<{ variant: "success" | "failure" | "ignored" | "error" }>()
 
 const variantClass = computed(() => {
   if (props.variant === "ignored") return "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
   if (props.variant === "success") return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400"
+  if (props.variant === "error") return "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400"
   return "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400"
 })
 </script>
