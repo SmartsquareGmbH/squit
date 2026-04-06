@@ -1,7 +1,7 @@
 {
   "extends": "@tsconfig/vite-react/tsconfig.json",
   "compilerOptions": {
-    "types": ["vite/client"],
+    "types": ["vite/client", "vitest/globals"],
     "lib": ["ESNext", "DOM", "DOM.Iterable"]
   }
 }

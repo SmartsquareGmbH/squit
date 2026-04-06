@@ -11,7 +11,8 @@
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "check": "vue-tsc",
-    "verify": "pnpm format:check && pnpm lint && pnpm check"
+    "test": "vitest run",
+    "verify": "pnpm format:check && pnpm lint && pnpm check && pnpm test"
   },
   "dependencies": {
     "@formatjs/intl-durationformat": "^0.10.3",
@@ -28,6 +29,8 @@
     "@tailwindcss/vite": "^4.2.2",
     "@tsconfig/vite-react": "^7.0.2",
     "@vitejs/plugin-vue": "^6.0.5",
+    "@vue/test-utils": "^2.4.6",
+    "happy-dom": "^20.8.9",
     "oxfmt": "^0.43.0",
     "oxlint": "^1.58.0",
     "oxlint-tsgolint": "^0.20.0",
@@ -36,6 +39,7 @@
     "vite": "^8.0.5",
     "vite-plugin-singlefile": "^2.3.2",
     "vite-plugin-vue-devtools": "^8.1.1",
+    "vitest": "^4.1.2",
     "vue-tsc": "^3.2.6"
   },
   "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319"
