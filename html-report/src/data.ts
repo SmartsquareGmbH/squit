@@ -35,19 +35,24 @@ export async function getSquitData(): Promise<SquitData> {
   } else {
     const raw = document.getElementById("squit-data")?.textContent ?? ""
 
-    return JSON.parse(raw)
+    try {
+      return JSON.parse(raw)
+    } catch {
+      throw new Error("Failed to parse test results data. The report file may be corrupted or incomplete.")
+    }
   }
 }
 
-export type SquitResultNodeStats = { success: number; failed: number }
+export type SquitResultNodeStats = { success: number; failed: number; ignored: number }
 
 export function getResultNodeStats(node: SquitResultNode | SquitResult): SquitResultNodeStats {
   if (isSquitResult(node)) {
-    if (node.ignored) return { success: 0, failed: 0 }
+    if (node.ignored) return { success: 0, failed: 0, ignored: 1 }
 
     return {
       success: node.success ? 1 : 0,
       failed: node.success ? 0 : 1,
+      ignored: 0,
     }
   } else {
     return Object.values(node).reduce(
@@ -57,27 +62,50 @@ export function getResultNodeStats(node: SquitResultNode | SquitResult): SquitRe
         return {
           success: acc.success + stats.success,
           failed: acc.failed + stats.failed,
+          ignored: acc.ignored + stats.ignored,
         }
       },
-      { success: 0, failed: 0 },
+      { success: 0, failed: 0, ignored: 0 },
     )
   }
 }
 
-export function findSquitResult(
+export type SquitResultData = SquitResult & {
+  name: string
+  path: string[]
+}
+
+export function findSquitResult(node: SquitResultNode | SquitResult, id: number): SquitResultData | undefined {
+  return findSquitResultRec(node, id, [])
+}
+
+function findSquitResultRec(
   node: SquitResultNode | SquitResult,
   id: number,
-): (SquitResult & { name: string }) | undefined {
+  path: string[],
+): SquitResultData | undefined {
   for (const [name, value] of Object.entries(node)) {
     if (isSquitResult(value)) {
-      if (value.id === id) return { ...value, name }
+      if (value.id === id) return { ...value, name, path }
     } else {
-      const found = findSquitResult(value, id)
+      const found = findSquitResultRec(value, id, [...path, name])
       if (found) return found
     }
   }
 }
 
+export function nodeMatchesSearch(node: SquitResultNode | SquitResult, name: string, query: string): boolean {
+  if (!query) return true
+
+  const q = query.toLowerCase()
+
+  if (isSquitResult(node)) {
+    return (node.alternativeName || name).toLowerCase().includes(q)
+  }
+
+  return Object.entries(node).some(([childName, child]) => nodeMatchesSearch(child, childName, q))
+}
+
 export function isSquitResult(node: SquitResultNode | SquitResult): node is SquitResult {
-  return !Object.values(node).every((value) => typeof value === "object" && value != null)
+  return "id" in node && "success" in node
 }

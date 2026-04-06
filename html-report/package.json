@@ -17,6 +17,7 @@
     "@formatjs/intl-durationformat": "^0.10.3",
     "@lucide/vue": "^1.7.0",
     "@vueuse/core": "^14.2.1",
+    "dompurify": "^3.3.3",
     "marked": "^17.0.6",
     "v-code-diff": "^1.13.1",
     "vue": "^3.5.32",
