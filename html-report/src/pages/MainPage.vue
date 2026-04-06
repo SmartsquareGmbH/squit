@@ -64,14 +64,14 @@ const summary = computed(() => {
 const childrenRefs = useTemplateRef("children")
 
 function collapse() {
-  for (let child of childrenRefs.value ?? []) {
-    child.collapse()
+  for (const child of childrenRefs.value ?? []) {
+    child?.collapse()
   }
 }
 
 function expand() {
-  for (let child of childrenRefs.value ?? []) {
-    child.expand()
+  for (const child of childrenRefs.value ?? []) {
+    child?.expand()
   }
 }
 </script>
