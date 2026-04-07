@@ -121,22 +121,6 @@ data class SquitResult(
         }
     }
 
-    /**
-     * [List] of lines of the actual info response.
-     */
-    val actualInfoLines: List<String> by lazy {
-        val resolvedActualResponseInfoPath = squitBuildDirectoryPath
-            .resolve(RESPONSES_DIRECTORY)
-            .resolve(RAW_DIRECTORY)
-            .resolve(fullPath)
-            .resolve(ACTUAL_RESPONSE_INFO)
-        if (Files.exists(resolvedActualResponseInfoPath)) {
-            FilesUtils.readAllLines(resolvedActualResponseInfoPath)
-        } else {
-            emptyList()
-        }
-    }
-
     private val metaInfoPath = squitBuildDirectoryPath
         .resolve(RESPONSES_DIRECTORY)
         .resolve(RAW_DIRECTORY)
@@ -161,31 +145,4 @@ data class SquitResult(
         .resolve(PROCESSED_DIRECTORY)
         .resolve(fullPath)
         .resolve(ERROR)
-
-    /**
-     * Returns a copy of this result with the first part of the [fullPath] cut.
-     */
-    fun cutFirstPathElement(): SquitResult {
-        val isContextPathEmpty = contextPath.fileName.toString().isBlank()
-        val isSquitPathEmpty = suitePath.fileName.toString().isBlank()
-
-        val newContextPath = contextPath.drop(1)
-            .fold(Paths.get("")) { acc, path -> acc.resolve(path) }
-
-        val newSuitePath = if (isContextPathEmpty) {
-            suitePath.drop(1)
-                .fold(Paths.get("")) { acc, path -> acc.resolve(path) }
-        } else {
-            suitePath
-        }
-
-        val newTestDirectoryPath = if (isContextPathEmpty && isSquitPathEmpty) {
-            testDirectoryPath.drop(1)
-                .fold(Paths.get("")) { acc, path -> acc.resolve(path) }
-        } else {
-            testDirectoryPath
-        }
-
-        return copy(contextPath = newContextPath, suitePath = newSuitePath, testDirectoryPath = newTestDirectoryPath)
-    }
 }
