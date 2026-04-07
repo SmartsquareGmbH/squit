@@ -1,7 +1,7 @@
 import { mount } from "@vue/test-utils"
 import { describe, expect, test } from "vitest"
-import type { SquitResult, SquitResultNode } from "../../src/data.ts"
 import ResultTree from "../../src/components/ResultTree.vue"
+import type { SquitResult, SquitResultNode } from "../../src/data.ts"
 
 const makeLeaf = (overrides: Partial<SquitResult> = {}): SquitResult => ({
   id: 1,
