@@ -24,7 +24,7 @@ alphanumeric-comparator = "2.0.0"
 
 junit = "6.0.3"
 kluent = "1.73"
-h2 = "2.2.224"
+h2 = "2.4.240"
 mockk = "1.14.9"
 
 [plugins]
