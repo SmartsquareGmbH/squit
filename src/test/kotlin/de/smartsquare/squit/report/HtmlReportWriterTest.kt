@@ -1,20 +1,21 @@
 package de.smartsquare.squit.report
 
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import de.smartsquare.squit.entity.SquitResponseInfo
 import de.smartsquare.squit.entity.SquitResult
 import de.smartsquare.squit.mediatype.MediaTypeConfig
+import de.smartsquare.squit.mediatype.MediaTypeFactory
+import de.smartsquare.squit.mediatype.MediaTypeFactory.xmlMediaType
 import io.mockk.mockk
-import okhttp3.MediaType.Companion.toMediaType
-import org.amshove.kluent.shouldBeEmpty
+import org.amshove.kluent.shouldBeTrue
 import org.amshove.kluent.shouldNotBeEmpty
+import org.amshove.kluent.shouldNotBeNull
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.jvm.java
 
 class HtmlReportWriterTest {
 
@@ -22,98 +23,53 @@ class HtmlReportWriterTest {
     private val mediaTypeConfig = MediaTypeConfig()
 
     @TempDir
-    lateinit var tempDir: Path
+    private lateinit var tempDir: Path
 
-    @Test
-    fun `info diff is null for a result with default expected response info`() {
-        val result = buildResult(tempDir)
+    private lateinit var squitResult: SquitResult
 
-        writer.writeReport(listOf(result), tempDir.resolve("report"), mediaTypeConfig)
-
-//        readResults(tempDir.resolve("report")).single().infoDiff.shouldBeEmpty()
-    }
-
-    @Test
-    fun `info diff is null for a result with an error`() {
-        val result = buildResult(tempDir, expectedResponseInfo = SquitResponseInfo(200), isError = true)
-
-        writer.writeReport(listOf(result), tempDir.resolve("report"), mediaTypeConfig)
-
-//        readResults(tempDir.resolve("report")).single().infoDiff.shouldBeEmpty()
-    }
-
-    @Test
-    fun `info diff is produced for a result with expected response code and no actual info file`() {
-        val result = buildResult(tempDir, expectedResponseInfo = SquitResponseInfo(200))
-
-        writer.writeReport(listOf(result), tempDir.resolve("report"), mediaTypeConfig)
-
-//        readResults(tempDir.resolve("report")).single().infoDiff.shouldNotBeEmpty()
-    }
-
-    @Test
-    fun `info diff is null for a result with expected response code and a matching actual info file`() {
-        val result = buildResult(
-            tempDir,
-            expectedResponseInfo = SquitResponseInfo(200),
-            actualInfoContent = SquitResponseInfo(200).toJson(),
-        )
-
-        writer.writeReport(listOf(result), tempDir.resolve("report"), mediaTypeConfig)
-
-//        readResults(tempDir.resolve("report")).single().infoDiff.shouldBeEmpty()
-    }
-
-    private fun buildResult(
-        buildDir: Path,
-        expectedResponseInfo: SquitResponseInfo = SquitResponseInfo(),
-        isError: Boolean = false,
-        actualInfoContent: String? = null,
-    ): SquitResult {
-        val mediaType = "text/plain".toMediaType()
+    @BeforeEach
+    fun setUp() {
         val testDir = Paths.get("test")
 
-        val rawDir = buildDir.resolve("responses/raw").resolve(testDir)
-        val processedDir = buildDir.resolve("responses/processed").resolve(testDir)
-        val sourcesDir = buildDir.resolve("sources").resolve(testDir)
-
-        Files.createDirectories(rawDir)
-        Files.createDirectories(processedDir)
-        Files.createDirectories(sourcesDir)
+        val rawDir = Files.createDirectories(tempDir.resolve("responses/raw").resolve(testDir))
+        val processedDir = Files.createDirectories(tempDir.resolve("responses/processed").resolve(testDir))
+        val sourcesDir = Files.createDirectories(tempDir.resolve("sources").resolve(testDir))
 
         Files.writeString(rawDir.resolve("meta.json"), """{"date":"2024-01-01T00:00:00","duration":100}""")
+        Files.writeString(sourcesDir.resolve(MediaTypeFactory.expectedResponse(xmlMediaType)), "<test></test>")
+        Files.writeString(processedDir.resolve(MediaTypeFactory.actualResponse(xmlMediaType)), "<test></test>")
 
-        if (isError) {
-            Files.writeString(processedDir.resolve("error.txt"), "error")
-        } else {
-            Files.writeString(sourcesDir.resolve("expected_response.txt"), "")
-            Files.writeString(processedDir.resolve("actual_response.txt"), "")
-        }
-
-        if (actualInfoContent != null) {
-            Files.writeString(rawDir.resolve("actual_response_info.json"), actualInfoContent)
-        }
-
-        return SquitResult(
+        squitResult = SquitResult(
             id = 1L,
             difference = "",
-            expectedResponseInfo = expectedResponseInfo,
+            expectedResponseInfo = SquitResponseInfo(),
             isIgnored = false,
-            mediaType = mediaType,
+            mediaType = xmlMediaType,
             alternativeName = "",
             contextPath = Paths.get(""),
             suitePath = Paths.get(""),
             testDirectoryPath = testDir,
-            squitBuildDirectoryPath = buildDir,
+            squitBuildDirectoryPath = tempDir,
         )
     }
 
-    private fun readResults(reportDir: Path): List<SquitReportResult> {
-        val html = Files.readString(reportDir.resolve("index.html"))
-        val json = html
+    @Test
+    fun `report index html is written and contains injected json`() {
+        writer.writeReport(listOf(squitResult), tempDir.resolve("report"), mediaTypeConfig)
+
+        Files.exists(tempDir.resolve("report/index.html")).shouldBeTrue()
+
+        val reportData = readReport(tempDir.resolve("report/index.html"))
+
+        reportData.slowestTest.shouldNotBeNull()
+        reportData.results.shouldNotBeEmpty()
+    }
+
+    private fun readReport(reportPath: Path): SquitHtmlReportData {
+        val json = Files.readString(reportPath)
             .substringAfter("<script type=\"application/json\" id=\"squit-data\">")
             .substringBefore("</script>")
 
-        return Gson().fromJson(json, object : TypeToken<List<SquitReportResult>>() {})
+        return Gson().fromJson(json, SquitHtmlReportData::class.java)
     }
 }
