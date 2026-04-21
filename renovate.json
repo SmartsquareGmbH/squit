@@ -4,9 +4,16 @@
   "automerge": true,
   "packageRules": [
     {
+      "matchManagers": ["gradle", "gradle-wrapper"],
       "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "all non-major dependencies",
-      "groupSlug": "all-minor-patch"
+      "groupName": "all non-major gradle dependencies",
+      "groupSlug": "all-minor-patch-gradle"
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "all non-major npm dependencies",
+      "groupSlug": "all-minor-patch-npm"
     },
     {
       "matchUpdateTypes": ["major"],
