@@ -19,7 +19,7 @@
     "@lucide/vue": "^1.7.0",
     "@vueuse/core": "^14.2.1",
     "dompurify": "^3.3.3",
-    "marked": "^17.0.6",
+    "marked": "^18.0.0",
     "v-code-diff": "^1.13.1",
     "vue": "^3.5.32",
     "vue-router": "^5.0.4"

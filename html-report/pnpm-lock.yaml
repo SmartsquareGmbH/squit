@@ -21,8 +21,8 @@ importers:
         specifier: ^3.3.3
         version: 3.4.0
       marked:
-        specifier: ^17.0.6
-        version: 17.0.6
+        specifier: ^18.0.0
+        version: 18.0.2
       v-code-diff:
         specifier: ^1.13.1
         version: 1.13.1(vue@3.5.32(typescript@6.0.2))
@@ -1507,8 +1507,8 @@ packages:
     resolution: {integrity: sha512-hXdUTZYIVOt1Ex//jAQi+wTZZpUpwBj/0QsOzqegb3rGMMeJiSEu5xLHnYfBrRV4RH2+OCSOO95Is/7x1WJ4bw==}
     engines: {node: '>=10'}
 
-  marked@17.0.6:
-    resolution: {integrity: sha512-gB0gkNafnonOw0obSTEGZTT86IuhILt2Wfx0mWH/1Au83kybTayroZ/V6nS25mN7u8ASy+5fMhgB3XPNrOZdmA==}
+  marked@18.0.2:
+    resolution: {integrity: sha512-NsmlUYBS/Zg57rgDWMYdnre6OTj4e+qq/JS2ot3KrYLSoHLw+sDu0Nm1ZGpRgYAq6c+b1ekaY5NzVchMCQnzcg==}
     engines: {node: '>= 20'}
     hasBin: true
 
@@ -3189,7 +3189,7 @@ snapshots:
     dependencies:
       semver: 7.7.4
 
-  marked@17.0.6: {}
+  marked@18.0.2: {}
 
   micromatch@4.0.8:
     dependencies:
