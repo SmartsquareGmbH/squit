@@ -118,36 +118,30 @@ tasks.named<Jar>("javadocJar") {
 }
 
 dokka {
-    val dom4jVersion = resolveVersion("org.dom4j:dom4j")
-    val typesafeConfigVersion = resolveVersion("com.typesafe:config")
-    val gsonVersion = resolveVersion("com.google.code.gson:gson")
-
     dokkaSourceSets.configureEach {
+        sourceLink { remoteUrl("https://github.com/SmartsquareGmbh/squit/tree/main") }
+
         externalDocumentationLinks.register("gradle") {
             url("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/")
             packageListUrl("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/element-list")
         }
 
         externalDocumentationLinks.register("dom4j") {
-            url("https://javadoc.io/doc/org.dom4j/dom4j/$dom4jVersion/")
+            url(libs.versions.dom4j.map { "https://javadoc.io/doc/org.dom4j/dom4j/$it" })
+            packageListUrl(url.map { it.resolve("${it.path}/element-list").normalize().toString() })
         }
 
         externalDocumentationLinks.register("config") {
-            url("https://javadoc.io/doc/com.typesafe/config/$typesafeConfigVersion/")
+            url(libs.versions.typesafe.config.map { "https://javadoc.io/doc/com.typesafe/config/$it" })
+            packageListUrl(url.map { it.resolve("${it.path}/element-list").normalize().toString() })
         }
 
         externalDocumentationLinks.register("gson") {
-            url("https://javadoc.io/doc/com.google.code.gson/gson/$gsonVersion")
-            packageListUrl("https://javadoc.io/doc/com.google.code.gson/gson/$gsonVersion/element-list")
+            url(libs.versions.gson.map { "https://javadoc.io/doc/com.google.code.gson/gson/$it" })
+            packageListUrl(url.map { it.resolve("${it.path}/element-list").normalize().toString() })
         }
     }
 }
-
-fun resolveVersion(dependency: String): String =
-    project.configurations.getByName("runtimeClasspath").resolvedConfiguration.resolvedArtifacts
-        .find { it.moduleVersion.id.module.toString() == dependency }
-        ?.moduleVersion?.id?.version
-        ?: "latest"
 
 gradlePlugin {
     website = "https://github.com/SmartsquareGmbH/squit"
