@@ -12,6 +12,7 @@ gradle = "9.4.1"
 
 jaxen = "2.0.1"
 dom4j = "2.2.0"
+jooq = "3.19.22"
 pull-parser = "2.1.10"
 gson = "2.13.2"
 xml-sec = "4.0.4"
@@ -42,6 +43,7 @@ versions = { id = "com.github.ben-manes.versions", version.ref = "versions-plugi
 dom4j = { module = "org.dom4j:dom4j", version.ref = "dom4j" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 typesafe-config = { module = "com.typesafe:config", version.ref = "typesafe-config" }
+jooq = { module = "org.jooq:jooq", version.ref = "jooq" }
 jaxen = { module = "jaxen:jaxen", version.ref = "jaxen" }
 pull-parser = { module = "pull-parser:pull-parser", version.ref = "pull-parser" }
 xml-sec = { module = "org.apache.santuario:xmlsec", version.ref = "xml-sec" }

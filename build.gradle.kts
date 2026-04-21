@@ -35,6 +35,7 @@ dependencies {
     implementation(libs.json.unit)
     implementation(libs.okhttp)
     implementation(libs.alphanumeric.comparator)
+    implementation(libs.jooq)
     implementation(libs.diff.utils) {
         exclude(group = "org.eclipse.jgit")
     }

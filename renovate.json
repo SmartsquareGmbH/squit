@@ -25,6 +25,11 @@
       "matchUpdateTypes": ["major"],
       "automerge": false,
       "dependencyDashboardApproval": true
+    },
+    {
+      "matchPackageNames": ["org.jooq:jooq"],
+      "allowedVersions": "3.19.x",
+      "description": "jOOQ 3.20+ requires Java 21, this project targets Java 17"
     }
   ]
 }

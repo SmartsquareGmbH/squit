@@ -55,11 +55,11 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
+import org.jooq.exception.DataAccessException
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.sql.Driver
-import java.sql.SQLException
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
@@ -343,7 +343,7 @@ abstract class SquitRequestTask : DefaultTask() {
                 .executeScript(path)
 
             true
-        } catch (error: SQLException) {
+        } catch (error: DataAccessException) {
             logger.newLineIfNeeded()
             logger.warn(
                 "Could not run database script ${path.fileName} for test " +

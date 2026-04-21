@@ -5,6 +5,7 @@ import org.amshove.kluent.shouldBeFalse
 import org.amshove.kluent.shouldBeTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.sql.Connection
 import org.h2.Driver as H2Driver
 
 class ConnectionCollectionTest {
@@ -20,28 +21,32 @@ class ConnectionCollectionTest {
 
     @Test
     fun `creating a new db connection`() {
-        val connectionCollection = ConnectionCollection()
-        val connection = connectionCollection.createOrGet(jdbc, username, password)
+        ConnectionCollection().use { collection ->
+            val context = collection.createOrGet(jdbc, username, password)
 
-        connection.isClosed.shouldBeFalse()
+            context.connection { it.isClosed.shouldBeFalse() }
+        }
     }
 
     @Test
     fun `getting an existing connection`() {
-        val connectionCollection = ConnectionCollection()
-        val connection = connectionCollection.createOrGet(jdbc, username, password)
-        val connection2 = connectionCollection.createOrGet(jdbc, username, password)
+        ConnectionCollection().use { collection ->
+            val context = collection.createOrGet(jdbc, username, password)
+            val context2 = collection.createOrGet(jdbc, username, password)
 
-        connection shouldBe connection2
+            context shouldBe context2
+        }
     }
 
     @Test
     fun `closing the collection`() {
-        val connectionCollection = ConnectionCollection()
-        val connection = connectionCollection.createOrGet(jdbc, username, password)
+        var underlying: Connection? = null
 
-        connectionCollection.close()
+        ConnectionCollection().use { collection ->
+            val context = collection.createOrGet(jdbc, username, password)
+            context.connection { underlying = it }
+        }
 
-        connection.isClosed.shouldBeTrue()
+        underlying!!.isClosed.shouldBeTrue()
     }
 }

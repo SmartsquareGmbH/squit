@@ -15,10 +15,7 @@ import org.gradle.api.provider.Provider
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.text.RegexOption.DOT_MATCHES_ALL
 import org.dom4j.Document as XmlDocument
-
-private val sqlCommentRegex = Regex("--.*?\n", DOT_MATCHES_ALL)
 
 /**
  * Removes pieces of a path, based on another path. This is useful for getting the sub directories of a path, with the
@@ -65,16 +62,6 @@ fun JsonElement.write(path: Path, gson: Gson = GsonBuilder().setPrettyPrinting()
         gson.toJson(this, it)
     }
 }
-
-/**
- * Cleans this [String] by removing sql comments, newlines and blanks, followed by trimming ([trim]).
- */
-fun String.cleanSqlString() = this
-    .replace(sqlCommentRegex, "")
-    .replace("\n", " ")
-    .replace("\r", " ")
-    .replace("\uFEFF", "") // This is a weird unicode blank character, present in some sql files.
-    .trim()
 
 /**
  * Resolves one or more directory parts.

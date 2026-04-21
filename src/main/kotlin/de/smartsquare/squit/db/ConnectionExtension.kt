@@ -1,28 +1,14 @@
 package de.smartsquare.squit.db
 
 import de.smartsquare.squit.io.FilesUtils
-import de.smartsquare.squit.util.cleanSqlString
+import org.jooq.DSLContext
 import java.nio.file.Path
-import java.sql.Connection
-import java.sql.SQLException
 
 /**
- * Executes the sql script at the given [path]. The contained statements are split by ";" and cleaned.
+ * Executes the sql script at the given [path] using jOOQ's SQL parser to correctly split statements.
  */
-fun Connection.executeScript(path: Path) {
-    try {
-        createStatement().use { statement ->
-            FilesUtils.readAllBytes(path).toString(Charsets.UTF_8).cleanSqlString()
-                .split(";")
-                .map { it.cleanSqlString() }
-                .filter { it.isNotBlank() }
-                .forEach { statement.execute(it) }
-        }
+fun DSLContext.executeScript(path: Path) {
+    val sql = FilesUtils.readAllBytes(path).toString(Charsets.UTF_8)
 
-        commit()
-    } catch (error: SQLException) {
-        rollback()
-
-        throw error
-    }
+    parser().parse(sql).forEach { it.execute() }
 }
