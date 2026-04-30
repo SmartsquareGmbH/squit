@@ -3,6 +3,9 @@ exceptions:
     active: false
 
 style:
+  AbstractClassCanBeConcreteClass:
+    ignoreAnnotated:
+      - CacheableTask
   MagicNumber:
     active: false
 

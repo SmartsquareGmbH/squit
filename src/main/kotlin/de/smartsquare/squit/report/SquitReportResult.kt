@@ -1,9 +1,9 @@
 package de.smartsquare.squit.report
 
-sealed class SquitReportResultNode
+sealed interface SquitReportResultNode
 
 data class SquitReportResultBranch(val children: MutableMap<String, SquitReportResultNode> = mutableMapOf()) :
-    SquitReportResultNode() {
+    SquitReportResultNode {
 
     fun toMap(): Map<String, Any> = children.mapValues { (_, value) ->
         when (value) {
@@ -26,7 +26,7 @@ data class SquitReportResult(
     val infoExpected: String?,
     val infoActual: String?,
     val language: String?,
-) : SquitReportResultNode()
+) : SquitReportResultNode
 
 data class SquitSlowestTest(val id: Long, val name: String, val duration: Long)
 
