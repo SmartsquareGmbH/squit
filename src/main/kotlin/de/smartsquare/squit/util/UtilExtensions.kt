@@ -96,6 +96,11 @@ fun List<SquitResult>.countTestResults(): Triple<Int, Int, Int> {
     return Triple(successfulTests, failedTests, ignoredTests)
 }
 
+fun requiresRequestBody(method: String) =
+    method == "POST" || method == "PUT" || method == "PATCH" || method == "PROPPATCH" || method == "REPORT"
+
+fun permitsRequestBody(method: String) = method != "GET" && method != "HEAD"
+
 /**
  * Prints the given [message] to the standard output stream and flushes it afterwards.
  */

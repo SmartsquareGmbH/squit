@@ -9,7 +9,8 @@ import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.util.Constants
 import de.smartsquare.squit.util.Constants.DESCRIPTION
 import de.smartsquare.squit.util.cut
-import okhttp3.internal.http.HttpMethod
+import de.smartsquare.squit.util.permitsRequestBody
+import de.smartsquare.squit.util.requiresRequestBody
 import org.gradle.api.GradleException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -151,9 +152,9 @@ class TestIndexer(private val projectConfig: Config) {
         .resolve(MediaTypeFactory.request(config.mediaType))
         .let {
             when {
-                HttpMethod.requiresRequestBody(config.method) -> FilesUtils.validateExistence(it)
+                requiresRequestBody(config.method) -> FilesUtils.validateExistence(it)
 
-                HttpMethod.permitsRequestBody(config.method) -> when (Files.exists(it)) {
+                permitsRequestBody(config.method) -> when (Files.exists(it)) {
                     true -> it
                     else -> null
                 }

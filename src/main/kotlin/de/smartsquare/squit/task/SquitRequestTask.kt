@@ -35,6 +35,8 @@ import de.smartsquare.squit.util.cut
 import de.smartsquare.squit.util.dir
 import de.smartsquare.squit.util.lifecycleOnSameLine
 import de.smartsquare.squit.util.newLineIfNeeded
+import de.smartsquare.squit.util.permitsRequestBody
+import de.smartsquare.squit.util.requiresRequestBody
 import groovy.lang.Binding
 import groovy.lang.GroovyShell
 import okhttp3.Call
@@ -193,11 +195,6 @@ abstract class SquitRequestTask : DefaultTask() {
                 else -> null
             }
         }
-
-    private fun requiresRequestBody(method: String) =
-        method == "POST" || method == "PUT" || method == "PATCH" || method == "PROPPATCH" || method == "REPORT"
-
-    private fun permitsRequestBody(method: String) = method != "GET" && method != "HEAD"
 
     private fun doRequestAndScriptExecutions(
         testDirectoryPath: Path,
