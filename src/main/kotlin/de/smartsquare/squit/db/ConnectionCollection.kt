@@ -11,7 +11,7 @@ import org.jooq.impl.DSL
  */
 class ConnectionCollection : AutoCloseable {
 
-    private val contexts = hashMapOf<Triple<String, String, String>, CloseableDSLContext>()
+    private val contexts = mutableMapOf<Triple<String, String, String>, CloseableDSLContext>()
 
     /**
      * Creates a new [DSLContext] or returns an existing one, based on the passed [jdbc] address, [username]
@@ -26,6 +26,18 @@ class ConnectionCollection : AutoCloseable {
     }
 
     override fun close() {
-        contexts.values.forEach { it.close() }
+        var thrown: Throwable? = null
+
+        for (context in contexts.values) {
+            try {
+                context.close()
+            } catch (e: Exception) {
+                if (thrown == null) thrown = e else thrown.addSuppressed(e)
+            }
+        }
+
+        if (thrown != null) {
+            throw thrown
+        }
     }
 }
