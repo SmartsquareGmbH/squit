@@ -33,7 +33,7 @@ object SquitPreProcessRunner {
             MediaTypeFactory.processor(mediaType)
                 .preProcess(test.request, test.response, processedRequestPath, processedResponsePath, test.config)
         } catch (error: Exception) {
-            Files.write(processedResultPath.resolve(Constants.ERROR), error.toString().toByteArray())
+            Files.write(processedResultPath.resolve(Constants.ERROR), error.stackTraceToString().toByteArray())
         }
 
         test.preSqlScripts.filterValues { it.isNotEmpty() }.forEach { (name, scripts) ->

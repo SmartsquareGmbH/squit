@@ -50,7 +50,7 @@ object SquitPostProcessRunner {
                 MediaTypeFactory.processor(config.mediaType)
                     .postProcess(actualResponsePath, expectedResponsePath, resultActualResponseFilePath, config)
             } catch (error: Exception) {
-                Files.write(resultActualResponsePath.resolve(Constants.ERROR), error.toString().toByteArray())
+                Files.write(resultActualResponsePath.resolve(Constants.ERROR), error.stackTraceToString().toByteArray())
             }
         }
     }
