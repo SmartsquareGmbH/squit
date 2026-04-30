@@ -13,7 +13,7 @@ import org.apache.xml.security.Init as ApacheInit
 import org.apache.xml.security.c14n.Canonicalizer as ApacheCanonicalizer
 
 /**
- * [Canonicalizer] for Xml.
+ * [Canonicalizer] for XML.
  */
 class XmlCanonicalizer : Canonicalizer {
 

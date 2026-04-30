@@ -5,9 +5,9 @@ import org.gradle.api.tasks.Input
 /**
  * Data class containing options for the media types.
  *
- * @property xmlStrict If the xml diffing should use strict (e.g. identic) comparison.
- * @property xmlCanonicalize If the html report should be canonicalized for xml tests.
- * @property jsonCanonicalize If the html report should be canonicalized for json tests.
+ * @property xmlStrict If the XML diffing should use strict (e.g. identic) comparison.
+ * @property xmlCanonicalize If the HTML report should be canonicalized for XML tests.
+ * @property jsonCanonicalize If the HTML report should be canonicalized for JSON tests.
  */
 data class MediaTypeConfig(
     @get:Input val xmlStrict: Boolean = true,

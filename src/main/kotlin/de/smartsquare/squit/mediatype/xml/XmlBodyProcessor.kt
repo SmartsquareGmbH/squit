@@ -17,7 +17,7 @@ import org.gradle.api.logging.Logging
 import java.nio.file.Path
 
 /**
- * Xml-specific [BodyProcessor] implementation. It allows for user-supplied pre- and post-processor implementations
+ * XML-specific [BodyProcessor] implementation. It allows for user-supplied pre- and post-processor implementations
  * to run on the generated [Document] instances and saves the results.
  */
 class XmlBodyProcessor : BodyProcessor {

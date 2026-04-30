@@ -6,7 +6,7 @@ package de.smartsquare.squit.mediatype
 interface Canonicalizer {
 
     /**
-     * Canonicalize the [input] into a common format. E.g. for xml this might mean to remove all unnecessary whitespace
+     * Canonicalize the [input] into a common format. E.g. for XML this might mean to remove all unnecessary whitespace
      * and order attributes.
      */
     fun canonicalize(input: String, mediaTypeConfig: MediaTypeConfig): String

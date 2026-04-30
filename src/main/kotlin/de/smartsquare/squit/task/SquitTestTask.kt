@@ -106,14 +106,14 @@ abstract class SquitTestTask : DefaultTask() {
         .map { dir -> dir.asFileTree.matching { tree -> tree.include("**/$META") } }
 
     /**
-     * The directory to generate the xml report file into.
+     * The directory to generate the XML report file into.
      */
     @get:OutputFile
     val xmlReportFile
         get() = reportDir.file("xml", "index.xml")
 
     /**
-     * The directory to generate the html report into.
+     * The directory to generate the HTML report into.
      */
     @get:OutputDirectory
     val htmlReportDir: Provider<Directory>

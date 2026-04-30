@@ -7,7 +7,7 @@ import org.xmlunit.builder.Input
 import java.io.ByteArrayInputStream
 
 /**
- * [Differ] for xml.
+ * [Differ] for XML.
  */
 class XmlDiffer(private val mediaTypeConfig: MediaTypeConfig) : Differ {
 

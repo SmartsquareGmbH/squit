@@ -8,7 +8,7 @@ import de.smartsquare.squit.mediatype.MediaTypeConfig
 import de.smartsquare.squit.util.prettyGson
 
 /**
- * [Canonicalizer] for Json.
+ * [Canonicalizer] for JSON.
  */
 class JsonCanonicalizer : Canonicalizer {
 

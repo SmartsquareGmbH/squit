@@ -177,7 +177,7 @@ val Config.headers
         .associate { (key, value) -> key to value.unwrapped().toString() }
 
 /**
- * The http status response code that is expected in the response.
+ * The HTTP status response code that is expected in the response.
  */
 val Config.expectedResponseCode get() = getSafeInt(EXPECTED_RESPONSE_CODE)
 

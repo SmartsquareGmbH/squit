@@ -11,13 +11,13 @@ import javax.inject.Inject
 open class SquitExtension @Inject constructor(private val project: Project) {
 
     /**
-     * Extension for xml configuration.
+     * Extension for XML configuration.
      */
     @Nested
     val xml: XmlExtension = project.objects.newInstance(XmlExtension::class.java, project)
 
     /**
-     * Extension for json configuration.
+     * Extension for JSON configuration.
      */
     @Nested
     val json: JsonExtension = project.objects.newInstance(JsonExtension::class.java, project)
@@ -64,31 +64,31 @@ open class SquitExtension @Inject constructor(private val project: Project) {
     fun reportDir(path: String) = reportDir.set(project.layout.projectDirectory.dir(path))
 
     /**
-     * Configures the xml dsl.
+     * Configures the XML DSL.
      */
     fun xml(action: Action<XmlExtension>) {
         action.execute(xml)
     }
 
     /**
-     * Configures the json dsl.
+     * Configures the JSON DSL.
      */
     fun json(action: Action<JsonExtension>) {
         action.execute(json)
     }
 
     /**
-     * Class containing the available extensions for the xml dsl.
+     * Class containing the available extensions for the XML DSL.
      */
     open class XmlExtension @Inject constructor(project: Project) {
 
         /**
-         * If the xml diffing should use strict (e.g. identic) comparison.
+         * If the XML diffing should use strict (e.g. identical) comparison.
          */
         val strict: Property<Boolean> = project.objects.property(Boolean::class.java)
 
         /**
-         * If the html report should be canonicalized for xml tests.
+         * If the HTML report should be canonicalized for XML tests.
          */
         val canonicalize: Property<Boolean> = project.objects.property(Boolean::class.java)
 
@@ -99,12 +99,12 @@ open class SquitExtension @Inject constructor(private val project: Project) {
     }
 
     /**
-     * Class containing the available extensions for the json dsl.
+     * Class containing the available extensions for the JSON DSL.
      */
     open class JsonExtension @Inject constructor(project: Project) {
 
         /**
-         * If the html report should be canonicalized for json tests.
+         * If the HTML report should be canonicalized for JSON tests.
          */
         val canonicalize: Property<Boolean> = project.objects.property(Boolean::class.java)
     }

@@ -11,8 +11,8 @@ import java.nio.file.Path
  * @param config The config.
  * @param request The path of the request.
  * @param response The path of the response.
- * @param preSqlScripts The map of sql scripts to run before the test.
- * @param postSqlScripts The map of sql scripts to run after the test.
+ * @param preSqlScripts The map of SQL scripts to run before the test.
+ * @param postSqlScripts The map of SQL scripts to run after the test.
  * @param descriptions The list of descriptions for the test.
  */
 data class SquitTest(

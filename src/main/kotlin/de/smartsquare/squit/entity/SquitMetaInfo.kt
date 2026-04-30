@@ -31,7 +31,7 @@ data class SquitMetaInfo(val date: LocalDateTime, val duration: Long) {
     }
 
     /**
-     * Converts this instance into a Json representation.
+     * Converts this instance into a JSON representation.
      */
     fun toJson(): String = gson.toJson(
         mapOf(

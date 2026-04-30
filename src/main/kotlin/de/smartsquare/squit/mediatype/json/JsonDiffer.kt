@@ -4,7 +4,7 @@ import de.smartsquare.squit.mediatype.Differ
 import net.javacrumbs.jsonunit.JsonAssert
 
 /**
- * [Differ] for json.
+ * [Differ] for JSON.
  */
 class JsonDiffer : Differ {
 

@@ -65,7 +65,7 @@ import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
 /**
- * Task for running requests against the given api. Also capable of running existing sql scripts before and after the
+ * Task for running requests against the given API. Also capable of running existing SQL scripts before and after the
  * request.
  */
 @DisableCachingByDefault(because = "Should run every time")

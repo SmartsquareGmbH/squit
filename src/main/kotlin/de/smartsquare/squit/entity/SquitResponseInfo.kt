@@ -8,7 +8,7 @@ import de.smartsquare.squit.util.prettyGson
 /**
  * Data class holding further response information concerning a single [SquitResult].
  *
- * @property responseCode The http status code of the response.
+ * @property responseCode The HTTP status code of the response.
  */
 data class SquitResponseInfo(val responseCode: Int = 0) {
 
@@ -27,7 +27,7 @@ data class SquitResponseInfo(val responseCode: Int = 0) {
     }
 
     /**
-     * Converts this instance into a Json representation.
+     * Converts this instance into a JSON representation.
      */
     fun toJson(): String = prettyGson.toJson(
         mapOf(

@@ -16,7 +16,7 @@ object Constants {
     const val LOCAL_CONFIG = "local.conf"
 
     /**
-     * Filename of the meta json.
+     * Filename of the meta JSON.
      */
     const val META = "meta.json"
 

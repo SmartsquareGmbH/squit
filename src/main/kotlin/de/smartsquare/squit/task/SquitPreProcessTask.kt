@@ -30,7 +30,7 @@ import java.nio.file.Path
 import javax.inject.Inject
 
 /**
- * Task for pre-processing the available sources like requests, responses, sql scripts and properties.
+ * Task for pre-processing the available sources like requests, responses, SQL scripts and properties.
  */
 @CacheableTask
 abstract class SquitPreProcessTask @Inject constructor(private val workerExecutor: WorkerExecutor) : DefaultTask() {
