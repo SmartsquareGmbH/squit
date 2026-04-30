@@ -1,6 +1,7 @@
 package de.smartsquare.squit.io
 
 import org.dom4j.Document
+import org.dom4j.DocumentException
 import org.dom4j.io.SAXReader
 import org.gradle.api.GradleException
 import java.io.IOException
@@ -22,5 +23,7 @@ object SAXReaderSupport {
         }
     } catch (error: IOException) {
         throw GradleException("Could not read xml file: $path", error)
+    } catch (error: DocumentException) {
+        throw GradleException("Could not parse xml file: $path", error)
     }
 }

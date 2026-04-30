@@ -5,6 +5,7 @@ import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldThrow
 import org.amshove.kluent.withCause
 import org.amshove.kluent.withMessage
+import org.dom4j.DocumentException
 import org.gradle.api.GradleException
 import org.junit.jupiter.api.Test
 import java.io.IOException
@@ -28,5 +29,14 @@ class SAXReaderSupportTest {
         val readCall = { SAXReaderSupport.read(nonExisting) }
 
         readCall shouldThrow GradleException::class withMessage expectedMessage withCause IOException::class
+    }
+
+    @Test
+    fun `reading a path to a malformed xml file`() {
+        val malformedXml = TestUtils.getResourcePath("malformed.xml")
+        val expectedMessage = "Could not parse xml file: $malformedXml"
+        val readCall = { SAXReaderSupport.read(malformedXml) }
+
+        readCall shouldThrow GradleException::class withMessage expectedMessage withCause DocumentException::class
     }
 }
