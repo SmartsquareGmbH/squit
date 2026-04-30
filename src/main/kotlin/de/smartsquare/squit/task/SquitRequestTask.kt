@@ -240,7 +240,7 @@ abstract class SquitRequestTask : DefaultTask() {
                 )
             }
         } catch (error: IOException) {
-            Files.write(resultResponsePath.resolve(ERROR), error.toString().toByteArray())
+            Files.write(resultResponsePath.resolve(ERROR), error.stackTraceToString().toByteArray())
         }
 
         doPostScriptExecutions(config, testDirectoryPath)
