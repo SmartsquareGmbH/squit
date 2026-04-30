@@ -16,17 +16,12 @@ import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 object FilesUtils {
 
     /**
-     * Returns a sequence yielding every path starting with the passed [path] until the given [until] condition is met.
-     * The default is when parent is null.
+     * Returns a sequence yielding every path starting with the passed [path] and walking up to its
+     * ancestors until the given [until] condition is met. The default is when the current path has
+     * no parent.
      */
-    fun walkUpwards(path: Path, until: (Path) -> Boolean = { path.parent == null }): Sequence<Path> = when {
-        until(path) -> emptySequence()
-
-        else -> sequence {
-            yield(path)
-            yieldAll(walkUpwards(path.parent, until))
-        }
-    }
+    fun walkUpwards(path: Path, until: (Path) -> Boolean = { it.parent == null }): Sequence<Path> =
+        generateSequence(path) { it.parent }.takeWhile { !until(it) }
 
     /**
      * Returns a sequence yielding every path starting with the passed [path] until the given
@@ -37,20 +32,29 @@ object FilesUtils {
     /**
      * Returns all leaf directories of the given [path], optionally sorted by alphanumeric order
      * (if [sort] is set to true, which is the default).
+     *
+     * The given [path] itself is never yielded; only descendant directories that have no further
+     * subdirectories qualify as leaves.
      */
-    fun getLeafDirectories(path: Path, sort: Boolean = true): Sequence<Path> = getChildDirectories(path)
-        .let { directories ->
-            when (sort) {
-                true -> directories.sortedWith(compareBy(AlphanumericComparator()) { it.fileName.toString() })
-                false -> directories
+    fun getLeafDirectories(path: Path, sort: Boolean = true): Sequence<Path> = sequence {
+        val children = getChildDirectories(path)
+
+        val ordered = if (sort) {
+            children.sortedWith(compareBy(AlphanumericComparator()) { it.fileName.toString() })
+        } else {
+            children
+        }
+
+        for (child in ordered) {
+            val grandchildren = getChildDirectories(child)
+
+            if (grandchildren.isEmpty()) {
+                yield(child)
+            } else {
+                yieldAll(getLeafDirectories(child, sort))
             }
         }
-        .fold(emptySequence()) { current, next ->
-            current + when (containsDirectories(next)) {
-                true -> getLeafDirectories(next, sort)
-                false -> sequence { yield(next) }
-            }
-        }
+    }
 
     /**
      * Deletes the given [path] recursively, if existing.
@@ -133,9 +137,6 @@ object FilesUtils {
         throw IOException("Error reading file $path. Squit expects UTF-8 encoded files only.", error)
     }
 
-    private fun containsDirectories(path: Path) = Files.newDirectoryStream(path) { Files.isDirectory(it) }
-        .use { it.any() }
-
-    private fun getChildDirectories(path: Path) = Files.newDirectoryStream(path) { Files.isDirectory(it) }
+    private fun getChildDirectories(path: Path): List<Path> = Files.newDirectoryStream(path) { Files.isDirectory(it) }
         .use { it.toList() }
 }

@@ -27,7 +27,6 @@ class TestIndexer(private val projectConfig: Config) {
     }
 
     private val configCache = ConcurrentHashMap<Path, Config>()
-    private val leafCache = ConcurrentHashMap<Path, List<Path>>()
 
     /**
      * Indexes the given [sourceDir] and returns a list of [SquitTest]s. The [filter] can be used to exclude
@@ -78,8 +77,16 @@ class TestIndexer(private val projectConfig: Config) {
         }
         .toList()
 
-    private fun indexTests(leafDirectoriesWithConfig: List<Pair<Path, Config>>, sourceDir: Path): List<SquitTest> =
-        leafDirectoriesWithConfig
+    private fun indexTests(leafDirectoriesWithConfig: List<Pair<Path, Config>>, sourceDir: Path): List<SquitTest> {
+        val leavesByAncestor = mutableMapOf<Path, MutableList<Path>>()
+
+        for ((leaf, _) in leafDirectoriesWithConfig) {
+            FilesUtils.walkUpwards(leaf, sourceDir).forEach { ancestor ->
+                leavesByAncestor.getOrPut(ancestor) { mutableListOf() }.add(leaf)
+            }
+        }
+
+        return leafDirectoriesWithConfig
             .filterNot { (path, _) -> FilesUtils.isDirectoryEmpty(path) }
             .mapNotNull { (leafDirectory, config) ->
                 val request = resolveRequest(leafDirectory, config)
@@ -87,12 +94,7 @@ class TestIndexer(private val projectConfig: Config) {
 
                 val testParts = FilesUtils.walkUpwards(leafDirectory, sourceDir)
                     .map { path ->
-                        val leafsFromHere = leafCache.getOrPut(path) {
-                            leafDirectoriesWithConfig
-                                .filter { (leaf, _) -> leaf.startsWith(path) }
-                                .map { (leaf, _) -> leaf }
-                                .toList()
-                        }
+                        val leafsFromHere = leavesByAncestor[path].orEmpty()
 
                         val sqlScripts = resolveSqlScripts(path, config, leafsFromHere, leafDirectory)
 
@@ -115,6 +117,7 @@ class TestIndexer(private val projectConfig: Config) {
                     else -> testParts.reduce { acc, test -> acc.merge(test) }
                 }
             }
+    }
 
     private fun resolveConfigs(path: Path, sourceDir: Path): Config = FilesUtils.walkUpwards(path, sourceDir)
         .map { it to resolveConfig(it) }
