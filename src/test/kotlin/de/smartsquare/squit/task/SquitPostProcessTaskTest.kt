@@ -76,7 +76,7 @@ class SquitPostProcessTaskTest {
         result.task(":squitPostProcess")?.outcome shouldBe TaskOutcome.SUCCESS
 
         Files.readAllBytes(call2Error).toString(Charsets.UTF_8) shouldStartWith
-            "org.dom4j.DocumentException: Error on line 1 of document"
+            "org.gradle.api.GradleException: Could not parse xml file: " shouldContain "Error on line 1 of document"
     }
 
     @Test

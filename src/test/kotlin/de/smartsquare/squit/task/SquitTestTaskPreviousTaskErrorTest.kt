@@ -3,6 +3,7 @@ package de.smartsquare.squit.task
 import de.smartsquare.squit.TestUtils
 import de.smartsquare.squit.gradleRunner
 import org.amshove.kluent.shouldBe
+import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldStartWith
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
@@ -23,6 +24,6 @@ class SquitTestTaskPreviousTaskErrorTest {
         result.task(":squitTest")?.outcome shouldBe TaskOutcome.FAILED
 
         Files.readAllBytes(invalid3Call1Error).toString(Charsets.UTF_8) shouldStartWith
-            "org.dom4j.DocumentException: Error on line 4 of document"
+            "org.gradle.api.GradleException: Could not parse xml file: " shouldContain "Error on line 4 of document"
     }
 }
