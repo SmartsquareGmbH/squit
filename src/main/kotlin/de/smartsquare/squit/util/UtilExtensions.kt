@@ -67,13 +67,13 @@ fun JsonElement.write(path: Path, gson: Gson = GsonBuilder().setPrettyPrinting()
  * Resolves one or more directory parts.
  */
 fun DirectoryProperty.dir(first: String, vararg more: String): Provider<Directory> =
-    dir(Paths.get(first, *more).toString())
+    dir(Path.of(first, *more).toString())
 
 /**
  * Resolves one or more file parts.
  */
 fun DirectoryProperty.file(first: String, vararg more: String): Provider<RegularFile> =
-    file(Paths.get(first, *more).toString())
+    file(Path.of(first, *more).toString())
 
 /**
  * Returns this as a [Path].
@@ -85,15 +85,18 @@ val DirectoryProperty.asPath: Path get() = asFile.get().toPath()
  */
 val Provider<out FileSystemLocation>.asPath: Path get() = get().asFile.toPath()
 
+/** Counts of successful, failed and ignored test results. */
+data class TestResultCounts(val successful: Int, val failed: Int, val ignored: Int)
+
 /**
- * Iterate the list of [SquitResult]s and returns a [Triple] of successful, failed and ignored tests.
+ * Iterate the list of [SquitResult]s and returns a [TestResultCounts] of successful, failed and ignored tests.
  */
-fun List<SquitResult>.countTestResults(): Triple<Int, Int, Int> {
+fun List<SquitResult>.countTestResults(): TestResultCounts {
     val successfulTests = count { !it.isIgnored && it.isSuccess }
     val failedTests = count { !it.isIgnored && !it.isSuccess }
     val ignoredTests = count { it.isIgnored }
 
-    return Triple(successfulTests, failedTests, ignoredTests)
+    return TestResultCounts(successfulTests, failedTests, ignoredTests)
 }
 
 fun requiresRequestBody(method: String) =

@@ -81,24 +81,19 @@ object FilesUtils {
      * Checks whether the directory at the given [path] is empty.
      */
     fun isDirectoryEmpty(path: Path): Boolean =
-        Files.newDirectoryStream(path).use { dirStream -> !dirStream.iterator().hasNext() }
+        Files.newDirectoryStream(path).use { dirStream -> dirStream.none() }
 
     /**
      * Returns the given [path] if it exists or null otherwise.
      */
-    fun ifExists(path: Path) = when (Files.exists(path)) {
-        true -> path
-        false -> null
-    }
+    fun ifExists(path: Path) = if (Files.exists(path)) path else null
 
     /**
      * Validates if a file or directory exists at the given [path] and returns it.
      */
     @Throws(GradleException::class)
-    fun validateExistence(path: Path): Path = when (Files.exists(path)) {
-        true -> path
-        false -> throw GradleException("Missing expected file: $path")
-    }
+    fun validateExistence(path: Path): Path =
+        if (Files.exists(path)) path else throw GradleException("Missing expected file: $path")
 
     /**
      * Copies a resource specified by the passed [name] to the given [target] path.

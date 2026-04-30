@@ -16,7 +16,6 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.gradle.api.GradleException
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 private const val TITLE = "title"
 private const val TEST_DIRECTORY = "testDir"
@@ -54,7 +53,7 @@ val Config.title: String get() = getSafeString(TITLE)
 /**
  * The path to the directory of the test
  */
-val Config.testDir: Path get() = FilesUtils.validateExistence(Paths.get(getSafeString(TEST_DIRECTORY)))
+val Config.testDir: Path get() = FilesUtils.validateExistence(Path.of(getSafeString(TEST_DIRECTORY)))
 
 /**
  * The endpoint to request against.
@@ -113,14 +112,10 @@ val Config.preRunnerScripts get() = getSafePathList(PRE_RUN_SCRIPTS)
  * default: PRE_RUNNERS, PRE_RUNNER_SCRIPTS, DATABASE_SCRIPTS
  */
 val Config.preTestTasks: List<SquitPreTestTask>
-    get() = when (hasPath(PRE_TEST_TASKS)) {
-        true -> getEnumList(SquitPreTestTask::class.java, PRE_TEST_TASKS)
-
-        else -> listOf(
-            SquitPreTestTask.PRE_RUNNERS,
-            SquitPreTestTask.PRE_RUNNER_SCRIPTS,
-            SquitPreTestTask.DATABASE_SCRIPTS,
-        )
+    get() = if (hasPath(PRE_TEST_TASKS)) {
+        getEnumList(SquitPreTestTask::class.java, PRE_TEST_TASKS)
+    } else {
+        listOf(SquitPreTestTask.PRE_RUNNERS, SquitPreTestTask.PRE_RUNNER_SCRIPTS, SquitPreTestTask.DATABASE_SCRIPTS)
     }
 
 /**
@@ -148,14 +143,10 @@ val Config.postRunnerScripts get() = getSafePathList(POST_RUN_SCRIPTS)
  * default: DATABASE_SCRIPTS, POST_RUNNERS, POST_RUNNER_SCRIPTS
  */
 val Config.postTestTasks: List<SquitPostTestTask>
-    get() = when (hasPath(POST_TEST_TASKS)) {
-        true -> getEnumList(SquitPostTestTask::class.java, POST_TEST_TASKS)
-
-        else -> listOf(
-            SquitPostTestTask.DATABASE_SCRIPTS,
-            SquitPostTestTask.POST_RUNNERS,
-            SquitPostTestTask.POST_RUNNER_SCRIPTS,
-        )
+    get() = if (hasPath(POST_TEST_TASKS)) {
+        getEnumList(SquitPostTestTask::class.java, POST_TEST_TASKS)
+    } else {
+        listOf(SquitPostTestTask.DATABASE_SCRIPTS, SquitPostTestTask.POST_RUNNERS, SquitPostTestTask.POST_RUNNER_SCRIPTS)
     }
 
 /**
@@ -248,41 +239,26 @@ fun Config.writeTo(
         .setJson(false),
 ): Path = Files.write(path, root().render(options).toByteArray())
 
-private fun Config.getSafeBoolean(path: String, fallback: Boolean = false) = when (hasPath(path)) {
-    true -> getBoolean(path)
-    false -> fallback
-}
+private fun Config.getSafeBoolean(path: String, fallback: Boolean = false) =
+    if (hasPath(path)) getBoolean(path) else fallback
 
-private fun Config.getSafeString(path: String, fallback: String = "") = when (hasPath(path)) {
-    true -> getString(path)
-    false -> fallback
-}
+private fun Config.getSafeString(path: String, fallback: String = "") =
+    if (hasPath(path)) getString(path) else fallback
 
 private fun Config.getSafeStringList(path: String, fallback: List<String> = emptyList()): List<String> =
-    when (hasPath(path)) {
-        true -> getStringList(path)
-        false -> fallback
-    }
+    if (hasPath(path)) getStringList(path) else fallback
 
-private fun Config.getSafeConfig(path: String, fallback: Config = ConfigFactory.empty()) = when (hasPath(path)) {
-    true -> getConfig(path)
-    false -> fallback
-}
+private fun Config.getSafeConfig(path: String, fallback: Config = ConfigFactory.empty()) =
+    if (hasPath(path)) getConfig(path) else fallback
 
-private fun Config.getSafeConfigList(path: String, fallback: List<Config> = emptyList()) = when (hasPath(path)) {
-    true -> getConfigList(path)
-    false -> fallback
-}
+private fun Config.getSafeConfigList(path: String, fallback: List<Config> = emptyList()) =
+    if (hasPath(path)) getConfigList(path) else fallback
 
-private fun Config.getSafePathList(path: String, fallback: List<Path> = emptyList()) = when (hasPath(path)) {
-    true -> getStringList(path).map { Paths.get(it) }
-    false -> fallback
-}
+private fun Config.getSafePathList(path: String, fallback: List<Path> = emptyList()) =
+    if (hasPath(path)) getStringList(path).map { Path.of(it) } else fallback
 
-private fun Config.getSafeInt(path: String, fallback: Int = 0) = when (hasPath(path)) {
-    true -> getInt(path)
-    false -> fallback
-}
+private fun Config.getSafeInt(path: String, fallback: Int = 0) =
+    if (hasPath(path)) getInt(path) else fallback
 
 private fun checkClass(name: String) {
     try {

@@ -8,7 +8,7 @@ import com.typesafe.config.Config
 interface SquitPreRunner {
 
     /**
-     * Runs arbitrary code before a request exectution. The [config] can be used to conveniently look up properties.
+     * Runs arbitrary code before a request execution. The [config] can be used to conveniently look up properties.
      */
     fun run(config: Config)
 }

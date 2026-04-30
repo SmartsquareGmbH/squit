@@ -8,12 +8,12 @@ import java.net.InetAddress
 import java.nio.file.Path
 
 /**
- * Object for writing the Squit html report.
+ * Object for writing the Squit XML/JUnit report.
  */
 class XmlReportWriter {
 
     /**
-     * Generates and writes the Squit html report, given the [result] list and [reportFilePath].
+     * Generates and writes the Squit XML/JUnit report, given the [result] list and [reportFilePath].
      */
     @Suppress("NestedBlockDepth")
     fun writeReport(result: List<SquitResult>, reportFilePath: Path) {
@@ -29,13 +29,13 @@ class XmlReportWriter {
                 addAttribute("failures", "${tests.count { !it.isIgnored && !it.isSuccess && !it.isError }}")
                 addAttribute("skipped", "${tests.count { it.isIgnored }}")
                 addAttribute("errors", "${tests.count { !it.isIgnored && it.isError }}")
-                addAttribute("time", "${tests.sumOf { it.metaInfo.duration.toInt() } / 1000f}")
+                addAttribute("time", "${tests.sumOf { it.metaInfo.duration } / 1000.0}")
             }
 
             tests.forEach {
                 val testElement = suiteElement.addElement("testcase").apply {
                     addAttribute("name", it.simpleName)
-                    addAttribute("time", "${it.metaInfo.duration.toInt() / 1000f}")
+                    addAttribute("time", "${it.metaInfo.duration / 1000.0}")
                 }
 
                 when {

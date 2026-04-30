@@ -98,16 +98,14 @@ class TestIndexer(private val projectConfig: Config) {
                         val sqlScripts = resolveSqlScripts(path, config, leafsFromHere, leafDirectory)
 
                         val preSqlScripts = sqlScripts.mapValues { (_, scripts) ->
-                            scripts.preOnce?.let { listOf(it) }.orEmpty() +
-                                scripts.pre?.let { listOf(it) }.orEmpty()
+                            listOfNotNull(scripts.preOnce, scripts.pre)
                         }
 
                         val postSqlScripts = sqlScripts.mapValues { (_, scripts) ->
-                            scripts.post?.let { listOf(it) }.orEmpty() +
-                                scripts.postOnce?.let { listOf(it) }.orEmpty()
+                            listOfNotNull(scripts.post, scripts.postOnce)
                         }
 
-                        val descriptions = resolveDescription(path)?.let { listOf(it) }.orEmpty()
+                        val descriptions = listOfNotNull(resolveDescription(path))
 
                         SquitTest(path, config, request, response, preSqlScripts, postSqlScripts, descriptions)
                     }

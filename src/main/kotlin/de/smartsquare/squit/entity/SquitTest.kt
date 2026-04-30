@@ -3,7 +3,6 @@ package de.smartsquare.squit.entity
 import com.typesafe.config.Config
 import java.io.Serializable
 import java.nio.file.Path
-import java.nio.file.Paths
 
 /**
  * Entity describing a single indexed test for squit to run.
@@ -76,13 +75,13 @@ data class SquitTest(
 
         @Suppress("UnusedPrivateFunction")
         private fun readResolve(): Any = SquitTest(
-            Paths.get(path),
+            Path.of(path),
             config,
-            request?.let { Paths.get(it) },
-            Paths.get(response),
-            preSqlScripts.mapValues { (_, scripts) -> scripts.map { Paths.get(it) } },
-            postSqlScripts.mapValues { (_, scripts) -> scripts.map { Paths.get(it) } },
-            descriptions.map { Paths.get(it) },
+            request?.let { Path.of(it) },
+            Path.of(response),
+            preSqlScripts.mapValues { (_, scripts) -> scripts.map { Path.of(it) } },
+            postSqlScripts.mapValues { (_, scripts) -> scripts.map { Path.of(it) } },
+            descriptions.map { Path.of(it) },
         )
     }
 }

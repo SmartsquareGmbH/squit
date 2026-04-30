@@ -18,11 +18,9 @@ object JsonParserSupport {
      * This is a safe operation, as such the file is correctly closed.
      */
     fun read(path: Path): JsonElement = try {
-        val jsonElement = FilesUtils.useBufferedReader(path) { reader ->
+        FilesUtils.useBufferedReader(path) { reader ->
             JsonParser.parseReader(reader)
         }
-
-        jsonElement
     } catch (error: IOException) {
         throw GradleException("Could not read json file: $path", error)
     } catch (error: JsonParseException) {

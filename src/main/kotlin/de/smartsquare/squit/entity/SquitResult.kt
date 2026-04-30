@@ -2,7 +2,6 @@ package de.smartsquare.squit.entity
 
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeFactory
-import de.smartsquare.squit.util.Constants.ACTUAL_RESPONSE_INFO
 import de.smartsquare.squit.util.Constants.DESCRIPTION
 import de.smartsquare.squit.util.Constants.ERROR
 import de.smartsquare.squit.util.Constants.META
@@ -13,7 +12,6 @@ import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import okhttp3.MediaType
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 /**
  * Intermediate data class for storing test results.
