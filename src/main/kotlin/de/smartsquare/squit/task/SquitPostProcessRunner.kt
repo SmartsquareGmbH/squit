@@ -5,7 +5,6 @@ import de.smartsquare.squit.config.mediaType
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.util.Constants
-import de.smartsquare.squit.util.cut
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -19,7 +18,7 @@ object SquitPostProcessRunner {
      */
     fun run(processedSourcesPath: Path, actualResponsesPath: Path, processedActualResponsesPath: Path, testPath: Path) {
         val resultActualResponsePath = Files.createDirectories(
-            processedActualResponsesPath.resolve(testPath.cut(actualResponsesPath)),
+            processedActualResponsesPath.resolve(actualResponsesPath.relativize(testPath)),
         )
 
         val errorFile = testPath.resolve(Constants.ERROR)
@@ -28,7 +27,7 @@ object SquitPostProcessRunner {
             Files.copy(errorFile, resultActualResponsePath.resolve(Constants.ERROR))
         } else {
             val configPath = FilesUtils
-                .validateExistence(processedSourcesPath.resolve(testPath.cut(actualResponsesPath)))
+                .validateExistence(processedSourcesPath.resolve(actualResponsesPath.relativize(testPath)))
                 .resolve(Constants.CONFIG)
 
             val config = ConfigFactory.parseFile(configPath.toFile())
@@ -39,7 +38,7 @@ object SquitPostProcessRunner {
 
             val expectedResponsePath = FilesUtils.validateExistence(
                 processedSourcesPath
-                    .resolve(testPath.cut(actualResponsesPath))
+                    .resolve(actualResponsesPath.relativize(testPath))
                     .resolve(MediaTypeFactory.expectedResponse(config.mediaType)),
             )
 

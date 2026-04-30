@@ -8,7 +8,6 @@ import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.util.Constants
 import de.smartsquare.squit.util.Constants.DESCRIPTION
-import de.smartsquare.squit.util.cut
 import de.smartsquare.squit.util.permitsRequestBody
 import de.smartsquare.squit.util.requiresRequestBody
 import org.gradle.api.GradleException
@@ -47,7 +46,7 @@ class TestIndexer(private val projectConfig: Config) {
         filter: (Pair<Path, Config>) -> Boolean,
     ): List<Pair<Path, Config>> = leafDirectories
         .onEach { path ->
-            if (path.cut(sourceDir).toList().size < 2) {
+            if (sourceDir.relativize(path).toList().size < 2) {
                 throw GradleException(
                     "Invalid project structure. Please add a project directory to the src/squit directory.",
                 )
@@ -71,7 +70,7 @@ class TestIndexer(private val projectConfig: Config) {
                 throw GradleException(
                     """
                             |Invalid test.conf or local.conf file on path of test:
-                            | ${leafDirectory.cut(sourceDir)} ($innerMessage)
+                            | ${sourceDir.relativize(leafDirectory)} ($innerMessage)
                     """.trimMargin().replace("\n", ""),
                     error,
                 )

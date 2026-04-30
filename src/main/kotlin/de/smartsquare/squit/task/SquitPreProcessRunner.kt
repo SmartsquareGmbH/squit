@@ -6,7 +6,6 @@ import de.smartsquare.squit.entity.SquitTest
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.util.Constants
-import de.smartsquare.squit.util.cut
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
@@ -22,7 +21,7 @@ object SquitPreProcessRunner {
     fun run(sourceDir: Path, processedSourcesPath: Path, test: SquitTest) {
         val mediaType = test.config.mediaType
 
-        val processedResultPath = Files.createDirectories(processedSourcesPath.resolve(test.path.cut(sourceDir)))
+        val processedResultPath = Files.createDirectories(processedSourcesPath.resolve(sourceDir.relativize(test.path)))
         val processedConfigPath = processedResultPath.resolve(Constants.CONFIG)
 
         val processedRequestPath = processedResultPath.resolve(MediaTypeFactory.request(mediaType))

@@ -10,7 +10,6 @@ import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.asPath
-import de.smartsquare.squit.util.cut
 import de.smartsquare.squit.util.dir
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
@@ -127,13 +126,13 @@ abstract class SquitPreProcessTask @Inject constructor(private val workerExecuto
 
     private fun filterIndex(input: Pair<Path, Config>) = when {
         isTestExcluded(input.second) -> {
-            logger.info("Excluding test ${input.first.cut(sourceDir.asPath)}")
+            logger.info("Excluding test ${sourceDir.asPath.relativize(input.first)}")
 
             false
         }
 
         !isTestCoveredByTags(input.second) -> {
-            logger.info("Ignoring test ${input.first.cut(sourceDir.asPath)}")
+            logger.info("Ignoring test ${sourceDir.asPath.relativize(input.first)}")
 
             false
         }

@@ -31,7 +31,6 @@ import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.asPath
-import de.smartsquare.squit.util.cut
 import de.smartsquare.squit.util.dir
 import de.smartsquare.squit.util.lifecycleOnSameLine
 import de.smartsquare.squit.util.newLineIfNeeded
@@ -154,7 +153,7 @@ abstract class SquitRequestTask : DefaultTask() {
                 }
 
                 val resultResponsePath = Files.createDirectories(
-                    actualResponsesDir.asPath.resolve(testDirectoryPath.cut(processedSourcesDir.asPath)),
+                    actualResponsesDir.asPath.resolve(processedSourcesDir.asPath.relativize(testDirectoryPath)),
                 )
 
                 val errorFile = testDirectoryPath.resolve(ERROR)
@@ -224,7 +223,7 @@ abstract class SquitRequestTask : DefaultTask() {
                 if (!silent.get()) logger.newLineIfNeeded()
 
                 logger.info(
-                    "Unsuccessful request for test ${testDirectoryPath.cut(processedSourcesDir.asPath)} " +
+                    "Unsuccessful request for test ${processedSourcesDir.asPath.relativize(testDirectoryPath)} " +
                         "(status code: ${apiResponse.code})",
                 )
             } else if (
@@ -235,7 +234,7 @@ abstract class SquitRequestTask : DefaultTask() {
 
                 logger.info(
                     "Unexpected Media type $mediaType for test " +
-                        "${testDirectoryPath.cut(processedSourcesDir.asPath)}. Expected ${config.mediaType}",
+                        "${processedSourcesDir.asPath.relativize(testDirectoryPath)}. Expected ${config.mediaType}",
                 )
             }
         } catch (error: IOException) {
@@ -346,7 +345,7 @@ abstract class SquitRequestTask : DefaultTask() {
             logger.newLineIfNeeded()
             logger.warn(
                 "Could not run database script ${path.fileName} for test " +
-                    "${path.parent.cut(processedSourcesDir.asPath)} (${error.toString().trim()})",
+                    "${processedSourcesDir.asPath.relativize(path.parent)} (${error.toString().trim()})",
             )
 
             false

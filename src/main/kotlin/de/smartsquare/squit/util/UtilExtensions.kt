@@ -13,30 +13,7 @@ import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 import org.dom4j.Document as XmlDocument
-
-/**
- * Removes pieces of a path, based on another path. This is useful for getting the sub directories of a path, with the
- * same ancestors as another path.
- *
- * Given this is /a/b/c/d/e and [other] is /a/b/c, /d/e would be returned.
- */
-fun Path.cut(other: Path): Path {
-    var mutableOther = other.toList()
-
-    return this.toMutableList()
-        .dropWhile {
-            val isSame = it.fileName == (mutableOther.firstOrNull()?.fileName ?: "")
-
-            if (mutableOther.isNotEmpty()) {
-                mutableOther = mutableOther.drop(1)
-            }
-
-            isSame
-        }
-        .fold(Paths.get("")) { acc, path -> acc.resolve(path) }
-}
 
 /**
  * Writes this [org.dom4j.Document] to the given [path], with the specified [outputFormat] (defaulting to the pretty

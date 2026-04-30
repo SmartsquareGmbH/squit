@@ -25,7 +25,6 @@ import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
 import de.smartsquare.squit.util.asPath
 import de.smartsquare.squit.util.countTestResults
-import de.smartsquare.squit.util.cut
 import de.smartsquare.squit.util.dir
 import de.smartsquare.squit.util.file
 import org.gradle.api.DefaultTask
@@ -169,7 +168,7 @@ abstract class SquitTestTask : DefaultTask() {
         FilesUtils.getLeafDirectories(processedResponsesDir.asPath).forEach { actualResponsePath ->
             val configPath = FilesUtils.validateExistence(
                 processedSourcesDir.asPath
-                    .resolve(actualResponsePath.cut(processedResponsesDir.asPath))
+                    .resolve(processedResponsesDir.asPath.relativize(actualResponsePath))
                     .resolve(CONFIG),
             )
 
@@ -206,7 +205,7 @@ abstract class SquitTestTask : DefaultTask() {
         expectedResponseInfo: SquitResponseInfo,
     ): String {
         if (!expectedResponseInfo.isDefault) {
-            val contextPath = actualResponsePath.parent.parent.cut(processedResponsesDir.asPath)
+            val contextPath = processedResponsesDir.asPath.relativize(actualResponsePath.parent.parent)
             val suitePath = actualResponsePath.parent.fileName
             val path: Path = contextPath.resolve(suitePath)
             val squitBuildDirectoryPath = project.layout.buildDirectory.asPath.resolve(SQUIT_DIRECTORY)
@@ -236,7 +235,7 @@ abstract class SquitTestTask : DefaultTask() {
 
         val expectedResponseFilePath = FilesUtils.validateExistence(
             processedSourcesDir.asPath
-                .resolve(actualResponsePath.cut(processedResponsesDir.asPath))
+                .resolve(processedResponsesDir.asPath.relativize(actualResponsePath))
                 .resolve(MediaTypeFactory.expectedResponse(config.mediaType)),
         )
 
@@ -288,7 +287,7 @@ abstract class SquitTestTask : DefaultTask() {
         isIgnored: Boolean = false,
     ): SquitResult {
         val squitBuildDirectoryPath = project.layout.buildDirectory.dir(SQUIT_DIRECTORY).asPath
-        val contextPath = actualResponsePath.parent.parent.cut(processedResponsesDir.asPath)
+        val contextPath = processedResponsesDir.asPath.relativize(actualResponsePath.parent.parent)
         val suitePath = actualResponsePath.parent.fileName
         val testDirectoryPath = actualResponsePath.fileName
         val id = nextResultId++

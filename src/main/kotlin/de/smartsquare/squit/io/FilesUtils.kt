@@ -1,6 +1,5 @@
 package de.smartsquare.squit.io
 
-import de.smartsquare.squit.util.cut
 import org.gradle.api.GradleException
 import se.sawano.java.text.AlphanumericComparator
 import java.io.BufferedReader
@@ -72,7 +71,7 @@ object FilesUtils {
     fun copyFilesFromDirectory(source: Path, dest: Path) {
         Files.newDirectoryStream(source) { Files.isRegularFile(it) }.use { files ->
             files.forEach { file ->
-                Files.copy(file, dest.resolve(file.cut(source)), REPLACE_EXISTING)
+                Files.copy(file, dest.resolve(source.relativize(file)), REPLACE_EXISTING)
             }
         }
     }
