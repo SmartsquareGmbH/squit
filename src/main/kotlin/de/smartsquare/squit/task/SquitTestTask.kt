@@ -114,7 +114,7 @@ abstract class SquitTestTask : DefaultTask() {
         get() = reportDir.file("xml", "index.xml")
 
     /**
-     * The directory to generate the xml report file into.
+     * The directory to generate the html report into.
      */
     @get:OutputDirectory
     val htmlReportDir: Provider<Directory>

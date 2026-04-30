@@ -113,10 +113,12 @@ abstract class SquitRequestTask : DefaultTask() {
         .dir(SQUIT_DIRECTORY, RESPONSES_DIRECTORY, RAW_DIRECTORY)
 
     private val okHttpClient by lazy {
+        val timeout = requestTimeout.get()
+
         OkHttpClient.Builder()
-            .connectTimeout(requestTimeout.get(), TimeUnit.SECONDS)
-            .writeTimeout(requestTimeout.get(), TimeUnit.SECONDS)
-            .readTimeout(requestTimeout.get(), TimeUnit.SECONDS)
+            .connectTimeout(timeout, TimeUnit.SECONDS)
+            .writeTimeout(timeout, TimeUnit.SECONDS)
+            .readTimeout(timeout, TimeUnit.SECONDS)
             .build()
     }
 
