@@ -2,7 +2,6 @@ package de.smartsquare.squit.mediatype.json
 
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldContain
-import org.amshove.kluent.shouldNotBeEqualTo
 import org.junit.jupiter.api.Test
 
 class JsonDifferTest {
@@ -42,7 +41,7 @@ class JsonDifferTest {
 
         val result = differ.diff(expected, actual)
 
-        result shouldContain  "Can not parse fullJson value: 'this is not valid json'"
+        result shouldContain "Can not parse fullJson value: 'this is not valid json'"
     }
 
     @Test

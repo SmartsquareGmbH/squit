@@ -83,8 +83,7 @@ object FilesUtils {
     /**
      * Checks whether the directory at the given [path] is empty.
      */
-    fun isDirectoryEmpty(path: Path): Boolean =
-        Files.newDirectoryStream(path).use { dirStream -> dirStream.none() }
+    fun isDirectoryEmpty(path: Path): Boolean = Files.newDirectoryStream(path).use { dirStream -> dirStream.none() }
 
     /**
      * Returns the given [path] if it exists or null otherwise.

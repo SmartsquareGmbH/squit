@@ -146,7 +146,11 @@ val Config.postTestTasks: List<SquitPostTestTask>
     get() = if (hasPath(POST_TEST_TASKS)) {
         getEnumList(SquitPostTestTask::class.java, POST_TEST_TASKS)
     } else {
-        listOf(SquitPostTestTask.DATABASE_SCRIPTS, SquitPostTestTask.POST_RUNNERS, SquitPostTestTask.POST_RUNNER_SCRIPTS)
+        listOf(
+            SquitPostTestTask.DATABASE_SCRIPTS,
+            SquitPostTestTask.POST_RUNNERS,
+            SquitPostTestTask.POST_RUNNER_SCRIPTS,
+        )
     }
 
 /**
@@ -242,8 +246,7 @@ fun Config.writeTo(
 private fun Config.getSafeBoolean(path: String, fallback: Boolean = false) =
     if (hasPath(path)) getBoolean(path) else fallback
 
-private fun Config.getSafeString(path: String, fallback: String = "") =
-    if (hasPath(path)) getString(path) else fallback
+private fun Config.getSafeString(path: String, fallback: String = "") = if (hasPath(path)) getString(path) else fallback
 
 private fun Config.getSafeStringList(path: String, fallback: List<String> = emptyList()): List<String> =
     if (hasPath(path)) getStringList(path) else fallback
@@ -257,8 +260,7 @@ private fun Config.getSafeConfigList(path: String, fallback: List<Config> = empt
 private fun Config.getSafePathList(path: String, fallback: List<Path> = emptyList()) =
     if (hasPath(path)) getStringList(path).map { Path.of(it) } else fallback
 
-private fun Config.getSafeInt(path: String, fallback: Int = 0) =
-    if (hasPath(path)) getInt(path) else fallback
+private fun Config.getSafeInt(path: String, fallback: Int = 0) = if (hasPath(path)) getInt(path) else fallback
 
 private fun checkClass(name: String) {
     try {
