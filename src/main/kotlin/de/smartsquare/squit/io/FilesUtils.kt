@@ -57,9 +57,9 @@ object FilesUtils {
      * Deletes the given [path] recursively, if existing.
      */
     fun deleteRecursivelyIfExisting(path: Path) = when {
-        Files.exists(path) -> Files.walk(path)
-            .sorted(Comparator.reverseOrder())
-            .forEach { Files.delete(it) }
+        Files.exists(path) -> Files.walk(path).use { stream ->
+            stream.sorted(Comparator.reverseOrder()).forEach { Files.delete(it) }
+        }
 
         else -> Unit
     }
