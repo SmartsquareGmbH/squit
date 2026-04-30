@@ -143,40 +143,46 @@ abstract class SquitRequestTask : DefaultTask() {
         FilesUtils.deleteRecursivelyIfExisting(actualResponsesDir.asPath)
         Files.createDirectories(actualResponsesDir.asPath)
 
-        dbConnections.use {
-            FilesUtils.getLeafDirectories(processedSourcesDir.asPath).forEachIndexed { index, testDirectoryPath ->
-                if (!silent.get()) {
-                    logger.lifecycleOnSameLine(
-                        "Running test ${index + 1}",
-                        project.gradle.startParameter.consoleOutput,
+        try {
+            dbConnections.use {
+                FilesUtils.getLeafDirectories(processedSourcesDir.asPath).forEachIndexed { index, testDirectoryPath ->
+                    if (!silent.get()) {
+                        logger.lifecycleOnSameLine(
+                            "Running test ${index + 1}",
+                            project.gradle.startParameter.consoleOutput,
+                        )
+                    }
+
+                    val resultResponsePath = Files.createDirectories(
+                        actualResponsesDir.asPath.resolve(processedSourcesDir.asPath.relativize(testDirectoryPath)),
                     )
+
+                    val errorFile = testDirectoryPath.resolve(ERROR)
+                    val metaFilePath = resultResponsePath.resolve(META)
+
+                    val startTime = System.currentTimeMillis()
+
+                    if (Files.exists(errorFile)) {
+                        Files.copy(errorFile, resultResponsePath.resolve(ERROR))
+                    } else {
+                        val configPath = FilesUtils.validateExistence(testDirectoryPath.resolve(CONFIG))
+                        val config = ConfigFactory.parseFile(configPath.toFile())
+
+                        val requestPath = resolveRequestPath(config, testDirectoryPath)
+
+                        doRequestAndScriptExecutions(testDirectoryPath, resultResponsePath, requestPath, config)
+                    }
+
+                    val endTime = System.currentTimeMillis()
+                    val metaInfo = SquitMetaInfo(LocalDateTime.now(), endTime - startTime)
+
+                    Files.write(metaFilePath, metaInfo.toJson().toByteArray())
                 }
-
-                val resultResponsePath = Files.createDirectories(
-                    actualResponsesDir.asPath.resolve(processedSourcesDir.asPath.relativize(testDirectoryPath)),
-                )
-
-                val errorFile = testDirectoryPath.resolve(ERROR)
-                val metaFilePath = resultResponsePath.resolve(META)
-
-                val startTime = System.currentTimeMillis()
-
-                if (Files.exists(errorFile)) {
-                    Files.copy(errorFile, resultResponsePath.resolve(ERROR))
-                } else {
-                    val configPath = FilesUtils.validateExistence(testDirectoryPath.resolve(CONFIG))
-                    val config = ConfigFactory.parseFile(configPath.toFile())
-
-                    val requestPath = resolveRequestPath(config, testDirectoryPath)
-
-                    doRequestAndScriptExecutions(testDirectoryPath, resultResponsePath, requestPath, config)
-                }
-
-                val endTime = System.currentTimeMillis()
-                val metaInfo = SquitMetaInfo(LocalDateTime.now(), endTime - startTime)
-
-                Files.write(metaFilePath, metaInfo.toJson().toByteArray())
             }
+        } finally {
+            // Release resources so they don't linger in the Gradle daemon between builds.
+            okHttpClient.dispatcher.executorService.shutdown()
+            okHttpClient.connectionPool.evictAll()
         }
 
         logger.newLineIfNeeded()
@@ -208,34 +214,35 @@ abstract class SquitRequestTask : DefaultTask() {
         doPreScriptExecutions(config, testDirectoryPath)
 
         try {
-            val apiResponse = constructApiCall(requestPath, config).execute()
-            val apiBody = apiResponse.body.string()
-            val mediaType = apiResponse.body.contentType()
+            constructApiCall(requestPath, config).execute().use { apiResponse ->
+                val apiBody = apiResponse.body.string()
+                val mediaType = apiResponse.body.contentType()
 
-            Files.write(resultResponseFilePath, apiBody.toByteArray())
+                Files.write(resultResponseFilePath, apiBody.toByteArray())
 
-            val responseInfo = SquitResponseInfo(apiResponse.code)
-            val resultResponseInfoFilePath = resultResponsePath.resolve(ACTUAL_RESPONSE_INFO)
+                val responseInfo = SquitResponseInfo(apiResponse.code)
+                val resultResponseInfoFilePath = resultResponsePath.resolve(ACTUAL_RESPONSE_INFO)
 
-            Files.write(resultResponseInfoFilePath, responseInfo.toJson().toByteArray())
+                Files.write(resultResponseInfoFilePath, responseInfo.toJson().toByteArray())
 
-            if (!apiResponse.isSuccessful) {
-                if (!silent.get()) logger.newLineIfNeeded()
+                if (!apiResponse.isSuccessful) {
+                    if (!silent.get()) logger.newLineIfNeeded()
 
-                logger.info(
-                    "Unsuccessful request for test ${processedSourcesDir.asPath.relativize(testDirectoryPath)} " +
-                        "(status code: ${apiResponse.code})",
-                )
-            } else if (
-                mediaType?.type != config.mediaType.type ||
-                mediaType.subtype != config.mediaType.subtype
-            ) {
-                if (!silent.get()) logger.newLineIfNeeded()
+                    logger.info(
+                        "Unsuccessful request for test ${processedSourcesDir.asPath.relativize(testDirectoryPath)} " +
+                            "(status code: ${apiResponse.code})",
+                    )
+                } else if (
+                    mediaType?.type != config.mediaType.type ||
+                    mediaType.subtype != config.mediaType.subtype
+                ) {
+                    if (!silent.get()) logger.newLineIfNeeded()
 
-                logger.info(
-                    "Unexpected Media type $mediaType for test " +
-                        "${processedSourcesDir.asPath.relativize(testDirectoryPath)}. Expected ${config.mediaType}",
-                )
+                    logger.info(
+                        "Unexpected Media type $mediaType for test " +
+                            "${processedSourcesDir.asPath.relativize(testDirectoryPath)}. Expected ${config.mediaType}",
+                    )
+                }
             }
         } catch (error: IOException) {
             Files.write(resultResponsePath.resolve(ERROR), error.stackTraceToString().toByteArray())
