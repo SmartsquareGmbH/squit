@@ -13,6 +13,7 @@ import de.smartsquare.squit.util.write
 import groovy.lang.Binding
 import groovy.lang.GroovyShell
 import org.dom4j.Document
+import org.gradle.api.logging.Logging
 import java.nio.file.Path
 
 /**
@@ -21,6 +22,10 @@ import java.nio.file.Path
  */
 class XmlBodyProcessor : BodyProcessor {
 
+    private companion object {
+        private val logger = Logging.getLogger(XmlBodyProcessor::class.java)
+    }
+
     override fun preProcess(
         requestPath: Path?,
         responsePath: Path,
@@ -28,7 +33,7 @@ class XmlBodyProcessor : BodyProcessor {
         resultResponsePath: Path,
         config: Config,
     ) {
-        val request = requestPath?.let { SAXReaderSupport.read(requestPath) }
+        val request = requestPath?.let { SAXReaderSupport.read(it) }
         val response = SAXReaderSupport.read(responsePath)
 
         runPreProcessors(config, request, response)
@@ -52,9 +57,20 @@ class XmlBodyProcessor : BodyProcessor {
     }
 
     private fun runPreProcessors(config: Config, request: Document?, response: Document) {
-        config.preProcessors.map { Class.forName(it).getConstructor().newInstance() }
-            .filterIsInstance<SquitXmlPreProcessor>()
-            .forEach { it.process(request, response, config) }
+        val processors = config.preProcessors.map { Class.forName(it).getConstructor().newInstance() }
+
+        for (processor in processors) {
+            if (processor !is SquitXmlPreProcessor) {
+                logger.warn(
+                    "Pre-processor ${processor::class.java.name} is not a SquitXmlPreProcessor and will be " +
+                        "ignored for XML processing.",
+                )
+
+                continue
+            }
+
+            processor.process(request, response, config)
+        }
 
         config.preProcessorScripts.forEach {
             GroovyShell(javaClass.classLoader).parse(it.toFile()).apply {
@@ -70,9 +86,20 @@ class XmlBodyProcessor : BodyProcessor {
     }
 
     private fun runPostProcessors(config: Config, actualResponse: Document, expectedResponse: Document) {
-        config.postProcessors.map { Class.forName(it).getConstructor().newInstance() }
-            .filterIsInstance<SquitXmlPostProcessor>()
-            .forEach { it.process(actualResponse, expectedResponse, config) }
+        val processors = config.postProcessors.map { Class.forName(it).getConstructor().newInstance() }
+
+        for (processor in processors) {
+            if (processor !is SquitXmlPostProcessor) {
+                logger.warn(
+                    "Post-processor ${processor::class.java.name} is not a SquitXmlPostProcessor and will be " +
+                        "ignored for XML processing.",
+                )
+
+                continue
+            }
+
+            processor.process(actualResponse, expectedResponse, config)
+        }
 
         config.postProcessorScripts.forEach {
             GroovyShell(javaClass.classLoader).parse(it.toFile()).apply {

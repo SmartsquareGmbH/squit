@@ -13,6 +13,7 @@ import de.smartsquare.squit.mediatype.BodyProcessor
 import de.smartsquare.squit.util.write
 import groovy.lang.Binding
 import groovy.lang.GroovyShell
+import org.gradle.api.logging.Logging
 import java.nio.file.Path
 
 /**
@@ -20,6 +21,10 @@ import java.nio.file.Path
  * to run on the generated [JsonElement] instances and saves the results.
  */
 class JsonBodyProcessor : BodyProcessor {
+
+    private companion object {
+        private val logger = Logging.getLogger(JsonBodyProcessor::class.java)
+    }
 
     override fun preProcess(
         requestPath: Path?,
@@ -52,9 +57,20 @@ class JsonBodyProcessor : BodyProcessor {
     }
 
     private fun runPreProcessors(config: Config, request: JsonElement?, response: JsonElement) {
-        config.preProcessors.map { Class.forName(it).getConstructor().newInstance() }
-            .filterIsInstance<SquitJsonPreProcessor>()
-            .forEach { it.process(request, response, config) }
+        val processors = config.preProcessors.map { Class.forName(it).getConstructor().newInstance() }
+
+        for (processor in processors) {
+            if (processor !is SquitJsonPreProcessor) {
+                logger.warn(
+                    "Pre-processor ${processor::class.java.name} is not a SquitJsonPreProcessor and will be " +
+                        "ignored for JSON processing.",
+                )
+
+                continue
+            }
+
+            processor.process(request, response, config)
+        }
 
         config.preProcessorScripts.forEach {
             GroovyShell(javaClass.classLoader).parse(it.toFile()).apply {
@@ -70,9 +86,20 @@ class JsonBodyProcessor : BodyProcessor {
     }
 
     private fun runPostProcessors(config: Config, actualResponse: JsonElement, expectedResponse: JsonElement) {
-        config.postProcessors.map { Class.forName(it).getConstructor().newInstance() }
-            .filterIsInstance<SquitJsonPostProcessor>()
-            .forEach { it.process(actualResponse, expectedResponse, config) }
+        val processors = config.postProcessors.map { Class.forName(it).getConstructor().newInstance() }
+
+        for (processor in processors) {
+            if (processor !is SquitJsonPostProcessor) {
+                logger.warn(
+                    "Post-processor ${processor::class.java.name} is not a SquitJsonPostProcessor and will be " +
+                        "ignored for JSON processing.",
+                )
+
+                continue
+            }
+
+            processor.process(actualResponse, expectedResponse, config)
+        }
 
         config.postProcessorScripts.forEach {
             GroovyShell(javaClass.classLoader).parse(it.toFile()).apply {
