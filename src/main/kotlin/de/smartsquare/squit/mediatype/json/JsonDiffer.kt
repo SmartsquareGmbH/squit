@@ -16,6 +16,8 @@ class JsonDiffer : Differ {
 
         ""
     } catch (error: AssertionError) {
-        requireNotNull(error.message)
+        error.message ?: error.toString()
+    } catch (error: RuntimeException) {
+        "JSON comparison failed: ${error.message ?: error.toString()}"
     }
 }
