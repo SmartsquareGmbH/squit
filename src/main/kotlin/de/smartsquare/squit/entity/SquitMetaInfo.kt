@@ -1,7 +1,7 @@
 package de.smartsquare.squit.entity
 
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import de.smartsquare.squit.util.gson
 import java.time.LocalDateTime
 
 /**
@@ -21,7 +21,7 @@ data class SquitMetaInfo(val date: LocalDateTime, val duration: Long) {
          * Constructs a [SquitMetaInfo] instance from the given [json] String.
          */
         fun fromJson(json: String): SquitMetaInfo {
-            val map = Gson().fromJson(json, object : TypeToken<Map<String, Any>>() {})
+            val map = gson.fromJson(json, object : TypeToken<Map<String, Any>>() {})
 
             return SquitMetaInfo(
                 LocalDateTime.parse(map[DATE] as String),
@@ -33,7 +33,7 @@ data class SquitMetaInfo(val date: LocalDateTime, val duration: Long) {
     /**
      * Converts this instance into a Json representation.
      */
-    fun toJson(): String = Gson().toJson(
+    fun toJson(): String = gson.toJson(
         mapOf(
             DATE to date.toString(),
             DURATION to duration,

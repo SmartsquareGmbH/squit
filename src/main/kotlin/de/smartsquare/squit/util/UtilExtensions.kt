@@ -1,7 +1,6 @@
 package de.smartsquare.squit.util
 
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import de.smartsquare.squit.entity.SquitOutputFormat
 import de.smartsquare.squit.entity.SquitResult
@@ -57,9 +56,9 @@ fun XmlDocument.write(path: Path, outputFormat: OutputFormat = SquitOutputFormat
  *
  * This is a safe operation, as such the file is correctly closed.
  */
-fun JsonElement.write(path: Path, gson: Gson = GsonBuilder().setPrettyPrinting().create()) {
+fun JsonElement.write(path: Path, gsonInstance: Gson = prettyGson) {
     Files.newBufferedWriter(path).use {
-        gson.toJson(this, it)
+        gsonInstance.toJson(this, it)
     }
 }
 

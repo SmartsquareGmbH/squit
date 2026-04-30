@@ -1,24 +1,22 @@
 package de.smartsquare.squit.mediatype.json
 
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import de.smartsquare.squit.mediatype.Canonicalizer
 import de.smartsquare.squit.mediatype.MediaTypeConfig
+import de.smartsquare.squit.util.prettyGson
 
 /**
  * [Canonicalizer] for Json.
  */
 class JsonCanonicalizer : Canonicalizer {
 
-    private val gson = GsonBuilder().setPrettyPrinting().create()
-
     override fun canonicalize(input: String, mediaTypeConfig: MediaTypeConfig): String =
         if (mediaTypeConfig.jsonCanonicalize) {
-            val element = gson.fromJson(input, JsonElement::class.java)
+            val element = prettyGson.fromJson(input, JsonElement::class.java)
 
-            gson.toJson(element.canonicalize())
+            prettyGson.toJson(element.canonicalize())
         } else {
             input
         }

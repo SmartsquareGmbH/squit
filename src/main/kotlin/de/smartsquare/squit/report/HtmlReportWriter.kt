@@ -1,9 +1,9 @@
 package de.smartsquare.squit.report
 
-import com.google.gson.Gson
 import de.smartsquare.squit.entity.SquitResult
 import de.smartsquare.squit.mediatype.MediaTypeConfig
 import de.smartsquare.squit.mediatype.MediaTypeFactory
+import de.smartsquare.squit.util.gson
 import okhttp3.MediaType
 import org.gradle.api.logging.Logger
 import java.nio.file.Files
@@ -36,12 +36,13 @@ class HtmlReportWriter(private val logger: Logger) {
             results = constructResults(results, mediaTypeConfig),
         )
 
-        val json = Gson().toJson(data)
+        val json = gson.toJson(data)
 
-        val template = javaClass.getResourceAsStream("/squit-report-template.html")!!
-            .readBytes()
-            .toString(Charsets.UTF_8)
+        val templateResource = requireNotNull(javaClass.getResourceAsStream("/squit-report-template.html")) {
+            "Could not find squit-report-template.html on classpath"
+        }
 
+        val template = templateResource.readBytes().toString(Charsets.UTF_8)
         val html = template.replace(DATA_PLACEHOLDER, json)
 
         Files.createDirectories(reportDirectoryPath)
