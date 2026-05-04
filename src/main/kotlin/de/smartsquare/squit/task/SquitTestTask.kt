@@ -126,8 +126,6 @@ abstract class SquitTestTask : DefaultTask() {
     val failureReportDir: Provider<Directory>
         get() = reportDir.dir("failures")
 
-    private var nextResultId = 0L
-
     init {
         group = "Build"
         description = "Compares the actual responses to the expected responses and generates a report."
@@ -165,7 +163,7 @@ abstract class SquitTestTask : DefaultTask() {
     private fun processTests(): List<SquitResult> {
         val resultList = mutableListOf<SquitResult>()
 
-        FilesUtils.getLeafDirectories(processedResponsesDir.asPath).forEach { actualResponsePath ->
+        FilesUtils.getLeafDirectories(processedResponsesDir.asPath).forEachIndexed { index, actualResponsePath ->
             val configPath = FilesUtils.validateExistence(
                 processedSourcesDir.asPath
                     .resolve(processedResponsesDir.asPath.relativize(actualResponsePath))
@@ -180,6 +178,7 @@ abstract class SquitTestTask : DefaultTask() {
 
                 resultList += if (Files.exists(errorFile)) {
                     constructResult(
+                        index.toLong(),
                         FilesUtils.readAllBytes(errorFile).toString(Charsets.UTF_8),
                         expectedResponseInfo,
                         actualResponsePath,
@@ -190,10 +189,17 @@ abstract class SquitTestTask : DefaultTask() {
                     val infoDiff = createResponseInfoDifference(actualResponsePath, expectedResponseInfo)
                     val diff = "$infoDiff$bodyDiff"
 
-                    constructResult(diff, expectedResponseInfo, actualResponsePath, config)
+                    constructResult(index.toLong(), diff, expectedResponseInfo, actualResponsePath, config)
                 }
             } else {
-                resultList += constructResult("", expectedResponseInfo, actualResponsePath, config, true)
+                resultList += constructResult(
+                    index.toLong(),
+                    "",
+                    expectedResponseInfo,
+                    actualResponsePath,
+                    config,
+                    true,
+                )
             }
         }
 
@@ -280,6 +286,7 @@ abstract class SquitTestTask : DefaultTask() {
     }
 
     private fun constructResult(
+        id: Long,
         differences: String,
         responseInfo: SquitResponseInfo,
         actualResponsePath: Path,
@@ -290,7 +297,6 @@ abstract class SquitTestTask : DefaultTask() {
         val contextPath = processedResponsesDir.asPath.relativize(actualResponsePath.parent.parent)
         val suitePath = actualResponsePath.parent.fileName
         val testDirectoryPath = actualResponsePath.fileName
-        val id = nextResultId++
 
         return when (differences.isNotBlank()) {
             true -> SquitResult(
