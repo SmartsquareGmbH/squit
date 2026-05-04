@@ -75,10 +75,18 @@ fun List<SquitResult>.countTestResults(): TestResultCounts {
     return TestResultCounts(successfulTests, failedTests, ignoredTests)
 }
 
-fun requiresRequestBody(method: String) =
-    method == "POST" || method == "PUT" || method == "PATCH" || method == "PROPPATCH" || method == "REPORT"
+private val methodsRequiringRequestBody = setOf("POST", "PUT", "PATCH", "PROPPATCH", "REPORT")
+private val methodsForbiddingRequestBody = setOf("GET", "HEAD")
 
-fun permitsRequestBody(method: String) = method != "GET" && method != "HEAD"
+/**
+ * Returns whether the given HTTP [method] requires a request body.
+ */
+fun requiresRequestBody(method: String) = method in methodsRequiringRequestBody
+
+/**
+ * Returns whether the given HTTP [method] permits a request body.
+ */
+fun permitsRequestBody(method: String) = method !in methodsForbiddingRequestBody
 
 /**
  * Prints the given [message] to the standard output stream and flushes it afterwards.

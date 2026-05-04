@@ -22,9 +22,7 @@ import java.nio.file.Path
  */
 class XmlBodyProcessor : BodyProcessor {
 
-    private companion object {
-        private val logger = Logging.getLogger(XmlBodyProcessor::class.java)
-    }
+    private val logger = Logging.getLogger(XmlBodyProcessor::class.java)
 
     override fun preProcess(
         requestPath: Path?,

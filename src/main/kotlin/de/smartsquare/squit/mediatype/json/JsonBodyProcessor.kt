@@ -22,9 +22,7 @@ import java.nio.file.Path
  */
 class JsonBodyProcessor : BodyProcessor {
 
-    private companion object {
-        private val logger = Logging.getLogger(JsonBodyProcessor::class.java)
-    }
+    private val logger = Logging.getLogger(JsonBodyProcessor::class.java)
 
     override fun preProcess(
         requestPath: Path?,

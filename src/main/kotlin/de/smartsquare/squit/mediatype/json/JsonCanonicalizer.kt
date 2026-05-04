@@ -22,24 +22,14 @@ class JsonCanonicalizer : Canonicalizer {
         }
 
     private fun JsonElement.canonicalize(): JsonElement = when (this) {
-        is JsonObject -> {
-            val newEntries = entrySet().map { (key, value) -> key to value.canonicalize() }
-
-            JsonObject().also { newObject ->
-                newEntries.sortedBy { (key) -> key }.forEach { (key, value) ->
-                    newObject.add(key, value)
-                }
-            }
+        is JsonObject -> JsonObject().also { newObject ->
+            entrySet()
+                .sortedBy { (key, _) -> key }
+                .forEach { (key, value) -> newObject.add(key, value.canonicalize()) }
         }
 
-        is JsonArray -> {
-            val newEntries = this.map { it.canonicalize() }
-
-            JsonArray().also { newArray ->
-                newEntries.forEach {
-                    newArray.add(it)
-                }
-            }
+        is JsonArray -> JsonArray().also { newArray ->
+            forEach { newArray.add(it.canonicalize()) }
         }
 
         else -> this
