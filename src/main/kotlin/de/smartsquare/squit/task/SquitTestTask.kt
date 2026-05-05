@@ -285,6 +285,7 @@ abstract class SquitTestTask : DefaultTask() {
         }
     }
 
+    @Suppress("LongParameterList")
     private fun constructResult(
         id: Long,
         differences: String,
@@ -298,19 +299,18 @@ abstract class SquitTestTask : DefaultTask() {
         val suitePath = actualResponsePath.parent.fileName
         val testDirectoryPath = actualResponsePath.fileName
 
-        return when (differences.isNotBlank()) {
-            true -> SquitResult(
-                id, differences, responseInfo, isIgnored, config.mediaType, config.title,
-                contextPath, suitePath,
-                testDirectoryPath, squitBuildDirectoryPath,
-            )
-
-            false -> SquitResult(
-                id, "", responseInfo, isIgnored, config.mediaType, config.title,
-                contextPath, suitePath,
-                testDirectoryPath, squitBuildDirectoryPath,
-            )
-        }
+        return SquitResult(
+            id = id,
+            difference = differences.trim(),
+            expectedResponseInfo = responseInfo,
+            isIgnored = isIgnored,
+            mediaType = config.mediaType,
+            alternativeName = config.title,
+            contextPath = contextPath,
+            suitePath = suitePath,
+            testDirectoryPath = testDirectoryPath,
+            squitBuildDirectoryPath = squitBuildDirectoryPath,
+        )
     }
 
     private fun shouldReportTest(config: Config) = !config.shouldIgnore ||
