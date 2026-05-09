@@ -98,18 +98,6 @@ object FilesUtils {
         if (Files.exists(path)) path else throw GradleException("Missing expected file: $path")
 
     /**
-     * Copies a resource specified by the passed [name] to the given [target] path.
-     */
-    fun copyResource(name: String, target: Path, modification: (ByteArray) -> ByteArray = { it }) {
-        val resource = requireNotNull(javaClass.classLoader.getResource(name)) {
-            "Could not find resource $name on classpath"
-        }
-
-        Files.createDirectories(target.parent)
-        Files.write(target, modification(resource.readBytes()))
-    }
-
-    /**
      * Creates a new [BufferedReader] for the given [path] and executes [block] with improved error handling.
      */
     fun <T> useBufferedReader(path: Path, block: (BufferedReader) -> T): T = try {

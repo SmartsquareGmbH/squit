@@ -17,7 +17,7 @@ import org.apache.xml.security.c14n.Canonicalizer as ApacheCanonicalizer
  */
 class XmlCanonicalizer : Canonicalizer {
 
-    private val canonicalizer: org.apache.xml.security.c14n.Canonicalizer
+    private val canonicalizer: ApacheCanonicalizer
 
     init {
         ApacheInit.init()
