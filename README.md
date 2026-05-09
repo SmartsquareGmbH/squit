@@ -26,11 +26,11 @@ Add the [plugin](https://plugins.gradle.org/plugin/de.smartsquare.squit) to your
 
 ```groovy
 plugins {
-    id "de.smartsquare.squit" version "5.1.0"
+    id "de.smartsquare.squit" version "5.2.0"
 }
 ```
 
-The minimum supported Gradle version is `6.8`.
+The minimum supported Gradle version is `7.5`.
 
 ## Project structure
 
@@ -83,7 +83,8 @@ A simple example looks like this:
 This shows a valid project structure for `Squit`. `my_suite` contains all our tests (in this case only two: `test1`
 and `test2`).
 
-> You _can_ have more directories beneath `my_suite` (e.g. `another_suite`) and as aforementioned can also nest more deeply.
+> You _can_ have more directories beneath `my_suite` (e.g. `another_suite`) and as aforementioned can also nest more
+> deeply.
 > At least one suite folder is required though, you can't have your tests directly in the `src/squit` folder.
 
 `my_suite` also contains a `test.conf` file, which could look like this:
@@ -97,7 +98,8 @@ endpoint = "http://localhost:1234/endpoint"
 As the example shows, `test1` also contains a `test.conf` file. This one could be used to override the `endpoint`
 property of the `test.conf` file in the `my_suite` folder.
 
-> It is not **required** to have a `test.conf` file there, often it is enough to have one for all your tests in the root folder.
+> It is not **required** to have a `test.conf` file there, often it is enough to have one for all your tests in the root
+> folder.
 
 ## Usage
 
@@ -105,7 +107,7 @@ The plugin is composed of various `Gradle` tasks. For daily usage, only the `squ
 The following table lists all tasks and their purpose:
 
 | Task name          | Description                                                                                                         |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------- |
+|--------------------|---------------------------------------------------------------------------------------------------------------------|
 | `squitPreProcess`  | Pre processes the test sources in a configurable manner.                                                            |
 | `squitRunRequests` | Runs the actual requests against your backend.                                                                      |
 | `squitPostProcess` | Post processes the responses in a configurable manner.                                                              |
@@ -136,13 +138,14 @@ its features. As of the current version, these are the supported properties:
 | preProcessorScripts    | An array of paths to groovy pre processor scripts to use.                                                                                          | `preProcessorScripts = [./scripts/pre_processor.groovy]`                      |
 | postProcessorScripts   | An array of paths to groovy post processor scripts to use.                                                                                         | `postProcessorScripts = [./scripts/post_processor.groovy]`                    |
 | preRunners             | An array of pre runner classes to use.                                                                                                             | `preRunners= ["com.example.ExamplePreRunner"]`                                |
-| preTestTasks           | An array of tasks to execute before the test. The order of the entries determines the order of execution.                                          | `preTestTasks = ["DATABASE_SCRIPTS", "PRE_RUNNERS", "PRE_RUNNER_SCRIPTS"]`    |
+| preTestTasks           | An array of tasks to execute before the test. The order of the entries determines the order of execution.                                          | `preTestTasks = ["PRE_RUNNERS", "PRE_RUNNER_SCRIPTS", "DATABASE_SCRIPTS"]`    |
 | postRunners            | An array of post runner classes to use.                                                                                                            | `postRunners = ["com.example.ExamplePostRunner"]`                             |
 | preRunnerScripts       | An array of paths to groovy pre runner scripts to use.                                                                                             | `preRunnerScripts = [./scripts/pre_runner.groovy]`                            |
 | postRunnerScripts      | An array of paths to groovy post runner scripts to use.                                                                                            | `postRunnerScripts = [./scripts/post_runner.groovy]`                          |
-| postTestTasks           | An array of tasks to execute after the test. The order of the entries determines the order of execution.                                           | `postTestTasks = ["DATABASE_SCRIPTS", "POST_RUNNERS", "POST_RUNNER_SCRIPTS"]` |
+| postTestTasks          | An array of tasks to execute after the test. The order of the entries determines the order of execution.                                           | `postTestTasks = ["DATABASE_SCRIPTS", "POST_RUNNERS", "POST_RUNNER_SCRIPTS"]` |
 | headers                | A map of headers to use for requests.                                                                                                              | `headers = { "some-header": "value" }`                                        |
 | title                  | An optional alternative title for the test.                                                                                                        | `title = "Something"`                                                         |
+| tags                   | An array of tags for the test or test group. See [Tagging](#tagging).                                                                              | `tags = ["fast", "mysuite"]`                                                  |
 | expectedResponseCode   | An optional expected HTTP response code. Default is the 200-range.                                                                                 | `expectedResponseCode = 400`                                                  |
 
 > The parameter `endpoint` is required and the build will fail if it is missing for a test.
@@ -164,7 +167,8 @@ endpoint = "http://localhost:"${port}"/someEndpoint"
 ./gradlew squitTest -Psquit.port=1234
 ```
 
-> This mechanism can also be used to create global configuration properties, which are then used in configuration files deeper in the hierarchy.
+> This mechanism can also be used to create global configuration properties, which are then used in configuration files
+> deeper in the hierarchy.
 
 #### Local configuration
 
@@ -254,7 +258,8 @@ request.selectNodes("//Date").each {
 }
 ```
 
-> The passed objects for the post-processor are called `actualResponse` and `expectedResponse`. Note that the `expectedResponse` is only for reference here and changes to it are not reflected.
+> The passed objects for the post-processor are called `actualResponse` and `expectedResponse`. Note that the
+`expectedResponse` is only for reference here and changes to it are not reflected.
 
 #### Interface processing
 
@@ -274,7 +279,7 @@ repositories {
 }
 
 dependencies {
-    compile 'de.smartsquare:squit:5.1.0'
+    compile 'de.smartsquare:squit:5.2.0'
 }
 ```
 
@@ -293,12 +298,13 @@ public class MyPreProcessor implements SquitXmlPreProcessor {
     @Override
     public void process(Document request, Document expectedResponse, Config config) {
         request.selectNodes("//Date")
-            .forEach(it -> it.setText(LocalDate.now().toString()));
+                .forEach(it -> it.setText(LocalDate.now().toString()));
     }
 }
 ```
 
-> The other interfaces as of the current version are `SquitXmlPostProcessor`, `SquitJsonPostProcessor`, `SquitJsonPreProcessor`.
+> The other interfaces as of the current version are `SquitXmlPostProcessor`, `SquitJsonPostProcessor`,
+`SquitJsonPreProcessor`. For pre- and post-runners, the interfaces are `SquitPreRunner` and `SquitPostRunner`.
 
 The last step is to add the class to your `test.conf`, similar to the approach with `groovy` scripts:
 
@@ -342,23 +348,26 @@ an "or", use `-PtagsOr`.
 
 As of the current version, Squit supports these request formats:
 
-| Media Type         | File ending | Pre- and post-processor input                                                               |
-| ------------------ | ----------- | ------------------------------------------------------------------------------------------- |
-| `application/xml`  | `.xml`      | [Dom4J Documents](http://static.javadoc.io/org.dom4j/dom4j/2.1.0/org/dom4j/Document.html)   |
-| `application/json` | `.json`     | [Gson JsonElements](https://google.github.io/gson/apidocs/com/google/gson/JsonElement.html) |
-| All others         | `.txt`      | :x:                                                                                         |
+| Media Type             | File ending | Pre- and post-processor input                                                               |
+|------------------------|-------------|---------------------------------------------------------------------------------------------|
+| `application/xml`      | `.xml`      | [Dom4J Documents](http://static.javadoc.io/org.dom4j/dom4j/2.1.0/org/dom4j/Document.html)   |
+| `text/xml`             | `.xml`      | [Dom4J Documents](http://static.javadoc.io/org.dom4j/dom4j/2.1.0/org/dom4j/Document.html)   |
+| `application/soap+xml` | `.xml`      | [Dom4J Documents](http://static.javadoc.io/org.dom4j/dom4j/2.1.0/org/dom4j/Document.html)   |
+| `application/json`     | `.json`     | [Gson JsonElements](https://google.github.io/gson/apidocs/com/google/gson/JsonElement.html) |
+| All others             | `.txt`      | :x:                                                                                         |
 
 ### Command line options
 
 Because Squit is a Gradle plugin, it supports all of Gradle's command line options and configuration options.
 Additionally, these options are evaluated:
 
-| Option      | Description                                                       | Example                                 |
-|-------------|-------------------------------------------------------------------|-----------------------------------------|
-| `tags`      | The tags tests must have to be included in a run.                 | `./gradlew squitTest -Ptags=fast`       |
-| `tagsOr`    | The tags tests must have at least one of to be included in a run. | `./gradlew squitTest -Ptags=fast,suite` |
-| `unignore`  | Handle all tests as if the ignore property would not be set.      | `./gradlew squitTest -Punignore`        |
-| `unexclude` | Handle all tests as if the `exclude` property would not be set.   | `./gradlew squitTest -Punexclude`       |
+| Option      | Description                                                                 | Example                                 |
+|-------------|-----------------------------------------------------------------------------|-----------------------------------------|
+| `tags`      | The tags tests must have to be included in a run.                           | `./gradlew squitTest -Ptags=fast`       |
+| `tagsOr`    | The tags tests must have at least one of to be included in a run.           | `./gradlew squitTest -Ptags=fast,suite` |
+| `tagsAnd`   | Additional tags tests must also have (AND semantics, combined with `tags`). | `./gradlew squitTest -PtagsAnd=suite`   |
+| `unignore`  | Handle all tests as if the ignore property would not be set.                | `./gradlew squitTest -Punignore`        |
+| `unexclude` | Handle all tests as if the `exclude` property would not be set.             | `./gradlew squitTest -Punexclude`       |
 
 ### Squit Dsl
 
@@ -396,7 +405,7 @@ squit {
         // If invalid namespace resources given in the xml should be resolved.
         // If neither http:// or https:// are set as part of the namespace url, http:// will be set as a prefix,
         // so that the canonicalization does not throw errors.
-        resolveInvalidNamespaces = true
+        resolveInvalidNamespaces = false
     }
 
     json {
