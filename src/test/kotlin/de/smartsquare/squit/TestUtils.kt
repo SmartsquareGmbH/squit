@@ -34,6 +34,10 @@ fun GradleRunner.withExtendedPluginClasspath(): GradleRunner {
         .plus(File(H2Driver::class.java.protectionDomain.codeSource.location.toURI()))
         .plus(File(XmlPreProcessor::class.java.protectionDomain.codeSource.location.toURI()))
         .plus(File(XmlPostProcessor::class.java.protectionDomain.codeSource.location.toURI()))
+        .plus(File(JsonPreProcessor::class.java.protectionDomain.codeSource.location.toURI()))
+        .plus(File(JsonPostProcessor::class.java.protectionDomain.codeSource.location.toURI()))
+        .plus(File(JsonArrayPreProcessor::class.java.protectionDomain.codeSource.location.toURI()))
+        .plus(File(JsonArrayPostProcessor::class.java.protectionDomain.codeSource.location.toURI()))
 
     return withPluginClasspath(classpath)
 }
