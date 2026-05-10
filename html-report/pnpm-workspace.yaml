@@ -1,3 +1,4 @@
 allowBuilds:
   v-code-diff: true
   vue-demi: false
+trustPolicy: no-downgrade
