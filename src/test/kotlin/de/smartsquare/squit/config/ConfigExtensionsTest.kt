@@ -145,7 +145,7 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "preProcessorScripts" to listOf(testProject.resolve("build.gradle").toString()),
+                "preProcessorScripts" to listOf(testProject.resolve("build.gradle.kts").toString()),
             ),
         )
 
@@ -202,7 +202,7 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "postProcessorScripts" to listOf(testProject.resolve("build.gradle").toString()),
+                "postProcessorScripts" to listOf(testProject.resolve("build.gradle.kts").toString()),
             ),
         )
 
@@ -259,7 +259,7 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "preRunnerScripts" to listOf(testProject.resolve("build.gradle").toString()),
+                "preRunnerScripts" to listOf(testProject.resolve("build.gradle.kts").toString()),
             ),
         )
 
@@ -316,7 +316,7 @@ class ConfigExtensionsTest {
         val config = ConfigFactory.parseMap(
             mapOf(
                 "endpoint" to "https://example.com",
-                "postRunnerScripts" to listOf(testProject.resolve("build.gradle").toString()),
+                "postRunnerScripts" to listOf(testProject.resolve("build.gradle.kts").toString()),
             ),
         )
 

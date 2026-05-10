@@ -27,14 +27,17 @@ class GradleCompatibilityTest {
 
             // This older Gradle version does not work on Java 20+.
             if (JavaVersion.current() < JavaVersion.VERSION_20) {
+                result += Arguments.of(GradleVersion.version("9.0.0"))
                 result += Arguments.of(GradleVersion.version("8.0.2"))
+                result += Arguments.of(GradleVersion.version("7.5.1"))
             }
 
             return result.stream()
         }
     }
 
-    private val project = TestUtils.getResourcePath("test-project")
+    // Older Gradle Versions do not support testing projects with kts.
+    private val project = TestUtils.getResourcePath("test-project-groovy")
 
     private lateinit var server: MockWebServer
 
@@ -54,8 +57,6 @@ class GradleCompatibilityTest {
     @MethodSource("provideVersions")
     fun compatibility(gradleVersion: GradleVersion) {
         server.enqueue(MockResponse().setBody("<cool/>"))
-        server.enqueue(MockResponse().setBody("<nice/>"))
-        server.enqueue(MockResponse().setBody("<relevant/>"))
 
         val arguments = listOf(
             "squitTest",

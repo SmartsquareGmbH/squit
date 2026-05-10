@@ -29,15 +29,22 @@ object TestUtils {
 /**
  * Adds the plugin classpath to this runner with additional needed dependencies, not being included by default.
  */
-fun GradleRunner.withExtendedPluginClasspath(): GradleRunner {
+fun GradleRunner.withExtendedPluginClasspath(version: GradleVersion? = null): GradleRunner {
     val classpath = PluginUnderTestMetadataReading.readImplementationClasspath()
-        .plus(File(H2Driver::class.java.protectionDomain.codeSource.location.toURI()))
-        .plus(File(XmlPreProcessor::class.java.protectionDomain.codeSource.location.toURI()))
-        .plus(File(XmlPostProcessor::class.java.protectionDomain.codeSource.location.toURI()))
-        .plus(File(JsonPreProcessor::class.java.protectionDomain.codeSource.location.toURI()))
-        .plus(File(JsonPostProcessor::class.java.protectionDomain.codeSource.location.toURI()))
-        .plus(File(JsonArrayPreProcessor::class.java.protectionDomain.codeSource.location.toURI()))
-        .plus(File(JsonArrayPostProcessor::class.java.protectionDomain.codeSource.location.toURI()))
+
+    classpath += listOf(
+        File(XmlPreProcessor::class.java.protectionDomain.codeSource.location.toURI()),
+        File(XmlPostProcessor::class.java.protectionDomain.codeSource.location.toURI()),
+        File(JsonPreProcessor::class.java.protectionDomain.codeSource.location.toURI()),
+        File(JsonPostProcessor::class.java.protectionDomain.codeSource.location.toURI()),
+        File(JsonArrayPreProcessor::class.java.protectionDomain.codeSource.location.toURI()),
+        File(JsonArrayPostProcessor::class.java.protectionDomain.codeSource.location.toURI()),
+    )
+
+    // Workaround a bug in older versions of Gradle that fail when reading JDK 21 files from the H2Driver jar.
+    if (version == null || version >= GradleVersion.version("9.0")) {
+        classpath += File(H2Driver::class.java.protectionDomain.codeSource.location.toURI())
+    }
 
     return withPluginClasspath(classpath)
 }
@@ -49,9 +56,8 @@ fun GradleRunner.withExtendedPluginClasspath(): GradleRunner {
  */
 fun gradleRunner(project: Path, arguments: List<String>, version: GradleVersion? = null): GradleRunner =
     GradleRunner.create()
-        .withArguments(listOf("clean") + arguments + "--stacktrace")
         .apply { if (version !== null) withGradleVersion(version.version) }
+        .withArguments(listOf("clean") + arguments + "--stacktrace")
+        .withExtendedPluginClasspath(version)
         .withProjectDir(project.toFile())
-        .withExtendedPluginClasspath()
-        .withDebug(true)
         .forwardOutput()

@@ -1,0 +1,10 @@
+plugins {
+    id("base")
+    id("de.smartsquare.squit")
+}
+
+squit {
+    xml {
+        strict.set(false)
+    }
+}
