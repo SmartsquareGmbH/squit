@@ -73,6 +73,7 @@ node {
 val buildHtmlReport = tasks.register<PnpmTask>("buildHtmlReport") {
     dependsOn(tasks.pnpmInstall)
 
+    description = "Builds the HTML report frontend."
     args = listOf("run", "build")
 
     inputs.files(
@@ -82,7 +83,7 @@ val buildHtmlReport = tasks.register<PnpmTask>("buildHtmlReport") {
         },
     )
 
-    outputs.file("report-frontend/dist/index.html")
+    outputs.file("html-report/dist/index.html")
 }
 
 tasks.processResources {
