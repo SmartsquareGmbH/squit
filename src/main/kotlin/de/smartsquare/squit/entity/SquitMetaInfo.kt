@@ -2,7 +2,7 @@ package de.smartsquare.squit.entity
 
 import com.google.gson.reflect.TypeToken
 import de.smartsquare.squit.util.gson
-import java.time.LocalDateTime
+import java.time.Instant
 
 /**
  * Data class holding further information concerning a single [SquitResult].
@@ -10,7 +10,7 @@ import java.time.LocalDateTime
  * @property date The date the associated test was executed.
  * @property duration The time the test has taken in milliseconds.
  */
-data class SquitMetaInfo(val date: LocalDateTime, val duration: Long) {
+data class SquitMetaInfo(val date: Instant, val duration: Long) {
 
     companion object {
 
@@ -24,7 +24,7 @@ data class SquitMetaInfo(val date: LocalDateTime, val duration: Long) {
             val map = gson.fromJson(json, object : TypeToken<Map<String, Any>>() {})
 
             return SquitMetaInfo(
-                LocalDateTime.parse(map[DATE] as String),
+                Instant.parse(map[DATE] as String),
                 (map[DURATION] as Number).toLong(),
             )
         }

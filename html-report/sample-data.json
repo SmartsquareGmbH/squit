@@ -1,7 +1,7 @@
 {
   "version": "1.0.0-SNAPSHOT",
-  "generatedAt": "2026-04-04T00:54:44.230957541",
-  "startedAt": "2026-04-04T00:53:20.610375536",
+  "generatedAt": "2026-04-04T00:54:44.230957541Z",
+  "startedAt": "2026-04-04T00:53:20.610375536Z",
   "totalDuration": 3167,
   "averageDuration": 158,
   "slowestTest": {

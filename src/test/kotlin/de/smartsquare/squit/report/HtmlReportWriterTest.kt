@@ -35,7 +35,7 @@ class HtmlReportWriterTest {
         val processedDir = Files.createDirectories(tempDir.resolve("responses/processed").resolve(testDir))
         val sourcesDir = Files.createDirectories(tempDir.resolve("sources").resolve(testDir))
 
-        Files.writeString(rawDir.resolve("meta.json"), """{"date":"2024-01-01T00:00:00","duration":100}""")
+        Files.writeString(rawDir.resolve("meta.json"), """{"date":"2024-01-01T00:00:00Z","duration":100}""")
         Files.writeString(sourcesDir.resolve(MediaTypeFactory.expectedResponse(xmlMediaType)), "<test></test>")
         Files.writeString(processedDir.resolve(MediaTypeFactory.actualResponse(xmlMediaType)), "<test></test>")
 

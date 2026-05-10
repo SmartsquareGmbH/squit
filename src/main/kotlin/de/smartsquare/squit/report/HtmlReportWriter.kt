@@ -8,7 +8,7 @@ import okhttp3.MediaType
 import org.gradle.api.logging.Logger
 import java.nio.file.Files
 import java.nio.file.Path
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.Properties
 
 /**
@@ -42,7 +42,7 @@ class HtmlReportWriter(private val logger: Logger) {
 
         val data = SquitHtmlReportData(
             version = squitVersion,
-            generatedAt = LocalDateTime.now().toString(),
+            generatedAt = Instant.now().toString(),
             startedAt = firstTest?.metaInfo?.date?.toString(),
             totalDuration = duration,
             averageDuration = averageTime,

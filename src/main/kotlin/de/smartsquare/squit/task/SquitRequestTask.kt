@@ -61,7 +61,7 @@ import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.sql.Driver
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 /**
@@ -174,7 +174,7 @@ abstract class SquitRequestTask : DefaultTask() {
                     }
 
                     val endTime = System.currentTimeMillis()
-                    val metaInfo = SquitMetaInfo(LocalDateTime.now(), endTime - startTime)
+                    val metaInfo = SquitMetaInfo(Instant.now(), endTime - startTime)
 
                     Files.write(metaFilePath, metaInfo.toJson().toByteArray())
                 }

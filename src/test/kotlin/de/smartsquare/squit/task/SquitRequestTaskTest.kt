@@ -21,7 +21,8 @@ import org.junit.jupiter.api.Test
 import java.io.File
 import java.nio.file.Files
 import java.sql.DriverManager
-import java.time.LocalDateTime
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import org.h2.Driver as H2Driver
 
 class SquitRequestTaskTest {
@@ -78,8 +79,8 @@ class SquitRequestTaskTest {
                 .toString(Charsets.UTF_8),
         )
 
-        date shouldBeBefore LocalDateTime.now()
-        date shouldBeAfter LocalDateTime.now().minusMinutes(5)
+        date shouldBeBefore Instant.now()
+        date shouldBeAfter Instant.now().minus(5, ChronoUnit.MINUTES)
         duration shouldBeInRange 5L..5000L
 
         server.takeRequest().let {
