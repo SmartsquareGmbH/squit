@@ -86,12 +86,22 @@ val buildHtmlReport = tasks.register<PnpmTask>("buildHtmlReport") {
     outputs.file("html-report/dist/index.html")
 }
 
+val generateVersionProperties = tasks.register<WriteProperties>("generateVersionProperties") {
+    description = "Generates the squit-version.properties resource file."
+
+    destinationFile = layout.buildDirectory.file("generated-resources/squit-version.properties")
+
+    property("version", version.toString())
+}
+
 tasks.processResources {
     dependsOn(buildHtmlReport)
 
     from("html-report/dist/index.html") {
         rename { "squit-report-template.html" }
     }
+
+    from(generateVersionProperties)
 }
 
 tasks.withType<Test>().configureEach {

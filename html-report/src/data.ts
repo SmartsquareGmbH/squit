@@ -1,4 +1,6 @@
 export type SquitData = {
+  version: string
+  generatedAt: string
   startedAt: string
   totalDuration: number
   averageDuration: number

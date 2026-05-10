@@ -31,6 +31,8 @@ data class SquitReportResult(
 data class SquitSlowestTest(val id: Long, val name: String, val duration: Long)
 
 data class SquitHtmlReportData(
+    val version: String,
+    val generatedAt: String?,
     val startedAt: String?,
     val totalDuration: Long,
     val averageDuration: Long,

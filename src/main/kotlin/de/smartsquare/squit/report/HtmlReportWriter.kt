@@ -8,6 +8,8 @@ import okhttp3.MediaType
 import org.gradle.api.logging.Logger
 import java.nio.file.Files
 import java.nio.file.Path
+import java.time.LocalDateTime
+import java.util.Properties
 
 /**
  * Object for writing the Squit HTML report.
@@ -16,6 +18,16 @@ class HtmlReportWriter(private val logger: Logger) {
 
     private companion object {
         private const val DATA_PLACEHOLDER = "__SQUIT_DATA__"
+
+        private val squitVersion: String by lazy {
+            val resource = requireNotNull(javaClass.getResourceAsStream("/squit-version.properties")) {
+                "Could not find squit-report-template.html on classpath"
+            }
+
+            val props = resource.use { Properties().apply { load(it) } }
+
+            requireNotNull(props.getProperty("version")) { "Missing version property in squit-version.properties" }
+        }
     }
 
     /**
@@ -29,6 +41,8 @@ class HtmlReportWriter(private val logger: Logger) {
         val slowestTest = results.maxByOrNull { it.metaInfo.duration }
 
         val data = SquitHtmlReportData(
+            version = squitVersion,
+            generatedAt = LocalDateTime.now().toString(),
             startedAt = firstTest?.metaInfo?.date?.toString(),
             totalDuration = duration,
             averageDuration = averageTime,
