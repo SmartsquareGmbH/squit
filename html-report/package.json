@@ -15,14 +15,14 @@
     "verify": "pnpm format:check && pnpm lint && pnpm check && pnpm test"
   },
   "dependencies": {
-    "@formatjs/intl-durationformat": "^0.10.3",
-    "@lucide/vue": "^1.7.0",
-    "@vueuse/core": "^14.2.1",
-    "dompurify": "^3.3.3",
-    "marked": "^18.0.0",
+    "@formatjs/intl-durationformat": "^0.10.8",
+    "@lucide/vue": "^1.14.0",
+    "@vueuse/core": "^14.3.0",
+    "dompurify": "^3.4.2",
+    "marked": "^18.0.3",
     "v-code-diff": "^1.13.1",
-    "vue": "^3.5.32",
-    "vue-router": "^5.0.4"
+    "vue": "^3.5.34",
+    "vue-router": "^5.0.6"
   },
   "devDependencies": {
     "@tailwindcss/typography": "0.5.19",
