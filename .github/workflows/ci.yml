@@ -69,3 +69,7 @@ jobs:
       - name: Verify
         working-directory: html-report
         run: pnpm verify
+
+      - name: Build
+        working-directory: html-report
+        run: pnpm build

@@ -37,7 +37,7 @@
     "oxlint-tsgolint": "0.23.0",
     "tailwindcss": "4.3.0",
     "typescript": "6.0.3",
-    "vite": "8.0.14",
+    "vite": "8.0.13",
     "vite-plugin-singlefile": "2.3.3",
     "vite-plugin-vue-devtools": "8.1.2",
     "vitest": "4.1.7",
