@@ -26,22 +26,22 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "0.5.19",
-    "@tailwindcss/vite": "4.2.4",
+    "@tailwindcss/vite": "4.3.0",
     "@tsconfig/vite-react": "7.0.2",
-    "@vitejs/plugin-vue": "6.0.6",
-    "@vitest/coverage-v8": "4.1.5",
+    "@vitejs/plugin-vue": "6.0.7",
+    "@vitest/coverage-v8": "4.1.7",
     "@vue/test-utils": "2.4.10",
     "happy-dom": "20.9.0",
-    "oxfmt": "0.48.0",
-    "oxlint": "1.63.0",
-    "oxlint-tsgolint": "0.22.1",
-    "tailwindcss": "4.2.4",
+    "oxfmt": "0.51.0",
+    "oxlint": "1.66.0",
+    "oxlint-tsgolint": "0.23.0",
+    "tailwindcss": "4.3.0",
     "typescript": "6.0.3",
-    "vite": "8.0.11",
+    "vite": "8.0.14",
     "vite-plugin-singlefile": "2.3.3",
     "vite-plugin-vue-devtools": "8.1.2",
-    "vitest": "4.1.5",
-    "vue-tsc": "3.2.8"
+    "vitest": "4.1.7",
+    "vue-tsc": "3.3.1"
   },
-  "packageManager": "pnpm@11.0.9+sha512.34ce82e6780233cf9cad8685029a8f81d2e06196c5a9bad98879f7424940c6817c4e4524fb7d38b8553ceed48b9758b8ebaf1abd3600c232c4c8cf7366086f38"
+  "packageManager": "pnpm@11.2.2+sha512.36e6621fad506178936455e70247b8808ef4ec25797a9f437a93281a020484e2607f6a469a22e982987c3dbb8866e3071514ab10a4a1749e06edcd1ec118436f"
 }
