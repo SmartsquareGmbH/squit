@@ -2,6 +2,8 @@ package de.smartsquare.squit.db
 
 import org.jooq.CloseableDSLContext
 import org.jooq.DSLContext
+import org.jooq.conf.ParseUnsupportedSyntax
+import org.jooq.conf.Settings
 import org.jooq.impl.DSL
 
 /**
@@ -11,6 +13,7 @@ import org.jooq.impl.DSL
  */
 class ConnectionCollection : AutoCloseable {
 
+    private val settings = Settings().withParseUnsupportedSyntax(ParseUnsupportedSyntax.IGNORE)
     private val contexts = mutableMapOf<Triple<String, String, String>, CloseableDSLContext>()
 
     /**
@@ -21,7 +24,7 @@ class ConnectionCollection : AutoCloseable {
         val key = Triple(jdbc, username, password)
 
         return contexts.getOrPut(key) {
-            DSL.using(jdbc, username, password)
+            DSL.using(jdbc, username, password).apply { configuration().set(settings) }
         }
     }
 
