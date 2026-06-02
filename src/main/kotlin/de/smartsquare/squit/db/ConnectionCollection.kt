@@ -1,39 +1,35 @@
 package de.smartsquare.squit.db
 
-import org.jooq.CloseableDSLContext
-import org.jooq.DSLContext
-import org.jooq.conf.ParseUnsupportedSyntax
-import org.jooq.conf.Settings
-import org.jooq.impl.DSL
+import java.sql.Connection
+import java.sql.DriverManager
 
 /**
- * Data structure for holding [DSLContext] objects with auto close capabilities.
+ * Data structure for holding [Connection] objects with auto close capabilities.
  *
- * The contexts are held in a HashMap keyed by the jdbc address, username and password triple.
+ * The connections are held in a HashMap keyed by the jdbc address, username and password triple.
  */
 class ConnectionCollection : AutoCloseable {
 
-    private val settings = Settings().withParseUnsupportedSyntax(ParseUnsupportedSyntax.IGNORE)
-    private val contexts = mutableMapOf<Triple<String, String, String>, CloseableDSLContext>()
+    private val connections = mutableMapOf<Triple<String, String, String>, Connection>()
 
     /**
-     * Creates a new [DSLContext] or returns an existing one, based on the passed [jdbc] address, [username]
+     * Creates a new [Connection] or returns an existing one, based on the passed [jdbc] address, [username]
      * and [password].
      */
-    fun createOrGet(jdbc: String, username: String, password: String): DSLContext {
+    fun createOrGet(jdbc: String, username: String, password: String): Connection {
         val key = Triple(jdbc, username, password)
 
-        return contexts.getOrPut(key) {
-            DSL.using(jdbc, username, password).apply { configuration().set(settings) }
+        return connections.getOrPut(key) {
+            DriverManager.getConnection(jdbc, username, password)
         }
     }
 
     override fun close() {
         var thrown: Throwable? = null
 
-        for (context in contexts.values) {
+        for (connection in connections.values) {
             try {
-                context.close()
+                connection.close()
             } catch (e: Exception) {
                 if (thrown == null) thrown = e else thrown.addSuppressed(e)
             }

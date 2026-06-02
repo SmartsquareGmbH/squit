@@ -22,19 +22,19 @@ class ConnectionCollectionTest {
     @Test
     fun `creating a new db connection`() {
         ConnectionCollection().use { collection ->
-            val context = collection.createOrGet(jdbc, username, password)
+            val connection = collection.createOrGet(jdbc, username, password)
 
-            context.connection { it.isClosed.shouldBeFalse() }
+            connection.isClosed.shouldBeFalse()
         }
     }
 
     @Test
     fun `getting an existing connection`() {
         ConnectionCollection().use { collection ->
-            val context = collection.createOrGet(jdbc, username, password)
-            val context2 = collection.createOrGet(jdbc, username, password)
+            val connection = collection.createOrGet(jdbc, username, password)
+            val connection2 = collection.createOrGet(jdbc, username, password)
 
-            context shouldBe context2
+            connection shouldBe connection2
         }
     }
 
@@ -43,8 +43,7 @@ class ConnectionCollectionTest {
         var underlying: Connection? = null
 
         ConnectionCollection().use { collection ->
-            val context = collection.createOrGet(jdbc, username, password)
-            context.connection { underlying = it }
+            underlying = collection.createOrGet(jdbc, username, password)
         }
 
         underlying!!.isClosed.shouldBeTrue()
