@@ -16,7 +16,7 @@ fun Connection.executeScript(path: Path) {
     val sql = FilesUtils.readAllBytes(path).toString(Charsets.UTF_8)
 
     for (statement in splitSqlScript(sql)) {
-        prepareStatement(statement).execute()
+        prepareStatement(statement).use { it.execute() }
     }
 }
 

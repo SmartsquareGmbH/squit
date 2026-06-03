@@ -72,17 +72,20 @@ class SquitRequestTaskConfigurableTasksTest {
         val postScriptExecution = Instant.ofEpochMilli(postRunFile.readText().toLong())
 
         DriverManager.getConnection(jdbc, username, password).use { connection ->
-            val resultSet = connection.createStatement().executeQuery("SELECT * FROM TIMESTAMPS")
-            resultSet.next()
-            val preDbScriptExecution = resultSet.getTimestamp(2).toInstant()
-            resultSet.getString(3) shouldBeEqualTo "TEST_PRE.SQL"
-            resultSet.next()
-            resultSet.getString(3) shouldBeEqualTo "TEST_POST.SQL"
-            val postDbScriptExecution = resultSet.getTimestamp(2).toInstant()
-            preDbScriptExecution shouldBeBefore postDbScriptExecution
-            preScriptExecution shouldBeBefore postScriptExecution
-            preScriptExecution shouldBeBefore preDbScriptExecution
-            postScriptExecution shouldBeAfter postDbScriptExecution
+            connection.createStatement().use { statement ->
+                statement.executeQuery("SELECT * FROM TIMESTAMPS").use { resultSet ->
+                    resultSet.next()
+                    val preDbScriptExecution = resultSet.getTimestamp(2).toInstant()
+                    resultSet.getString(3) shouldBeEqualTo "TEST_PRE.SQL"
+                    resultSet.next()
+                    resultSet.getString(3) shouldBeEqualTo "TEST_POST.SQL"
+                    val postDbScriptExecution = resultSet.getTimestamp(2).toInstant()
+                    preDbScriptExecution shouldBeBefore postDbScriptExecution
+                    preScriptExecution shouldBeBefore postScriptExecution
+                    preScriptExecution shouldBeBefore preDbScriptExecution
+                    postScriptExecution shouldBeAfter postDbScriptExecution
+                }
+            }
         }
     }
 
@@ -109,17 +112,20 @@ class SquitRequestTaskConfigurableTasksTest {
         val postScriptExecution = Instant.ofEpochMilli(postRunFile.readText().toLong())
 
         DriverManager.getConnection(jdbc, username, password).use { connection ->
-            val resultSet = connection.createStatement().executeQuery("SELECT * FROM TIMESTAMPS")
-            resultSet.next()
-            val preDbScriptExecution = resultSet.getTimestamp(2).toInstant()
-            resultSet.getString(3) shouldBeEqualTo "TEST_PRE.SQL"
-            resultSet.next()
-            resultSet.getString(3) shouldBeEqualTo "TEST_POST.SQL"
-            val postDbScriptExecution = resultSet.getTimestamp(2).toInstant()
-            preDbScriptExecution shouldBeBefore postDbScriptExecution
-            preScriptExecution shouldBeBefore postScriptExecution
-            preScriptExecution shouldBeAfter preDbScriptExecution
-            postScriptExecution shouldBeBefore postDbScriptExecution
+            connection.createStatement().use { statement ->
+                statement.executeQuery("SELECT * FROM TIMESTAMPS").use { resultSet ->
+                    resultSet.next()
+                    val preDbScriptExecution = resultSet.getTimestamp(2).toInstant()
+                    resultSet.getString(3) shouldBeEqualTo "TEST_PRE.SQL"
+                    resultSet.next()
+                    resultSet.getString(3) shouldBeEqualTo "TEST_POST.SQL"
+                    val postDbScriptExecution = resultSet.getTimestamp(2).toInstant()
+                    preDbScriptExecution shouldBeBefore postDbScriptExecution
+                    preScriptExecution shouldBeBefore postScriptExecution
+                    preScriptExecution shouldBeAfter preDbScriptExecution
+                    postScriptExecution shouldBeBefore postDbScriptExecution
+                }
+            }
         }
     }
 
@@ -143,10 +149,13 @@ class SquitRequestTaskConfigurableTasksTest {
         result.task(":squitRunRequests")?.outcome shouldBe TaskOutcome.SUCCESS
 
         DriverManager.getConnection(jdbc, username, password).use { connection ->
-            val resultSet = connection.createStatement().executeQuery("SELECT * FROM TIMESTAMPS")
-            resultSet.next()
-            resultSet.getString(3) shouldBeEqualTo "TEST_PRE.SQL"
-            resultSet.next().shouldBeFalse()
+            connection.createStatement().use { statement ->
+                statement.executeQuery("SELECT * FROM TIMESTAMPS").use { resultSet ->
+                    resultSet.next()
+                    resultSet.getString(3) shouldBeEqualTo "TEST_PRE.SQL"
+                    resultSet.next().shouldBeFalse()
+                }
+            }
         }
 
         preRunFile.shouldNotExist()

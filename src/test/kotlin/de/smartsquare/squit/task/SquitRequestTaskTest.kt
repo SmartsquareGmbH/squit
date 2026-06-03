@@ -97,14 +97,16 @@ class SquitRequestTaskTest {
 
         H2Driver.load()
         DriverManager.getConnection(jdbc, username, password).use { connection ->
-            val resultSet = connection.createStatement().executeQuery("SELECT * FROM animals")
-
-            resultSet.next()
-            resultSet.getString(2) shouldBeEqualTo "brown"
-            resultSet.getString(3) shouldBeEqualTo "dog"
-            resultSet.next()
-            resultSet.getString(2) shouldBeEqualTo "black"
-            resultSet.getString(3) shouldBeEqualTo "cat"
+            connection.createStatement().use { statement ->
+                statement.executeQuery("SELECT * FROM animals").use { resultSet ->
+                    resultSet.next()
+                    resultSet.getString(2) shouldBeEqualTo "brown"
+                    resultSet.getString(3) shouldBeEqualTo "dog"
+                    resultSet.next()
+                    resultSet.getString(2) shouldBeEqualTo "black"
+                    resultSet.getString(3) shouldBeEqualTo "cat"
+                }
+            }
         }
 
         // Files created by pre- and post runners.

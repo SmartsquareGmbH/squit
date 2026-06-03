@@ -26,11 +26,12 @@ class ConnectionExtensionTest {
 
             connection.executeScript(sqlPath)
 
-            val count = connection.prepareStatement("SELECT COUNT(*) FROM ANIMALS").executeQuery()
-                .use { resultSet ->
+            val count = connection.prepareStatement("SELECT COUNT(*) FROM ANIMALS").use { statement ->
+                statement.executeQuery().use { resultSet ->
                     resultSet.next()
                     resultSet.getInt(1)
                 }
+            }
 
             count shouldBeEqualTo 3
         }
@@ -45,11 +46,12 @@ class ConnectionExtensionTest {
 
             connection.executeScript(sqlPath)
 
-            val count = connection.prepareStatement("SELECT COUNT(*) FROM DIALECT_ANIMALS").executeQuery()
-                .use { resultSet ->
+            val count = connection.prepareStatement("SELECT COUNT(*) FROM DIALECT_ANIMALS").use { statement ->
+                statement.executeQuery().use { resultSet ->
                     resultSet.next()
                     resultSet.getInt(1)
                 }
+            }
 
             count shouldBeEqualTo 2
         }
