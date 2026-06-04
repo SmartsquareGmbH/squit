@@ -4,6 +4,9 @@ import de.smartsquare.squit.mediatype.MediaTypeConfig
 import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldNotBeEmpty
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
+import java.nio.file.Files
+import java.nio.file.Path
 
 class XmlDifferTest {
 
@@ -13,9 +16,15 @@ class XmlDifferTest {
     private val strictDiffer =
         XmlDiffer(MediaTypeConfig(xmlStrict = true, xmlCanonicalize = false, jsonCanonicalize = false))
 
+    @TempDir
+    private lateinit var tempDir: Path
+
+    private fun xmlPath(name: String, content: String): Path =
+        tempDir.resolve(name).also { Files.writeString(it, content) }
+
     @Test
     fun `diffing identic XMLs`() {
-        differ.diff("<cool/>".toByteArray(), "<cool/>".toByteArray()).shouldBeEmpty()
+        differ.diff(xmlPath("expected.xml", "<cool/>"), xmlPath("actual.xml", "<cool/>")).shouldBeEmpty()
     }
 
     @Test
@@ -34,20 +43,17 @@ class XmlDifferTest {
             </something:root>
         """.trimIndent()
 
-        differ.diff(expected.toByteArray(), actual.toByteArray()).shouldBeEmpty()
+        differ.diff(xmlPath("expected.xml", expected), xmlPath("actual.xml", actual)).shouldBeEmpty()
     }
 
     @Test
     fun `diffing different XMLs`() {
-        val expected = "<good/>"
-        val actual = "<bad/>"
-
-        differ.diff(expected.toByteArray(), actual.toByteArray()).shouldNotBeEmpty()
+        differ.diff(xmlPath("expected.xml", "<good/>"), xmlPath("actual.xml", "<bad/>")).shouldNotBeEmpty()
     }
 
     @Test
     fun `strictly diffing identic XMLs`() {
-        strictDiffer.diff("<cool/>".toByteArray(), "<cool/>".toByteArray()).shouldBeEmpty()
+        strictDiffer.diff(xmlPath("expected.xml", "<cool/>"), xmlPath("actual.xml", "<cool/>")).shouldBeEmpty()
     }
 
     @Test
@@ -66,14 +72,11 @@ class XmlDifferTest {
             </something:root>
         """.trimIndent()
 
-        strictDiffer.diff(expected.toByteArray(), actual.toByteArray()).shouldNotBeEmpty()
+        strictDiffer.diff(xmlPath("expected.xml", expected), xmlPath("actual.xml", actual)).shouldNotBeEmpty()
     }
 
     @Test
     fun `strictly diffing different XMLs`() {
-        val expected = "<good/>"
-        val actual = "<bad/>"
-
-        strictDiffer.diff(expected.toByteArray(), actual.toByteArray()).shouldNotBeEmpty()
+        strictDiffer.diff(xmlPath("expected.xml", "<good/>"), xmlPath("actual.xml", "<bad/>")).shouldNotBeEmpty()
     }
 }

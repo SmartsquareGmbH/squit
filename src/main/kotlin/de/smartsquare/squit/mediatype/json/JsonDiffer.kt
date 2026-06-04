@@ -2,16 +2,18 @@ package de.smartsquare.squit.mediatype.json
 
 import de.smartsquare.squit.mediatype.Differ
 import net.javacrumbs.jsonunit.JsonAssert
+import java.nio.file.Files
+import java.nio.file.Path
 
 /**
  * [Differ] for JSON.
  */
 class JsonDiffer : Differ {
 
-    override fun diff(expectedResponse: ByteArray, actualResponse: ByteArray): String = try {
+    override fun diff(expectedResponsePath: Path, actualResponsePath: Path): String = try {
         JsonAssert.assertJsonEquals(
-            expectedResponse.toString(Charsets.UTF_8),
-            actualResponse.toString(Charsets.UTF_8),
+            Files.readString(expectedResponsePath),
+            Files.readString(actualResponsePath),
         )
 
         ""

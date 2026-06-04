@@ -245,11 +245,8 @@ abstract class SquitTestTask : DefaultTask() {
                 .resolve(MediaTypeFactory.expectedResponse(config.mediaType)),
         )
 
-        val expectedResponse = FilesUtils.readAllBytes(expectedResponseFilePath)
-        val actualResponse = FilesUtils.readAllBytes(actualResponseFilePath)
-
         return MediaTypeFactory.differ(config.mediaType, mediaTypeConfig.get())
-            .diff(expectedResponse, actualResponse)
+            .diff(expectedResponseFilePath, actualResponseFilePath)
     }
 
     private fun writeXmlReport(result: List<SquitResult>) {
