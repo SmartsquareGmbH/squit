@@ -64,9 +64,13 @@ class HtmlReportWriter(private val logger: Logger) {
 
         Files.createDirectories(reportDirectoryPath)
         Files.newBufferedWriter(reportDirectoryPath.resolve("index.html")).use { writer ->
-            writer.write(templateContent.substring(0, placeholderIndex))
+            writer.write(templateContent, 0, placeholderIndex)
             reportGson.toJson(data, SquitHtmlReportData::class.java, JsonWriter(writer))
-            writer.write(templateContent.substring(placeholderIndex + DATA_PLACEHOLDER.length))
+            writer.write(
+                templateContent,
+                placeholderIndex + DATA_PLACEHOLDER.length,
+                templateContent.length - placeholderIndex - DATA_PLACEHOLDER.length,
+            )
         }
     }
 
