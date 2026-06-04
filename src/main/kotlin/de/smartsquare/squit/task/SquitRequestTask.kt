@@ -30,6 +30,7 @@ import de.smartsquare.squit.util.Constants.RAW_DIRECTORY
 import de.smartsquare.squit.util.Constants.RESPONSES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SOURCES_DIRECTORY
 import de.smartsquare.squit.util.Constants.SQUIT_DIRECTORY
+import de.smartsquare.squit.util.GroovyScriptRunner
 import de.smartsquare.squit.util.asPath
 import de.smartsquare.squit.util.dir
 import de.smartsquare.squit.util.lifecycleOnSameLine
@@ -37,7 +38,6 @@ import de.smartsquare.squit.util.newLineIfNeeded
 import de.smartsquare.squit.util.permitsRequestBody
 import de.smartsquare.squit.util.requiresRequestBody
 import groovy.lang.Binding
-import groovy.lang.GroovyShell
 import okhttp3.Call
 import okhttp3.Headers.Companion.toHeaders
 import okhttp3.OkHttpClient
@@ -270,10 +270,10 @@ abstract class SquitRequestTask : DefaultTask() {
     private fun executePreRunnerScripts(config: Config) {
         config.preRunnerScripts.forEach { scriptPath ->
             try {
-                GroovyShell(javaClass.classLoader)
-                    .parse(scriptPath.toFile())
-                    .apply { binding = Binding(mapOf("config" to config)) }
-                    .run()
+                GroovyScriptRunner.run(
+                    scriptPath,
+                    Binding(mapOf("config" to config)),
+                )
             } catch (error: Exception) {
                 throw GradleException("Error executing pre-runner script $scriptPath: ${error.message}", error)
             }
@@ -308,10 +308,10 @@ abstract class SquitRequestTask : DefaultTask() {
     private fun executePostRunnerScripts(config: Config) {
         config.postRunnerScripts.forEach { scriptPath ->
             try {
-                GroovyShell(javaClass.classLoader)
-                    .parse(scriptPath.toFile())
-                    .apply { binding = Binding(mapOf("config" to config)) }
-                    .run()
+                GroovyScriptRunner.run(
+                    scriptPath,
+                    Binding(mapOf("config" to config)),
+                )
             } catch (error: Exception) {
                 throw GradleException("Error executing post-runner script $scriptPath: ${error.message}", error)
             }

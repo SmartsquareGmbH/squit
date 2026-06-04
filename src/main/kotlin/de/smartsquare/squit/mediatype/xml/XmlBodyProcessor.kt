@@ -9,9 +9,9 @@ import de.smartsquare.squit.interfaces.SquitXmlPostProcessor
 import de.smartsquare.squit.interfaces.SquitXmlPreProcessor
 import de.smartsquare.squit.io.SAXReaderSupport
 import de.smartsquare.squit.mediatype.BodyProcessor
+import de.smartsquare.squit.util.GroovyScriptRunner
 import de.smartsquare.squit.util.write
 import groovy.lang.Binding
-import groovy.lang.GroovyShell
 import org.dom4j.Document
 import org.gradle.api.logging.Logging
 import java.nio.file.Path
@@ -70,16 +70,17 @@ class XmlBodyProcessor : BodyProcessor {
             processor.process(request, response, config)
         }
 
-        config.preProcessorScripts.forEach {
-            GroovyShell(javaClass.classLoader).parse(it.toFile()).apply {
-                binding = Binding(
+        config.preProcessorScripts.forEach { scriptPath ->
+            GroovyScriptRunner.run(
+                scriptPath,
+                Binding(
                     mapOf(
                         "request" to request,
                         "expectedResponse" to response,
                         "config" to config,
                     ),
-                )
-            }.run()
+                ),
+            )
         }
     }
 
@@ -99,15 +100,16 @@ class XmlBodyProcessor : BodyProcessor {
             processor.process(actualResponse, expectedResponse, config)
         }
 
-        config.postProcessorScripts.forEach {
-            GroovyShell(javaClass.classLoader).parse(it.toFile()).apply {
-                binding = Binding(
+        config.postProcessorScripts.forEach { scriptPath ->
+            GroovyScriptRunner.run(
+                scriptPath,
+                Binding(
                     mapOf(
                         "actualResponse" to actualResponse,
                         "expectedResponse" to expectedResponse,
                     ),
-                )
-            }.run()
+                ),
+            )
         }
     }
 }
