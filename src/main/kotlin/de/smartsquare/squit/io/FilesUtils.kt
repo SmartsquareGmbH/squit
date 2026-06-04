@@ -116,10 +116,10 @@ object FilesUtils {
     }
 
     /**
-     * Reads all lines at the given [path] with improved error handling.
+     * Reads string at the given [path] with improved error handling.
      */
-    fun readAllLines(path: Path): List<String> = try {
-        Files.readAllLines(path)
+    fun readString(path: Path): String = try {
+        Files.readString(path)
     } catch (error: MalformedInputException) {
         throw IOException("Error reading file $path. Squit expects UTF-8 encoded files only.", error)
     }

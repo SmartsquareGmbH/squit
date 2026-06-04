@@ -1,10 +1,9 @@
 package de.smartsquare.squit.report
 
+import com.google.gson.stream.JsonWriter
 import de.smartsquare.squit.entity.SquitResult
 import de.smartsquare.squit.mediatype.MediaTypeConfig
-import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.util.gson
-import okhttp3.MediaType
 import org.gradle.api.logging.Logger
 import java.nio.file.Files
 import java.nio.file.Path
@@ -36,7 +35,6 @@ class HtmlReportWriter(private val logger: Logger) {
     fun writeReport(results: List<SquitResult>, reportDirectoryPath: Path, mediaTypeConfig: MediaTypeConfig) {
         val firstTest = results.minByOrNull { it.metaInfo.date }
         val duration = results.fold(0L) { acc, next -> acc + next.metaInfo.duration }
-
         val averageTime = results.map { it.metaInfo.duration }.average().let { if (it.isNaN()) 0L else it.toLong() }
         val slowestTest = results.maxByOrNull { it.metaInfo.duration }
 
@@ -47,111 +45,51 @@ class HtmlReportWriter(private val logger: Logger) {
             totalDuration = duration,
             averageDuration = averageTime,
             slowestTest = slowestTest?.let { SquitSlowestTest(it.id, it.simpleName, it.metaInfo.duration) },
-            results = constructResults(results, mediaTypeConfig),
+            results = constructResults(results),
         )
 
-        val json = gson.toJson(data)
+        val reportGson = gson.newBuilder()
+            .registerTypeAdapter(
+                SquitReportResultBranch::class.java,
+                SquitReportResultBranchAdapter(mediaTypeConfig, logger),
+            )
+            .create()
 
-        val templateResource = requireNotNull(javaClass.getResourceAsStream("/squit-report-template.html")) {
+        val templateContent = requireNotNull(javaClass.getResource("/squit-report-template.html")) {
             "Could not find squit-report-template.html on classpath"
-        }
+        }.readText()
 
-        val template = templateResource.readBytes().toString(Charsets.UTF_8)
-        val html = template.replace(DATA_PLACEHOLDER, json)
+        val placeholderIndex = templateContent.indexOf(DATA_PLACEHOLDER)
+        require(placeholderIndex != -1) { "Could not find $DATA_PLACEHOLDER in squit-report-template.html" }
 
         Files.createDirectories(reportDirectoryPath)
-        Files.write(reportDirectoryPath.resolve("index.html"), html.toByteArray())
+        Files.newBufferedWriter(reportDirectoryPath.resolve("index.html")).use { writer ->
+            writer.write(templateContent.substring(0, placeholderIndex))
+            reportGson.toJson(data, SquitHtmlReportData::class.java, JsonWriter(writer))
+            writer.write(templateContent.substring(placeholderIndex + DATA_PLACEHOLDER.length))
+        }
     }
 
-    private fun constructResults(results: List<SquitResult>, mediaTypeConfig: MediaTypeConfig): Map<String, Any> {
+    private fun constructResults(results: List<SquitResult>): SquitReportResultBranch {
         val root = SquitReportResultBranch()
 
         for (result in results) {
             var current = root
 
             for (segment in result.path) {
-                val next = current.children.getOrPut(segment.toString()) { SquitReportResultBranch() }
+                val key = segment.toString()
+                val existing = current.children[key]
 
-                current = next as? SquitReportResultBranch
-                    ?: error("Path segment '$segment' is already occupied by a result.")
+                current = when (existing) {
+                    null -> SquitReportResultBranch().also { current.children[key] = it }
+                    is SquitReportResultBranch -> existing
+                    is SquitReportResultLeaf -> error("Path segment '$key' is already occupied by a result.")
+                }
             }
 
-            current.children[result.simpleName] = buildReportResult(result, mediaTypeConfig)
+            current.children[result.simpleName] = SquitReportResultLeaf(result)
         }
 
-        return root.toMap()
-    }
-
-    private fun buildReportResult(result: SquitResult, mediaTypeConfig: MediaTypeConfig): SquitReportResult {
-        val canonicalizedExpectedLines = canonicalizeExpectedLines(result, mediaTypeConfig)
-        val canonicalizedActualLines = canonicalizeActualLines(result, mediaTypeConfig)
-
-        val hasInfoDiff = !result.expectedResponseInfo.isDefault && !result.isError
-        val infoExpected = if (hasInfoDiff) result.expectedResponseInfo.toJson() else null
-        val infoActual = if (hasInfoDiff) result.actualLines.joinToString("\n") else null
-
-        return SquitReportResult(
-            result.id,
-            result.alternativeName,
-            result.description,
-            result.isSuccess,
-            result.isIgnored,
-            result.isError,
-            result.metaInfo.duration,
-            canonicalizedExpectedLines.joinToString("\n"),
-            canonicalizedActualLines.joinToString("\n"),
-            infoExpected,
-            infoActual,
-            highlightLanguage(result.mediaType),
-        )
-    }
-
-    private fun highlightLanguage(mediaType: MediaType): String? = when (mediaType) {
-        MediaTypeFactory.xmlMediaType, MediaTypeFactory.applicationXmlMediaType, MediaTypeFactory.soapMediaType -> "xml"
-        MediaTypeFactory.jsonMediaType -> "json"
-        else -> null
-    }
-
-    private fun canonicalizeExpectedLines(result: SquitResult, mediaTypeConfig: MediaTypeConfig): List<String> =
-        if (!result.isError) {
-            canonicalize(
-                result.expectedLines,
-                result.mediaType,
-                mediaTypeConfig,
-                "Could not canonicalize expected response",
-            )
-        } else {
-            result.expectedLines
-        }
-
-    private fun canonicalizeActualLines(result: SquitResult, mediaTypeConfig: MediaTypeConfig): List<String> =
-        if (!result.isError) {
-            canonicalize(
-                result.actualLines,
-                result.mediaType,
-                mediaTypeConfig,
-                "Could not canonicalize actual response",
-            )
-        } else {
-            result.actualLines
-        }
-
-    private fun canonicalize(
-        lines: List<String>,
-        mediaType: MediaType,
-        mediaTypeConfig: MediaTypeConfig,
-        errorMessage: String,
-    ): List<String> = when {
-        lines.isEmpty() -> lines
-
-        else -> try {
-            MediaTypeFactory.canonicalizer(mediaType)
-                .canonicalize(lines.joinToString(""), mediaTypeConfig)
-                .lines()
-        } catch (error: Exception) {
-            logger.warn(errorMessage, error)
-
-            lines
-        }
+        return root
     }
 }

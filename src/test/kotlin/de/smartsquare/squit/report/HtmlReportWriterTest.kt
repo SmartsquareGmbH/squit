@@ -1,16 +1,12 @@
 package de.smartsquare.squit.report
 
-import com.google.gson.Gson
 import de.smartsquare.squit.entity.SquitResponseInfo
 import de.smartsquare.squit.entity.SquitResult
 import de.smartsquare.squit.mediatype.MediaTypeConfig
 import de.smartsquare.squit.mediatype.MediaTypeFactory
 import de.smartsquare.squit.mediatype.MediaTypeFactory.xmlMediaType
 import io.mockk.mockk
-import org.amshove.kluent.shouldBeTrue
-import org.amshove.kluent.shouldNotBeEmpty
-import org.amshove.kluent.shouldNotBeNull
-import org.junit.jupiter.api.BeforeEach
+import net.javacrumbs.jsonunit.JsonAssert
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Files
@@ -20,56 +16,86 @@ import java.nio.file.Paths
 class HtmlReportWriterTest {
 
     private val writer = HtmlReportWriter(mockk(relaxUnitFun = true))
-    private val mediaTypeConfig = MediaTypeConfig()
+    private val mediaTypeConfig = MediaTypeConfig(xmlCanonicalize = false)
 
-    @TempDir
-    private lateinit var tempDir: Path
+    // language=json
+    private val meta = """{ "date": "2024-01-01T00:00:00Z", "duration": 100 }"""
 
-    private lateinit var squitResult: SquitResult
+    // language=xml
+    private val expected = "<root><expected/></root>"
 
-    @BeforeEach
-    fun setUp() {
-        val testDir = Paths.get("test")
+    // language=xml
+    private val actual = "<root><actual/></root>"
 
-        val rawDir = Files.createDirectories(tempDir.resolve("responses/raw").resolve(testDir))
-        val processedDir = Files.createDirectories(tempDir.resolve("responses/processed").resolve(testDir))
-        val sourcesDir = Files.createDirectories(tempDir.resolve("sources").resolve(testDir))
+    // language=json
+    private val actualResponseInfo = """{ "responseCode": 299 }"""
 
-        Files.writeString(rawDir.resolve("meta.json"), """{"date":"2024-01-01T00:00:00Z","duration":100}""")
-        Files.writeString(sourcesDir.resolve(MediaTypeFactory.expectedResponse(xmlMediaType)), "<test></test>")
-        Files.writeString(processedDir.resolve(MediaTypeFactory.actualResponse(xmlMediaType)), "<test></test>")
+    @Test
+    fun `report contains correct json`(@TempDir tempDir: Path) {
+        val testPath = Paths.get("context/suite/test")
 
-        squitResult = SquitResult(
+        val rawDir = Files.createDirectories(tempDir.resolve("responses/raw").resolve(testPath))
+        val processedDir = Files.createDirectories(tempDir.resolve("responses/processed").resolve(testPath))
+        val sourcesDir = Files.createDirectories(tempDir.resolve("sources").resolve(testPath))
+
+        Files.writeString(rawDir.resolve("meta.json"), meta)
+        Files.writeString(sourcesDir.resolve("description.md"), "description")
+        Files.writeString(sourcesDir.resolve(MediaTypeFactory.expectedResponse(xmlMediaType)), expected)
+        Files.writeString(processedDir.resolve(MediaTypeFactory.actualResponse(xmlMediaType)), actual)
+        Files.writeString(rawDir.resolve("actual_response_info.json"), actualResponseInfo)
+
+        val squitResult = SquitResult(
             id = 1L,
-            difference = "",
-            expectedResponseInfo = SquitResponseInfo(),
+            difference = "difference",
+            expectedResponseInfo = SquitResponseInfo(responseCode = 200),
             isIgnored = false,
             mediaType = xmlMediaType,
-            alternativeName = "",
-            contextPath = Paths.get(""),
-            suitePath = Paths.get(""),
-            testDirectoryPath = testDir,
+            alternativeName = "alternative",
+            contextPath = Paths.get("context"),
+            suitePath = Paths.get("suite"),
+            testDirectoryPath = Paths.get("test"),
             squitBuildDirectoryPath = tempDir,
+        )
+
+        writer.writeReport(listOf(squitResult), tempDir.resolve("report"), mediaTypeConfig)
+
+        JsonAssert.assertJsonEquals(
+            // language=json
+            $$"""
+            {
+                "version": "${json-unit.any-string}",
+                "generatedAt": "${json-unit.any-string}",
+                "startedAt": "2024-01-01T00:00:00Z",
+                "totalDuration": 100,
+                "averageDuration": 100,
+                "slowestTest": { "id": 1, "name": "test", "duration": 100 },
+                "results": {
+                    "context": {
+                        "suite": {
+                            "test": {
+                                "id": 1,
+                                "alternativeName": "alternative",
+                                "description": "description",
+                                "success": false,
+                                "ignored": false,
+                                "error": false,
+                                "duration": 100,
+                                "expected": "<root><expected/></root>",
+                                "actual": "<root><actual/></root>",
+                                "infoExpected": "{\n  \"responseCode\": 200\n}",
+                                "infoActual": "{ \"responseCode\": 299 }",
+                                "language": "xml"
+                            }
+                        }
+                    }
+                }
+            }
+            """.trimIndent(),
+            readReportJson(tempDir.resolve("report/index.html")),
         )
     }
 
-    @Test
-    fun `report index html is written and contains injected json`() {
-        writer.writeReport(listOf(squitResult), tempDir.resolve("report"), mediaTypeConfig)
-
-        Files.exists(tempDir.resolve("report/index.html")).shouldBeTrue()
-
-        val reportData = readReport(tempDir.resolve("report/index.html"))
-
-        reportData.slowestTest.shouldNotBeNull()
-        reportData.results.shouldNotBeEmpty()
-    }
-
-    private fun readReport(reportPath: Path): SquitHtmlReportData {
-        val json = Files.readString(reportPath)
-            .substringAfter("<script type=\"application/json\" id=\"squit-data\">")
-            .substringBefore("</script>")
-
-        return Gson().fromJson(json, SquitHtmlReportData::class.java)
-    }
+    private fun readReportJson(reportPath: Path): String = Files.readString(reportPath)
+        .substringAfter("<script type=\"application/json\" id=\"squit-data\">")
+        .substringBefore("</script>")
 }

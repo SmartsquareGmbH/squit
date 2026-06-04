@@ -2,6 +2,7 @@ package de.smartsquare.squit.entity
 
 import de.smartsquare.squit.io.FilesUtils
 import de.smartsquare.squit.mediatype.MediaTypeFactory
+import de.smartsquare.squit.util.Constants.ACTUAL_RESPONSE_INFO
 import de.smartsquare.squit.util.Constants.DESCRIPTION
 import de.smartsquare.squit.util.Constants.ERROR
 import de.smartsquare.squit.util.Constants.META
@@ -26,7 +27,7 @@ import java.nio.file.Path
  * @param suitePath The path of the suite the test has been run in. This means the parent directory of the test.
  * @param testDirectoryPath The path of the directory, the test files are contained in.
  * @param squitBuildDirectoryPath The directory of Squit's build files. Used to resolve the [metaInfo],
- * [expectedLines] and [actualLines] properties.
+ * [expectedContent] and [actualContent] methods.
  */
 data class SquitResult(
     val id: Long,
@@ -61,13 +62,6 @@ data class SquitResult(
     val simpleName = testDirectoryPath.fileName.toString()
 
     /**
-     * Convenience property with the combined name of this test.
-     *
-     * This is the [simpleName] with the [alternativeName] if present.
-     */
-    val combinedName = simpleName + if (alternativeName.isNotBlank()) " ($alternativeName)" else ""
-
-    /**
      * An optional description of the test.
      */
     val description by lazy {
@@ -98,25 +92,30 @@ data class SquitResult(
     }
 
     /**
-     * [List] of lines of the expected response.
+     * Returns [List] of lines of the expected response.
      */
-    val expectedLines: List<String> by lazy {
-        if (isError) {
-            FilesUtils.readAllLines(errorPath)
-        } else {
-            FilesUtils.readAllLines(expectedResponsePath)
-        }
+    fun expectedContent() = if (isError) {
+        FilesUtils.readString(errorPath)
+    } else {
+        FilesUtils.readString(expectedResponsePath)
     }
 
     /**
-     * [List] of lines of the actual response.
+     * Returns [List] of lines of the actual response.
      */
-    val actualLines: List<String> by lazy {
-        if (isError) {
-            FilesUtils.readAllLines(errorPath)
-        } else {
-            FilesUtils.readAllLines(actualResponsePath)
-        }
+    fun actualContent() = if (isError) {
+        FilesUtils.readString(errorPath)
+    } else {
+        FilesUtils.readString(actualResponsePath)
+    }
+
+    /**
+     * Returns [List] of lines of the actual info response.
+     */
+    fun actualInfoContent() = if (Files.exists(actualResponseInfoPath)) {
+        FilesUtils.readString(actualResponseInfoPath)
+    } else {
+        ""
     }
 
     private val metaInfoPath = squitBuildDirectoryPath
@@ -143,4 +142,10 @@ data class SquitResult(
         .resolve(PROCESSED_DIRECTORY)
         .resolve(fullPath)
         .resolve(ERROR)
+
+    private val actualResponseInfoPath = squitBuildDirectoryPath
+        .resolve(RESPONSES_DIRECTORY)
+        .resolve(RAW_DIRECTORY)
+        .resolve(fullPath)
+        .resolve(ACTUAL_RESPONSE_INFO)
 }
