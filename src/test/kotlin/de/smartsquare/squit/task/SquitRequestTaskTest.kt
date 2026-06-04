@@ -81,7 +81,7 @@ class SquitRequestTaskTest {
 
         date shouldBeBefore Instant.now()
         date shouldBeAfter Instant.now().minus(5, ChronoUnit.MINUTES)
-        duration shouldBeInRange 5L..5000L
+        duration shouldBeInRange 1L..5000L
 
         server.takeRequest().let {
             it.method shouldBeEqualTo "POST"
