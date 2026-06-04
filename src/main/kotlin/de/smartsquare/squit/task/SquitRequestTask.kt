@@ -215,10 +215,11 @@ abstract class SquitRequestTask : DefaultTask() {
 
         try {
             constructApiCall(requestPath, config).execute().use { apiResponse ->
-                val apiBody = apiResponse.body.string()
                 val mediaType = apiResponse.body.contentType()
 
-                Files.write(resultResponseFilePath, apiBody.toByteArray())
+                apiResponse.body.byteStream().use { input ->
+                    Files.newOutputStream(resultResponseFilePath).use { output -> input.copyTo(output) }
+                }
 
                 val responseInfo = SquitResponseInfo(apiResponse.code)
                 val resultResponseInfoFilePath = resultResponsePath.resolve(ACTUAL_RESPONSE_INFO)
