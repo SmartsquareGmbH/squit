@@ -7,6 +7,7 @@ import org.dom4j.Document
 import org.dom4j.io.OutputFormat
 import org.dom4j.io.SAXReader
 import org.dom4j.io.XMLWriter
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.StringWriter
 import org.apache.xml.security.Init as ApacheInit
@@ -34,17 +35,16 @@ class XmlCanonicalizer : Canonicalizer {
 
     override fun canonicalize(input: String, mediaTypeConfig: MediaTypeConfig): String =
         if (mediaTypeConfig.xmlCanonicalize) {
-            val outputStream = ByteArrayOutputStream()
-
             val content = if (mediaTypeConfig.xmlResolveInvalidNamespaces) {
                 resolveInvalidNamespaces(input)
             } else {
                 input
             }
 
-            canonicalizer.canonicalize(content.toByteArray(), outputStream, false)
+            val canonicalized = UncopiedByteArrayOutputStream()
+                .also { canonicalizer.canonicalize(content.toByteArray(), it, false) }
 
-            SAXReader().read(outputStream.toByteArray().inputStream()).asString()
+            SAXReader().read(canonicalized.asInputStream()).asString()
         } else {
             input
         }
@@ -59,6 +59,10 @@ class XmlCanonicalizer : Canonicalizer {
         } else {
             "$start$potentialUrlString$end"
         }
+    }
+
+    private class UncopiedByteArrayOutputStream : ByteArrayOutputStream() {
+        fun asInputStream() = ByteArrayInputStream(buf, 0, count)
     }
 
     private fun Document.asString(outputFormat: OutputFormat = SquitOutputFormat): String = StringWriter()
