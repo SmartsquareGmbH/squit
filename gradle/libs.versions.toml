@@ -2,7 +2,7 @@
 kotlin = "2.4.0"
 node = "7.1.0"
 dokka = "2.2.0"
-detekt = "2.0.0-alpha.4"
+detekt = "2.0.0-alpha.5"
 kotlinter = "5.5.0"
 jacoco = "0.8.14"
 jacoco-testkit = "1.0.12"
