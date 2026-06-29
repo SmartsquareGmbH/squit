@@ -22,7 +22,7 @@ okhttp = "5.4.0"
 diff-utils = "3.0"
 alphanumeric-comparator = "2.0.0"
 
-junit = "6.1.0"
+junit = "6.1.1"
 kluent = "1.73"
 h2 = "2.4.240"
 mockk = "1.14.11"
