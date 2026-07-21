@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.4.0"
+kotlin = "2.4.10"
 node = "7.1.0"
 dokka = "2.2.0"
 detekt = "2.0.0-alpha.5"
@@ -22,7 +22,7 @@ okhttp = "5.4.0"
 diff-utils = "3.0"
 alphanumeric-comparator = "2.0.0"
 
-junit = "6.1.1"
+junit = "6.1.2"
 kluent = "1.73"
 h2 = "2.4.240"
 mockk = "1.14.11"
