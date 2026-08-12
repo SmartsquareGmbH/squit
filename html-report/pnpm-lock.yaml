@@ -52,7 +52,7 @@ importers:
         specifier: 2.4.11
         version: 2.4.11(@vue/compiler-dom@3.5.40)(@vue/server-renderer@3.5.41)(vue@3.5.41(typescript-native-bridge@6.0.3-bridge.12.tsgo.7.0.2))
       '@vue/tsconfig':
-        specifier: ^0.9.1
+        specifier: 0.9.1
         version: 0.9.1(typescript-native-bridge@6.0.3-bridge.12.tsgo.7.0.2)(vue@3.5.41(typescript-native-bridge@6.0.3-bridge.12.tsgo.7.0.2))
       happy-dom:
         specifier: 20.11.2
