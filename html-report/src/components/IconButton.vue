@@ -1,5 +1,5 @@
 <template>
-  <button :title="title" class="cursor-pointer text-gray-400 transition-colors" :class="sizeClass">
+  <button :title="title" class="cursor-pointer text-gray-400" :class="sizeClass">
     <slot />
     <span class="sr-only">{{ title }}</span>
   </button>

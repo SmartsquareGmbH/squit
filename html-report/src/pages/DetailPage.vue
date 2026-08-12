@@ -1,10 +1,7 @@
 <template>
   <div v-if="result" class="mx-auto max-w-5xl px-6 py-8">
     <div class="mb-6 flex flex-wrap items-center gap-3">
-      <router-link
-        to="/"
-        class="cursor-pointer rounded p-0.5 transition-colors hover:bg-gray-200 dark:hover:bg-gray-700"
-      >
+      <router-link to="/" class="cursor-pointer rounded p-0.5 hover:bg-gray-200 dark:hover:bg-gray-700">
         <ArrowLeft class="h-5 w-5" aria-hidden="true" />
       </router-link>
 

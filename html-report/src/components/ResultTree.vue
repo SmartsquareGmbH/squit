@@ -3,7 +3,7 @@
     v-if="isSquitResult(node)"
     v-show="isVisible"
     :to="`/detail/${node.id}`"
-    class="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-800 transition-colors hover:border-gray-300 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-700 dark:hover:bg-gray-800"
+    class="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-800 hover:border-gray-300 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-700 dark:hover:bg-gray-800"
   >
     <span class="min-w-0 flex-1 truncate">{{ node.alternativeName || name }}</span>
     <span class="shrink-0 text-xs text-gray-400 dark:text-gray-500">{{ formatDuration(node.duration) }}</span>

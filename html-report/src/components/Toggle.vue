@@ -3,8 +3,8 @@
     role="switch"
     :aria-checked="model"
     :aria-label="ariaLabel"
-    class="relative inline-flex h-5 w-9 cursor-pointer items-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-    :class="model ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600'"
+    class="relative inline-flex h-5 w-9 cursor-pointer items-center rounded-full focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:outline-none"
+    :class="model ? 'bg-indigo-400 dark:bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600'"
     @click="model = !model"
   >
     <span

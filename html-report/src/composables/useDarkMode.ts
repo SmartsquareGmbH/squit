@@ -4,6 +4,7 @@ const isDark = useDark({
   storageKey: "squit-color-scheme",
   valueDark: "dark",
   valueLight: "light",
+  disableTransition: false,
 })
 
 export function useDarkMode() {

@@ -4,7 +4,7 @@
       type="button"
       :aria-expanded="isOpen"
       @click="toggle"
-      class="flex w-full cursor-pointer items-center gap-2 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-700 transition-colors select-none hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
+      class="flex w-full cursor-pointer items-center gap-2 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-700 select-none hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
     >
       <ChevronRight
         class="h-3.5 w-3.5 shrink-0 text-gray-400 transition-transform duration-200"
