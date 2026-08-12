@@ -31,17 +31,17 @@
     "@vitest/coverage-v8": "4.1.10",
     "@vue/test-utils": "2.4.11",
     "@vue/tsconfig": "^0.9.1",
-    "happy-dom": "20.11.1",
-    "oxfmt": "0.60.0",
-    "oxlint": "1.75.0",
+    "happy-dom": "20.11.2",
+    "oxfmt": "0.62.0",
+    "oxlint": "1.77.0",
     "oxlint-tsgolint": "7.0.2001",
     "tailwindcss": "4.3.3",
     "typescript": "npm:typescript-native-bridge@v6.0.3-bridge.12.tsgo.7.0.2",
-    "vite": "8.1.5",
+    "vite": "8.2.1",
     "vite-plugin-singlefile": "2.3.3",
-    "vite-plugin-vue-devtools": "8.1.5",
+    "vite-plugin-vue-devtools": "8.2.1",
     "vitest": "4.1.10",
-    "vue-tsc": "3.3.8"
+    "vue-tsc": "3.3.9"
   },
-  "packageManager": "pnpm@11.17.0+sha512.cca3cea332ad254bb84145f966d19f4879615210346fc92c79a047f23a0d7b3cca3c3792f0076ba1f1831d277efbcf0a9119b31a9a60eca7fb3d6231f331ef72"
+  "packageManager": "pnpm@11.20.0+sha512.9a6f330a95b66446ea088faf1521405a8a01f07fde7124cc9958dfed52d4bb436737e65b08f85f37b46fcba375092558ac51262b816844b22f63406ed166bfee"
 }
