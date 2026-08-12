@@ -43,8 +43,8 @@ importers:
         specifier: 4.3.3
         version: 4.3.3(vite@8.1.5(@types/node@25.6.2)(jiti@2.7.0)(yaml@2.9.0))
       '@tsconfig/vite-react':
-        specifier: 7.0.2
-        version: 7.0.2
+        specifier: 8.1.1
+        version: 8.1.1
       '@vitejs/plugin-vue':
         specifier: 6.0.8
         version: 6.0.8(vite@8.1.5(@types/node@25.6.2)(jiti@2.7.0)(yaml@2.9.0))(vue@3.5.40(typescript@6.0.3))
@@ -794,8 +794,8 @@ packages:
     peerDependencies:
       vite: ^5.2.0 || ^6 || ^7 || ^8
 
-  '@tsconfig/vite-react@7.0.2':
-    resolution: {integrity: sha512-lEj4y5SPRcH+bjw0tyuxrEnPqQUwfQzBKgd1YamD9xyet9zLwh2gwy5F8w/Nxg5DjdgYVjjKo5aLJUf0BTDz4w==}
+  '@tsconfig/vite-react@8.1.1':
+    resolution: {integrity: sha512-TdLtRE9INt7aupEC2yhem6y4RN8T+B4oa2OUYsay0ioxSDl8Q4yaq0k2yc86Gb2BEHjKp4RUxgIzqOTk4IQ8dQ==}
 
   '@tybys/wasm-util@0.10.3':
     resolution: {integrity: sha512-F3fo1MYrRJYL3zER0OUOmkutjr1Vp23m7OsSgp7nq4SP6OqX6C/56XFIPAl5bt3zaBRjmW7SGz3u/6LwFpYcOg==}
@@ -2519,7 +2519,7 @@ snapshots:
       tailwindcss: 4.3.3
       vite: 8.1.5(@types/node@25.6.2)(jiti@2.7.0)(yaml@2.9.0)
 
-  '@tsconfig/vite-react@7.0.2': {}
+  '@tsconfig/vite-react@8.1.1': {}
 
   '@tybys/wasm-util@0.10.3':
     dependencies:
