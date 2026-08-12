@@ -32,6 +32,7 @@
       :name="childName"
       :node="child"
       :search-query="searchQuery"
+      :failed-only="failedOnly"
       ref="children"
     />
   </expansion-panel>
@@ -44,7 +45,7 @@ import { RouterLink } from "vue-router"
 import {
   getResultNodeStats,
   isSquitResult,
-  nodeMatchesSearch,
+  nodeMatchesFilter,
   type SquitResult,
   type SquitResultNode,
 } from "../data.ts"
@@ -58,6 +59,7 @@ const props = defineProps<{
   name: string
   node: SquitResultNode | SquitResult
   searchQuery?: string
+  failedOnly?: boolean
 }>()
 
 const stats = computed(() => getResultNodeStats(props.node))
@@ -66,7 +68,7 @@ const isOpen = ref(stats.value.failed > 0)
 const childrenRefs = useTemplateRef("children")
 
 const isVisible = computed(() => {
-  return nodeMatchesSearch(props.node, props.name, props.searchQuery ?? "")
+  return nodeMatchesFilter(props.node, props.name, props.searchQuery ?? "", props.failedOnly ?? false)
 })
 
 watchEffect(() => {

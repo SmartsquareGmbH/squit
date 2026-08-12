@@ -3,7 +3,7 @@ import {
   findSquitResult,
   getResultNodeStats,
   isSquitResult,
-  nodeMatchesSearch,
+  nodeMatchesFilter,
   type SquitResult,
   type SquitResultNode,
 } from "../src/data.ts"
@@ -116,23 +116,23 @@ describe("findSquitResult", () => {
   })
 })
 
-describe("nodeMatchesSearch", () => {
-  test("returns true when query is empty", () => {
-    expect(nodeMatchesSearch(makeLeaf(), "name", "")).toEqual(true)
+describe("nodeMatchesFilter", () => {
+  test("returns true when query is empty and failed-only is off", () => {
+    expect(nodeMatchesFilter(makeLeaf(), "name", "")).toEqual(true)
   })
 
   test("matches leaf by alternativeName (case-insensitive)", () => {
     const leaf = makeLeaf({ alternativeName: "Get User By ID" })
 
-    expect(nodeMatchesSearch(leaf, "get-user", "get user")).toEqual(true)
-    expect(nodeMatchesSearch(leaf, "get-user", "GET USER")).toEqual(true)
+    expect(nodeMatchesFilter(leaf, "get-user", "get user")).toEqual(true)
+    expect(nodeMatchesFilter(leaf, "get-user", "GET USER")).toEqual(true)
   })
 
   test("matches leaf by node name when alternativeName is empty", () => {
     const leaf = makeLeaf({ alternativeName: "" })
 
-    expect(nodeMatchesSearch(leaf, "create-order", "create")).toEqual(true)
-    expect(nodeMatchesSearch(leaf, "create-order", "delete")).toEqual(false)
+    expect(nodeMatchesFilter(leaf, "create-order", "create")).toEqual(true)
+    expect(nodeMatchesFilter(leaf, "create-order", "delete")).toEqual(false)
   })
 
   test("returns true for a branch when any child matches", () => {
@@ -141,7 +141,7 @@ describe("nodeMatchesSearch", () => {
       other: makeLeaf({ id: 2, alternativeName: "something else" }),
     }
 
-    expect(nodeMatchesSearch(branch, "branch", "matching")).toEqual(true)
+    expect(nodeMatchesFilter(branch, "branch", "matching")).toEqual(true)
   })
 
   test("returns false for a branch when no child matches", () => {
@@ -150,6 +150,73 @@ describe("nodeMatchesSearch", () => {
       b: makeLeaf({ id: 2, alternativeName: "beta" }),
     }
 
-    expect(nodeMatchesSearch(branch, "branch", "gamma")).toEqual(false)
+    expect(nodeMatchesFilter(branch, "branch", "gamma")).toEqual(false)
+  })
+
+  test("hides a passing leaf when failed-only is on", () => {
+    const leaf = makeLeaf({ success: true, ignored: false })
+
+    expect(nodeMatchesFilter(leaf, "passing", "", true)).toEqual(false)
+  })
+
+  test("shows a failing leaf when failed-only is on", () => {
+    const leaf = makeLeaf({ success: false, ignored: false })
+
+    expect(nodeMatchesFilter(leaf, "failing", "", true)).toEqual(true)
+  })
+
+  test("hides an ignored leaf when failed-only is on", () => {
+    const leaf = makeLeaf({ success: false, ignored: true })
+
+    expect(nodeMatchesFilter(leaf, "ignored", "", true)).toEqual(false)
+  })
+
+  test("failed-only keeps a passing leaf matching the query hidden", () => {
+    const leaf = makeLeaf({ alternativeName: "Get User", success: true })
+
+    expect(nodeMatchesFilter(leaf, "get-user", "get", true)).toEqual(false)
+  })
+
+  test("failed-only keeps a failing leaf matching the query visible", () => {
+    const leaf = makeLeaf({ alternativeName: "Get User", success: false })
+
+    expect(nodeMatchesFilter(leaf, "get-user", "get", true)).toEqual(true)
+  })
+
+  test("returns false for a branch with only passing children when failed-only is on", () => {
+    const branch: SquitResultNode = {
+      a: makeLeaf({ id: 1, success: true }),
+      b: makeLeaf({ id: 2, success: true }),
+    }
+
+    expect(nodeMatchesFilter(branch, "branch", "", true)).toEqual(false)
+  })
+
+  test("returns true for a branch with any failing child when failed-only is on", () => {
+    const branch: SquitResultNode = {
+      a: makeLeaf({ id: 1, success: true }),
+      b: makeLeaf({ id: 2, success: false }),
+    }
+
+    expect(nodeMatchesFilter(branch, "branch", "", true)).toEqual(true)
+  })
+
+  test("failed-only requires the failing child to also match the query", () => {
+    const branch: SquitResultNode = {
+      failing: makeLeaf({ id: 1, alternativeName: "Create Order", success: false }),
+      passing: makeLeaf({ id: 2, alternativeName: "Get User", success: true }),
+    }
+
+    expect(nodeMatchesFilter(branch, "branch", "get user", true)).toEqual(false)
+    expect(nodeMatchesFilter(branch, "branch", "create", true)).toEqual(true)
+  })
+
+  test("returns true for a branch matching the query when failed-only is off", () => {
+    const branch: SquitResultNode = {
+      a: makeLeaf({ id: 1, alternativeName: "alpha" }),
+      b: makeLeaf({ id: 2, alternativeName: "beta" }),
+    }
+
+    expect(nodeMatchesFilter(branch, "branch", "alpha", false)).toEqual(true)
   })
 })

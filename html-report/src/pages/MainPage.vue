@@ -10,6 +10,11 @@
     <div class="mb-4 flex flex-wrap items-center gap-4">
       <div class="mr-auto flex flex-wrap items-center gap-4">
         <search-input v-model="searchQuery" />
+
+        <label class="flex cursor-pointer items-center gap-2 text-sm text-gray-600 select-none dark:text-gray-400">
+          <toggle v-model="failedOnly" aria-label="Failed only" />
+          Failed only
+        </label>
       </div>
 
       <icon-button size="sm" title="Expand all" @click.stop="expand">
@@ -28,10 +33,11 @@
         :name="name"
         :node="node"
         :search-query="searchQuery"
+        :failed-only="failedOnly"
       />
 
       <div
-        v-if="searchQuery && !hasSearchResults"
+        v-if="(searchQuery || failedOnly) && !hasSearchResults"
         class="flex flex-col items-center gap-2 py-12 text-gray-400 dark:text-gray-500"
       >
         <Search class="h-8 w-8" aria-hidden="true" />
@@ -51,12 +57,13 @@ import IconButton from "../components/IconButton.vue"
 import OverviewStats from "../components/OverviewStats.vue"
 import ResultTree from "../components/ResultTree.vue"
 import SearchInput from "../components/SearchInput.vue"
-import { useSearch } from "../composables/useSearch.ts"
+import Toggle from "../components/Toggle.vue"
+import { useFilters } from "../composables/useFilters.ts"
 import { useSquitData } from "../composables/useSquitData.ts"
 import { getResultNodeStats } from "../data.ts"
 
 const data = useSquitData()
-const { searchQuery, hasSearchResults } = useSearch(data.results)
+const { searchQuery, failedOnly, hasSearchResults } = useFilters(data.results)
 
 const summary = computed(() => {
   const { success, failed } = getResultNodeStats(data.results)

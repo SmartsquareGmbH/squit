@@ -96,16 +96,22 @@ function findSquitResultRec(
   }
 }
 
-export function nodeMatchesSearch(node: SquitResultNode | SquitResult, name: string, query: string): boolean {
-  if (!query) return true
-
-  const q = query.toLowerCase()
+export function nodeMatchesFilter(
+  node: SquitResultNode | SquitResult,
+  name: string,
+  query: string,
+  failedOnly = false,
+): boolean {
+  if (!query && !failedOnly) return true
 
   if (isSquitResult(node)) {
-    return (node.alternativeName || name).toLowerCase().includes(q)
+    const matchesName = query ? (node.alternativeName || name).toLowerCase().includes(query.toLowerCase()) : true
+    const isFailed = !node.success && !node.ignored
+
+    return matchesName && (!failedOnly || isFailed)
   }
 
-  return Object.entries(node).some(([childName, child]) => nodeMatchesSearch(child, childName, q))
+  return Object.entries(node).some(([childName, child]) => nodeMatchesFilter(child, childName, query, failedOnly))
 }
 
 export function isSquitResult(node: SquitResultNode | SquitResult): node is SquitResult {
