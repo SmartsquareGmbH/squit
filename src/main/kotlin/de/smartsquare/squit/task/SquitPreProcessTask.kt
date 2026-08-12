@@ -66,7 +66,7 @@ abstract class SquitPreProcessTask @Inject constructor(private val workerExecuto
      * If all excluded or ignored tests should be run nevertheless.
      */
     @get:Input
-    val shouldUnexclude: Provider<Boolean> = project.provider { project.properties.containsKey("unexclude") }
+    val shouldUnexclude: Provider<Boolean> = project.provider { project.hasProperty("unexclude") }
 
     /**
      * The properties of the project parsed into a [Config] object.
@@ -75,9 +75,8 @@ abstract class SquitPreProcessTask @Inject constructor(private val workerExecuto
     val projectConfig: Provider<Config> = project.provider {
         ConfigValueFactory
             .fromMap(
-                project.properties
-                    .filterKeys { it.startsWith("squit.") }
-                    .filterValues { it != null }
+                project.providers
+                    .gradlePropertiesPrefixedBy("squit.").get()
                     .mapKeys { (key, _) -> key.replaceFirst("squit.", "") },
             )
             .toConfig()

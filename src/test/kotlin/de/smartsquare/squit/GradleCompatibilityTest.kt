@@ -29,7 +29,6 @@ class GradleCompatibilityTest {
             if (JavaVersion.current() < JavaVersion.VERSION_20) {
                 result += Arguments.of(GradleVersion.version("9.0.0"))
                 result += Arguments.of(GradleVersion.version("8.0.2"))
-                result += Arguments.of(GradleVersion.version("7.5.1"))
             }
 
             return result.stream()
@@ -71,8 +70,8 @@ class GradleCompatibilityTest {
 
     @Test
     fun `outdated version`() {
-        val result = gradleRunner(project, emptyList(), GradleVersion.version("7.4")).buildAndFail()
+        val result = gradleRunner(project, emptyList(), GradleVersion.version("7.6")).buildAndFail()
 
-        result.output shouldContain "Minimum supported Gradle version is 7.5. Current version is 7.4."
+        result.output shouldContain "Minimum supported Gradle version is 8.0. Current version is 7.6."
     }
 }

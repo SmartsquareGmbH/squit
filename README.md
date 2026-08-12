@@ -30,7 +30,7 @@ plugins {
 }
 ```
 
-The minimum supported Gradle version is `7.5`.
+The minimum supported Gradle version is `8.0`.
 
 ## Project structure
 
