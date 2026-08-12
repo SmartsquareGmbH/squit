@@ -7,7 +7,6 @@ kotlinter = "5.7.0"
 jacoco = "0.8.14"
 jacoco-testkit = "1.0.12"
 publish-plugin = "2.1.1"
-versions-plugin = "0.61.0"
 gradle = "9.4.1"
 
 jaxen = "2.0.6"
@@ -36,7 +35,6 @@ detekt = { id = "dev.detekt", version.ref = "detekt" }
 kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
 jacoco-testkit = { id = "pl.droidsonroids.jacoco.testkit", version.ref = "jacoco-testkit" }
 publish = { id = "com.gradle.plugin-publish", version.ref = "publish-plugin" }
-versions = { id = "com.github.ben-manes.versions", version.ref = "versions-plugin" }
 
 [libraries]
 dom4j = { module = "org.dom4j:dom4j", version.ref = "dom4j" }

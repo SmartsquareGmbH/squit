@@ -11,7 +11,6 @@ plugins {
     alias(libs.plugins.kotlinter)
     alias(libs.plugins.jacoco.testkit)
     alias(libs.plugins.publish)
-    alias(libs.plugins.versions)
     jacoco
 }
 
