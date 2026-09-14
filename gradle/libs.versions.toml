@@ -1,12 +1,12 @@
 [versions]
-kotlin = "2.4.10"
+kotlin = "2.4.20"
 node = "7.1.0"
 dokka = "2.2.0"
 detekt = "2.0.0-alpha.6"
 kotlinter = "5.7.0"
 jacoco = "0.8.14"
 jacoco-testkit = "1.0.12"
-publish-plugin = "2.1.1"
+publish-plugin = "2.2.1"
 gradle = "9.4.1"
 
 jaxen = "2.0.6"
