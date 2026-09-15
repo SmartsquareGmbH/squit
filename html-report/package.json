@@ -15,7 +15,7 @@
     "verify": "pnpm format:check && pnpm lint && pnpm check && pnpm test"
   },
   "dependencies": {
-    "@formatjs/intl-durationformat": "^0.10.8",
+    "@formatjs/intl-durationformat": "^0.11.0",
     "@lucide/vue": "^1.43.0",
     "@vueuse/core": "^14.3.0",
     "dompurify": "^3.4.15",
@@ -31,17 +31,17 @@
     "@vitest/coverage-v8": "5.0.0",
     "@vue/test-utils": "2.5.0",
     "@vue/tsconfig": "0.9.1",
-    "happy-dom": "20.14.3",
+    "happy-dom": "20.14.5",
     "oxfmt": "0.67.0",
     "oxlint": "1.82.0",
     "oxlint-tsgolint": "7.0.2001",
     "tailwindcss": "4.3.3",
     "typescript": "npm:typescript-native-bridge@6.0.3-bridge.16.tsgo.7.0.2",
-    "vite": "8.2.2",
+    "vite": "8.3.0",
     "vite-plugin-singlefile": "2.3.3",
     "vite-plugin-vue-devtools": "8.2.1",
     "vitest": "5.0.0",
     "vue-tsc": "3.3.11"
   },
-  "packageManager": "pnpm@12.4.0+sha512.37536c26ed40ab4134b6511e09f6b27f3ebb45687468f2406ca3805279a4e5ca158c1931350ad9774d6ab2108d71b3dbaeb39943159294375e4d053e8e05685c"
+  "packageManager": "pnpm@12.4.1"
 }
