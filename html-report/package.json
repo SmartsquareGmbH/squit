@@ -28,7 +28,7 @@
     "@tailwindcss/typography": "0.5.20",
     "@tailwindcss/vite": "4.3.3",
     "@vitejs/plugin-vue": "6.0.9",
-    "@vitest/coverage-v8": "5.0.0",
+    "@vitest/coverage-v8": "5.0.1",
     "@vue/test-utils": "2.5.0",
     "@vue/tsconfig": "0.9.1",
     "happy-dom": "20.14.5",
@@ -40,7 +40,7 @@
     "vite": "8.3.0",
     "vite-plugin-singlefile": "2.3.3",
     "vite-plugin-vue-devtools": "8.2.1",
-    "vitest": "5.0.0",
+    "vitest": "5.0.1",
     "vue-tsc": "3.3.11"
   },
   "packageManager": "pnpm@12.4.2+sha512.08adc6613180275c7c9edada39dcf08c9c61ad4e7eaf330a4f3461f102b0f907423454d117f98e72d47fef0616070644d7bffc973a6a57f5090a6d7c368b07c9"
