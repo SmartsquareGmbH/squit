@@ -31,7 +31,7 @@
     "@vitest/coverage-v8": "5.0.5",
     "@vue/test-utils": "2.5.1",
     "@vue/tsconfig": "0.9.1",
-    "happy-dom": "20.14.6",
+    "happy-dom": "21.0.4",
     "oxfmt": "0.73.0",
     "oxlint": "1.88.0",
     "oxlint-tsgolint": "7.0.2004",
