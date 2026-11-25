@@ -42,8 +42,7 @@
       >
         <Search class="h-8 w-8" aria-hidden="true" />
         <p class="text-sm">
-          No results for "<span class="font-medium text-gray-600 dark:text-gray-400">{{ searchQuery }}</span
-          >"
+          No results for "<span class="font-medium text-gray-600 dark:text-gray-400">{{ searchQuery }}</span>"
         </p>
       </div>
     </div>
